@@ -164,7 +164,7 @@ export function CartDrawer() {
                   className={cn(
                     'inline-flex items-center justify-center',
                     'px-8 py-3',
-                    'bg-luxe-charcoal text-text-inverse',
+                    'bg-luxe-charcoal !text-white',
                     'font-sans text-body-sm uppercase tracking-luxe font-medium',
                     'transition-all duration-350 ease-luxe',
                     'hover:bg-hermes-500'

@@ -1,10 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
-import { MapPin, User, Phone, Building2, Mail } from 'lucide-react';
+import { MapPin, User, Phone, Building2, Mail, Home, Plus, Check } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { cn } from '@/lib/utils';
+
+/**
+ * Mock saved addresses
+ */
+interface SavedAddress {
+  id: string;
+  label: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  addressLine2?: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  isDefault?: boolean;
+}
+
+const SAVED_ADDRESSES: SavedAddress[] = [
+  {
+    id: 'addr-1',
+    label: 'Domicile',
+    firstName: 'Marie',
+    lastName: 'Dupont',
+    email: 'marie.dupont@email.com',
+    phone: '+33 6 12 34 56 78',
+    address: '15 Avenue des Champs-Elysees',
+    addressLine2: 'Appartement 4B',
+    city: 'Paris',
+    postalCode: '75008',
+    country: 'France',
+    isDefault: true,
+  },
+  {
+    id: 'addr-2',
+    label: 'Bureau',
+    firstName: 'Marie',
+    lastName: 'Dupont',
+    email: 'marie.dupont@work.com',
+    phone: '+33 1 42 68 53 00',
+    address: '25 Rue de la Paix',
+    addressLine2: '3eme etage',
+    city: 'Paris',
+    postalCode: '75002',
+    country: 'France',
+  },
+];
 
 /**
  * Zod schema for shipping address validation
@@ -103,6 +151,59 @@ export function ShippingForm({
     ...initialData,
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  // 'new' for new address, or address id for saved address
+  const [selectedAddressId, setSelectedAddressId] = useState<string | 'new'>(
+    SAVED_ADDRESSES.find((a) => a.isDefault)?.id || 'new'
+  );
+
+  /**
+   * Initialize form data with default saved address on mount
+   */
+  useEffect(() => {
+    const defaultAddress = SAVED_ADDRESSES.find((a) => a.isDefault);
+    if (defaultAddress && !initialData) {
+      setFormData({
+        firstName: defaultAddress.firstName,
+        lastName: defaultAddress.lastName,
+        email: defaultAddress.email,
+        phone: defaultAddress.phone,
+        address: defaultAddress.address,
+        addressLine2: defaultAddress.addressLine2 || '',
+        city: defaultAddress.city,
+        postalCode: defaultAddress.postalCode,
+        country: defaultAddress.country,
+      });
+    }
+  }, [initialData]);
+
+  /**
+   * Handle saved address selection
+   */
+  const handleAddressSelect = (addressId: string | 'new') => {
+    setSelectedAddressId(addressId);
+    setErrors({});
+
+    if (addressId === 'new') {
+      // Reset to empty form
+      setFormData(initialFormState);
+    } else {
+      // Fill form with saved address data
+      const savedAddress = SAVED_ADDRESSES.find((a) => a.id === addressId);
+      if (savedAddress) {
+        setFormData({
+          firstName: savedAddress.firstName,
+          lastName: savedAddress.lastName,
+          email: savedAddress.email,
+          phone: savedAddress.phone,
+          address: savedAddress.address,
+          addressLine2: savedAddress.addressLine2 || '',
+          city: savedAddress.city,
+          postalCode: savedAddress.postalCode,
+          country: savedAddress.country,
+        });
+      }
+    }
+  };
 
   /**
    * Handle input change
@@ -168,186 +269,309 @@ export function ShippingForm({
         </p>
       </div>
 
-      {/* General error message */}
-      {errors.general && (
-        <div
-          role="alert"
-          className={cn(
-            'p-4 border border-red-500/30 bg-red-500/10',
-            'text-red-600 text-sm text-center'
-          )}
-        >
-          {errors.general}
+      {/* Saved addresses selection */}
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-text-primary">
+          Choisir une adresse
+        </p>
+        <div className="grid grid-cols-1 gap-3">
+          {/* Saved address cards */}
+          {SAVED_ADDRESSES.map((addr) => (
+            <button
+              key={addr.id}
+              type="button"
+              onClick={() => handleAddressSelect(addr.id)}
+              disabled={isLoading}
+              className={cn(
+                'w-full p-4 text-left',
+                'border transition-all duration-200',
+                'flex items-start gap-4',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
+                selectedAddressId === addr.id
+                  ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
+                  : 'border-border-light bg-white hover:border-hermes-500/50'
+              )}
+            >
+              {/* Selection indicator */}
+              <div
+                className={cn(
+                  'flex-shrink-0 w-5 h-5 mt-0.5',
+                  'rounded-full border-2',
+                  'flex items-center justify-center',
+                  'transition-colors duration-200',
+                  selectedAddressId === addr.id
+                    ? 'border-hermes-500 bg-hermes-500'
+                    : 'border-border-medium bg-white'
+                )}
+              >
+                {selectedAddressId === addr.id && (
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                )}
+              </div>
+
+              {/* Address content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Home className="w-4 h-4 text-hermes-500" />
+                  <span className="font-medium text-text-primary">
+                    {addr.label}
+                  </span>
+                  {addr.isDefault && (
+                    <span className="text-xs px-2 py-0.5 bg-hermes-500/10 text-hermes-600 rounded-full">
+                      Par defaut
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-text-muted truncate">
+                  {addr.firstName} {addr.lastName}
+                </p>
+                <p className="text-sm text-text-muted truncate">
+                  {addr.address}
+                  {addr.addressLine2 && `, ${addr.addressLine2}`}
+                </p>
+                <p className="text-sm text-text-muted">
+                  {addr.postalCode} {addr.city}, {addr.country}
+                </p>
+              </div>
+            </button>
+          ))}
+
+          {/* New address option */}
+          <button
+            type="button"
+            onClick={() => handleAddressSelect('new')}
+            disabled={isLoading}
+            className={cn(
+              'w-full p-4 text-left',
+              'border transition-all duration-200',
+              'flex items-center gap-4',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              selectedAddressId === 'new'
+                ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
+                : 'border-border-light bg-white hover:border-hermes-500/50'
+            )}
+          >
+            {/* Selection indicator */}
+            <div
+              className={cn(
+                'flex-shrink-0 w-5 h-5',
+                'rounded-full border-2',
+                'flex items-center justify-center',
+                'transition-colors duration-200',
+                selectedAddressId === 'new'
+                  ? 'border-hermes-500 bg-hermes-500'
+                  : 'border-border-medium bg-white'
+              )}
+            >
+              {selectedAddressId === 'new' && (
+                <Check className="w-3 h-3 text-white" strokeWidth={3} />
+              )}
+            </div>
+
+            {/* New address content */}
+            <div className="flex items-center gap-2">
+              <Plus className="w-4 h-4 text-hermes-500" />
+              <span className="font-medium text-text-primary">
+                Utiliser une nouvelle adresse
+              </span>
+            </div>
+          </button>
         </div>
+      </div>
+
+      {/* New address form - only shown when 'new' is selected */}
+      {selectedAddressId === 'new' && (
+        <>
+          {/* Divider */}
+          <div className="border-t border-border-light" />
+
+          {/* General error message */}
+          {errors.general && (
+            <div
+              role="alert"
+              className={cn(
+                'p-4 border border-red-500/30 bg-red-500/10',
+                'text-red-600 text-sm text-center'
+              )}
+            >
+              {errors.general}
+            </div>
+          )}
+
+          {/* Form title */}
+          <p className="text-sm font-medium text-text-primary">
+            Nouvelle adresse
+          </p>
+
+          {/* Name fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Prenom"
+              name="firstName"
+              type="text"
+              placeholder="Votre prenom"
+              value={formData.firstName}
+              onChange={handleChange}
+              error={errors.firstName}
+              disabled={isLoading}
+              autoComplete="given-name"
+              startIcon={<User className="h-5 w-5" />}
+              containerClassName="bg-white"
+              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            />
+
+            <Input
+              label="Nom"
+              name="lastName"
+              type="text"
+              placeholder="Votre nom"
+              value={formData.lastName}
+              onChange={handleChange}
+              error={errors.lastName}
+              disabled={isLoading}
+              autoComplete="family-name"
+              startIcon={<User className="h-5 w-5" />}
+              containerClassName="bg-white"
+              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            />
+          </div>
+
+          {/* Contact fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Email"
+              name="email"
+              type="email"
+              placeholder="votre@email.com"
+              value={formData.email}
+              onChange={handleChange}
+              error={errors.email}
+              disabled={isLoading}
+              autoComplete="email"
+              startIcon={<Mail className="h-5 w-5" />}
+              containerClassName="bg-white"
+              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            />
+
+            <Input
+              label="Telephone"
+              name="phone"
+              type="tel"
+              placeholder="+33 6 12 34 56 78"
+              value={formData.phone}
+              onChange={handleChange}
+              error={errors.phone}
+              disabled={isLoading}
+              autoComplete="tel"
+              startIcon={<Phone className="h-5 w-5" />}
+              containerClassName="bg-white"
+              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            />
+          </div>
+
+          {/* Address field */}
+          <Input
+            label="Adresse"
+            name="address"
+            type="text"
+            placeholder="Numero et nom de rue"
+            value={formData.address}
+            onChange={handleChange}
+            error={errors.address}
+            disabled={isLoading}
+            autoComplete="address-line1"
+            startIcon={<MapPin className="h-5 w-5" />}
+            containerClassName="bg-white"
+            className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+          />
+
+          {/* Address line 2 (optional) */}
+          <Input
+            label="Complement d'adresse"
+            name="addressLine2"
+            type="text"
+            placeholder="Appartement, batiment, etage... (optionnel)"
+            value={formData.addressLine2}
+            onChange={handleChange}
+            error={errors.addressLine2}
+            disabled={isLoading}
+            autoComplete="address-line2"
+            startIcon={<Building2 className="h-5 w-5" />}
+            containerClassName="bg-white"
+            className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+          />
+
+          {/* City and postal code */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Ville"
+              name="city"
+              type="text"
+              placeholder="Votre ville"
+              value={formData.city}
+              onChange={handleChange}
+              error={errors.city}
+              disabled={isLoading}
+              autoComplete="address-level2"
+              containerClassName="bg-white"
+              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            />
+
+            <Input
+              label="Code postal"
+              name="postalCode"
+              type="text"
+              placeholder="75001"
+              value={formData.postalCode}
+              onChange={handleChange}
+              error={errors.postalCode}
+              disabled={isLoading}
+              autoComplete="postal-code"
+              containerClassName="bg-white"
+              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            />
+          </div>
+
+          {/* Country selection */}
+          <div className="relative">
+            <label
+              htmlFor="country"
+              className={cn(
+                'block mb-2',
+                'font-sans text-sm font-medium tracking-wide',
+                'text-text-primary'
+              )}
+            >
+              Pays
+            </label>
+            <select
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              disabled={isLoading}
+              className={cn(
+                'w-full px-4 py-3',
+                'bg-white text-text-primary',
+                'border border-border-light',
+                'focus:outline-none focus:border-hermes-500 focus:ring-1 focus:ring-hermes-500/30',
+                'transition-all duration-300',
+                'disabled:bg-background-beige disabled:cursor-not-allowed',
+                errors.country && 'border-red-500'
+              )}
+            >
+              <option value="France">France</option>
+              <option value="Belgique">Belgique</option>
+              <option value="Suisse">Suisse</option>
+              <option value="Luxembourg">Luxembourg</option>
+              <option value="Monaco">Monaco</option>
+            </select>
+            {errors.country && (
+              <p className="mt-2 text-sm text-red-600">{errors.country}</p>
+            )}
+          </div>
+        </>
       )}
-
-      {/* Name fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Prenom"
-          name="firstName"
-          type="text"
-          placeholder="Votre prenom"
-          value={formData.firstName}
-          onChange={handleChange}
-          error={errors.firstName}
-          disabled={isLoading}
-          autoComplete="given-name"
-          startIcon={<User className="h-5 w-5" />}
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-
-        <Input
-          label="Nom"
-          name="lastName"
-          type="text"
-          placeholder="Votre nom"
-          value={formData.lastName}
-          onChange={handleChange}
-          error={errors.lastName}
-          disabled={isLoading}
-          autoComplete="family-name"
-          startIcon={<User className="h-5 w-5" />}
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-      </div>
-
-      {/* Contact fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Email"
-          name="email"
-          type="email"
-          placeholder="votre@email.com"
-          value={formData.email}
-          onChange={handleChange}
-          error={errors.email}
-          disabled={isLoading}
-          autoComplete="email"
-          startIcon={<Mail className="h-5 w-5" />}
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-
-        <Input
-          label="Telephone"
-          name="phone"
-          type="tel"
-          placeholder="+33 6 12 34 56 78"
-          value={formData.phone}
-          onChange={handleChange}
-          error={errors.phone}
-          disabled={isLoading}
-          autoComplete="tel"
-          startIcon={<Phone className="h-5 w-5" />}
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-      </div>
-
-      {/* Address field */}
-      <Input
-        label="Adresse"
-        name="address"
-        type="text"
-        placeholder="Numero et nom de rue"
-        value={formData.address}
-        onChange={handleChange}
-        error={errors.address}
-        disabled={isLoading}
-        autoComplete="address-line1"
-        startIcon={<MapPin className="h-5 w-5" />}
-        containerClassName="bg-white"
-        className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-      />
-
-      {/* Address line 2 (optional) */}
-      <Input
-        label="Complement d'adresse"
-        name="addressLine2"
-        type="text"
-        placeholder="Appartement, batiment, etage... (optionnel)"
-        value={formData.addressLine2}
-        onChange={handleChange}
-        error={errors.addressLine2}
-        disabled={isLoading}
-        autoComplete="address-line2"
-        startIcon={<Building2 className="h-5 w-5" />}
-        containerClassName="bg-white"
-        className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-      />
-
-      {/* City and postal code */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Ville"
-          name="city"
-          type="text"
-          placeholder="Votre ville"
-          value={formData.city}
-          onChange={handleChange}
-          error={errors.city}
-          disabled={isLoading}
-          autoComplete="address-level2"
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-
-        <Input
-          label="Code postal"
-          name="postalCode"
-          type="text"
-          placeholder="75001"
-          value={formData.postalCode}
-          onChange={handleChange}
-          error={errors.postalCode}
-          disabled={isLoading}
-          autoComplete="postal-code"
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-      </div>
-
-      {/* Country selection */}
-      <div className="relative">
-        <label
-          htmlFor="country"
-          className={cn(
-            'block mb-2',
-            'font-sans text-sm font-medium tracking-wide',
-            'text-text-primary'
-          )}
-        >
-          Pays
-        </label>
-        <select
-          id="country"
-          name="country"
-          value={formData.country}
-          onChange={handleChange}
-          disabled={isLoading}
-          className={cn(
-            'w-full px-4 py-3',
-            'bg-white text-text-primary',
-            'border border-border-light',
-            'focus:outline-none focus:border-hermes-500 focus:ring-1 focus:ring-hermes-500/30',
-            'transition-all duration-300',
-            'disabled:bg-background-beige disabled:cursor-not-allowed',
-            errors.country && 'border-red-500'
-          )}
-        >
-          <option value="France">France</option>
-          <option value="Belgique">Belgique</option>
-          <option value="Suisse">Suisse</option>
-          <option value="Luxembourg">Luxembourg</option>
-          <option value="Monaco">Monaco</option>
-        </select>
-        {errors.country && (
-          <p className="mt-2 text-sm text-red-600">{errors.country}</p>
-        )}
-      </div>
 
       {/* Submit button */}
       <div className="pt-4">
@@ -356,7 +580,7 @@ export function ShippingForm({
           variant="primary"
           size="lg"
           isLoading={isLoading}
-          className="w-full uppercase tracking-wider"
+          className="w-full uppercase tracking-wider border border-luxe-charcoal hover:bg-luxe-charcoal hover:text-white transition-all duration-300"
         >
           Continuer vers le paiement
         </Button>

@@ -87,7 +87,7 @@ export function EmptyCart() {
           className={cn(
             'group inline-flex items-center gap-3',
             'px-8 py-4',
-            'bg-luxe-charcoal text-text-inverse',
+            'bg-luxe-charcoal !text-white',
             'font-sans text-body-sm uppercase tracking-luxe font-medium',
             'transition-all duration-350 ease-luxe',
             'hover:bg-hermes-500',

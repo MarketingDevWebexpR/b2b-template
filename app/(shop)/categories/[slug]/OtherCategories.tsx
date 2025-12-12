@@ -46,10 +46,10 @@ interface CategoryCardProps {
  */
 function CategoryCard({ category, index }: CategoryCardProps) {
   return (
-    <motion.div variants={itemVariants}>
+    <motion.div variants={itemVariants} className="h-full">
       <Link
         href={`/categories/${category.slug}`}
-        className="group relative block border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant lg:p-8"
+        className="group relative flex h-full flex-col border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant lg:p-8"
         aria-label={`Decouvrir la collection ${category.name}`}
       >
         {/* Index number */}
@@ -58,7 +58,7 @@ function CategoryCard({ category, index }: CategoryCardProps) {
         </span>
 
         {/* Category Name */}
-        <h3 className="font-serif text-heading-4 text-text-primary transition-colors duration-350 group-hover:text-hermes-600 lg:text-heading-3">
+        <h3 className="pr-12 font-serif text-heading-4 text-text-primary transition-colors duration-350 group-hover:text-hermes-600 lg:pr-14 lg:text-heading-3">
           {category.name}
         </h3>
 
@@ -67,8 +67,8 @@ function CategoryCard({ category, index }: CategoryCardProps) {
           {category.description}
         </p>
 
-        {/* Bottom row: product count + arrow */}
-        <div className="mt-4 flex items-center justify-between lg:mt-6">
+        {/* Bottom row: product count + arrow - pushed to bottom */}
+        <div className="mt-auto flex items-center justify-between pt-4 lg:pt-6">
           <span className="font-sans text-caption uppercase tracking-luxe text-text-muted">
             {category.productCount} pieces
           </span>
