@@ -1,47 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { z } from 'zod';
-import { CreditCard, Calendar, Lock, User } from 'lucide-react';
-import { Button, Input } from '@/components/ui';
+import { useState, useEffect } from 'react';
+import { Elements } from '@stripe/react-stripe-js';
+import { Clock, CreditCard, Lock, Check, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
+import { getStripe } from '@/lib/stripe';
+import { StripePaymentForm } from './StripePaymentForm';
 
 /**
- * Zod schema for payment form validation
- * Note: This is a mock payment form - no real payment processing
+ * Payment method type
  */
-const paymentSchema = z.object({
-  cardName: z
-    .string()
-    .min(2, 'Veuillez entrer le nom du titulaire'),
-  cardNumber: z
-    .string()
-    .min(16, 'Numero de carte invalide')
-    .max(19, 'Numero de carte invalide')
-    .regex(/^[0-9\s]+$/, 'Numero de carte invalide'),
-  expiryDate: z
-    .string()
-    .regex(/^(0[1-9]|1[0-2])\/([0-9]{2})$/, 'Format invalide (MM/AA)'),
-  cvv: z
-    .string()
-    .length(3, 'CVV invalide')
-    .regex(/^[0-9]+$/, 'CVV invalide'),
-});
+type PaymentMethod = 'deferred' | 'immediate';
 
 /**
- * Payment form data type
+ * Payment form data type (simplified for deferred payments)
  */
-export type PaymentFormData = z.infer<typeof paymentSchema>;
-
-/**
- * Form validation errors type
- */
-interface FormErrors {
-  cardName?: string;
-  cardNumber?: string;
-  expiryDate?: string;
-  cvv?: string;
-  general?: string;
+export interface PaymentFormData {
+  paymentMethod: PaymentMethod;
+  stripePaymentIntentId?: string;
 }
 
 /**
@@ -54,275 +31,329 @@ interface PaymentFormProps {
   onBack: () => void;
   /** Whether form submission is in progress */
   isLoading?: boolean;
+  /** Total amount in EUR (for Stripe) */
+  totalAmount?: number;
   /** Optional additional CSS classes */
   className?: string;
 }
 
 /**
- * Initial empty form state
- */
-const initialFormState: PaymentFormData = {
-  cardName: '',
-  cardNumber: '',
-  expiryDate: '',
-  cvv: '',
-};
-
-/**
- * Format card number with spaces every 4 digits
- */
-function formatCardNumber(value: string): string {
-  const digits = value.replace(/\D/g, '');
-  const groups = digits.match(/.{1,4}/g);
-  return groups ? groups.join(' ').slice(0, 19) : '';
-}
-
-/**
- * Format expiry date as MM/YY
- */
-function formatExpiryDate(value: string): string {
-  const digits = value.replace(/\D/g, '');
-  if (digits.length >= 2) {
-    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}`;
-  }
-  return digits;
-}
-
-/**
  * PaymentForm Component
- * Mock payment form for UI demonstration only
- * Hermes-inspired luxury styling with gold accents
+ * Payment method selection with Stripe integration
+ * Hermes-inspired luxury styling
  */
 export function PaymentForm({
   onSubmit,
   onBack,
   isLoading = false,
+  totalAmount = 0,
   className,
 }: PaymentFormProps) {
-  const [formData, setFormData] = useState<PaymentFormData>(initialFormState);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('immediate');
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [stripeError, setStripeError] = useState<string | null>(null);
+  const [isLoadingStripe, setIsLoadingStripe] = useState(false);
 
-  /**
-   * Handle input change with formatting
-   */
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    let formattedValue = value;
+  // Create PaymentIntent when immediate payment is selected
+  useEffect(() => {
+    if (paymentMethod === 'immediate' && totalAmount > 0) {
+      setIsLoadingStripe(true);
+      setStripeError(null);
 
-    // Apply formatting based on field
-    if (name === 'cardNumber') {
-      formattedValue = formatCardNumber(value);
-    } else if (name === 'expiryDate') {
-      formattedValue = formatExpiryDate(value);
-    } else if (name === 'cvv') {
-      formattedValue = value.replace(/\D/g, '').slice(0, 3);
-    }
-
-    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
-
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
-
-  /**
-   * Validate form data
-   */
-  const validateForm = (): boolean => {
-    try {
-      paymentSchema.parse(formData);
-      setErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: FormErrors = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            newErrors[err.path[0] as keyof FormErrors] = err.message;
+      fetch('/api/stripe/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: Math.round(totalAmount * 100), // Convert to cents
+          currency: 'eur',
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            setStripeError(data.error);
+          } else {
+            setClientSecret(data.clientSecret);
           }
+        })
+        .catch((err) => {
+          console.error('Error creating payment intent:', err);
+          setStripeError('Erreur lors de la connexion au service de paiement');
+        })
+        .finally(() => {
+          setIsLoadingStripe(false);
         });
-        setErrors(newErrors);
-      }
-      return false;
     }
+  }, [paymentMethod, totalAmount]);
+
+  /**
+   * Handle deferred payment submission
+   */
+  const handleDeferredSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({ paymentMethod: 'deferred' });
   };
 
   /**
-   * Handle form submission
+   * Handle Stripe payment success
    */
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStripeSuccess = () => {
+    onSubmit({ paymentMethod: 'immediate' });
+  };
 
-    if (!validateForm()) return;
-
-    onSubmit(formData);
+  /**
+   * Handle Stripe payment error
+   */
+  const handleStripeError = (error: string) => {
+    setStripeError(error);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={cn('space-y-6', className)}
-      noValidate
-    >
+    <div className={cn('space-y-6', className)}>
       {/* Section title */}
       <div className="mb-8">
         <h2 className="font-serif text-xl md:text-2xl text-text-primary mb-2">
-          Informations de paiement
+          Mode de paiement
         </h2>
         <p className="text-sm text-text-muted">
-          Vos donnees de paiement sont securisees et chiffrees.
+          Choisissez votre methode de paiement preferee.
         </p>
       </div>
 
-      {/* Demo notice */}
-      <div
-        className={cn(
-          'p-4 border border-hermes-500/30 bg-hermes-500/5',
-          'text-sm'
-        )}
-      >
-        <p className="text-hermes-700 font-medium mb-1">
-          Mode demonstration
-        </p>
-        <p className="text-text-muted">
-          Ceci est un formulaire de demonstration. Aucun paiement reel ne sera effectue.
-          Vous pouvez utiliser n'importe quelle information.
-        </p>
-      </div>
-
-      {/* General error message */}
-      {errors.general && (
-        <div
-          role="alert"
+      {/* Payment method selection */}
+      <div className="space-y-3">
+        {/* Deferred payment option */}
+        <button
+          type="button"
+          onClick={() => setPaymentMethod('deferred')}
+          disabled={isLoading}
           className={cn(
-            'p-4 border border-red-500/30 bg-red-500/10',
-            'text-red-600 text-sm text-center'
+            'w-full p-5 text-left',
+            'border transition-all duration-200',
+            'flex items-start gap-4',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            paymentMethod === 'deferred'
+              ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
+              : 'border-border-light bg-white hover:border-hermes-500/50'
           )}
         >
-          {errors.general}
+          {/* Selection indicator */}
+          <div
+            className={cn(
+              'flex-shrink-0 w-5 h-5 mt-0.5',
+              'rounded-full border-2',
+              'flex items-center justify-center',
+              'transition-colors duration-200',
+              paymentMethod === 'deferred'
+                ? 'border-hermes-500 bg-hermes-500'
+                : 'border-border-medium bg-white'
+            )}
+          >
+            {paymentMethod === 'deferred' && (
+              <Check className="w-3 h-3 text-white" strokeWidth={3} />
+            )}
+          </div>
+
+          {/* Option content */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="w-5 h-5 text-hermes-500" />
+              <span className="font-medium text-text-primary text-lg">
+                Paiement a 30 jours
+              </span>
+            </div>
+            <p className="text-sm text-text-muted">
+              Recevez votre commande maintenant et payez dans 30 jours.
+              Aucun frais supplementaire.
+            </p>
+          </div>
+        </button>
+
+        {/* Immediate payment option */}
+        <button
+          type="button"
+          onClick={() => setPaymentMethod('immediate')}
+          disabled={isLoading}
+          className={cn(
+            'w-full p-5 text-left',
+            'border transition-all duration-200',
+            'flex items-start gap-4',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            paymentMethod === 'immediate'
+              ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
+              : 'border-border-light bg-white hover:border-hermes-500/50'
+          )}
+        >
+          {/* Selection indicator */}
+          <div
+            className={cn(
+              'flex-shrink-0 w-5 h-5 mt-0.5',
+              'rounded-full border-2',
+              'flex items-center justify-center',
+              'transition-colors duration-200',
+              paymentMethod === 'immediate'
+                ? 'border-hermes-500 bg-hermes-500'
+                : 'border-border-medium bg-white'
+            )}
+          >
+            {paymentMethod === 'immediate' && (
+              <Check className="w-3 h-3 text-white" strokeWidth={3} />
+            )}
+          </div>
+
+          {/* Option content */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <CreditCard className="w-5 h-5 text-hermes-500" />
+              <span className="font-medium text-text-primary text-lg">
+                Paiement comptant
+              </span>
+            </div>
+            <p className="text-sm text-text-muted">
+              Payez immediatement par carte bancaire via notre plateforme securisee Stripe.
+            </p>
+          </div>
+        </button>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-border-light" />
+
+      {/* Payment form based on selection */}
+      {paymentMethod === 'deferred' ? (
+        /* Deferred payment confirmation */
+        <form onSubmit={handleDeferredSubmit} className="space-y-6">
+          <div className="p-6 bg-background-beige border border-border-light">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-hermes-500/10 flex items-center justify-center">
+                <Clock className="w-6 h-6 text-hermes-500" />
+              </div>
+              <div>
+                <h3 className="font-medium text-text-primary mb-2">
+                  Paiement differe a 30 jours
+                </h3>
+                <ul className="space-y-2 text-sm text-text-muted">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    Votre commande est expediee immediatement
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    Vous recevez une facture par email
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    Reglez sous 30 jours sans frais
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-col-reverse sm:flex-row gap-4 pt-4">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              onClick={onBack}
+              disabled={isLoading}
+              className="flex-1 uppercase tracking-wider"
+            >
+              Retour
+            </Button>
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={isLoading}
+              className="flex-1 uppercase tracking-wider bg-luxe-charcoal !text-white border border-luxe-charcoal hover:bg-hermes-500 hover:border-hermes-500 transition-all duration-300"
+            >
+              Confirmer la commande
+            </Button>
+          </div>
+
+          {/* Security note */}
+          <div className="flex items-center justify-center gap-2 text-xs text-text-muted pt-2">
+            <Lock className="h-4 w-4" />
+            <span>Commande securisee</span>
+          </div>
+        </form>
+      ) : (
+        /* Immediate payment with Stripe */
+        <div className="space-y-6">
+          {stripeError && (
+            <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 text-red-700 text-sm">
+              <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              {stripeError}
+            </div>
+          )}
+
+          {isLoadingStripe ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="w-10 h-10 border-2 border-hermes-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-sm text-text-muted">
+                  Chargement du formulaire de paiement...
+                </p>
+              </div>
+            </div>
+          ) : clientSecret ? (
+            <Elements
+              stripe={getStripe()}
+              options={{
+                clientSecret,
+                appearance: {
+                  theme: 'stripe',
+                  variables: {
+                    colorPrimary: '#c9a050',
+                    colorBackground: '#ffffff',
+                    colorText: '#1a1a1a',
+                    colorDanger: '#dc2626',
+                    fontFamily: 'system-ui, sans-serif',
+                    borderRadius: '0px',
+                  },
+                },
+              }}
+            >
+              <StripePaymentForm
+                onSuccess={handleStripeSuccess}
+                onError={handleStripeError}
+                isSubmitting={isLoading}
+              />
+            </Elements>
+          ) : (
+            <div className="text-center py-8 text-text-muted">
+              <p>Impossible de charger le formulaire de paiement.</p>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('immediate')}
+                className="mt-2 text-hermes-500 underline"
+              >
+                Reessayer
+              </button>
+            </div>
+          )}
+
+          {/* Back button for Stripe form */}
+          <div className="pt-4">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              onClick={onBack}
+              disabled={isLoading || isLoadingStripe}
+              className="w-full uppercase tracking-wider"
+            >
+              Retour
+            </Button>
+          </div>
         </div>
       )}
-
-      {/* Card holder name */}
-      <Input
-        label="Titulaire de la carte"
-        name="cardName"
-        type="text"
-        placeholder="Nom sur la carte"
-        value={formData.cardName}
-        onChange={handleChange}
-        error={errors.cardName}
-        disabled={isLoading}
-        autoComplete="cc-name"
-        startIcon={<User className="h-5 w-5" />}
-        containerClassName="bg-white"
-        className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-      />
-
-      {/* Card number */}
-      <Input
-        label="Numero de carte"
-        name="cardNumber"
-        type="text"
-        placeholder="1234 5678 9012 3456"
-        value={formData.cardNumber}
-        onChange={handleChange}
-        error={errors.cardNumber}
-        disabled={isLoading}
-        autoComplete="cc-number"
-        inputMode="numeric"
-        startIcon={<CreditCard className="h-5 w-5" />}
-        containerClassName="bg-white"
-        className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-      />
-
-      {/* Expiry and CVV */}
-      <div className="grid grid-cols-2 gap-4">
-        <Input
-          label="Date d'expiration"
-          name="expiryDate"
-          type="text"
-          placeholder="MM/AA"
-          value={formData.expiryDate}
-          onChange={handleChange}
-          error={errors.expiryDate}
-          disabled={isLoading}
-          autoComplete="cc-exp"
-          inputMode="numeric"
-          startIcon={<Calendar className="h-5 w-5" />}
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-
-        <Input
-          label="CVV"
-          name="cvv"
-          type="text"
-          placeholder="123"
-          value={formData.cvv}
-          onChange={handleChange}
-          error={errors.cvv}
-          disabled={isLoading}
-          autoComplete="cc-csc"
-          inputMode="numeric"
-          startIcon={<Lock className="h-5 w-5" />}
-          containerClassName="bg-white"
-          className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
-        />
-      </div>
-
-      {/* Accepted cards */}
-      <div className="flex items-center justify-center gap-4 py-4 border-t border-border-light">
-        <span className="text-xs text-text-muted uppercase tracking-wide">
-          Cartes acceptees
-        </span>
-        <div className="flex items-center gap-3">
-          {/* Visa */}
-          <div className="w-10 h-6 bg-background-beige border border-border-light flex items-center justify-center">
-            <span className="text-xs font-bold text-blue-700">VISA</span>
-          </div>
-          {/* Mastercard */}
-          <div className="w-10 h-6 bg-background-beige border border-border-light flex items-center justify-center">
-            <span className="text-xs font-bold text-red-600">MC</span>
-          </div>
-          {/* Amex */}
-          <div className="w-10 h-6 bg-background-beige border border-border-light flex items-center justify-center">
-            <span className="text-xs font-bold text-blue-500">AMEX</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Action buttons */}
-      <div className="flex flex-col-reverse sm:flex-row gap-4 pt-4">
-        <Button
-          type="button"
-          variant="secondary"
-          size="lg"
-          onClick={onBack}
-          disabled={isLoading}
-          className="flex-1 uppercase tracking-wider"
-        >
-          Retour
-        </Button>
-
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          isLoading={isLoading}
-          className="flex-1 uppercase tracking-wider"
-        >
-          Confirmer la commande
-        </Button>
-      </div>
-
-      {/* Security note */}
-      <div className="flex items-center justify-center gap-2 text-xs text-text-muted pt-2">
-        <Lock className="h-4 w-4" />
-        <span>Paiement securise par chiffrement SSL</span>
-      </div>
-    </form>
+    </div>
   );
 }
 

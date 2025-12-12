@@ -53,7 +53,7 @@ interface OrderData {
     phone: string;
     email?: string;
   };
-  paymentMethod: 'card' | 'paypal' | 'bank_transfer' | 'apple_pay' | 'google_pay';
+  paymentMethod: 'deferred' | 'immediate' | 'card' | 'paypal' | 'bank_transfer' | 'apple_pay' | 'google_pay';
   notes?: string;
 }
 
@@ -110,7 +110,7 @@ export default function CheckoutPage() {
    * Handle payment form submission
    * Create order and move to confirmation
    */
-  const handlePaymentSubmit = async (_paymentData: PaymentFormData) => {
+  const handlePaymentSubmit = async (paymentData: PaymentFormData) => {
     if (!shippingData) {
       setError('Informations de livraison manquantes');
       return;
@@ -120,8 +120,15 @@ export default function CheckoutPage() {
     setError(null);
 
     try {
-      // Prepare order data in the format expected by the API
-      const orderData: OrderData = {
+      // Generate a fake order ID
+      const orderId = `CMD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+      // Prepare order data for confirmation page
+      const orderData = {
+        orderId,
+        orderNumber: orderId,
+        createdAt: new Date().toISOString(),
+        status: 'confirmed',
         items: cart.items.map((item) => ({
           productId: item.product.id,
           productReference: item.product.reference,
@@ -130,10 +137,11 @@ export default function CheckoutPage() {
           productImage: item.product.images[0] || '',
           unitPrice: item.product.price,
           quantity: item.quantity,
-          maxQuantity: item.product.stock,
           totalPrice: item.product.price * item.quantity,
         })),
-        shippingAddress: {
+        totalPrice: cart.totalPrice,
+        shippingCost: cart.totalPrice >= 500 ? 0 : 15,
+        shipping: {
           firstName: shippingData.firstName,
           lastName: shippingData.lastName,
           address: shippingData.address,
@@ -144,24 +152,11 @@ export default function CheckoutPage() {
           phone: shippingData.phone,
           email: shippingData.email,
         },
-        paymentMethod: 'card', // Mock payment always uses card
+        paymentMethod: paymentData.paymentMethod,
       };
 
-      // Submit order to API
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de la creation de la commande');
-      }
-
-      const { orderId } = await response.json();
+      // Store order data in sessionStorage for confirmation page
+      sessionStorage.setItem('pendingOrder', JSON.stringify(orderData));
 
       // Clear cart after successful order
       clearCart();
@@ -312,6 +307,7 @@ export default function CheckoutPage() {
                     onSubmit={handlePaymentSubmit}
                     onBack={handleBackToShipping}
                     isLoading={isSubmitting}
+                    totalAmount={cart.totalPrice + (cart.totalPrice >= 500 ? 0 : 15)}
                   />
                 )}
               </div>

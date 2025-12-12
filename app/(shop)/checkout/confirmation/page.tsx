@@ -3,16 +3,29 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, Package, Truck, ShieldCheck, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import {
+  CheckCircle2,
+  Package,
+  Truck,
+  ShieldCheck,
+  ArrowRight,
+  Gift,
+  Clock,
+  Mail,
+  MapPin,
+  CreditCard,
+  Sparkles,
+} from 'lucide-react';
 import { Container } from '@/components/ui/Container';
-import { Button } from '@/components/ui/Button';
 import { HeaderSpacer } from '@/components/layout/Header';
 import { cn, formatPrice } from '@/lib/utils';
 
 /**
- * Order details from API
+ * Order data structure from sessionStorage
  */
-interface OrderDetails {
+interface OrderData {
   orderId: string;
   orderNumber: string;
   createdAt: string;
@@ -20,303 +33,540 @@ interface OrderDetails {
   items: Array<{
     productId: string;
     productName: string;
+    productImage: string;
+    unitPrice: number;
     quantity: number;
-    price: number;
+    totalPrice: number;
   }>;
   totalPrice: number;
+  shippingCost: number;
   shipping: {
     firstName: string;
     lastName: string;
     address: string;
+    addressLine2?: string;
     city: string;
     postalCode: string;
     country: string;
+    phone: string;
+    email?: string;
   };
 }
 
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
+
+const scaleVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
+
+const checkmarkVariants = {
+  hidden: { pathLength: 0, opacity: 0 },
+  visible: {
+    pathLength: 1,
+    opacity: 1,
+    transition: {
+      pathLength: { duration: 0.8, ease: 'easeOut', delay: 0.3 },
+      opacity: { duration: 0.2 },
+    },
+  },
+};
+
 /**
  * ConfirmationContent Component
- * Separated to use useSearchParams within Suspense
  */
 function ConfirmationContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
 
-  const [order, setOrder] = useState<OrderDetails | null>(null);
+  const [order, setOrder] = useState<OrderData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Fetch order details
+  // Load order from sessionStorage
   useEffect(() => {
-    const fetchOrder = async () => {
-      if (!orderId) {
-        setIsLoading(false);
-        return;
-      }
-
+    const loadOrder = () => {
       try {
-        const response = await fetch(`/api/orders/${orderId}`);
-
-        if (!response.ok) {
-          throw new Error('Commande non trouvee');
+        const storedOrder = sessionStorage.getItem('pendingOrder');
+        if (storedOrder) {
+          const parsedOrder = JSON.parse(storedOrder);
+          // Verify the order ID matches
+          if (parsedOrder.orderId === orderId || !orderId) {
+            setOrder(parsedOrder);
+            // Clear the stored order after loading
+            sessionStorage.removeItem('pendingOrder');
+          }
         }
-
-        const data = await response.json();
-        setOrder(data);
       } catch (err) {
-        console.error('Error fetching order:', err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Erreur lors de la recuperation de la commande'
-        );
+        console.error('Error loading order:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchOrder();
+    // Small delay for better UX
+    setTimeout(loadOrder, 500);
   }, [orderId]);
+
+  // Calculate estimated delivery date
+  const getEstimatedDelivery = () => {
+    const today = new Date();
+    const minDays = 3;
+    const maxDays = 5;
+    const minDate = new Date(today.setDate(today.getDate() + minDays));
+    const maxDate = new Date(new Date().setDate(new Date().getDate() + maxDays));
+
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      });
+    };
+
+    return `${formatDate(minDate)} - ${formatDate(maxDate)}`;
+  };
 
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="w-12 h-12 border-2 border-hermes-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-text-muted">Chargement de votre commande...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-[500px]">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-hermes-500/30"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.div
+              className="absolute inset-2 rounded-full border-2 border-t-hermes-500 border-r-transparent border-b-transparent border-l-transparent"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+            />
+            <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-hermes-500" />
+          </div>
+          <p className="font-serif text-lg text-text-primary">
+            Validation de votre commande...
+          </p>
+          <p className="text-sm text-text-muted mt-2">
+            Merci de patienter quelques instants
+          </p>
+        </motion.div>
       </div>
     );
   }
 
-  // No order ID provided
-  if (!orderId) {
+  // No order found
+  if (!order) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center min-h-[400px] text-center"
+      >
         <Package className="h-16 w-16 text-text-muted mb-6" />
         <h1 className="font-serif text-2xl md:text-3xl text-text-primary mb-4">
-          Aucune commande specifiee
+          Aucune commande trouvee
         </h1>
         <p className="text-text-muted mb-8 max-w-md">
           Vous pouvez consulter vos commandes dans votre espace personnel.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/account/orders">
-            <Button variant="primary" size="lg">
-              Mes commandes
-            </Button>
+          <Link
+            href="/compte/commandes"
+            className="inline-flex items-center justify-center px-8 py-4 bg-luxe-charcoal !text-white font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-hermes-500"
+          >
+            Mes commandes
           </Link>
-          <Link href="/collections">
-            <Button variant="secondary" size="lg">
-              Continuer mes achats
-            </Button>
+          <Link
+            href="/collections"
+            className="inline-flex items-center justify-center px-8 py-4 border border-luxe-charcoal text-text-primary font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-luxe-charcoal hover:text-white"
+          >
+            Continuer mes achats
           </Link>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
-  // Error state
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-        <Package className="h-16 w-16 text-text-muted mb-6" />
-        <h1 className="font-serif text-2xl md:text-3xl text-text-primary mb-4">
-          Commande non trouvee
-        </h1>
-        <p className="text-text-muted mb-8 max-w-md">{error}</p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/account/orders">
-            <Button variant="primary" size="lg">
-              Mes commandes
-            </Button>
-          </Link>
-          <Link href="/">
-            <Button variant="secondary" size="lg">
-              Retour a l'accueil
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const totalWithShipping = order.totalPrice + order.shippingCost;
 
   return (
-    <>
-      {/* Success icon and message */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-6">
-          <CheckCircle2 className="h-12 w-12 text-green-600" />
-        </div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="max-w-4xl mx-auto"
+    >
+      {/* Success Header */}
+      <motion.div variants={itemVariants} className="text-center mb-12">
+        {/* Animated checkmark */}
+        <motion.div
+          variants={scaleVariants}
+          className="relative inline-flex items-center justify-center w-24 h-24 mb-8"
+        >
+          {/* Outer ring animation */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-green-100"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+          />
+          {/* Sparkle effects */}
+          <motion.div
+            className="absolute -top-2 -right-2"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.8, duration: 0.3 }}
+          >
+            <Sparkles className="w-6 h-6 text-hermes-500" />
+          </motion.div>
+          {/* Checkmark */}
+          <svg className="relative w-12 h-12" viewBox="0 0 24 24" fill="none">
+            <motion.path
+              d="M5 13l4 4L19 7"
+              stroke="#16a34a"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              variants={checkmarkVariants}
+            />
+          </svg>
+        </motion.div>
 
-        <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl text-text-primary mb-4">
-          Commande confirmee
-        </h1>
+        <motion.h1
+          variants={itemVariants}
+          className="font-serif text-3xl md:text-4xl lg:text-5xl text-text-primary mb-4"
+        >
+          Merci pour votre commande !
+        </motion.h1>
 
-        <p className="text-text-muted max-w-lg mx-auto">
-          Merci pour votre confiance. Votre commande a ete enregistree et sera
-          preparee avec le plus grand soin par nos artisans.
+        <motion.p
+          variants={itemVariants}
+          className="text-text-muted max-w-lg mx-auto text-lg"
+        >
+          Votre commande a ete confirmee. Un email de confirmation vous sera envoye sous peu.
+        </motion.p>
+      </motion.div>
+
+      {/* Order Number Card */}
+      <motion.div
+        variants={itemVariants}
+        className="bg-gradient-to-br from-hermes-50 to-white border border-hermes-200 p-8 mb-8 text-center"
+      >
+        <span className="text-xs uppercase tracking-luxe text-hermes-600 mb-2 block">
+          Numero de commande
+        </span>
+        <p className="font-serif text-3xl md:text-4xl text-hermes-600 tracking-wide">
+          {order.orderNumber}
         </p>
-      </div>
+        <p className="text-sm text-text-muted mt-3">
+          Conservez ce numero pour suivre votre commande
+        </p>
+      </motion.div>
 
-      {/* Order details card */}
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white border border-border-light p-6 md:p-8 mb-8">
-          {/* Order number */}
-          <div className="text-center border-b border-border-light pb-6 mb-6">
-            <span className="text-xs uppercase tracking-luxe text-text-muted">
-              Numero de commande
-            </span>
-            <p className="font-serif text-2xl md:text-3xl text-hermes-600 mt-2">
-              {order?.orderNumber || `#CMD-${orderId.slice(0, 8).toUpperCase()}`}
-            </p>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        {/* Order Items */}
+        <motion.div
+          variants={itemVariants}
+          className="bg-white border border-border-light p-6"
+        >
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border-light">
+            <Package className="w-5 h-5 text-hermes-500" />
+            <h2 className="font-serif text-xl text-text-primary">
+              Vos articles
+            </h2>
           </div>
 
-          {/* Order items */}
-          {order?.items && order.items.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm uppercase tracking-luxe text-text-muted mb-4">
-                Articles commandes
-              </h2>
-              <div className="space-y-3">
-                {order.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center py-2 border-b border-border-light last:border-0"
-                  >
-                    <div>
-                      <p className="font-medium text-text-primary">
-                        {item.productName}
-                      </p>
-                      <p className="text-sm text-text-muted">
-                        Quantite: {item.quantity}
-                      </p>
+          <div className="space-y-4">
+            {order.items.map((item, index) => (
+              <motion.div
+                key={item.productId}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+                className="flex gap-4"
+              >
+                <div className="relative w-20 h-20 bg-background-warm rounded overflow-hidden flex-shrink-0">
+                  {item.productImage ? (
+                    <Image
+                      src={item.productImage}
+                      alt={item.productName}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Gift className="w-8 h-8 text-text-muted" />
                     </div>
-                    <p className="font-medium text-hermes-600">
-                      {formatPrice(item.price * item.quantity)}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-text-primary truncate">
+                    {item.productName}
+                  </h3>
+                  <p className="text-sm text-text-muted">
+                    Quantite: {item.quantity}
+                  </p>
+                  <p className="font-medium text-hermes-600 mt-1">
+                    {formatPrice(item.totalPrice)}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
-              {/* Total */}
-              <div className="flex justify-between items-center pt-4 mt-4 border-t border-border-light">
-                <span className="font-medium text-text-primary">Total</span>
-                <span className="font-serif text-xl text-hermes-600">
-                  {formatPrice(order.totalPrice)}
-                </span>
-              </div>
+          {/* Totals */}
+          <div className="mt-6 pt-4 border-t border-border-light space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-text-muted">Sous-total</span>
+              <span className="text-text-primary">{formatPrice(order.totalPrice)}</span>
             </div>
-          )}
+            <div className="flex justify-between text-sm">
+              <span className="text-text-muted">Livraison</span>
+              <span className={order.shippingCost === 0 ? 'text-green-600' : 'text-text-primary'}>
+                {order.shippingCost === 0 ? 'Offerte' : formatPrice(order.shippingCost)}
+              </span>
+            </div>
+            <div className="flex justify-between pt-2 border-t border-border-light">
+              <span className="font-serif text-lg text-text-primary">Total</span>
+              <span className="font-serif text-xl text-hermes-600">
+                {formatPrice(totalWithShipping)}
+              </span>
+            </div>
+          </div>
+        </motion.div>
 
-          {/* Shipping address */}
-          {order?.shipping && (
-            <div className="mb-6">
-              <h2 className="text-sm uppercase tracking-luxe text-text-muted mb-4">
+        {/* Shipping & Delivery Info */}
+        <div className="space-y-6">
+          {/* Shipping Address */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-white border border-border-light p-6"
+          >
+            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border-light">
+              <MapPin className="w-5 h-5 text-hermes-500" />
+              <h2 className="font-serif text-xl text-text-primary">
                 Adresse de livraison
               </h2>
-              <div className="text-text-secondary">
-                <p className="font-medium text-text-primary">
-                  {order.shipping.firstName} {order.shipping.lastName}
+            </div>
+            <div className="text-text-secondary space-y-1">
+              <p className="font-medium text-text-primary">
+                {order.shipping.firstName} {order.shipping.lastName}
+              </p>
+              <p>{order.shipping.address}</p>
+              {order.shipping.addressLine2 && <p>{order.shipping.addressLine2}</p>}
+              <p>
+                {order.shipping.postalCode} {order.shipping.city}
+              </p>
+              <p>{order.shipping.country}</p>
+              {order.shipping.phone && (
+                <p className="text-text-muted mt-2">{order.shipping.phone}</p>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Delivery Estimate */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-gradient-to-br from-green-50 to-white border border-green-200 p-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <Truck className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-text-primary mb-1">
+                  Livraison estimee
+                </h3>
+                <p className="text-green-700 font-medium">
+                  {getEstimatedDelivery()}
                 </p>
-                <p>{order.shipping.address}</p>
-                <p>
-                  {order.shipping.postalCode} {order.shipping.city}
+                <p className="text-sm text-text-muted mt-2">
+                  Vous recevrez un email avec le numero de suivi des l'expedition de votre colis.
                 </p>
-                <p>{order.shipping.country}</p>
               </div>
             </div>
-          )}
+          </motion.div>
 
-          {/* Estimated delivery */}
-          <div className="bg-background-beige p-4 flex items-start gap-3">
-            <Truck className="h-5 w-5 text-hermes-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium text-text-primary">
-                Livraison estimee
-              </p>
-              <p className="text-sm text-text-muted">
-                Sous 3 a 5 jours ouvrables. Vous recevrez un email avec le
-                numero de suivi une fois votre colis expedie.
-              </p>
+          {/* Payment Method */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-white border border-border-light p-6"
+          >
+            <div className="flex items-center gap-3">
+              <CreditCard className="w-5 h-5 text-hermes-500" />
+              <div>
+                <span className="text-sm text-text-muted">Paiement par</span>
+                <p className="font-medium text-text-primary">Carte bancaire</p>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/account/orders">
-            <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-              Suivre ma commande
-            </Button>
-          </Link>
-          <Link href="/collections">
-            <Button variant="primary" size="lg" className="w-full sm:w-auto">
-              Continuer mes achats
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </Link>
+          </motion.div>
         </div>
       </div>
 
-      {/* Trust badges */}
-      <div className="mt-16 pt-8 border-t border-border-light">
+      {/* What's Next Section */}
+      <motion.div
+        variants={itemVariants}
+        className="bg-background-beige p-8 mb-12"
+      >
+        <h2 className="font-serif text-2xl text-text-primary mb-6 text-center">
+          Et maintenant ?
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-start gap-4 p-4">
-            <Package className="h-8 w-8 text-hermes-500 flex-shrink-0" />
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center flex-shrink-0">
+              <Mail className="w-5 h-5 text-hermes-600" />
+            </div>
             <div>
               <h3 className="font-medium text-text-primary mb-1">
-                Emballage de luxe
+                1. Confirmation email
               </h3>
               <p className="text-sm text-text-muted">
-                Chaque piece est soigneusement emballee dans un ecrin elegant
-                accompagne de son certificat d'authenticite.
+                Vous recevrez un email de confirmation avec tous les details de votre commande.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center flex-shrink-0">
+              <Package className="w-5 h-5 text-hermes-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-text-primary mb-1">
+                2. Preparation
+              </h3>
+              <p className="text-sm text-text-muted">
+                Nos artisans preparent votre commande avec le plus grand soin.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center flex-shrink-0">
+              <Truck className="w-5 h-5 text-hermes-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-text-primary mb-1">
+                3. Expedition
+              </h3>
+              <p className="text-sm text-text-muted">
+                Votre colis sera expedie et vous recevrez le numero de suivi.
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Action Buttons */}
+      <motion.div
+        variants={itemVariants}
+        className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+      >
+        <Link
+          href="/compte/commandes"
+          className="inline-flex items-center justify-center px-8 py-4 border border-luxe-charcoal text-text-primary font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-luxe-charcoal hover:text-white"
+        >
+          <Clock className="w-4 h-4 mr-2" />
+          Suivre ma commande
+        </Link>
+        <Link
+          href="/collections"
+          className="inline-flex items-center justify-center px-8 py-4 bg-luxe-charcoal !text-white font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-hermes-500"
+        >
+          Continuer mes achats
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Link>
+      </motion.div>
+
+      {/* Trust Badges */}
+      <motion.div
+        variants={itemVariants}
+        className="border-t border-border-light pt-12"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="flex items-start gap-4 p-4 text-center md:text-left">
+            <Gift className="h-10 w-10 text-hermes-500 flex-shrink-0 mx-auto md:mx-0" />
+            <div>
+              <h3 className="font-medium text-text-primary mb-1">
+                Emballage luxe
+              </h3>
+              <p className="text-sm text-text-muted">
+                Chaque piece est emballee dans un ecrin elegant avec certificat d'authenticite.
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-4 p-4">
-            <Truck className="h-8 w-8 text-hermes-500 flex-shrink-0" />
+          <div className="flex items-start gap-4 p-4 text-center md:text-left">
+            <Truck className="h-10 w-10 text-hermes-500 flex-shrink-0 mx-auto md:mx-0" />
             <div>
               <h3 className="font-medium text-text-primary mb-1">
                 Livraison securisee
               </h3>
               <p className="text-sm text-text-muted">
-                Votre commande sera livree par transporteur securise avec
-                signature obligatoire.
+                Transporteur securise avec signature obligatoire a la livraison.
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-4 p-4">
-            <ShieldCheck className="h-8 w-8 text-hermes-500 flex-shrink-0" />
+          <div className="flex items-start gap-4 p-4 text-center md:text-left">
+            <ShieldCheck className="h-10 w-10 text-hermes-500 flex-shrink-0 mx-auto md:mx-0" />
             <div>
               <h3 className="font-medium text-text-primary mb-1">
-                Garantie qualite
+                Garantie 30 jours
               </h3>
               <p className="text-sm text-text-muted">
-                Retours gratuits sous 30 jours. Votre satisfaction est notre
-                priorite absolue.
+                Retours gratuits sous 30 jours. Votre satisfaction est notre priorite.
               </p>
             </div>
           </div>
         </div>
-      </div>
-    </>
+      </motion.div>
+    </motion.div>
   );
 }
 
 /**
  * ConfirmationPage Component
- * Order success page showing order details and next steps
  */
 export default function ConfirmationPage() {
   return (
     <main className="min-h-screen bg-background-cream">
       <HeaderSpacer />
 
-      {/* Page header */}
+      {/* Page header with gradient */}
       <section
         className={cn(
           'py-8 md:py-12 border-b border-border-light',
