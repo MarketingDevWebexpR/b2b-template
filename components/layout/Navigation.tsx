@@ -38,12 +38,12 @@ export function Navigation({ className }: NavigationProps) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { isVisible: isAnnouncementVisible } = useAnnouncement();
 
-  // Fetch categories from API
+  // Fetch categories from API on component mount
   useEffect(() => {
     async function fetchCategories() {
       try {
         const response = await fetch(`${API_BASE_URL}/sage/families`, {
-          next: { revalidate: 300 },
+          cache: 'no-store', // Always fetch fresh data
         });
         if (response.ok) {
           const families = await response.json();

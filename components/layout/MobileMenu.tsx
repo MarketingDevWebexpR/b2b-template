@@ -34,11 +34,13 @@ export function MobileMenu({ className }: MobileMenuProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const pathname = usePathname();
 
-  // Fetch categories from API
+  // Fetch categories from API on component mount
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await fetch(`${API_BASE_URL}/sage/families`);
+        const response = await fetch(`${API_BASE_URL}/sage/families`, {
+          cache: 'no-store', // Always fetch fresh data
+        });
         if (response.ok) {
           const families = await response.json();
           // Map Sage families to categories (only leaf categories with type 0)
