@@ -5,3 +5,4 @@
  */
 
 export { CartIndicator, CartIndicatorCompact } from './CartIndicator';
+export { CartDrawer } from './CartDrawer';

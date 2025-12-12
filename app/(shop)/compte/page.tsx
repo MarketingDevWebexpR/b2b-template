@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { auth, signOut } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { Container } from '@/components/ui/Container';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { HeaderSpacer } from '@/components/layout/Header';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 import { getOrderCountByUserId, getTotalSpentByUserId } from '@/data/orders';
 import { formatPrice } from '@/lib/utils';
 import {
@@ -13,7 +14,6 @@ import {
   MapPin,
   CreditCard,
   User,
-  LogOut,
   ChevronRight,
 } from 'lucide-react';
 
@@ -161,7 +161,7 @@ export default async function AccountPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center gap-4 border border-border-light bg-white p-6 transition-all duration-300 ease-luxe hover:border-hermes-500/30 hover:shadow-elegant"
+                  className="group flex h-full items-center gap-4 border border-border-light bg-white p-6 transition-all duration-300 ease-luxe hover:border-hermes-500/30 hover:shadow-elegant"
                 >
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-border-light transition-all duration-300 group-hover:border-hermes-500/30 group-hover:bg-hermes-50">
                     <Icon
@@ -186,32 +186,9 @@ export default async function AccountPage() {
             })}
 
             {/* Logout Button */}
-            <form
-              action={async () => {
-                'use server';
-                await signOut({ redirectTo: '/' });
-              }}
-            >
-              <button
-                type="submit"
-                className="group flex w-full items-center gap-4 border border-border-light bg-white p-6 transition-all duration-300 ease-luxe hover:border-red-200 hover:bg-red-50/30"
-              >
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-border-light transition-all duration-300 group-hover:border-red-200 group-hover:bg-red-50">
-                  <LogOut
-                    className="h-5 w-5 text-text-secondary transition-colors group-hover:text-red-600"
-                    strokeWidth={1.5}
-                  />
-                </div>
-                <div className="flex-1 text-left">
-                  <h3 className="font-serif text-body-lg text-text-primary transition-colors group-hover:text-red-600">
-                    Deconnexion
-                  </h3>
-                  <p className="mt-1 font-sans text-caption text-text-muted">
-                    Se deconnecter de votre compte
-                  </p>
-                </div>
-              </button>
-            </form>
+            <div className="h-full">
+              <LogoutButton />
+            </div>
           </div>
 
           {/* User Info Card */}

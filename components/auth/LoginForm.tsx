@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { z } from 'zod';
@@ -37,6 +37,8 @@ interface FormErrors {
  */
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
@@ -103,7 +105,7 @@ export function LoginForm() {
           general: 'Email ou mot de passe incorrect',
         });
       } else if (result?.ok) {
-        router.push('/');
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (error) {

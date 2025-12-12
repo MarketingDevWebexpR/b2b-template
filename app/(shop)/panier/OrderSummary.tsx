@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
-import { ShieldCheck, Truck, RotateCcw, X } from 'lucide-react';
+import { ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/utils';
 
@@ -30,7 +29,6 @@ interface OrderSummaryProps {
 export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Shipping is free above 500EUR, otherwise 15EUR
   const FREE_SHIPPING_THRESHOLD = 500;
@@ -46,14 +44,9 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
       // User is logged in, proceed to checkout
       router.push('/checkout');
     } else {
-      // Show login prompt
-      setShowLoginPrompt(true);
+      // Redirect to login with callback to checkout
+      router.push('/login?callbackUrl=/checkout');
     }
-  };
-
-  const handleLoginRedirect = () => {
-    // Redirect to login with callback to checkout
-    router.push('/login?callbackUrl=/checkout');
   };
 
   return (
@@ -142,15 +135,19 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
             'w-full',
             'flex items-center justify-center',
             'px-8 py-4',
-            'bg-luxe-charcoal text-text-inverse',
-            'font-sans text-body-sm uppercase tracking-luxe font-medium',
+            'bg-luxe-charcoal !text-white',
+            'text-sm uppercase tracking-widest font-medium',
             'transition-all duration-350 ease-luxe',
             'hover:bg-hermes-500',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2',
             'disabled:opacity-60 disabled:cursor-not-allowed'
           )}
         >
-          {status === 'loading' ? 'Chargement...' : 'Passer la commande'}
+          {status === 'loading'
+            ? 'CHARGEMENT...'
+            : session
+            ? 'PASSER LA COMMANDE'
+            : 'SE CONNECTER & COMMANDER'}
         </button>
 
         {/* Continue Shopping Link */}
@@ -185,14 +182,6 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
           </div>
         </div>
       </motion.div>
-
-      {/* Login Prompt Modal */}
-      {showLoginPrompt && (
-        <LoginPromptModal
-          onClose={() => setShowLoginPrompt(false)}
-          onLogin={handleLoginRedirect}
-        />
-      )}
     </>
   );
 }
@@ -213,130 +202,5 @@ function TrustBadge({ icon, label }: TrustBadgeProps) {
         {label}
       </span>
     </div>
-  );
-}
-
-/**
- * Login Prompt Modal Component
- */
-interface LoginPromptModalProps {
-  onClose: () => void;
-  onLogin: () => void;
-}
-
-function LoginPromptModal({ onClose, onLogin }: LoginPromptModalProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="login-prompt-title"
-    >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-luxe-charcoal/60 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Modal */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className={cn(
-          'relative',
-          'w-full max-w-md',
-          'bg-background-cream',
-          'p-8 md:p-10',
-          'shadow-elegant-lg'
-        )}
-      >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className={cn(
-            'absolute top-4 right-4',
-            'flex items-center justify-center',
-            'w-8 h-8',
-            'text-text-muted',
-            'transition-colors duration-250',
-            'hover:text-text-primary',
-            'focus:outline-none focus-visible:ring-1 focus-visible:ring-hermes-500'
-          )}
-          aria-label="Fermer"
-        >
-          <X className="w-5 h-5" strokeWidth={1.5} />
-        </button>
-
-        {/* Content */}
-        <div className="text-center">
-          <h3
-            id="login-prompt-title"
-            className="font-serif text-heading-3 text-text-primary mb-4"
-          >
-            Connexion requise
-          </h3>
-
-          <p className="font-sans text-body text-text-muted mb-8 leading-elegant">
-            Pour finaliser votre commande, veuillez vous connecter a votre compte
-            ou creer un nouveau compte.
-          </p>
-
-          <div className="space-y-3">
-            {/* Login Button */}
-            <button
-              onClick={onLogin}
-              className={cn(
-                'w-full',
-                'flex items-center justify-center',
-                'px-6 py-3.5',
-                'bg-luxe-charcoal text-text-inverse',
-                'font-sans text-body-sm uppercase tracking-luxe font-medium',
-                'transition-all duration-350 ease-luxe',
-                'hover:bg-hermes-500',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
-              )}
-            >
-              Se connecter
-            </button>
-
-            {/* Register Link */}
-            <Link
-              href="/login?callbackUrl=/checkout"
-              className={cn(
-                'block w-full',
-                'px-6 py-3.5',
-                'border border-border-medium',
-                'font-sans text-body-sm uppercase tracking-luxe font-medium text-text-primary',
-                'transition-all duration-350 ease-luxe',
-                'hover:border-hermes-500 hover:text-hermes-500',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
-              )}
-            >
-              Creer un compte
-            </Link>
-
-            {/* Continue as Guest */}
-            <button
-              onClick={onClose}
-              className={cn(
-                'block w-full pt-4',
-                'font-sans text-caption text-text-muted',
-                'transition-colors duration-250',
-                'hover:text-text-primary',
-                'focus:outline-none'
-              )}
-            >
-              Continuer sans compte
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
   );
 }

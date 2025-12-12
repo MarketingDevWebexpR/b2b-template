@@ -128,7 +128,7 @@ export function ProductInfo({ product, onAddToCart, className }: ProductInfoProp
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <StockDisplay stock={product.stock} />
+        <StockDisplay stock={product.stock} showDetailedInfo={false} />
       </motion.div>
 
       {/* Quantity Selector & Add to Cart */}

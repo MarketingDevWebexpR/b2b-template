@@ -4,6 +4,7 @@ import { SessionProvider } from 'next-auth/react';
 import { type ReactNode } from 'react';
 import { AnnouncementProvider } from '@/contexts/AnnouncementContext';
 import { CartProvider } from '@/contexts/CartContext';
+import { CartDrawer } from '@/components/cart';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -17,8 +18,9 @@ interface ProvidersProps {
  */
 export function Providers({ children }: ProvidersProps) {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={true} refetchWhenOffline={false}>
       <CartProvider>
+        <CartDrawer />
         <AnnouncementProvider>{children}</AnnouncementProvider>
       </CartProvider>
     </SessionProvider>

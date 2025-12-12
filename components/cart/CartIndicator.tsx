@@ -13,6 +13,8 @@ interface CartIndicatorProps {
   showEmptyBadge?: boolean;
   /** Custom aria-label prefix (defaults to "Panier") */
   ariaLabelPrefix?: string;
+  /** Use link navigation instead of opening drawer */
+  asLink?: boolean;
 }
 
 /**
@@ -26,8 +28,9 @@ export function CartIndicator({
   className,
   showEmptyBadge = false,
   ariaLabelPrefix = 'Panier',
+  asLink = false,
 }: CartIndicatorProps) {
-  const { cart, isLoading } = useCart();
+  const { cart, isLoading, openDrawer } = useCart();
   const itemCount = cart.totalItems;
 
   // Determine if badge should be visible
@@ -41,21 +44,19 @@ export function CartIndicator({
     ? `${ariaLabelPrefix} (${itemCount} ${itemCount === 1 ? 'article' : 'articles'})`
     : ariaLabelPrefix;
 
-  return (
-    <Link
-      href="/panier"
-      className={cn(
-        'relative flex items-center justify-center',
-        'w-10 h-10 rounded-full',
-        'text-text-secondary hover:text-text-primary',
-        'hover:bg-background-warm',
-        'transition-all duration-300 ease-luxe',
-        'focus:outline-none focus-visible:ring-1 focus-visible:ring-luxe-charcoal/20',
-        'group',
-        className
-      )}
-      aria-label={ariaLabel}
-    >
+  const sharedClassName = cn(
+    'relative flex items-center justify-center',
+    'w-10 h-10 rounded-full',
+    'text-text-secondary hover:text-text-primary',
+    'hover:bg-background-warm',
+    'transition-all duration-300 ease-luxe',
+    'focus:outline-none focus-visible:ring-1 focus-visible:ring-luxe-charcoal/20',
+    'group',
+    className
+  );
+
+  const content = (
+    <>
       {/* Shopping bag icon */}
       <ShoppingBag
         className={cn(
@@ -112,35 +113,76 @@ export function CartIndicator({
           />
         )}
       </AnimatePresence>
-    </Link>
+    </>
+  );
+
+  // Render as link or button based on asLink prop
+  if (asLink) {
+    return (
+      <Link href="/panier" className={sharedClassName} aria-label={ariaLabel}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={openDrawer}
+      className={sharedClassName}
+      aria-label={ariaLabel}
+    >
+      {content}
+    </button>
   );
 }
 
 /**
  * Compact version of CartIndicator for mobile or smaller spaces
  */
-export function CartIndicatorCompact({ className }: { className?: string }) {
-  const { cart } = useCart();
+export function CartIndicatorCompact({ className, asLink = false }: { className?: string; asLink?: boolean }) {
+  const { cart, openDrawer } = useCart();
   const itemCount = cart.totalItems;
 
-  return (
-    <Link
-      href="/panier"
-      className={cn(
-        'relative inline-flex items-center gap-2',
-        'text-text-secondary hover:text-text-primary',
-        'transition-colors duration-300 ease-luxe',
-        className
-      )}
-      aria-label={`Panier (${itemCount} articles)`}
-    >
+  const sharedClassName = cn(
+    'relative inline-flex items-center gap-2',
+    'text-text-secondary hover:text-text-primary',
+    'transition-colors duration-300 ease-luxe',
+    className
+  );
+
+  const content = (
+    <>
       <ShoppingBag className="w-4 h-4" strokeWidth={1.25} />
       {itemCount > 0 && (
         <span className="text-caption font-medium">
           {itemCount}
         </span>
       )}
-    </Link>
+    </>
+  );
+
+  if (asLink) {
+    return (
+      <Link
+        href="/panier"
+        className={sharedClassName}
+        aria-label={`Panier (${itemCount} articles)`}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={openDrawer}
+      className={sharedClassName}
+      aria-label={`Panier (${itemCount} articles)`}
+    >
+      {content}
+    </button>
   );
 }
 

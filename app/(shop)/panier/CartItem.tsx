@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -64,56 +65,29 @@ function CartItemComponent({
       }}
       className={cn(
         'group relative',
-        'grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr_auto_auto] gap-4 md:gap-6',
+        'grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr_auto_auto_auto] gap-4 md:gap-6',
         'py-6 md:py-8',
         'border-b border-border-light',
         'transition-colors duration-300'
       )}
     >
-      {/* Product Image Placeholder */}
+      {/* Product Image */}
       <Link
         href={`/products/${product.slug}`}
         className={cn(
           'relative block aspect-square overflow-hidden',
-          'bg-background-warm',
+          'bg-background-warm rounded-lg border border-border-light',
           'transition-all duration-400 ease-luxe',
           'group-hover:shadow-soft-md'
         )}
         aria-label={`Voir ${product.name}`}
       >
-        {/* Elegant placeholder pattern */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-full h-full">
-            {/* Diamond pattern background */}
-            <div
-              className={cn(
-                'absolute inset-4',
-                'border border-border-medium',
-                'rotate-45 transform-gpu'
-              )}
-            />
-            {/* Inner diamond */}
-            <div
-              className={cn(
-                'absolute inset-8',
-                'border border-border-light',
-                'rotate-45 transform-gpu'
-              )}
-            />
-            {/* Center dot */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-hermes-500/30" />
-            </div>
-          </div>
-        </div>
-
-        {/* Hover overlay */}
-        <div
-          className={cn(
-            'absolute inset-0 bg-luxe-charcoal/5',
-            'opacity-0 transition-opacity duration-300',
-            'group-hover:opacity-100'
-          )}
+        <Image
+          src={product.images?.[0] || '/images/placeholder-product.jpg'}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100px, 140px"
         />
       </Link>
 
@@ -178,10 +152,26 @@ function CartItemComponent({
             </QuantityButton>
           </div>
 
-          {/* Price (Mobile) */}
-          <span className="font-serif text-heading-5 text-text-primary">
-            {formatPrice(itemTotal)}
-          </span>
+          {/* Price and Remove (Mobile) */}
+          <div className="flex items-center gap-3">
+            <span className="font-serif text-heading-5 text-text-primary">
+              {formatPrice(itemTotal)}
+            </span>
+            <button
+              onClick={handleRemove}
+              className={cn(
+                'flex items-center justify-center',
+                'w-8 h-8',
+                'text-text-light',
+                'transition-all duration-250 ease-luxe',
+                'hover:text-red-500',
+                'focus:outline-none focus-visible:ring-1 focus-visible:ring-hermes-500'
+              )}
+              aria-label={`Supprimer ${product.name} du panier`}
+            >
+              <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -213,37 +203,39 @@ function CartItemComponent({
         </QuantityButton>
       </div>
 
-      {/* Price and Remove (Desktop) */}
-      <div className="hidden md:flex flex-col items-end justify-between">
+      {/* Price (Desktop) */}
+      <div className="hidden md:flex flex-col items-end justify-center min-w-[100px]">
         {/* Price */}
-        <span className="font-serif text-heading-4 text-text-primary">
+        <span className="font-serif text-heading-4 text-text-primary whitespace-nowrap">
           {formatPrice(itemTotal)}
         </span>
 
         {/* Unit Price (if quantity > 1) */}
-        {quantity > 1 && (
-          <span className="mt-1 font-sans text-caption text-text-muted">
-            {formatPrice(product.price)} / piece
-          </span>
-        )}
+        <span className={cn(
+          "mt-1 font-sans text-caption text-text-muted whitespace-nowrap",
+          quantity <= 1 && "invisible"
+        )}>
+          {formatPrice(product.price)} / piece
+        </span>
       </div>
 
-      {/* Remove Button */}
-      <button
-        onClick={handleRemove}
-        className={cn(
-          'absolute top-6 right-0 md:top-8',
-          'flex items-center justify-center',
-          'w-8 h-8',
-          'text-text-light',
-          'transition-all duration-250 ease-luxe',
-          'hover:text-hermes-500',
-          'focus:outline-none focus-visible:ring-1 focus-visible:ring-hermes-500'
-        )}
-        aria-label={`Supprimer ${product.name} du panier`}
-      >
-        <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-      </button>
+      {/* Remove Button (Desktop) */}
+      <div className="hidden md:flex items-center justify-center">
+        <button
+          onClick={handleRemove}
+          className={cn(
+            'flex items-center justify-center',
+            'w-10 h-10',
+            'text-text-light',
+            'transition-all duration-250 ease-luxe',
+            'hover:text-red-500',
+            'focus:outline-none focus-visible:ring-1 focus-visible:ring-hermes-500'
+          )}
+          aria-label={`Supprimer ${product.name} du panier`}
+        >
+          <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+        </button>
+      </div>
     </motion.article>
   );
 }

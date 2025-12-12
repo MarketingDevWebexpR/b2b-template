@@ -23,6 +23,14 @@ interface CartContextType {
   cart: Cart;
   /** Whether cart is being loaded from storage */
   isLoading: boolean;
+  /** Whether cart drawer is open */
+  isDrawerOpen: boolean;
+  /** Open the cart drawer */
+  openDrawer: () => void;
+  /** Close the cart drawer */
+  closeDrawer: () => void;
+  /** Toggle the cart drawer */
+  toggleDrawer: () => void;
   /** Add a product to cart (or increase quantity if already exists) */
   addToCart: (product: Product, quantity?: number) => void;
   /** Remove a product completely from cart */
@@ -120,6 +128,12 @@ function saveCartToStorage(cart: Cart): void {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart>(initialCart);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Drawer controls
+  const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
+  const toggleDrawer = useCallback(() => setIsDrawerOpen((prev) => !prev), []);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -247,6 +261,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => ({
       cart,
       isLoading,
+      isDrawerOpen,
+      openDrawer,
+      closeDrawer,
+      toggleDrawer,
       addToCart,
       removeFromCart,
       updateQuantity,
@@ -257,6 +275,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [
       cart,
       isLoading,
+      isDrawerOpen,
+      openDrawer,
+      closeDrawer,
+      toggleDrawer,
       addToCart,
       removeFromCart,
       updateQuantity,
