@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
-import { User, ShoppingBag, Search } from 'lucide-react';
+import { User, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
 import { Navigation } from './Navigation';
@@ -11,6 +11,7 @@ import { MobileMenu } from './MobileMenu';
 import { useAnnouncement } from '@/contexts/AnnouncementContext';
 import { SearchOverlay } from '@/components/search';
 import { useSearch } from '@/hooks';
+import { CartIndicator } from '@/components/cart';
 
 interface HeaderProps {
   className?: string;
@@ -46,8 +47,6 @@ export function Header({ className }: HeaderProps) {
     setIsScrolled(window.scrollY > 20);
   }, []);
 
-  // Cart item count (placeholder - would come from cart context)
-  const cartItemCount = 0;
 
   return (
     <motion.header
@@ -156,40 +155,7 @@ export function Header({ className }: HeaderProps) {
             </Link>
 
             {/* Cart Button */}
-            <Link
-              href="/panier"
-              className={cn(
-                'relative flex items-center justify-center',
-                'w-10 h-10 rounded-full',
-                'text-text-secondary hover:text-text-primary',
-                'hover:bg-background-warm',
-                'transition-all duration-300 ease-luxe',
-                'focus:outline-none focus-visible:ring-1 focus-visible:ring-luxe-charcoal/20',
-                'group'
-              )}
-              aria-label={`Panier${cartItemCount > 0 ? ` (${cartItemCount} articles)` : ''}`}
-            >
-              <ShoppingBag
-                className="w-[17px] h-[17px] transition-transform duration-300 group-hover:scale-105"
-                strokeWidth={1.25}
-              />
-              {cartItemCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                  className={cn(
-                    'absolute -top-0.5 -right-0.5',
-                    'w-4 h-4 rounded-full',
-                    'bg-luxe-charcoal text-white',
-                    'text-[9px] font-medium',
-                    'flex items-center justify-center'
-                  )}
-                >
-                  {cartItemCount > 9 ? '9+' : cartItemCount}
-                </motion.span>
-              )}
-            </Link>
+            <CartIndicator />
 
             {/* Mobile Menu Toggle */}
             <MobileMenu />

@@ -11,16 +11,15 @@ import { cn } from '@/lib/utils';
 
 /**
  * Zod schema for login form validation
+ * Note: email field accepts any string to support mock users like "user"
  */
 const loginSchema = z.object({
   email: z
     .string()
-    .min(1, 'L\'email est requis')
-    .email('Veuillez entrer une adresse email valide'),
+    .min(1, 'L\'identifiant est requis'),
   password: z
     .string()
-    .min(1, 'Le mot de passe est requis')
-    .min(6, 'Le mot de passe doit contenir au moins 6 caracteres'),
+    .min(1, 'Le mot de passe est requis'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -141,19 +140,19 @@ export function LoginForm() {
       >
         <p className="text-gold-500 font-medium mb-2">Identifiants de demonstration</p>
         <p className="text-luxury-silver">
-          Email: <span className="text-luxury-pearl">demo@luxuryjewels.com</span>
+          Identifiant: <span className="text-luxury-pearl">user</span>
         </p>
         <p className="text-luxury-silver">
-          Mot de passe: <span className="text-luxury-pearl">demo123</span>
+          Mot de passe: <span className="text-luxury-pearl">password</span>
         </p>
       </div>
 
       {/* Email field */}
       <Input
-        label="Adresse email"
+        label="Identifiant"
         name="email"
-        type="email"
-        placeholder="votre@email.com"
+        type="text"
+        placeholder="Votre identifiant"
         value={formData.email}
         onChange={handleChange}
         error={errors.email}

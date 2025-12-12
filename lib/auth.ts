@@ -5,10 +5,11 @@ import { validateCredentials } from '@/data/users';
 
 /**
  * Zod schema for credentials validation
+ * Note: email field accepts any string to support mock users like "user"
  */
 const credentialsSchema = z.object({
-  email: z.string().email('Email invalide'),
-  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
+  email: z.string().min(1, 'Identifiant requis'),
+  password: z.string().min(1, 'Mot de passe requis'),
 });
 
 /**
