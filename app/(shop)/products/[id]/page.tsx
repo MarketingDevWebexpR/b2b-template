@@ -8,7 +8,6 @@ import {
   getProducts as getProductsApi,
 } from '@/lib/api';
 import {
-  products as staticProducts,
   getProductById as getStaticProductById,
   getProductBySlug as getStaticProductBySlug,
   getRelatedProducts as getStaticRelatedProducts,
@@ -24,6 +23,9 @@ import { Product, Category } from '@/types';
 interface ProductPageProps {
   params: Promise<{ id: string }>;
 }
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
 
 // ============================================
 // Data Fetching Functions with Fallback
@@ -94,14 +96,6 @@ function resolveCategory(product: Product): Category | undefined {
   }
   // Fall back to static category data
   return getCategoryById(product.categoryId);
-}
-
-// Generate static params for all products (static data only for build time)
-export async function generateStaticParams() {
-  // For static generation, use local data to avoid API dependency during build
-  return staticProducts.map((product) => ({
-    id: product.id,
-  }));
 }
 
 // Generate dynamic metadata

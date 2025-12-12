@@ -24,70 +24,84 @@ interface CategoryPageProps {
   }>;
 }
 
-// Generate static params for all categories from API
-export async function generateStaticParams() {
-  const categories = await getCategories();
-  return categories.map((category) => ({
-    slug: category.slug,
-  }));
-}
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 
 // Generate dynamic metadata
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  try {
+    const { slug } = await params;
+    const category = await getCategoryBySlug(slug);
 
-  if (!category) {
+    if (!category) {
+      return {
+        title: 'Collection non trouvee | Maison Joaillerie',
+      };
+    }
+
+    return {
+      title: `${category.name} | Maison Joaillerie`,
+      description: category.description,
+      openGraph: {
+        title: `${category.name} | Maison Joaillerie`,
+        description: category.description,
+        images: [
+          {
+            url: category.image,
+            width: 1200,
+            height: 630,
+            alt: category.name,
+          },
+        ],
+      },
+    };
+  } catch (error) {
+    console.error('Error generating metadata:', error);
     return {
       title: 'Collection non trouvee | Maison Joaillerie',
     };
   }
-
-  return {
-    title: `${category.name} | Maison Joaillerie`,
-    description: category.description,
-    openGraph: {
-      title: `${category.name} | Maison Joaillerie`,
-      description: category.description,
-      images: [
-        {
-          url: category.image,
-          width: 1200,
-          height: 630,
-          alt: category.name,
-        },
-      ],
-    },
-  };
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
   const filters = await searchParams;
-  const category = await getCategoryBySlug(slug);
 
-  if (!category) {
+  let category: Awaited<ReturnType<typeof getCategoryBySlug>>;
+  let products: Awaited<ReturnType<typeof getProductsByCategorySlug>>;
+  let totalProductCount = 0;
+  let otherCategories: Awaited<ReturnType<typeof getCategories>>;
+
+  try {
+    // Fetch category data
+    category = await getCategoryBySlug(slug);
+
+    if (!category) {
+      notFound();
+    }
+
+    // Get products and apply filters from API
+    products = await getProductsByCategorySlug(slug);
+    totalProductCount = products.length;
+
+    // Apply filters from URL params
+    if (filters.minPrice || filters.maxPrice || filters.materials || filters.sort) {
+      products = await filterProductsFromAPI({
+        categorySlug: slug,
+        minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+        maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
+        materials: filters.materials ? filters.materials.split(',') : undefined,
+        sortBy: filters.sort as 'price-asc' | 'price-desc' | 'name' | 'newest' | undefined,
+      });
+    }
+
+    // Get other categories for navigation from API
+    const allCategories = await getCategories();
+    otherCategories = allCategories.filter((cat) => cat.slug !== slug);
+  } catch (error) {
+    console.error('Error loading category page:', error);
     notFound();
   }
-
-  // Get products and apply filters from API
-  let products = await getProductsByCategorySlug(slug);
-  const totalProductCount = products.length;
-
-  // Apply filters from URL params
-  if (filters.minPrice || filters.maxPrice || filters.materials || filters.sort) {
-    products = await filterProductsFromAPI({
-      categorySlug: slug,
-      minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
-      maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
-      materials: filters.materials ? filters.materials.split(',') : undefined,
-      sortBy: filters.sort as 'price-asc' | 'price-desc' | 'name' | 'newest' | undefined,
-    });
-  }
-
-  // Get other categories for navigation from API
-  const allCategories = await getCategories();
-  const otherCategories = allCategories.filter((cat) => cat.slug !== slug);
 
   return (
     <main className="min-h-screen bg-background-cream">

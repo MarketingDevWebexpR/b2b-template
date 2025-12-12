@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function CategoriesPage() {
   // Charger les catégories depuis l'API avec fallback
   let categories;
