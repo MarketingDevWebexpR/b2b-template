@@ -35,7 +35,7 @@ interface CategoryCardProps {
 
 function CategoryCard({ category, index }: CategoryCardProps) {
   return (
-    <motion.div variants={itemVariants}>
+    <motion.div variants={itemVariants} className="h-full">
       <Link
         href={`/collections/${category.slug}`}
         className="group relative flex h-[200px] flex-col border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant"

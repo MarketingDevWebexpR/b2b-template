@@ -153,3 +153,190 @@ export interface RegisterFormData {
   password: string;
   confirmPassword: string;
 }
+
+// ============================================
+// E-commerce Types: Shipping & Address
+// ============================================
+
+export interface ShippingAddress {
+  firstName: string;
+  lastName: string;
+  address: string;
+  addressLine2?: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  phone: string;
+  email?: string;
+}
+
+export interface BillingAddress extends ShippingAddress {
+  companyName?: string;
+  vatNumber?: string;
+}
+
+// ============================================
+// E-commerce Types: Payment
+// ============================================
+
+/**
+ * Mock payment info for development
+ * In production, use Stripe/PayPal payment intents
+ */
+export interface PaymentInfo {
+  method: PaymentMethod;
+  status: PaymentStatus;
+  transactionId?: string;
+  lastFourDigits?: string;
+  cardBrand?: CardBrand;
+  paidAt?: string;
+}
+
+export type PaymentMethod = 'card' | 'paypal' | 'bank_transfer' | 'apple_pay' | 'google_pay';
+export type PaymentStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+export type CardBrand = 'visa' | 'mastercard' | 'amex' | 'cb';
+
+// ============================================
+// E-commerce Types: Orders
+// ============================================
+
+export type OrderStatus =
+  | 'pending'        // Order created, awaiting payment
+  | 'confirmed'      // Payment received, order confirmed
+  | 'processing'     // Being prepared for shipment
+  | 'shipped'        // Handed to carrier
+  | 'delivered'      // Successfully delivered
+  | 'cancelled'      // Order cancelled
+  | 'refunded';      // Order refunded
+
+export interface OrderItem {
+  productId: string;
+  productReference?: string;
+  productName: string;
+  productImage: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export interface OrderTotals {
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
+  total: number;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  userId: string;
+  items: OrderItem[];
+  totals: OrderTotals;
+  shippingAddress: ShippingAddress;
+  billingAddress?: BillingAddress;
+  paymentInfo: PaymentInfo;
+  status: OrderStatus;
+  notes?: string;
+  trackingNumber?: string;
+  createdAt: string;
+  updatedAt: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+}
+
+// ============================================
+// E-commerce Types: Checkout Flow
+// ============================================
+
+export type CheckoutStep =
+  | 'cart'           // Review cart items
+  | 'shipping'       // Enter shipping address
+  | 'billing'        // Enter billing (if different)
+  | 'payment'        // Select payment method
+  | 'review'         // Final review before purchase
+  | 'confirmation';  // Order confirmation
+
+export interface CheckoutState {
+  currentStep: CheckoutStep;
+  completedSteps: CheckoutStep[];
+  shippingAddress: ShippingAddress | null;
+  billingAddress: BillingAddress | null;
+  sameAsShipping: boolean;
+  paymentMethod: PaymentMethod | null;
+  orderNotes: string;
+  isProcessing: boolean;
+  error: string | null;
+}
+
+// ============================================
+// E-commerce Types: Cart (Enhanced)
+// ============================================
+
+export interface CartItemWithDetails {
+  productId: string;
+  productReference?: string;
+  productName: string;
+  productSlug: string;
+  productImage: string;
+  unitPrice: number;
+  quantity: number;
+  maxQuantity: number; // Based on stock
+  totalPrice: number;
+}
+
+export interface CartState {
+  items: CartItemWithDetails[];
+  itemCount: number;
+  subtotal: number;
+  lastUpdated: string;
+}
+
+// ============================================
+// E-commerce Types: Stock Management
+// ============================================
+
+export interface StockInfo {
+  productId: string;
+  available: number;
+  reserved: number;
+  showExactStock: boolean; // True for logged-in users
+}
+
+export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
+
+// ============================================
+// E-commerce API Types
+// ============================================
+
+export interface CreateOrderRequest {
+  items: CartItemWithDetails[];
+  shippingAddress: ShippingAddress;
+  billingAddress?: BillingAddress;
+  paymentMethod: PaymentMethod;
+  notes?: string;
+}
+
+export interface CreateOrderResponse {
+  success: boolean;
+  order?: Order;
+  error?: string;
+  paymentIntent?: string; // For Stripe integration
+}
+
+export interface OrderListResponse {
+  orders: Order[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+// ============================================
+// Session Types (NextAuth Extension)
+// ============================================
+
+export interface ExtendedUser extends User {
+  addresses?: ShippingAddress[];
+  defaultShippingAddressId?: string;
+  defaultBillingAddressId?: string;
+}

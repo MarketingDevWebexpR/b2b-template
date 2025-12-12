@@ -3,6 +3,14 @@ import { MockUser } from '@/types';
 export const mockUsers: MockUser[] = [
   {
     id: '1',
+    name: 'Utilisateur Test',
+    email: 'user',
+    password: 'password',
+    image: null,
+    role: 'user',
+  },
+  {
+    id: '2',
     name: 'Marie Dupont',
     email: 'demo@luxuryjewels.com',
     password: 'demo123',
@@ -10,7 +18,7 @@ export const mockUsers: MockUser[] = [
     role: 'user',
   },
   {
-    id: '2',
+    id: '3',
     name: 'Admin Bijoux',
     email: 'admin@luxuryjewels.com',
     password: 'admin123',

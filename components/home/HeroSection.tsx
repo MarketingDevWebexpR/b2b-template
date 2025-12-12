@@ -45,20 +45,23 @@ export function HeroSection() {
       {/* Background Image with Next/Image for optimization */}
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1920&q=80"
-          alt="Luxury jewelry collection"
+          src="https://images.unsplash.com/photo-1585960622850-ed33c41d6418?w=1920&q=90&auto=format&fit=crop"
+          alt="Femme elegante portant un collier en or - Maison Bijoux"
           fill
           priority
-          className="object-cover object-center"
+          className="object-cover object-[center_20%] scale-105"
           sizes="100vw"
         />
       </div>
 
-      {/* Light Overlay - Elegant Hermes style */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background-cream/30 via-transparent to-luxe-charcoal/50" />
+      {/* Premium Dark Overlay - Luxe feel */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
 
-      {/* Additional gradient for elegant depth */}
-      <div className="absolute inset-0 bg-gradient-to-r from-background-cream/20 via-transparent to-background-cream/20" />
+      {/* Subtle vignette effect for depth */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
+
+      {/* Gold accent glow at bottom */}
+      <div className="absolute inset-0 bg-gradient-to-t from-hermes-900/20 via-transparent to-transparent" />
 
       {/* Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8">

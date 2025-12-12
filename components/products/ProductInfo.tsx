@@ -2,9 +2,10 @@
 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Minus, Plus, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Minus, Plus, Check, Loader2 } from 'lucide-react';
 import type { Product } from '@/types';
 import { cn, formatPrice, calculateDiscount } from '@/lib/utils';
+import { StockDisplay } from './StockDisplay';
 
 interface ProductInfoProps {
   product: Product;
@@ -18,37 +19,6 @@ function getStockStatus(stock: number): StockStatus {
   if (stock === 0) return 'out_of_stock';
   if (stock <= 5) return 'low_stock';
   return 'in_stock';
-}
-
-function StockIndicator({ stock }: { stock: number }) {
-  const status = getStockStatus(stock);
-
-  const config = {
-    in_stock: {
-      icon: Check,
-      text: 'En stock',
-      className: 'text-green-600',
-    },
-    low_stock: {
-      icon: AlertCircle,
-      text: `Plus que ${stock} en stock`,
-      className: 'text-amber-600',
-    },
-    out_of_stock: {
-      icon: AlertCircle,
-      text: 'Rupture de stock',
-      className: 'text-red-600',
-    },
-  };
-
-  const { icon: Icon, text, className } = config[status];
-
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <Icon className="w-4 h-4" />
-      <span className="text-sm font-medium">{text}</span>
-    </div>
-  );
 }
 
 export function ProductInfo({ product, onAddToCart, className }: ProductInfoProps) {
@@ -152,13 +122,13 @@ export function ProductInfo({ product, onAddToCart, className }: ProductInfoProp
         </motion.div>
       )}
 
-      {/* Stock Status */}
+      {/* Stock Status - Enhanced for logged-in users */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <StockIndicator stock={product.stock} />
+        <StockDisplay stock={product.stock} showDetailedInfo={false} />
       </motion.div>
 
       {/* Quantity Selector & Add to Cart */}
