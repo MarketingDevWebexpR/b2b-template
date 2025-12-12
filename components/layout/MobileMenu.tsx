@@ -9,9 +9,6 @@ import { cn } from '@/lib/utils';
 import { LogoText } from './Logo';
 import type { NavItem, Category } from '@/types';
 
-// API URL for fetching categories
-const API_BASE_URL = process.env.NEXT_PUBLIC_SAGE_API_URL || 'https://sage-portal.webexpr.dev/api';
-
 // Base navigation items (without dynamic categories)
 const baseNavigationItems: NavItem[] = [
   { label: 'Accueil', href: '/' },
@@ -34,33 +31,18 @@ export function MobileMenu({ className }: MobileMenuProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const pathname = usePathname();
 
-  // Fetch categories from API on component mount
+  // Fetch categories from internal API route (avoids CORS issues on Vercel)
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await fetch(`${API_BASE_URL}/sage/families`, {
-          cache: 'no-store', // Always fetch fresh data
+        const response = await fetch('/api/categories', {
+          cache: 'no-store',
         });
         if (response.ok) {
-          const families = await response.json();
-          // Map Sage families to categories (only leaf categories with type 0)
-          const mappedCategories: Category[] = families
-            .filter((f: { TypeFamille: number }) => f.TypeFamille === 0)
-            .map((f: { CodeFamille: string; Intitule: string }) => ({
-              id: f.CodeFamille,
-              code: f.CodeFamille,
-              name: f.Intitule,
-              slug: f.Intitule
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)/g, ''),
-              description: f.Intitule,
-              image: '/images/placeholder-category.svg',
-              productCount: 0,
-            }));
-          setCategories(mappedCategories);
+          const data = await response.json();
+          // Handle both array response and object with error
+          const categoriesData = Array.isArray(data) ? data : [];
+          setCategories(categoriesData);
         }
       } catch (error) {
         console.error('Failed to fetch categories for mobile menu:', error);
