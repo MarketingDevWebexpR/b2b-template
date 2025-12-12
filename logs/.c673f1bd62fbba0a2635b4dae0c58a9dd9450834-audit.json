@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/jean_webexpr/Documents/projets_webexpr/bijoux-next/logs/.c673f1bd62fbba0a2635b4dae0c58a9dd9450834-audit.json",
+    "files": [
+        {
+            "date": 1765526614555,
+            "name": "/Users/jean_webexpr/Documents/projets_webexpr/bijoux-next/logs/mcp-puppeteer-2025-12-12.log",
+            "hash": "cb24bd32bb4bbc2d914450f97d1e75a83845139aca3ad8102be2514b20e4dda9"
+        }
+    ],
+    "hashType": "sha256"
+}

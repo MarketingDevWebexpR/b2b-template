@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background-cream text-text-primary antialiased;
+    font-family: 'Inter', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  }
+
+  ::selection {
+    @apply bg-hermes-500 text-white;
+  }
+
+  /* Hide scrollbar - Clean luxury aesthetic */
+  html {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  ::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
+}
+
+@layer components {
+  /* Buttons - Hermes style */
+  .btn {
+    @apply inline-flex items-center justify-center px-8 py-4 font-medium
+           tracking-luxe uppercase text-overline transition-all duration-400
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-hermes-500 text-white
+           hover:bg-hermes-600 hover:shadow-button-hover active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn bg-transparent text-text-primary border border-border
+           hover:border-hermes-500 hover:text-hermes-500;
+  }
+
+  .btn-outline {
+    @apply btn bg-transparent text-hermes-500 border border-hermes-500
+           hover:bg-hermes-500 hover:text-white;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-text-primary
+           hover:text-hermes-500 hover:bg-background-beige;
+  }
+
+  /* Inputs - Elegant light style */
+  .input {
+    @apply w-full bg-white border border-border rounded-soft
+           px-4 py-3 text-text-primary placeholder:text-text-light
+           focus:outline-none focus:border-hermes-500 transition-colors duration-350;
+  }
+
+  .input-label {
+    @apply block text-caption text-text-muted mb-2 uppercase tracking-elegant;
+  }
+
+  /* Cards - Light elegant style */
+  .card-luxury {
+    @apply bg-white border border-border-light rounded-soft
+           transition-all duration-400 ease-luxe
+           hover:border-hermes-500/30 hover:shadow-card-hover;
+  }
+
+  /* Section styling */
+  .section-title {
+    @apply text-heading-1 md:text-display-2 font-serif text-center text-text-primary;
+  }
+
+  .section-subtitle {
+    @apply text-text-muted text-center max-w-prose mx-auto mt-4 text-body-lg;
+  }
+
+  /* Hermes orange decorative line */
+  .hermes-line {
+    @apply w-24 h-px bg-hermes-500 mx-auto;
+  }
+
+  /* Text utilities */
+  .text-gradient-hermes {
+    @apply bg-clip-text text-transparent bg-gradient-hermes;
+  }
+
+  /* Link with underline animation */
+  .link-hover {
+    @apply relative;
+  }
+
+  .link-hover::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-px bg-hermes-500 transition-all duration-350;
+  }
+
+  .link-hover:hover::after {
+    @apply w-full;
+  }
+
+  /* Elegant divider */
+  .divider {
+    @apply w-full h-px bg-border;
+  }
+
+  .divider-hermes {
+    @apply w-24 h-px bg-hermes-500;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar,
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar,
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Image overlay for cards - Light version */
+  .image-overlay {
+    @apply relative overflow-hidden;
+  }
+
+  .image-overlay::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-t from-luxe-charcoal/50 via-transparent to-transparent
+           opacity-0 transition-opacity duration-400 z-10;
+  }
+
+  .image-overlay:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Prose styling for elegant text blocks */
+  .prose-elegant {
+    @apply text-body leading-elegant text-text-muted;
+  }
+
+  .prose-elegant p + p {
+    @apply mt-6;
+  }
+}

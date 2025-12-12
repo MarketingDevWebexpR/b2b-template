@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <!-- Elegant cream background -->
+  <rect width="400" height="400" fill="#FAF8F5"/>
+
+  <defs>
+    <!-- Subtle grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#EBE4D8" stroke-width="0.5"/>
+    </pattern>
+
+    <!-- Hermes orange gradient for accents -->
+    <linearGradient id="hermesGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C65A24"/>
+      <stop offset="50%" style="stop-color:#D4703D"/>
+      <stop offset="100%" style="stop-color:#C65A24"/>
+    </linearGradient>
+
+    <!-- Soft gold accent gradient -->
+    <linearGradient id="goldAccent" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#C9A962"/>
+      <stop offset="50%" style="stop-color:#E8D5A3"/>
+      <stop offset="100%" style="stop-color:#B8962E"/>
+    </linearGradient>
+
+    <!-- Radial glow effect -->
+    <radialGradient id="centerGlow" cx="50%" cy="45%" r="40%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#FAF8F5;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background pattern -->
+  <rect width="400" height="400" fill="url(#grid)" opacity="0.6"/>
+
+  <!-- Central glow -->
+  <ellipse cx="200" cy="170" rx="120" ry="100" fill="url(#centerGlow)"/>
+
+  <!-- Diamond shape - elegant geometric -->
+  <g transform="translate(200, 170)">
+    <!-- Main diamond outline -->
+    <path d="M0 -70 L60 -20 L0 80 L-60 -20 Z"
+          fill="none"
+          stroke="url(#hermesGradient)"
+          stroke-width="1.5"
+          opacity="0.9"/>
+
+    <!-- Inner facets -->
+    <path d="M0 -70 L0 80" stroke="url(#goldAccent)" stroke-width="0.5" opacity="0.5"/>
+    <path d="M-60 -20 L60 -20" stroke="url(#goldAccent)" stroke-width="0.5" opacity="0.5"/>
+    <path d="M0 -70 L-30 20" stroke="#C9A962" stroke-width="0.5" opacity="0.3"/>
+    <path d="M0 -70 L30 20" stroke="#C9A962" stroke-width="0.5" opacity="0.3"/>
+    <path d="M-60 -20 L0 80" stroke="#C9A962" stroke-width="0.5" opacity="0.3"/>
+    <path d="M60 -20 L0 80" stroke="#C9A962" stroke-width="0.5" opacity="0.3"/>
+
+    <!-- Sparkle effects - Hermes orange -->
+    <circle cx="-45" cy="-50" r="2" fill="#C65A24" opacity="0.7"/>
+    <circle cx="50" cy="-40" r="1.5" fill="#D4703D" opacity="0.5"/>
+    <circle cx="-55" cy="10" r="1" fill="#C65A24" opacity="0.4"/>
+
+    <!-- Ring around diamond -->
+    <ellipse cx="0" cy="85" rx="35" ry="8"
+             fill="none"
+             stroke="url(#goldAccent)"
+             stroke-width="2"
+             opacity="0.6"/>
+    <ellipse cx="0" cy="85" rx="25" ry="5"
+             fill="none"
+             stroke="#E8D5A3"
+             stroke-width="1"
+             opacity="0.3"/>
+  </g>
+
+  <!-- Decorative corner elements - Hermes orange -->
+  <g opacity="0.25">
+    <path d="M20 20 L50 20 M20 20 L20 50" stroke="#C65A24" stroke-width="1"/>
+    <path d="M380 20 L350 20 M380 20 L380 50" stroke="#C65A24" stroke-width="1"/>
+    <path d="M20 380 L50 380 M20 380 L20 350" stroke="#C65A24" stroke-width="1"/>
+    <path d="M380 380 L350 380 M380 380 L380 350" stroke="#C65A24" stroke-width="1"/>
+  </g>
+
+  <!-- Subtle pearl accents -->
+  <g opacity="0.3">
+    <circle cx="80" cy="100" r="3" fill="#E8E2D9"/>
+    <circle cx="320" cy="100" r="3" fill="#E8E2D9"/>
+    <circle cx="60" cy="200" r="2" fill="#DDD6C9"/>
+    <circle cx="340" cy="200" r="2" fill="#DDD6C9"/>
+  </g>
+
+  <!-- Text -->
+  <text x="200" y="320"
+        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="11"
+        fill="#9A9287"
+        text-anchor="middle"
+        letter-spacing="3"
+        font-weight="300">IMAGE NON DISPONIBLE</text>
+</svg>
