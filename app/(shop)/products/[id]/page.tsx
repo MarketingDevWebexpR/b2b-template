@@ -15,7 +15,7 @@ import {
 import { getCategoryById } from '@/data/categories';
 import { Container } from '@/components/ui/Container';
 import { ProductGallery } from '@/components/products/ProductGallery';
-import { ProductInfo } from '@/components/products/ProductInfo';
+import { ProductInfoWithCart } from '@/components/products/ProductInfoWithCart';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
 import { HeaderSpacer } from '@/components/layout/Header';
 import { Product, Category } from '@/types';
@@ -270,7 +270,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </Link>
                 )}
 
-                <ProductInfo product={product} />
+                <ProductInfoWithCart product={product} />
 
                 {/* Full Description */}
                 <div className="mt-8 pt-8 border-t border-border">

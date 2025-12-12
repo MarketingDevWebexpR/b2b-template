@@ -53,7 +53,7 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
 
   const handleLoginRedirect = () => {
     // Redirect to login with callback to checkout
-    router.push('/auth/connexion?callbackUrl=/checkout');
+    router.push('/login?callbackUrl=/checkout');
   };
 
   return (
@@ -307,7 +307,7 @@ function LoginPromptModal({ onClose, onLogin }: LoginPromptModalProps) {
 
             {/* Register Link */}
             <Link
-              href="/auth/inscription?callbackUrl=/checkout"
+              href="/login?callbackUrl=/checkout"
               className={cn(
                 'block w-full',
                 'px-6 py-3.5',
