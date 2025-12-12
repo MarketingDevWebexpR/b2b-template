@@ -6,13 +6,8 @@ import {
   getProductByReference,
   getProductBySlug as getProductBySlugApi,
   getProducts as getProductsApi,
+  getCategories as getCategoriesApi,
 } from '@/lib/api';
-import {
-  getProductById as getStaticProductById,
-  getProductBySlug as getStaticProductBySlug,
-  getRelatedProducts as getStaticRelatedProducts,
-} from '@/data/products';
-import { getCategoryById } from '@/data/categories';
 import { Container } from '@/components/ui/Container';
 import { ProductGallery } from '@/components/products/ProductGallery';
 import { ProductInfoWithCart } from '@/components/products/ProductInfoWithCart';
@@ -32,70 +27,57 @@ export const dynamic = 'force-dynamic';
 // ============================================
 
 /**
- * Fetch a product by ID (reference or slug) with fallback to static data.
+ * Fetch a product by ID (reference or slug) from the live Sage API.
  * Tries reference first, then slug.
  */
 async function fetchProduct(id: string): Promise<Product | null> {
-  try {
-    // Try fetching by reference first
-    let product = await getProductByReference(id);
-    if (product) {
-      return product;
-    }
-
-    // Then try by slug
-    product = await getProductBySlugApi(id);
-    if (product) {
-      return product;
-    }
-
-    // API returned no results, fall back to static data
-    console.log(`[ProductPage] No product found via API for "${id}", trying static data...`);
-    return getStaticProductById(id) || getStaticProductBySlug(id) || null;
-  } catch (error) {
-    // API failed, fall back to static data
-    console.error(`[ProductPage] API error for product "${id}":`, error);
-    console.log(`[ProductPage] Falling back to static data...`);
-    return getStaticProductById(id) || getStaticProductBySlug(id) || null;
+  // Try fetching by reference first
+  let product = await getProductByReference(id);
+  if (product) {
+    return product;
   }
+
+  // Then try by slug
+  product = await getProductBySlugApi(id);
+  if (product) {
+    return product;
+  }
+
+  // No product found
+  console.log(`[ProductPage] No product found via API for "${id}"`);
+  return null;
 }
 
 /**
- * Fetch related products from the same category with fallback to static data.
+ * Fetch related products from the same category from the live Sage API.
  */
 async function fetchRelatedProducts(
   product: Product,
   limit: number = 4
 ): Promise<Product[]> {
-  try {
-    const allProducts = await getProductsApi();
-    return allProducts
-      .filter(
-        (p) =>
-          p.categoryId === product.categoryId &&
-          p.id !== product.id &&
-          p.reference !== product.reference
-      )
-      .slice(0, limit);
-  } catch (error) {
-    console.error('[ProductPage] API error fetching related products:', error);
-    console.log('[ProductPage] Falling back to static related products...');
-    // Fallback to static data
-    return getStaticRelatedProducts(product.id, limit);
-  }
+  const allProducts = await getProductsApi();
+  return allProducts
+    .filter(
+      (p) =>
+        p.categoryId === product.categoryId &&
+        p.id !== product.id &&
+        p.reference !== product.reference
+    )
+    .slice(0, limit);
 }
 
 /**
  * Resolve category information for a product.
- * Uses product's embedded category if available, otherwise falls back to static data.
+ * Uses product's embedded category if available, otherwise fetches from API.
  */
-function resolveCategory(product: Product): Category | undefined {
+async function resolveCategory(product: Product): Promise<Category | undefined> {
   // Use embedded category from API if available
   if (product.category) {
     return product.category;
   }
-  // Fall back to static category data
-  return getCategoryById(product.categoryId);
+  // Fetch categories from API
+  const categories = await getCategoriesApi();
+  return categories.find(c => c.code === product.categoryId);
 }
 
 // Generate dynamic metadata
@@ -111,7 +93,7 @@ export async function generateMetadata({
     };
   }
 
-  const category = resolveCategory(product);
+  const category = await resolveCategory(product);
 
   return {
     title: `${product.name} | Maison Joaillerie`,
@@ -136,8 +118,7 @@ export async function generateMetadata({
 }
 
 // JSON-LD structured data for SEO
-function ProductJsonLd({ product }: { product: Product }) {
-  const category = resolveCategory(product);
+function ProductJsonLd({ product, category }: { product: Product; category?: Category }) {
   const reference = product.reference || product.id;
 
   const jsonLd = {
@@ -180,7 +161,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const category = resolveCategory(product);
+  const category = await resolveCategory(product);
   const relatedProducts = await fetchRelatedProducts(product, 4);
 
   // Format the reference for display
@@ -188,7 +169,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <>
-      <ProductJsonLd product={product} />
+      <ProductJsonLd product={product} category={category} />
 
       <main className="min-h-screen bg-background-cream">
         <HeaderSpacer />
@@ -300,6 +281,30 @@ export default async function ProductPage({ params }: ProductPageProps) {
                         {category?.name || '-'}
                       </dd>
                     </div>
+                    {product.brand && (
+                      <div className="flex justify-between">
+                        <dt className="text-text-muted">Marque</dt>
+                        <dd className="text-text-primary font-medium">
+                          {product.brand}
+                        </dd>
+                      </div>
+                    )}
+                    {product.collection && (
+                      <div className="flex justify-between">
+                        <dt className="text-text-muted">Collection</dt>
+                        <dd className="text-hermes-500 font-medium">
+                          {product.collection}
+                        </dd>
+                      </div>
+                    )}
+                    {product.style && (
+                      <div className="flex justify-between">
+                        <dt className="text-text-muted">Style</dt>
+                        <dd className="text-text-primary font-medium">
+                          {product.style}
+                        </dd>
+                      </div>
+                    )}
                     {product.materials.length > 0 && (
                       <div className="flex justify-between">
                         <dt className="text-text-muted">Matériaux</dt>
@@ -312,15 +317,31 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       <div className="flex justify-between">
                         <dt className="text-text-muted">Poids</dt>
                         <dd className="text-text-primary font-medium">
-                          {product.weight} g
+                          {product.weight} {product.weightUnit}
+                        </dd>
+                      </div>
+                    )}
+                    {product.origin && (
+                      <div className="flex justify-between">
+                        <dt className="text-text-muted">Origine</dt>
+                        <dd className="text-text-primary font-medium">
+                          {product.origin}
+                        </dd>
+                      </div>
+                    )}
+                    {product.warranty && product.warranty > 0 && (
+                      <div className="flex justify-between">
+                        <dt className="text-text-muted">Garantie</dt>
+                        <dd className="text-text-primary font-medium">
+                          {product.warranty} mois
                         </dd>
                       </div>
                     )}
                     {product.isNew && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Collection</dt>
+                        <dt className="text-text-muted">Nouveauté</dt>
                         <dd className="text-hermes-500 font-medium">
-                          Nouveauté 2024
+                          ✨ Nouveau
                         </dd>
                       </div>
                     )}

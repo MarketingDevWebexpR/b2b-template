@@ -29,6 +29,58 @@ function parseAspNetDate(dateString: string): Date {
 }
 
 // ============================================
+// Helpers: Extraction des données Sage
+// ============================================
+
+/**
+ * Extrait la valeur d'un champ InfoLibre par son nom
+ */
+function getInfoLibreValue(infosLibres: SageArticle['InfosLibres'], name: string): string | number | null {
+  if (!infosLibres) return null;
+  const info = infosLibres.find(i => i.Name === name);
+  return info?.Value ?? null;
+}
+
+/**
+ * Extrait la marque commerciale depuis les InfosLibres
+ */
+function extractBrand(article: SageArticle): string | undefined {
+  const value = getInfoLibreValue(article.InfosLibres, 'Marque commerciale');
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+/**
+ * Extrait la collection depuis StatistiqueArticles ou Statistique1
+ */
+function extractCollection(article: SageArticle): string | undefined {
+  // Priorité aux StatistiqueArticles structurées
+  const stat = article.StatistiqueArticles?.find(s => s.Intitule === 'Collection');
+  if (stat?.Valeur) return stat.Valeur;
+  // Fallback sur Statistique1
+  return article.Statistique1 || undefined;
+}
+
+/**
+ * Extrait le style depuis StatistiqueArticles ou Statistique2
+ */
+function extractStyle(article: SageArticle): string | undefined {
+  // Priorité aux StatistiqueArticles structurées
+  const stat = article.StatistiqueArticles?.find(s => s.Intitule === 'Style');
+  if (stat?.Valeur) return stat.Valeur;
+  // Fallback sur Statistique2
+  return article.Statistique2 || undefined;
+}
+
+/**
+ * Détermine l'unité de poids à partir de UnitePoids Sage
+ * 3 = grammes (le plus courant pour les bijoux)
+ */
+function getWeightUnit(unitePoids: number): 'g' | 'kg' {
+  // 3 = grammes dans Sage
+  return unitePoids === 3 ? 'g' : 'kg';
+}
+
+// ============================================
 // Mappers: API Sage -> Front-end
 // ============================================
 
@@ -40,23 +92,56 @@ export function mapSageArticleToProduct(article: SageArticle, categories?: Categ
     ? `${API_BASE_URL}/sage/articles/${encodeURIComponent(article.Reference)}/image`
     : '/images/placeholder-product.svg';
 
+  // Calculer la disponibilité
+  const isAvailable = article.Publie && !article.EstEnSommeil && !article.InterdireCommande;
+
   return {
+    // Identification
     id: article.Reference,
     reference: article.Reference,
     name: article.Intitule,
+    nameEn: article.Langue1 || undefined,
     slug: slugify(article.Intitule) + '-' + article.Reference.toLowerCase(),
+    ean: article.CodeBarres || undefined,
+
+    // Descriptions
     description: article.Langue1 || article.Intitule,
     shortDescription: article.Intitule,
+
+    // Prix (on n'expose PAS PrixAchat, PrixUnitaireNet, Coefficient)
     price: article.PrixVente,
-    compareAtPrice: article.PrixUnitaireNet > article.PrixVente ? article.PrixUnitaireNet : undefined,
+    isPriceTTC: article.EstEnPrixTTTC || false,
+    // Note: compareAtPrice ne doit PAS utiliser PrixUnitaireNet (c'est le prix d'achat net)
+    compareAtPrice: undefined,
+
+    // Média
     images: [imageUrl],
+
+    // Catégorisation
     categoryId: article.CodeFamille,
     category,
-    materials: [], // À extraire des InfosLibres si disponible
+    collection: extractCollection(article),
+    style: extractStyle(article),
+
+    // Caractéristiques physiques
+    materials: [], // À implémenter si disponible dans InfosLibres
     weight: article.PoidsNet,
-    stock: article.EstEnSommeil ? 0 : 100, // Simplifié, à adapter selon la logique métier
+    weightUnit: getWeightUnit(article.UnitePoids),
+
+    // Informations marque et origine
+    brand: extractBrand(article),
+    origin: article.Pays || undefined,
+    warranty: article.Garantie > 0 ? article.Garantie : undefined,
+
+    // Disponibilité
+    stock: isAvailable ? 100 : 0, // Simplifié, à adapter selon la logique métier
+    isAvailable,
+
+    // Flags
     featured: false,
     isNew: isRecentlyCreated(article.DateCreation),
+
+    // Métadonnées
     createdAt: article.DateCreation,
   };
 }

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { getCategories } from '@/lib/api';
-import { categories as fallbackCategories } from '@/data/categories';
 import { Container } from '@/components/ui/Container';
 import { HeaderSpacer } from '@/components/layout/Header';
 import { CategoryCard } from '@/components/categories/CategoryCard';
@@ -20,16 +19,9 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CategoriesPage() {
-  // Charger les catégories depuis l'API avec fallback
-  let categories;
-  try {
-    categories = await getCategories();
-    if (categories.length === 0) {
-      categories = fallbackCategories;
-    }
-  } catch {
-    categories = fallbackCategories;
-  }
+  // Charger les catégories depuis l'API Sage (données live)
+  const categories = await getCategories();
+
   return (
     <main className="min-h-screen bg-luxury-black">
       {/* Hero Header */}

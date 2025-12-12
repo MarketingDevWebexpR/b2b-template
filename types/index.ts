@@ -2,45 +2,83 @@
 // Types API Sage (données brutes de l'API)
 // ============================================
 
-// Statistiques article Sage
+// Statistiques article Sage (Collection, Style, etc.)
 export interface SageStatistiqueArticle {
-  CodeStatistique: string;
-  Intitule: string;
+  Intitule: string;       // Ex: "Collection", "Style"
+  IdStatistique: number;  // 1=Collection, 2=Style
+  Valeur: string;         // Ex: "Automne/Hiver", "Classique"
 }
 
 // Infos libres article Sage
 export interface SageInfoLibre {
-  Intitule: string;
-  Valeur: string | number | null;
+  Name: string;           // Ex: "Marque commerciale", "1ère commercialisation"
+  Type: number;           // 0=texte, 1=date, 3=nombre
+  Size: number;
+  EstCalculee: boolean;
+  Value: string | number | null;
 }
 
 // Article brut de l'API Sage
 export interface SageArticle {
-  __type: 'ArticleStandard' | 'ArticleGamme';
+  __type: 'ArticleStandard:http://www.proconsult.lu/WebServices100' | 'ArticleGamme:http://www.proconsult.lu/WebServices100';
   Reference: string;
   Intitule: string;
   CodeFamille: string;
-  TypeArticle: number; // 0=Standard, 1=Gamme, 2=Kit, 4=Composé
-  PrixAchat: number;
-  PrixUnitaireNet: number;
-  PrixVente: number;
-  Coefficient: number;
-  Garantie: number;
+  TypeArticle: number;    // 0=Standard, 1=Gamme, 2=Kit, 4=Composé
+
+  // Prix (données sensibles à ne PAS exposer au client: PrixAchat, PrixUnitaireNet, Coefficient)
+  PrixAchat: number;      // ⚠️ CONFIDENTIEL - Ne pas exposer
+  PrixUnitaireNet: number; // ⚠️ CONFIDENTIEL - Ne pas exposer
+  PrixVente: number;      // ✅ Prix public
+  Coefficient: number;    // ⚠️ CONFIDENTIEL - Ne pas exposer
+  EstEnPrixTTTC: boolean; // Indique si le prix est TTC
+
+  // Caractéristiques physiques
   PoidsNet: number;
   PoidsBrut: number;
-  UnitePoids: number; // 3=grammes
+  UnitePoids: number;     // 3=grammes
+  Garantie: number;       // En mois
+  Pays: string;           // Pays d'origine
+
+  // Gestion
   IdUniteVente: number;
   TypeSuiviStock: number;
   Fictif: boolean;
   EstEnSommeil: boolean;
+  Publie: boolean;
+  InterdireCommande: boolean;
   ExclureReapprovisionnement: boolean;
-  Langue1?: string; // Description anglaise
-  CodeBarres?: string;
-  Photo?: string;
+
+  // Descriptions
+  Langue1?: string;       // Description en anglais
+  Langue2?: string;
+
+  // Identifiants
+  CodeBarres?: string;    // Code EAN
+  Photo?: string;         // Chemin de l'image
+
+  // Catégories/Catalogues
+  IdCatalogue1: number;
+  IdCatalogue2: number;
+  IdCatalogue3: number;
+  IdCatalogue4: number;
+
+  // Statistiques (Collection, Style)
+  Statistique1: string;   // Valeur directe de la collection
+  Statistique2: string;   // Valeur directe du style
+  Statistique3: string;
+  Statistique4: string;
+  Statistique5: string;
   StatistiqueArticles?: SageStatistiqueArticle[];
+
+  // Infos libres (Marque commerciale, etc.)
   InfosLibres?: SageInfoLibre[];
+
+  // Dates
   DateCreation: string;
   DateModification: string;
+
+  // Données internes (ne pas exposer)
   Createur: string;
   UtilisateurCreateur: string;
 }
@@ -60,24 +98,53 @@ export interface SageFamille {
 // Types Front-end (utilisés dans les composants)
 // ============================================
 
-// Product Types
+// Product Types - Données utiles pour le client
 export interface Product {
+  // Identification
   id: string;
-  reference?: string;
+  reference: string;
   name: string;
+  nameEn?: string;          // Nom en anglais (Langue1)
   slug: string;
+  ean?: string;             // Code-barres EAN
+
+  // Descriptions
   description: string;
   shortDescription: string;
+
+  // Prix
   price: number;
   compareAtPrice?: number;
+  isPriceTTC: boolean;      // Indique si le prix est TTC
+
+  // Média
   images: string[];
+
+  // Catégorisation
   categoryId: string;
   category?: Category;
+  collection?: string;      // Ex: "Automne/Hiver", "Printemps/été"
+  style?: string;           // Ex: "Classique", "Fantaisie"
+
+  // Caractéristiques physiques
   materials: string[];
-  weight?: number;
+  weight?: number;          // Poids en grammes
+  weightUnit: 'g' | 'kg';
+
+  // Informations marque et origine
+  brand?: string;           // Marque commerciale
+  origin?: string;          // Pays d'origine
+  warranty?: number;        // Garantie en mois
+
+  // Disponibilité
   stock: number;
+  isAvailable: boolean;     // Calculé: Publie && !EstEnSommeil && !InterdireCommande
+
+  // Flags
   featured: boolean;
   isNew: boolean;
+
+  // Métadonnées
   createdAt: string;
 }
 
