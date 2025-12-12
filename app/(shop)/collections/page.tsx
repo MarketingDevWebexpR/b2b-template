@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
 import { getCategories } from '@/lib/api';
+import { Category } from '@/types';
 import { Container } from '@/components/ui/Container';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { HeaderSpacer } from '@/components/layout/Header';
@@ -19,6 +18,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Force dynamic rendering to always fetch fresh data from API
+export const dynamic = 'force-dynamic';
+
 /**
  * CollectionsIndexPage - Server Component listing all collections
  *
@@ -29,7 +31,12 @@ export const metadata: Metadata = {
  * - Product count per collection
  */
 export default async function CollectionsIndexPage() {
-  const categories = await getCategories();
+  let categories: Category[] = [];
+  try {
+    categories = await getCategories();
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+  }
 
   return (
     <main className="min-h-screen bg-background-cream">

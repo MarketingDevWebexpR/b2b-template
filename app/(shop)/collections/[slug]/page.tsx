@@ -25,16 +25,8 @@ interface CollectionPageProps {
   }>;
 }
 
-/**
- * Generate static params for all collections
- * This enables Static Site Generation (SSG) for collection pages
- */
-export async function generateStaticParams() {
-  const categories = await getCategories();
-  return categories.map((category) => ({
-    slug: category.slug,
-  }));
-}
+// Force dynamic rendering to always fetch fresh data from API
+export const dynamic = 'force-dynamic';
 
 /**
  * Generate dynamic metadata for SEO
@@ -85,21 +77,30 @@ export default async function CollectionPage({
 }: CollectionPageProps) {
   const { slug } = await params;
   const filters = await searchParams;
-  const category = await getCategoryBySlug(slug);
 
-  if (!category) {
+  let category;
+  let products;
+
+  try {
+    category = await getCategoryBySlug(slug);
+    if (!category) {
+      notFound();
+    }
+    products = await getProductsByCategorySlug(slug);
+  } catch (error) {
+    console.error('Failed to fetch collection data:', error);
     notFound();
   }
 
-  // Get products for this category
-  let products = await getProductsByCategorySlug(slug);
+  // Get products for this category (products already fetched above)
+  let filteredProducts = products;
   const totalProductCount = products.length;
 
   // Apply filters from URL params
   if (filters.minPrice || filters.maxPrice || filters.materials || filters.sort) {
     // Use category slug for filtering
     if (slug !== 'haute-joaillerie') {
-      products = await filterProductsFromAPI({
+      filteredProducts = await filterProductsFromAPI({
         categorySlug: slug,
         minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
         maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
@@ -116,7 +117,7 @@ export default async function CollectionPage({
 
   // For haute-joaillerie, get featured products across all categories
   if (slug === 'haute-joaillerie') {
-    products = await getFeaturedProductsFromAPI(12);
+    filteredProducts = await getFeaturedProductsFromAPI(12);
   }
 
   // Get other categories for navigation
@@ -129,7 +130,7 @@ export default async function CollectionPage({
       <CollectionHero
         category={{
           ...category,
-          productCount: products.length,
+          productCount: filteredProducts.length,
         }}
       />
 
@@ -149,7 +150,7 @@ export default async function CollectionPage({
           <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-12 xl:gap-16">
             {/* Filters Sidebar */}
             <div className="mb-8 lg:mb-0">
-              <CategoryFiltersLight totalProducts={products.length} categorySlug={slug} />
+              <CategoryFiltersLight totalProducts={filteredProducts.length} categorySlug={slug} />
             </div>
 
             {/* Products Area */}
@@ -158,10 +159,10 @@ export default async function CollectionPage({
               <div className="mb-8 hidden items-center justify-between border-b border-border-light pb-4 lg:flex">
                 <p className="font-sans text-sm text-text-muted">
                   <span className="font-medium text-text-primary">
-                    {products.length}
+                    {filteredProducts.length}
                   </span>{' '}
-                  {products.length > 1 ? 'pieces' : 'piece'}
-                  {products.length !== totalProductCount && (
+                  {filteredProducts.length > 1 ? 'pieces' : 'piece'}
+                  {filteredProducts.length !== totalProductCount && (
                     <span className="text-text-light">
                       {' '}
                       sur {totalProductCount}
@@ -174,13 +175,13 @@ export default async function CollectionPage({
 
               {/* Products Grid */}
               <CategoryProductsGrid
-                products={products}
+                products={filteredProducts}
                 initialCount={15}
                 loadIncrement={10}
               />
 
               {/* Empty State with Reset Link */}
-              {products.length === 0 && (
+              {filteredProducts.length === 0 && (
                 <div className="py-16 text-center">
                   <p className="mb-4 font-sans text-body text-text-muted">
                     Aucun produit ne correspond a vos criteres.
