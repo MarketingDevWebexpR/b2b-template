@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "Maison Bijoux",
+    "slug": "maison-bijoux",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "maisonbijoux",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#fffcf7"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.maisonbijoux.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Maison Bijoux utilise la camera pour scanner les codes-barres et QR codes de vos bijoux preferes."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#fffcf7"
+      },
+      "package": "com.maisonbijoux.app",
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Inter-Regular.ttf",
+            "./assets/fonts/Inter-Medium.ttf",
+            "./assets/fonts/Inter-SemiBold.ttf",
+            "./assets/fonts/Inter-Bold.ttf",
+            "./assets/fonts/PlayfairDisplay-Regular.ttf",
+            "./assets/fonts/PlayfairDisplay-Medium.ttf",
+            "./assets/fonts/PlayfairDisplay-SemiBold.ttf",
+            "./assets/fonts/PlayfairDisplay-Bold.ttf",
+            "./assets/fonts/CormorantGaramond-Regular.ttf",
+            "./assets/fonts/CormorantGaramond-Medium.ttf",
+            "./assets/fonts/CormorantGaramond-SemiBold.ttf",
+            "./assets/fonts/CormorantGaramond-Bold.ttf"
+          ]
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Maison Bijoux utilise la camera pour scanner les codes-barres et QR codes de vos bijoux preferes."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

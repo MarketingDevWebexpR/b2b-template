@@ -1,0 +1,4 @@
+
+> @bijoux/mobile@1.0.0 type-check /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux/apps/mobile
+> tsc --noEmit
+
