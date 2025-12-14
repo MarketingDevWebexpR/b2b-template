@@ -68,7 +68,7 @@ export default function ProductDetailScreen() {
   if (loading) {
     return (
       <View className="flex-1 bg-background">
-        <LoadingAnimation style="shimmer" variant="fullScreen" />
+        <LoadingAnimation variant="fullScreen" />
       </View>
     );
   }

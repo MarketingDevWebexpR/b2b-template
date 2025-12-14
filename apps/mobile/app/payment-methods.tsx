@@ -345,7 +345,7 @@ export default function PaymentMethodsScreen() {
           }}
         />
         <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <LoadingAnimation style="rings" variant="fullScreen" />
+          <LoadingAnimation variant="fullScreen" />
         </SafeAreaView>
       </>
     );

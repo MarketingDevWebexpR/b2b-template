@@ -36,7 +36,7 @@ export default function CollectionDetailScreen() {
   if (loading) {
     return (
       <View className="flex-1 bg-background">
-        <LoadingAnimation style="diamond" variant="fullScreen" />
+        <LoadingAnimation variant="fullScreen" />
       </View>
     );
   }

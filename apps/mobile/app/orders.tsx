@@ -363,7 +363,7 @@ export default function OrdersScreen() {
           }}
         />
         <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <LoadingAnimation style="diamond" variant="fullScreen" />
+          <LoadingAnimation variant="fullScreen" />
         </SafeAreaView>
       </>
     );

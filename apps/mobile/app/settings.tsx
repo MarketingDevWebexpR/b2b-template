@@ -218,7 +218,7 @@ export default function SettingsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background">
-        <LoadingAnimation style="diamond" variant="fullScreen" />
+        <LoadingAnimation variant="fullScreen" />
       </SafeAreaView>
     );
   }

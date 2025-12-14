@@ -77,7 +77,7 @@ export default function ProfileScreen() {
   if (authLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background">
-        <LoadingAnimation style="diamond" variant="fullScreen" />
+        <LoadingAnimation variant="fullScreen" />
       </SafeAreaView>
     );
   }

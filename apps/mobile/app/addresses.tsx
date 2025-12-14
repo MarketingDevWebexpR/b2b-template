@@ -306,7 +306,7 @@ export default function AddressesScreen() {
           }}
         />
         <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <LoadingAnimation style="diamond" variant="fullScreen" />
+          <LoadingAnimation variant="fullScreen" />
         </SafeAreaView>
       </>
     );
