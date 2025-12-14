@@ -260,7 +260,7 @@ export default function CartScreen() {
           <AnimatedPressable
             onPressIn={handleCheckoutPressIn}
             onPressOut={handleCheckoutPressOut}
-            onPress={() => router.push('/checkout')}
+            onPress={() => router.push('/checkout/shipping')}
             style={[styles.checkoutButton, checkoutButtonStyle]}
           >
             <Text style={styles.checkoutButtonText}>Passer commande</Text>

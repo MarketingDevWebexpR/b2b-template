@@ -159,24 +159,13 @@ export default function CheckoutLayout() {
       }}
     >
       <Stack.Screen
-        name="index"
-        options={{
-          title: 'Commande',
-          header: () => (
-            <CheckoutHeader title="Commande" showBack={false} showClose={true} />
-          ),
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
         name="shipping"
         options={{
           title: 'Livraison',
           header: () => (
-            <CheckoutHeader title="Livraison" showBack={true} showClose={true} />
+            <CheckoutHeader title="Livraison" showBack={false} showClose={true} />
           ),
           headerShown: true,
-          animation: 'slide_from_right',
         }}
       />
       <Stack.Screen
