@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Transpile workspace packages to ensure they work correctly in the build
+  transpilePackages: ['@bijoux/types', '@bijoux/utils', '@bijoux/config-tailwind'],
   images: {
     remotePatterns: [
       {
