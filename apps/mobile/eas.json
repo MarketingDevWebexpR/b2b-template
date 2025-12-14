@@ -9,12 +9,6 @@
     "base": {
       "node": "20.19.0",
       "pnpm": "9.15.0",
-      "cache": {
-        "key": "pnpm-monorepo-v1",
-        "paths": [
-          "node_modules/.cache/turbo"
-        ]
-      },
       "env": {
         "CI": "1"
       }
