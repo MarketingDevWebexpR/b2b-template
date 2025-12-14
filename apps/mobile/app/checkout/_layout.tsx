@@ -14,7 +14,6 @@ import Animated, {
   withSpring,
   FadeIn,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { springConfigs } from '@/constants/animations';
 import { hapticFeedback } from '@/constants/haptics';
@@ -50,7 +49,6 @@ function CheckoutHeader({
   showClose?: boolean;
 }) {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
 
   const backScale = useSharedValue(1);
   const closeScale = useSharedValue(1);
@@ -74,8 +72,11 @@ function CheckoutHeader({
     transform: [{ scale: closeScale.value }],
   }));
 
+  // For modal presentation, use minimal top padding (modal already has spacing)
+  const modalTopPadding = Platform.OS === 'ios' ? 8 : 12;
+
   return (
-    <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+    <View style={[styles.header, { paddingTop: modalTopPadding }]}>
       {/* Blur Background for iOS */}
       {Platform.OS === 'ios' && (
         <BlurView
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   headerSide: {
     width: 44,
