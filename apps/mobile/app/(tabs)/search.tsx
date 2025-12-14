@@ -859,7 +859,7 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Bold',
     fontSize: 18,
     color: COLORS.charcoal,
   },
@@ -999,9 +999,9 @@ const styles = StyleSheet.create({
   },
 
   categoryCheckmarkText: {
+    fontFamily: 'Inter-SemiBold',
     fontSize: 14,
     color: COLORS.hermes,
-    fontWeight: 'bold',
   },
 
   categoryName: {
@@ -1052,7 +1052,7 @@ const styles = StyleSheet.create({
   },
 
   trendingRankNumber: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Bold',
     fontSize: 20,
     color: COLORS.hermes,
     opacity: 0.5,
@@ -1080,7 +1080,7 @@ const styles = StyleSheet.create({
   },
 
   trendingName: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Medium',
     fontSize: 13,
     color: COLORS.charcoal,
     lineHeight: 17,

@@ -363,9 +363,8 @@ const styles = StyleSheet.create({
   },
 
   headerCartBadgeText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Bold',
     fontSize: 11,
-    fontWeight: '700',
     color: COLORS.white,
   },
 
@@ -386,7 +385,7 @@ const styles = StyleSheet.create({
   },
 
   quantityTitle: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-SemiBold',
     fontSize: 16,
     color: COLORS.charcoal,
   },
@@ -399,9 +398,8 @@ const styles = StyleSheet.create({
   },
 
   inCartText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Medium',
     fontSize: 12,
     color: '#059669',
-    fontWeight: '500',
   },
 });

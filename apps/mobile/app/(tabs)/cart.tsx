@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   },
 
   shippingHighlight: {
-    fontWeight: '600',
+    fontFamily: 'Inter-SemiBold',
     color: COLORS.hermes,
   },
 
@@ -534,8 +534,8 @@ const styles = StyleSheet.create({
   },
 
   freeText: {
+    fontFamily: 'Inter-Medium',
     color: COLORS.success,
-    fontWeight: '500',
   },
 
   totalRow: {

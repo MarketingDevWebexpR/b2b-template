@@ -97,17 +97,17 @@ export function Footer({ className }: FooterProps) {
 
   return (
     <footer
-      className={cn('bg-[#f6f1eb]', className)}
+      className={cn('bg-background-warm', className)}
       role="contentinfo"
     >
       {/* Newsletter Section */}
-      <div className="border-b border-[#2b333f]/10">
+      <div className="border-b border-luxe-charcoal/10">
         <div className="container mx-auto px-6 lg:px-12 py-16 lg:py-20">
           <div className="max-w-2xl mx-auto text-center">
-            <h3 className="font-serif text-2xl md:text-3xl text-[#2b333f] mb-4 tracking-wide">
+            <h3 className="font-serif text-2xl md:text-3xl text-text-primary mb-4 tracking-wide">
               La Newsletter Maison Bijoux
             </h3>
-            <p className="text-[#2b333f]/70 text-sm leading-relaxed mb-8 max-w-md mx-auto">
+            <p className="text-text-primary/70 text-sm leading-relaxed mb-8 max-w-md mx-auto">
               Recevez en avant-premiere nos nouveautes, invitations aux evenements prives et conseils d'experts.
             </p>
 
@@ -121,9 +121,9 @@ export function Footer({ className }: FooterProps) {
                   required
                   className={cn(
                     'flex-1 px-5 py-4',
-                    'bg-white border border-[#2b333f]/20',
-                    'text-[#2b333f] text-sm placeholder:text-[#2b333f]/40',
-                    'focus:outline-none focus:border-[#2b333f]/50',
+                    'bg-luxe-white border border-luxe-charcoal/20',
+                    'text-text-primary text-sm placeholder:text-text-primary/40',
+                    'focus:outline-none focus:border-luxe-charcoal/50',
                     'transition-colors duration-300'
                   )}
                   aria-label="Adresse email pour la newsletter"
@@ -133,9 +133,9 @@ export function Footer({ className }: FooterProps) {
                   disabled={isSubmitting}
                   className={cn(
                     'px-8 py-4',
-                    'bg-[#2b333f] text-white',
+                    'bg-luxe-charcoal text-luxe-white',
                     'text-xs uppercase tracking-[0.2em] font-medium',
-                    'hover:bg-[#1a1f26]',
+                    'hover:bg-luxe-noir',
                     'transition-colors duration-300',
                     'disabled:opacity-50 disabled:cursor-not-allowed'
                   )}
@@ -149,7 +149,7 @@ export function Footer({ className }: FooterProps) {
                 <motion.p
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-[#2b333f]/80 mt-4"
+                  className="text-sm text-text-primary/80 mt-4"
                 >
                   Merci pour votre inscription.
                 </motion.p>
@@ -164,7 +164,7 @@ export function Footer({ className }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
           {/* Column 1: About */}
           <div className="lg:col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-[#2b333f] font-medium mb-6">
+            <h4 className="text-xs uppercase tracking-[0.25em] text-text-primary font-medium mb-6">
               A Propos
             </h4>
             <ul className="space-y-4">
@@ -173,8 +173,8 @@ export function Footer({ className }: FooterProps) {
                   <Link
                     href={link.href}
                     className={cn(
-                      'text-sm text-[#2b333f]/70',
-                      'hover:text-[#2b333f]',
+                      'text-sm text-text-primary/70',
+                      'hover:text-text-primary',
                       'transition-colors duration-300'
                     )}
                   >
@@ -187,7 +187,7 @@ export function Footer({ className }: FooterProps) {
 
           {/* Column 2: Collections */}
           <div className="lg:col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-[#2b333f] font-medium mb-6">
+            <h4 className="text-xs uppercase tracking-[0.25em] text-text-primary font-medium mb-6">
               Collections
             </h4>
             <ul className="space-y-4">
@@ -196,8 +196,8 @@ export function Footer({ className }: FooterProps) {
                   <Link
                     href={link.href}
                     className={cn(
-                      'text-sm text-[#2b333f]/70',
-                      'hover:text-[#2b333f]',
+                      'text-sm text-text-primary/70',
+                      'hover:text-text-primary',
                       'transition-colors duration-300'
                     )}
                   >
@@ -210,7 +210,7 @@ export function Footer({ className }: FooterProps) {
 
           {/* Column 3: Services */}
           <div className="lg:col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-[#2b333f] font-medium mb-6">
+            <h4 className="text-xs uppercase tracking-[0.25em] text-text-primary font-medium mb-6">
               Services
             </h4>
             <ul className="space-y-4">
@@ -219,8 +219,8 @@ export function Footer({ className }: FooterProps) {
                   <Link
                     href={link.href}
                     className={cn(
-                      'text-sm text-[#2b333f]/70',
-                      'hover:text-[#2b333f]',
+                      'text-sm text-text-primary/70',
+                      'hover:text-text-primary',
                       'transition-colors duration-300'
                     )}
                   >
@@ -233,14 +233,14 @@ export function Footer({ className }: FooterProps) {
 
           {/* Column 4: Contact */}
           <div className="lg:col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-[#2b333f] font-medium mb-6">
+            <h4 className="text-xs uppercase tracking-[0.25em] text-text-primary font-medium mb-6">
               Contact
             </h4>
             <ul className="space-y-4">
               <li>
                 <a
                   href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}
-                  className="text-sm text-[#2b333f]/70 hover:text-[#2b333f] transition-colors duration-300"
+                  className="text-sm text-text-primary/70 hover:text-text-primary transition-colors duration-300"
                 >
                   {contactInfo.phone}
                 </a>
@@ -248,13 +248,13 @@ export function Footer({ className }: FooterProps) {
               <li>
                 <a
                   href={`mailto:${contactInfo.email}`}
-                  className="text-sm text-[#2b333f]/70 hover:text-[#2b333f] transition-colors duration-300"
+                  className="text-sm text-text-primary/70 hover:text-text-primary transition-colors duration-300"
                 >
                   {contactInfo.email}
                 </a>
               </li>
               <li>
-                <address className="text-sm text-[#2b333f]/70 not-italic leading-relaxed">
+                <address className="text-sm text-text-primary/70 not-italic leading-relaxed">
                   {contactInfo.address}
                 </address>
               </li>
@@ -263,7 +263,7 @@ export function Footer({ className }: FooterProps) {
 
           {/* Column 5: Social & Brand */}
           <div className="lg:col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-[#2b333f] font-medium mb-6">
+            <h4 className="text-xs uppercase tracking-[0.25em] text-text-primary font-medium mb-6">
               Suivez-nous
             </h4>
             <div className="flex items-center gap-4 mb-8">
@@ -274,7 +274,7 @@ export function Footer({ className }: FooterProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
-                    'text-[#2b333f]/60 hover:text-[#2b333f]',
+                    'text-text-primary/60 hover:text-text-primary',
                     'transition-colors duration-300'
                   )}
                   aria-label={social.label}
@@ -287,13 +287,13 @@ export function Footer({ className }: FooterProps) {
             <div className="space-y-3">
               <Link
                 href="/boutiques"
-                className="text-sm text-[#2b333f]/70 hover:text-[#2b333f] transition-colors duration-300 block"
+                className="text-sm text-text-primary/70 hover:text-text-primary transition-colors duration-300 block"
               >
                 Nos Boutiques
               </Link>
               <Link
                 href="/rendez-vous"
-                className="text-sm text-[#2b333f]/70 hover:text-[#2b333f] transition-colors duration-300 block"
+                className="text-sm text-text-primary/70 hover:text-text-primary transition-colors duration-300 block"
               >
                 Prendre Rendez-vous
               </Link>
@@ -303,13 +303,13 @@ export function Footer({ className }: FooterProps) {
       </div>
 
       {/* Bottom Footer */}
-      <div className="border-t border-[#2b333f]/10">
+      <div className="border-t border-luxe-charcoal/10">
         <div className="container mx-auto px-6 lg:px-12 py-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             {/* Logo / Brand */}
             <Link
               href="/"
-              className="font-serif text-lg tracking-[0.3em] text-[#2b333f] hover:opacity-70 transition-opacity duration-300"
+              className="font-serif text-lg tracking-[0.3em] text-text-primary hover:opacity-70 transition-opacity duration-300"
             >
               MAISON BIJOUX
             </Link>
@@ -318,32 +318,32 @@ export function Footer({ className }: FooterProps) {
             <div className="flex flex-wrap items-center justify-center gap-6 lg:gap-8">
               <Link
                 href="/mentions-legales"
-                className="text-xs uppercase tracking-[0.15em] text-[#2b333f]/50 hover:text-[#2b333f] transition-colors duration-300"
+                className="text-xs uppercase tracking-[0.15em] text-text-primary/50 hover:text-text-primary transition-colors duration-300"
               >
                 Mentions Legales
               </Link>
               <Link
                 href="/cgv"
-                className="text-xs uppercase tracking-[0.15em] text-[#2b333f]/50 hover:text-[#2b333f] transition-colors duration-300"
+                className="text-xs uppercase tracking-[0.15em] text-text-primary/50 hover:text-text-primary transition-colors duration-300"
               >
                 CGV
               </Link>
               <Link
                 href="/politique-confidentialite"
-                className="text-xs uppercase tracking-[0.15em] text-[#2b333f]/50 hover:text-[#2b333f] transition-colors duration-300"
+                className="text-xs uppercase tracking-[0.15em] text-text-primary/50 hover:text-text-primary transition-colors duration-300"
               >
                 Confidentialite
               </Link>
               <Link
                 href="/cookies"
-                className="text-xs uppercase tracking-[0.15em] text-[#2b333f]/50 hover:text-[#2b333f] transition-colors duration-300"
+                className="text-xs uppercase tracking-[0.15em] text-text-primary/50 hover:text-text-primary transition-colors duration-300"
               >
                 Cookies
               </Link>
             </div>
 
             {/* Copyright */}
-            <p className="text-xs text-[#2b333f]/40 tracking-wide">
+            <p className="text-xs text-text-primary/40 tracking-wide">
               {currentYear} Maison Bijoux
             </p>
           </div>
