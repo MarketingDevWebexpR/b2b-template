@@ -1,0 +1,10 @@
+<svg width="1284" height="2778" viewBox="0 0 1284 2778" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1284" height="2778" fill="#fffcf7"/>
+  <g transform="translate(642, 1200)">
+    <circle cx="0" cy="0" r="150" fill="none" stroke="#1a1a1a" stroke-width="8"/>
+    <path d="M0 150 L-112 337 L0 285 L112 337 Z" fill="none" stroke="#1a1a1a" stroke-width="8" stroke-linejoin="round"/>
+    <circle cx="0" cy="0" r="60" fill="#c9a55c"/>
+  </g>
+  <text x="642" y="1650" font-family="Playfair Display, serif" font-size="96" fill="#1a1a1a" text-anchor="middle" font-weight="600">MAISON BIJOUX</text>
+  <text x="642" y="1750" font-family="Inter, sans-serif" font-size="36" fill="#666666" text-anchor="middle" letter-spacing="8">JOAILLERIE DE LUXE</text>
+</svg>

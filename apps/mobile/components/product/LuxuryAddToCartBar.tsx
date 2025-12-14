@@ -305,7 +305,7 @@ export function LuxuryAddToCartBar({
 
               {/* Inline Loader */}
               <Animated.View style={[styles.iconWrapper, styles.iconAbsolute, loaderStyle]}>
-                <InlineLoader size="small" style="rings" />
+                <InlineLoader size="small" />
               </Animated.View>
             </View>
 

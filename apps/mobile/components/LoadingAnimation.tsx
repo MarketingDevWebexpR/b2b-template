@@ -1,29 +1,25 @@
 /**
  * LoadingAnimation Component - Maison Bijoux
- * Elegant Lottie-based loading animation for luxury jewelry app
+ * Simple, elegant loading animation for luxury jewelry app
  */
 
 import React, { useEffect, memo } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform, ActivityIndicator } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
-import LottieView from 'lottie-react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Brand Colors
 const COLORS = {
   gold: '#c9a96e',
-  goldLight: '#d4b896',
-  goldDark: '#a68a5b',
   hermes: '#f67828',
   cream: '#fffcf7',
   charcoal: '#2b333f',
-  white: '#ffffff',
 };
 
 export type LoadingVariant = 'fullScreen' | 'inline' | 'overlay';
@@ -37,26 +33,11 @@ export interface LoadingAnimationProps {
   visible?: boolean;
 }
 
-const SIZE_CONFIG = {
-  small: 60,
-  medium: 100,
-  large: 140,
+const SIZE_MAP = {
+  small: 'small' as const,
+  medium: 'large' as const,
+  large: 'large' as const,
 };
-
-// Lottie Animation Component
-const LuxuryLottie = memo(function LuxuryLottie({ size }: { size: number }) {
-  return (
-    <View style={[styles.lottieContainer, { width: size, height: size }]}>
-      <LottieView
-        source={require('../assets/animations/luxury-loader.json')}
-        autoPlay
-        loop
-        speed={1}
-        style={{ width: size, height: size }}
-      />
-    </View>
-  );
-});
 
 // Main Loading Animation Component
 export const LoadingAnimation = memo(function LoadingAnimation({
@@ -82,11 +63,12 @@ export const LoadingAnimation = memo(function LoadingAnimation({
 
   if (!visible) return null;
 
-  const animationSize = SIZE_CONFIG[size];
-
   const renderContent = () => (
     <View style={styles.contentContainer}>
-      <LuxuryLottie size={animationSize} />
+      <ActivityIndicator
+        size={SIZE_MAP[size]}
+        color={COLORS.hermes}
+      />
 
       {loadingText && (
         <Text style={styles.loadingText}>{loadingText}</Text>
@@ -186,18 +168,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  lottieContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
   loadingText: {
-    marginTop: 20,
+    marginTop: 16,
     fontFamily: Platform.OS === 'ios' ? 'Inter-Regular' : 'Inter',
     fontSize: 13,
     color: COLORS.charcoal,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 
   brandContainer: {

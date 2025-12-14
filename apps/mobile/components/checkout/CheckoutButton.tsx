@@ -308,7 +308,7 @@ export function CheckoutButton({
 
         {/* Loading State Overlay */}
         <Animated.View style={[styles.stateOverlay, loaderStyle]}>
-          <InlineLoader size="small" style="rings" />
+          <InlineLoader size="small" />
         </Animated.View>
 
         {/* Success State Overlay */}

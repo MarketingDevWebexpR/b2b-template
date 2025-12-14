@@ -114,7 +114,7 @@ function WaveBar({
 function StateIcon({ state }: { state: VoiceSearchState }) {
   switch (state) {
     case 'processing':
-      return <InlineLoader style="shimmer" size="medium" />;
+      return <InlineLoader size="medium" />;
     case 'success':
       return <Check size={32} color={COLORS.white} strokeWidth={2.5} />;
     case 'error':

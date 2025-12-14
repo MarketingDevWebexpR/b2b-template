@@ -1,0 +1,7 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" fill="#fffcf7"/>
+  <circle cx="512" cy="400" r="200" fill="none" stroke="#1a1a1a" stroke-width="12"/>
+  <path d="M512 600 L362 850 L512 780 L662 850 Z" fill="none" stroke="#1a1a1a" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="512" cy="400" r="80" fill="#c9a55c"/>
+  <text x="512" y="950" font-family="Playfair Display, serif" font-size="72" fill="#1a1a1a" text-anchor="middle" font-weight="600">MAISON BIJOUX</text>
+</svg>
