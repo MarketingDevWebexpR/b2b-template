@@ -15,7 +15,7 @@ import {
   BackHandler,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Check,
   Package,
@@ -173,6 +173,7 @@ function ActionButton({ icon, label, onPress }: ActionButtonProps) {
 
 export default function ConfirmationScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { shippingAddress, resetCheckout } = useCheckout();
 
   // Generate order number once
@@ -321,27 +322,30 @@ export default function ConfirmationScreen() {
           )}
         </View>
 
-        {/* Action Button */}
-        <Animated.View
-          entering={FadeInUp.delay(900).duration(400)}
-          style={styles.actionsContainer}
-        >
-          <ActionButton
-            variant="primary"
-            icon={<Home size={20} color={COLORS.white} />}
-            label="Retour à l'accueil"
-            onPress={handleContinueShopping}
-          />
-        </Animated.View>
-
         {/* Help Text */}
         <Animated.Text
-          entering={FadeInUp.delay(1000).duration(400)}
+          entering={FadeInUp.delay(900).duration(400)}
           style={styles.helpText}
         >
           Une question ? Contactez notre service client disponible 7j/7.
         </Animated.Text>
+
+        {/* Spacer for bottom button */}
+        <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Sticky Bottom Button */}
+      <Animated.View
+        entering={FadeInUp.delay(900).duration(400)}
+        style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, SPACING.lg) }]}
+      >
+        <ActionButton
+          variant="primary"
+          icon={<Home size={20} color={COLORS.white} />}
+          label="Retour à l'accueil"
+          onPress={handleContinueShopping}
+        />
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -472,9 +476,17 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
 
-  // Actions
-  actionsContainer: {
-    marginTop: SPACING.lg,
+  // Bottom Container
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.background,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.borderLight,
   },
   actionButton: {
     flexDirection: 'row',
