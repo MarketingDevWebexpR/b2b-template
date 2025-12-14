@@ -290,21 +290,21 @@ export function CheckoutButton({
       {/* Content Container */}
       <View style={styles.content}>
         {/* Idle State Content */}
-        <View style={styles.idleContent}>
+        <Animated.View style={[styles.idleContent, styles.stateOverlay, textStyle]}>
           {showSecureIcon && (
             <Animated.View style={lockStyle}>
               <Lock size={18} color={COLORS.white} strokeWidth={2} />
             </Animated.View>
           )}
 
-          <Animated.Text style={[styles.label, textStyle]}>
+          <Text style={styles.label}>
             {buttonLabel}
-          </Animated.Text>
+          </Text>
 
           <Animated.View style={arrowStyle}>
             <ArrowRight size={20} color={COLORS.white} strokeWidth={2} />
           </Animated.View>
-        </View>
+        </Animated.View>
 
         {/* Loading State Overlay */}
         <Animated.View style={[styles.stateOverlay, loaderStyle]}>
