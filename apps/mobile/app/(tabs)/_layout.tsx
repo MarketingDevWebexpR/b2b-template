@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import { Home, Search, Grid3X3, User } from 'lucide-react-native';
 import { View } from 'react-native';
 import { AnimatedCartIcon } from '@/components/navigation';
+import { hapticFeedback } from '@/constants/haptics';
 
 function TabBarIcon({
   icon: Icon,
@@ -38,6 +39,12 @@ export default function TabLayout() {
           fontFamily: 'Inter-Medium',
           fontSize: 11,
           marginTop: 4,
+        },
+      }}
+      screenListeners={{
+        tabPress: () => {
+          // Trigger haptic feedback on every tab press (including already active tab)
+          hapticFeedback.tabSwitch();
         },
       }}
     >
