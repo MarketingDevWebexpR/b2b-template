@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
+// Prevent build-time execution - force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
