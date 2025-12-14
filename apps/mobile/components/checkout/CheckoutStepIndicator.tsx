@@ -314,6 +314,11 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     backgroundColor: COLORS.hermesLightAlpha,
+    // Center the glow behind the circle (36px)
+    // Horizontal: (stepNode 80px - glow 44px) / 2 = 18px
+    // Vertical: (glow 44px - circle 36px) / 2 = -4px offset
+    top: -4,
+    left: 18,
   },
   circle: {
     width: 36,
