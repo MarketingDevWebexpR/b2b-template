@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import type { Product, Category } from '@bijoux/types';
 import { ProductCard } from '@/components/ProductCard';
 import { api } from '@/lib/api';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { CollectionSkeleton } from '@/components/skeleton';
 
 export default function CollectionDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -36,7 +36,7 @@ export default function CollectionDetailScreen() {
   if (loading) {
     return (
       <View className="flex-1 bg-background">
-        <LoadingAnimation variant="fullScreen" />
+        <CollectionSkeleton productCount={6} />
       </View>
     );
   }

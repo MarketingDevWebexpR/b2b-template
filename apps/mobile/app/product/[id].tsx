@@ -8,7 +8,7 @@ import { formatPrice } from '@bijoux/utils';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCartAnimation } from '@/context/CartAnimationContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { ProductDetailSkeleton } from '@/components/skeleton';
 import { api } from '@/lib/api';
 import {
   LuxuryQuantitySelector,
@@ -114,11 +114,7 @@ export default function ProductDetailScreen() {
   ), [cart.totalItems, router]);
 
   if (loading) {
-    return (
-      <View className="flex-1 bg-background">
-        <LoadingAnimation variant="fullScreen" />
-      </View>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (!product) {

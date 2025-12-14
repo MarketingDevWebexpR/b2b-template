@@ -14,7 +14,7 @@ import {
   LogIn,
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { AccountSkeleton } from '@/components/skeleton';
 
 const COLORS = {
   background: '#fffcf7',
@@ -76,7 +76,7 @@ export default function AccountScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <LoadingAnimation variant="fullScreen" />
+        <AccountSkeleton />
       </SafeAreaView>
     );
   }

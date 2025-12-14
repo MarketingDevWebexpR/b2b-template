@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, Link } from 'expo-router';
 import { MapPin, Plus, Check, Home, Building2, Phone, ChevronRight } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { ListSkeleton } from '@/components/skeleton';
 
 /**
  * Address type definition
@@ -306,7 +306,7 @@ export default function AddressesScreen() {
           }}
         />
         <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <LoadingAnimation variant="fullScreen" />
+          <ListSkeleton titleWidth={140} itemCount={2} variant="card" />
         </SafeAreaView>
       </>
     );

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, Link } from 'expo-router';
 import { CreditCard, Plus, Check, Shield, Trash2, ChevronLeft } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { ListSkeleton } from '@/components/skeleton';
 
 /**
  * Card type enumeration
@@ -345,7 +345,7 @@ export default function PaymentMethodsScreen() {
           }}
         />
         <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <LoadingAnimation variant="fullScreen" />
+          <ListSkeleton titleWidth={180} itemCount={3} variant="card" />
         </SafeAreaView>
       </>
     );

@@ -6,7 +6,7 @@ import { Heart } from 'lucide-react-native';
 import type { Product } from '@bijoux/types';
 import { formatPrice } from '@bijoux/utils';
 import { useWishlist } from '@/context/WishlistContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { CollectionSkeleton } from '@/components/skeleton';
 import { api } from '@/lib/api';
 
 const DEFAULT_PRODUCT_IMAGE =
@@ -105,7 +105,7 @@ export default function CollectionScreen() {
   if (loading) {
     return (
       <View className="flex-1 bg-background">
-        <LoadingAnimation variant="fullScreen" />
+        <CollectionSkeleton productCount={6} />
       </View>
     );
   }

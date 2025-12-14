@@ -29,7 +29,7 @@ import {
   Check,
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { SettingsSkeleton } from '@/components/skeleton';
 
 // Small red spinner for delete action
 function DeleteSpinner() {
@@ -218,7 +218,7 @@ export default function SettingsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background">
-        <LoadingAnimation variant="fullScreen" />
+        <SettingsSkeleton />
       </SafeAreaView>
     );
   }

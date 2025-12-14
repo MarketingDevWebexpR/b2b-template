@@ -4,7 +4,7 @@ import { Stack, useRouter, Link } from 'expo-router';
 import { useEffect } from 'react';
 import { Package, Clock, Truck, CheckCircle, ChevronRight, AlertCircle } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { OrdersSkeleton } from '@/components/skeleton';
 import { formatPrice } from '@bijoux/utils';
 
 /**
@@ -363,7 +363,7 @@ export default function OrdersScreen() {
           }}
         />
         <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <LoadingAnimation variant="fullScreen" />
+          <OrdersSkeleton count={3} />
         </SafeAreaView>
       </>
     );

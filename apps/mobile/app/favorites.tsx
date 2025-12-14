@@ -4,7 +4,7 @@ import { Link } from 'expo-router';
 import { Heart } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { FavoritesSkeleton } from '@/components/skeleton';
 import { ProductCard } from '@/components/ProductCard';
 import type { Product } from '@bijoux/types';
 
@@ -18,7 +18,7 @@ export default function FavoritesScreen() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background">
-        <LoadingAnimation variant="fullScreen" />
+        <FavoritesSkeleton productCount={4} />
       </SafeAreaView>
     );
   }
