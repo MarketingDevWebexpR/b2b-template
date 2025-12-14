@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import type { Product } from '@/types';
 import { cn, formatPrice, calculateDiscount } from '@/lib/utils';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 interface ProductCardProps {
   product: Product;
@@ -36,7 +37,10 @@ export function ProductCard({
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  // Use wishlist context instead of local state
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const isWishlisted = isInWishlist(product.id);
 
   // Determine the image source - use placeholder on error or if no images
   const imageSrc = imageError || !product.images[0] ? PLACEHOLDER_IMAGE : product.images[0];
@@ -58,7 +62,7 @@ export function ProductCard({
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
+    toggleWishlist(product);
   };
 
   const handleQuickAdd = (e: React.MouseEvent) => {

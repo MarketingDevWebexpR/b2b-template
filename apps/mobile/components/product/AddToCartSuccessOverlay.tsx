@@ -1,11 +1,11 @@
 /**
  * AddToCartSuccessOverlay Component
- * A full-screen celebration overlay shown after successfully adding to cart
- * Features animated checkmark, confetti particles, and elegant typography
+ * Enhanced version with actionable buttons and cart summary
+ * Features: View cart / Continue shopping options
  */
 
 import React, { useEffect, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Image, Pressable, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,27 +15,35 @@ import Animated, {
   withDelay,
   Easing,
   SharedValue,
+  runOnJS,
 } from 'react-native-reanimated';
-import { Check } from 'lucide-react-native';
+import { Check, ShoppingBag, ArrowRight } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
-import { springConfigs, successOverlayTiming } from '../../constants/animations';
+import { formatPrice } from '@bijoux/utils';
+import { springConfigs } from '../../constants/animations';
+import { hapticFeedback } from '../../constants/haptics';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Design tokens
 const COLORS = {
-  backdrop: 'rgba(43, 51, 63, 0.4)',
+  backdrop: 'rgba(43, 51, 63, 0.6)',
+  modalBg: '#fffcf7',
   successLight: '#ecfdf5',
   success: '#059669',
   successDark: '#047857',
   white: '#ffffff',
   charcoal: '#2b333f',
   hermes: '#f67828',
+  hermesDark: '#ea580c',
   gold: '#d4a574',
+  stone: '#b8a99a',
+  taupe: '#d4c9bd',
+  border: '#f0ebe3',
 };
 
 // Particle configuration
-const PARTICLE_COUNT = 12;
+const PARTICLE_COUNT = 8;
 const PARTICLE_COLORS = [COLORS.hermes, COLORS.gold, COLORS.success, '#fed7aa', '#fde68a'];
 
 interface ParticleData {
@@ -55,7 +63,7 @@ interface ParticleProps {
   opacity: SharedValue<number>;
 }
 
-// Separate Particle component to respect hooks rules
+// Particle component
 function Particle({ particle, translateY, scale, opacity }: ParticleProps) {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -79,18 +87,22 @@ interface AddToCartSuccessOverlayProps {
   productName?: string;
   productImage?: string;
   quantity?: number;
+  cartTotalItems?: number;
+  cartTotalPrice?: number;
   onDismiss?: () => void;
+  onViewCart?: () => void;
+  onContinueShopping?: () => void;
 }
 
-// Generate random particles - static to avoid regeneration
+// Generate particles
 const STATIC_PARTICLES: ParticleData[] = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
   id: i,
-  x: Math.random() * 200 - 100,
-  y: -(50 + Math.random() * 100),
+  x: Math.random() * 160 - 80,
+  y: -(40 + Math.random() * 80),
   rotation: Math.random() * 360,
   scale: 0.4 + Math.random() * 0.6,
   color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
-  delay: i * 30,
+  delay: i * 25,
 }));
 
 export function AddToCartSuccessOverlay({
@@ -98,74 +110,75 @@ export function AddToCartSuccessOverlay({
   productName,
   productImage,
   quantity = 1,
+  cartTotalItems = 0,
+  cartTotalPrice = 0,
   onDismiss,
+  onViewCart,
+  onContinueShopping,
 }: AddToCartSuccessOverlayProps) {
-  // Animation values
+  // Animation values - Backdrop & Modal
   const backdropOpacity = useSharedValue(0);
+  const modalScale = useSharedValue(0.9);
+  const modalOpacity = useSharedValue(0);
+
+  // Animation values - Success circle
   const circleScale = useSharedValue(0);
   const circleOpacity = useSharedValue(0);
   const checkmarkScale = useSharedValue(0);
   const checkmarkOpacity = useSharedValue(0);
-  const textOpacity = useSharedValue(0);
-  const textTranslateY = useSharedValue(20);
+  const glowOpacity = useSharedValue(0);
+
+  // Animation values - Content
+  const titleOpacity = useSharedValue(0);
+  const titleTranslateY = useSharedValue(15);
   const productOpacity = useSharedValue(0);
-  const productTranslateY = useSharedValue(30);
+  const productTranslateY = useSharedValue(20);
+  const summaryOpacity = useSharedValue(0);
+  const buttonsOpacity = useSharedValue(0);
+  const buttonsTranslateY = useSharedValue(20);
 
-  // Particle animation values - created once at component level
-  const p0Scale = useSharedValue(0);
-  const p0TranslateY = useSharedValue(0);
-  const p0Opacity = useSharedValue(0);
-  const p1Scale = useSharedValue(0);
-  const p1TranslateY = useSharedValue(0);
-  const p1Opacity = useSharedValue(0);
-  const p2Scale = useSharedValue(0);
-  const p2TranslateY = useSharedValue(0);
-  const p2Opacity = useSharedValue(0);
-  const p3Scale = useSharedValue(0);
-  const p3TranslateY = useSharedValue(0);
-  const p3Opacity = useSharedValue(0);
-  const p4Scale = useSharedValue(0);
-  const p4TranslateY = useSharedValue(0);
-  const p4Opacity = useSharedValue(0);
-  const p5Scale = useSharedValue(0);
-  const p5TranslateY = useSharedValue(0);
-  const p5Opacity = useSharedValue(0);
-  const p6Scale = useSharedValue(0);
-  const p6TranslateY = useSharedValue(0);
-  const p6Opacity = useSharedValue(0);
-  const p7Scale = useSharedValue(0);
-  const p7TranslateY = useSharedValue(0);
-  const p7Opacity = useSharedValue(0);
-  const p8Scale = useSharedValue(0);
-  const p8TranslateY = useSharedValue(0);
-  const p8Opacity = useSharedValue(0);
-  const p9Scale = useSharedValue(0);
-  const p9TranslateY = useSharedValue(0);
-  const p9Opacity = useSharedValue(0);
-  const p10Scale = useSharedValue(0);
-  const p10TranslateY = useSharedValue(0);
-  const p10Opacity = useSharedValue(0);
-  const p11Scale = useSharedValue(0);
-  const p11TranslateY = useSharedValue(0);
-  const p11Opacity = useSharedValue(0);
+  // Button press animations
+  const primaryButtonScale = useSharedValue(1);
+  const secondaryButtonScale = useSharedValue(1);
 
-  // Array of particle animations for easier iteration
+  // Particle animations - individual shared values (hooks cannot be called inside useMemo)
+  const particle0Scale = useSharedValue(0);
+  const particle0TranslateY = useSharedValue(0);
+  const particle0Opacity = useSharedValue(0);
+  const particle1Scale = useSharedValue(0);
+  const particle1TranslateY = useSharedValue(0);
+  const particle1Opacity = useSharedValue(0);
+  const particle2Scale = useSharedValue(0);
+  const particle2TranslateY = useSharedValue(0);
+  const particle2Opacity = useSharedValue(0);
+  const particle3Scale = useSharedValue(0);
+  const particle3TranslateY = useSharedValue(0);
+  const particle3Opacity = useSharedValue(0);
+  const particle4Scale = useSharedValue(0);
+  const particle4TranslateY = useSharedValue(0);
+  const particle4Opacity = useSharedValue(0);
+  const particle5Scale = useSharedValue(0);
+  const particle5TranslateY = useSharedValue(0);
+  const particle5Opacity = useSharedValue(0);
+  const particle6Scale = useSharedValue(0);
+  const particle6TranslateY = useSharedValue(0);
+  const particle6Opacity = useSharedValue(0);
+  const particle7Scale = useSharedValue(0);
+  const particle7TranslateY = useSharedValue(0);
+  const particle7Opacity = useSharedValue(0);
+
   const particleAnims = useMemo(() => [
-    { scale: p0Scale, translateY: p0TranslateY, opacity: p0Opacity },
-    { scale: p1Scale, translateY: p1TranslateY, opacity: p1Opacity },
-    { scale: p2Scale, translateY: p2TranslateY, opacity: p2Opacity },
-    { scale: p3Scale, translateY: p3TranslateY, opacity: p3Opacity },
-    { scale: p4Scale, translateY: p4TranslateY, opacity: p4Opacity },
-    { scale: p5Scale, translateY: p5TranslateY, opacity: p5Opacity },
-    { scale: p6Scale, translateY: p6TranslateY, opacity: p6Opacity },
-    { scale: p7Scale, translateY: p7TranslateY, opacity: p7Opacity },
-    { scale: p8Scale, translateY: p8TranslateY, opacity: p8Opacity },
-    { scale: p9Scale, translateY: p9TranslateY, opacity: p9Opacity },
-    { scale: p10Scale, translateY: p10TranslateY, opacity: p10Opacity },
-    { scale: p11Scale, translateY: p11TranslateY, opacity: p11Opacity },
+    { scale: particle0Scale, translateY: particle0TranslateY, opacity: particle0Opacity },
+    { scale: particle1Scale, translateY: particle1TranslateY, opacity: particle1Opacity },
+    { scale: particle2Scale, translateY: particle2TranslateY, opacity: particle2Opacity },
+    { scale: particle3Scale, translateY: particle3TranslateY, opacity: particle3Opacity },
+    { scale: particle4Scale, translateY: particle4TranslateY, opacity: particle4Opacity },
+    { scale: particle5Scale, translateY: particle5TranslateY, opacity: particle5Opacity },
+    { scale: particle6Scale, translateY: particle6TranslateY, opacity: particle6Opacity },
+    { scale: particle7Scale, translateY: particle7TranslateY, opacity: particle7Opacity },
   ], []);
 
-  // Handle show/hide
+  // Handle visibility
   useEffect(() => {
     if (visible) {
       showOverlay();
@@ -175,108 +188,135 @@ export function AddToCartSuccessOverlay({
   }, [visible]);
 
   const showOverlay = useCallback(() => {
-    // Reset values
+    // Reset all values
+    modalScale.value = 0.9;
+    modalOpacity.value = 0;
     circleScale.value = 0;
     checkmarkScale.value = 0;
-    textOpacity.value = 0;
-    textTranslateY.value = 20;
+    titleOpacity.value = 0;
+    titleTranslateY.value = 15;
     productOpacity.value = 0;
-    productTranslateY.value = 30;
+    productTranslateY.value = 20;
+    summaryOpacity.value = 0;
+    buttonsOpacity.value = 0;
+    buttonsTranslateY.value = 20;
 
-    // Reset particle values
     particleAnims.forEach((anim) => {
       anim.scale.value = 0;
       anim.translateY.value = 0;
       anim.opacity.value = 0;
     });
 
-    // Fade in backdrop
+    // Backdrop fade in
     backdropOpacity.value = withTiming(1, { duration: 200 });
-    circleOpacity.value = withTiming(1, { duration: 150 });
 
-    // Scale in circle with bounce
-    circleScale.value = withSpring(1, {
-      damping: 12,
-      stiffness: 150,
-    });
+    // Modal entrance
+    modalOpacity.value = withDelay(50, withTiming(1, { duration: 250 }));
+    modalScale.value = withDelay(50, withSpring(1, { damping: 15, stiffness: 200 }));
 
-    // Animate checkmark
-    checkmarkOpacity.value = withDelay(150, withTiming(1, { duration: 200 }));
-    checkmarkScale.value = withDelay(
-      150,
-      withSequence(
-        withSpring(1.2, springConfigs.celebration),
-        withSpring(1, springConfigs.button)
-      )
-    );
+    // Success circle
+    circleOpacity.value = withDelay(100, withTiming(1, { duration: 150 }));
+    circleScale.value = withDelay(100, withSpring(1, { damping: 12, stiffness: 180 }));
+    glowOpacity.value = withDelay(200, withTiming(0.6, { duration: 300 }));
 
-    // Animate text
-    textOpacity.value = withDelay(250, withTiming(1, { duration: 300 }));
-    textTranslateY.value = withDelay(250, withSpring(0, springConfigs.gentle));
+    // Checkmark
+    checkmarkOpacity.value = withDelay(200, withTiming(1, { duration: 200 }));
+    checkmarkScale.value = withDelay(200, withSequence(
+      withSpring(1.2, { damping: 8, stiffness: 200 }),
+      withSpring(1, { damping: 15, stiffness: 200 })
+    ));
 
-    // Animate product info
-    productOpacity.value = withDelay(350, withTiming(1, { duration: 300 }));
-    productTranslateY.value = withDelay(350, withSpring(0, springConfigs.gentle));
+    // Title
+    titleOpacity.value = withDelay(300, withTiming(1, { duration: 250 }));
+    titleTranslateY.value = withDelay(300, withSpring(0, { damping: 20, stiffness: 150 }));
 
-    // Animate particles
+    // Product info
+    productOpacity.value = withDelay(350, withTiming(1, { duration: 250 }));
+    productTranslateY.value = withDelay(350, withSpring(0, { damping: 20, stiffness: 150 }));
+
+    // Summary
+    summaryOpacity.value = withDelay(400, withTiming(1, { duration: 250 }));
+
+    // Buttons
+    buttonsOpacity.value = withDelay(450, withTiming(1, { duration: 250 }));
+    buttonsTranslateY.value = withDelay(450, withSpring(0, { damping: 20, stiffness: 150 }));
+
+    // Particles
     particleAnims.forEach((anim, i) => {
       const particle = STATIC_PARTICLES[i];
       anim.opacity.value = withDelay(
-        100 + particle.delay,
+        150 + particle.delay,
         withSequence(
           withTiming(1, { duration: 150 }),
-          withDelay(300, withTiming(0, { duration: 400 }))
+          withDelay(400, withTiming(0, { duration: 300 }))
         )
       );
       anim.scale.value = withDelay(
-        100 + particle.delay,
+        150 + particle.delay,
         withSequence(
-          withSpring(particle.scale, springConfigs.celebration),
-          withDelay(300, withTiming(0, { duration: 300 }))
+          withSpring(particle.scale, { damping: 10, stiffness: 180 }),
+          withDelay(400, withTiming(0, { duration: 250 }))
         )
       );
       anim.translateY.value = withDelay(
-        100 + particle.delay,
-        withTiming(particle.y, { duration: 600, easing: Easing.out(Easing.ease) })
+        150 + particle.delay,
+        withTiming(particle.y, { duration: 500, easing: Easing.out(Easing.ease) })
       );
     });
 
-    // Auto-dismiss
-    const timeout = setTimeout(() => {
-      if (onDismiss) {
-        onDismiss();
-      }
-    }, successOverlayTiming.autoDismiss);
-
-    return () => clearTimeout(timeout);
-  }, [onDismiss]);
+    // Haptic feedback
+    hapticFeedback.addToCartSuccess();
+  }, []);
 
   const hideOverlay = useCallback(() => {
     backdropOpacity.value = withTiming(0, { duration: 200 });
-    circleScale.value = withTiming(0.8, { duration: 200 });
-    circleOpacity.value = withTiming(0, { duration: 150 });
-    textOpacity.value = withTiming(0, { duration: 150 });
-    productOpacity.value = withTiming(0, { duration: 150 });
+    modalOpacity.value = withTiming(0, { duration: 150 });
+    modalScale.value = withTiming(0.95, { duration: 150 });
   }, []);
+
+  // Button handlers
+  const handlePrimaryPress = useCallback(() => {
+    hapticFeedback.addToCartPress();
+    onViewCart?.();
+  }, [onViewCart]);
+
+  const handleSecondaryPress = useCallback(() => {
+    hapticFeedback.softConfirm();
+    onContinueShopping?.() || onDismiss?.();
+  }, [onContinueShopping, onDismiss]);
+
+  const handleBackdropPress = useCallback(() => {
+    hapticFeedback.softConfirm();
+    onContinueShopping?.() || onDismiss?.();
+  }, [onContinueShopping, onDismiss]);
 
   // Animated styles
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: backdropOpacity.value,
   }));
 
+  const modalStyle = useAnimatedStyle(() => ({
+    opacity: modalOpacity.value,
+    transform: [{ scale: modalScale.value }],
+  }));
+
   const circleStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: circleScale.value }],
     opacity: circleOpacity.value,
+    transform: [{ scale: circleScale.value }],
+  }));
+
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: glowOpacity.value,
   }));
 
   const checkmarkStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: checkmarkScale.value }],
     opacity: checkmarkOpacity.value,
+    transform: [{ scale: checkmarkScale.value }],
   }));
 
-  const textStyle = useAnimatedStyle(() => ({
-    opacity: textOpacity.value,
-    transform: [{ translateY: textTranslateY.value }],
+  const titleStyle = useAnimatedStyle(() => ({
+    opacity: titleOpacity.value,
+    transform: [{ translateY: titleTranslateY.value }],
   }));
 
   const productStyle = useAnimatedStyle(() => ({
@@ -284,61 +324,144 @@ export function AddToCartSuccessOverlay({
     transform: [{ translateY: productTranslateY.value }],
   }));
 
+  const summaryStyle = useAnimatedStyle(() => ({
+    opacity: summaryOpacity.value,
+  }));
+
+  const buttonsStyle = useAnimatedStyle(() => ({
+    opacity: buttonsOpacity.value,
+    transform: [{ translateY: buttonsTranslateY.value }],
+  }));
+
+  const primaryButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: primaryButtonScale.value }],
+  }));
+
+  const secondaryButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: secondaryButtonScale.value }],
+  }));
+
   if (!visible) return null;
 
   return (
-    <View style={styles.container} pointerEvents="none">
-      {/* Backdrop Blur */}
-      <Animated.View style={[styles.backdrop, backdropStyle]}>
-        <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
-      </Animated.View>
+    <View style={styles.container}>
+      {/* Backdrop - Tappable to dismiss */}
+      <Pressable style={StyleSheet.absoluteFill} onPress={handleBackdropPress}>
+        <Animated.View style={[styles.backdrop, backdropStyle]}>
+          {Platform.OS === 'ios' ? (
+            <BlurView intensity={25} tint="dark" style={StyleSheet.absoluteFill} />
+          ) : (
+            <View style={styles.androidBackdrop} />
+          )}
+        </Animated.View>
+      </Pressable>
 
-      {/* Center Content */}
-      <View style={styles.content}>
+      {/* Modal Card */}
+      <Animated.View style={[styles.modal, modalStyle]}>
         {/* Particles */}
-        {STATIC_PARTICLES.map((particle, i) => (
-          <Particle
-            key={particle.id}
-            particle={particle}
-            translateY={particleAnims[i].translateY}
-            scale={particleAnims[i].scale}
-            opacity={particleAnims[i].opacity}
-          />
-        ))}
+        <View style={styles.particlesContainer}>
+          {STATIC_PARTICLES.map((particle, i) => (
+            <Particle
+              key={particle.id}
+              particle={particle}
+              translateY={particleAnims[i].translateY}
+              scale={particleAnims[i].scale}
+              opacity={particleAnims[i].opacity}
+            />
+          ))}
+        </View>
 
         {/* Success Circle */}
-        <Animated.View style={[styles.successCircle, circleStyle]}>
+        <Animated.View style={[styles.successCircleContainer, circleStyle]}>
           {/* Glow Ring */}
-          <View style={styles.glowRing} />
+          <Animated.View style={[styles.glowRing, glowStyle]} />
 
-          {/* Checkmark */}
-          <Animated.View style={[styles.checkmarkContainer, checkmarkStyle]}>
-            <Check size={48} color={COLORS.success} strokeWidth={3} />
-          </Animated.View>
+          {/* Circle */}
+          <View style={styles.successCircle}>
+            <Animated.View style={checkmarkStyle}>
+              <Check size={32} color={COLORS.success} strokeWidth={3} />
+            </Animated.View>
+          </View>
         </Animated.View>
 
-        {/* Success Text */}
-        <Animated.View style={[styles.textContainer, textStyle]}>
-          <Text style={styles.successTitle}>Ajouté au panier</Text>
-          <Text style={styles.successSubtitle}>
-            {quantity} article{quantity > 1 ? 's' : ''} ajouté{quantity > 1 ? 's' : ''}
-          </Text>
-        </Animated.View>
+        {/* Title */}
+        <Animated.Text style={[styles.title, titleStyle]}>
+          Ajouté au panier
+        </Animated.Text>
 
-        {/* Product Info (optional) */}
+        {/* Product Info */}
         {(productName || productImage) && (
-          <Animated.View style={[styles.productInfo, productStyle]}>
+          <Animated.View style={[styles.productSection, productStyle]}>
             {productImage && (
               <Image source={{ uri: productImage }} style={styles.productImage} />
             )}
-            {productName && (
-              <Text style={styles.productName} numberOfLines={2}>
-                {productName}
-              </Text>
-            )}
+            <View style={styles.productDetails}>
+              {productName && (
+                <Text style={styles.productName} numberOfLines={2}>
+                  {productName}
+                </Text>
+              )}
+              <View style={styles.quantityBadge}>
+                <Text style={styles.quantityText}>×{quantity}</Text>
+              </View>
+            </View>
           </Animated.View>
         )}
-      </View>
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Cart Summary */}
+        <Animated.View style={[styles.summarySection, summaryStyle]}>
+          <Text style={styles.summaryText}>
+            {cartTotalItems} article{cartTotalItems > 1 ? 's' : ''} dans votre panier
+          </Text>
+          <Text style={styles.totalText}>
+            Total : {formatPrice(cartTotalPrice)}
+          </Text>
+        </Animated.View>
+
+        {/* Action Buttons */}
+        <Animated.View style={[styles.buttonsContainer, buttonsStyle]}>
+          {/* Primary: View Cart */}
+          <Animated.View style={primaryButtonStyle}>
+            <Pressable
+              onPressIn={() => {
+                primaryButtonScale.value = withSpring(0.96, springConfigs.button);
+              }}
+              onPressOut={() => {
+                primaryButtonScale.value = withSpring(1, springConfigs.button);
+              }}
+              onPress={handlePrimaryPress}
+              style={styles.primaryButton}
+              accessibilityLabel="Voir le panier"
+              accessibilityRole="button"
+            >
+              <ShoppingBag size={18} color={COLORS.white} strokeWidth={1.5} />
+              <Text style={styles.primaryButtonText}>Voir le panier</Text>
+              <ArrowRight size={16} color={COLORS.white} strokeWidth={2} />
+            </Pressable>
+          </Animated.View>
+
+          {/* Secondary: Continue Shopping */}
+          <Animated.View style={secondaryButtonStyle}>
+            <Pressable
+              onPressIn={() => {
+                secondaryButtonScale.value = withSpring(0.96, springConfigs.button);
+              }}
+              onPressOut={() => {
+                secondaryButtonScale.value = withSpring(1, springConfigs.button);
+              }}
+              onPress={handleSecondaryPress}
+              style={styles.secondaryButton}
+              accessibilityLabel="Continuer mes achats"
+              accessibilityRole="button"
+            >
+              <Text style={styles.secondaryButtonText}>Continuer mes achats</Text>
+            </Pressable>
+          </Animated.View>
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 }
@@ -353,12 +476,33 @@ const styles = StyleSheet.create({
 
   backdrop: {
     ...StyleSheet.absoluteFillObject,
+  },
+
+  androidBackdrop: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: COLORS.backdrop,
   },
 
-  content: {
+  modal: {
+    width: Math.min(SCREEN_WIDTH - 48, 340),
+    backgroundColor: COLORS.modalBg,
+    borderRadius: 24,
+    padding: 24,
     alignItems: 'center',
-    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 30,
+    elevation: 20,
+  },
+
+  particlesContainer: {
+    position: 'absolute',
+    top: 60,
+    left: '50%',
+    width: 200,
+    height: 100,
+    marginLeft: -100,
   },
 
   particle: {
@@ -368,80 +512,165 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 
-  successCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.white,
+  successCircleContainer: {
+    marginBottom: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.success,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
   },
 
   glowRing: {
     position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 2,
-    borderColor: COLORS.successLight,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: COLORS.successLight,
   },
 
-  checkmarkContainer: {
+  successCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: COLORS.success,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
   },
 
-  textContainer: {
-    marginTop: 24,
-    alignItems: 'center',
-  },
-
-  successTitle: {
+  title: {
     fontFamily: 'PlayfairDisplay',
     fontSize: 24,
-    lineHeight: 32,
-    color: COLORS.white,
-    letterSpacing: 0.5,
+    color: COLORS.charcoal,
+    letterSpacing: 0.3,
+    marginBottom: 20,
     textAlign: 'center',
   },
 
-  successSubtitle: {
-    fontFamily: 'Inter',
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-
-  productInfo: {
-    marginTop: 24,
+  productSection: {
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    maxWidth: 200,
+    width: '100%',
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 16,
   },
 
   productImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: COLORS.white,
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: COLORS.border,
+  },
+
+  productDetails: {
+    flex: 1,
+    marginLeft: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 
   productName: {
+    flex: 1,
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.charcoal,
+    lineHeight: 20,
+    marginRight: 8,
+  },
+
+  quantityBadge: {
+    backgroundColor: COLORS.hermes,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+
+  quantityText: {
     fontFamily: 'Inter',
     fontSize: 13,
-    lineHeight: 18,
+    fontWeight: '600',
     color: COLORS.white,
-    textAlign: 'center',
-    marginTop: 12,
+  },
+
+  divider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginBottom: 16,
+  },
+
+  summarySection: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+
+  summaryText: {
+    fontFamily: 'Inter',
+    fontSize: 14,
+    color: COLORS.stone,
+    marginBottom: 4,
+  },
+
+  totalText: {
+    fontFamily: 'PlayfairDisplay',
+    fontSize: 18,
+    color: COLORS.charcoal,
+    fontWeight: '500',
+  },
+
+  buttonsContainer: {
+    width: '100%',
+    gap: 12,
+  },
+
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.hermes,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 28,
+    gap: 10,
+    shadowColor: COLORS.hermes,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+
+  primaryButtonText: {
+    fontFamily: 'Inter',
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.white,
+    letterSpacing: 0.3,
+  },
+
+  secondaryButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: COLORS.taupe,
+    backgroundColor: 'transparent',
+  },
+
+  secondaryButtonText: {
+    fontFamily: 'Inter',
+    fontSize: 15,
+    fontWeight: '500',
+    color: COLORS.charcoal,
+    letterSpacing: 0.2,
   },
 });
 

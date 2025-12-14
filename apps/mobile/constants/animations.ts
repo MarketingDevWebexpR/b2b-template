@@ -136,7 +136,7 @@ export const opacities = {
 } as const;
 
 /**
- * Success overlay animation timing
+ * Success overlay animation timing (V1 - auto-dismiss)
  */
 export const successOverlayTiming = {
   backdropFadeIn: 200,
@@ -146,4 +146,31 @@ export const successOverlayTiming = {
   textDelay: 200,
   particleBurst: 600,
   autoDismiss: 1500,
+} as const;
+
+/**
+ * Success overlay animation timing (V2 - user-controlled dismiss)
+ * Used by AddToCartSuccessOverlayV2 component
+ */
+export const successOverlayV2Timing = {
+  // Entry sequence (total ~550ms)
+  entry: {
+    backdropFadeIn: 200,
+    modalDelay: 100,
+    modalDuration: 250,
+    circleDelay: 150,
+    checkmarkDelay: 250,
+    checkmarkDuration: 150,
+    contentBaseDelay: 300,
+    contentDuration: 200,
+    contentStagger: 50, // Between each content section
+    particleDelay: 200,
+    particleDuration: 500,
+  },
+  // Exit sequence (~250ms)
+  exit: {
+    duration: 200,
+  },
+  // No auto-dismiss - user must interact
+  autoDismiss: null,
 } as const;

@@ -178,9 +178,7 @@ export function LuxuryQuantitySelector({
 
   return (
     <View style={styles.container}>
-      {/* Section Label */}
-      <Text style={styles.label}>Quantité</Text>
-
+      {/* Label removed - now provided by parent container for better context */}
       <View style={styles.selectorRow}>
         {/* Minus Button */}
         <AnimatedPressable
@@ -245,16 +243,7 @@ export function LuxuryQuantitySelector({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 24,
-  },
-
-  label: {
-    fontFamily: 'PlayfairDisplay',
-    fontSize: 18,
-    lineHeight: 24,
-    color: COLORS.charcoal,
-    letterSpacing: 0.3,
-    marginBottom: 12,
+    // Flexible container - spacing managed by parent
   },
 
   selectorRow: {

@@ -1,11 +1,12 @@
-import { View, Text, ScrollView, Image, Pressable, Dimensions } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { View, Text, ScrollView, Image, Pressable, Dimensions, StyleSheet } from 'react-native';
+import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
-import { Heart } from 'lucide-react-native';
+import { Heart, ShoppingBag } from 'lucide-react-native';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import type { Product } from '@bijoux/types';
 import { formatPrice } from '@bijoux/utils';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { api } from '@/lib/api';
 import {
@@ -19,15 +20,24 @@ const { width: screenWidth } = Dimensions.get('window');
 const DEFAULT_PRODUCT_IMAGE =
   'https://images.unsplash.com/photo-1561828995-aa79a2db86dd?ixlib=rb-4.1.0&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800&fit=max';
 
+// Design tokens
+const COLORS = {
+  charcoal: '#2b333f',
+  hermes: '#f67828',
+  white: '#ffffff',
+  stone: '#b8a99a',
+};
+
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const { addToCart, isInCart, getItemQuantity } = useCart();
+  const { addToCart, isInCart, getItemQuantity, cart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const inCart = product ? isInCart(product.id) : false;
   const cartQuantity = product ? getItemQuantity(product.id) : 0;
@@ -57,13 +67,40 @@ export default function ProductDetailScreen() {
     setShowSuccessOverlay(true);
   }, [product, quantity, addToCart]);
 
-  const handleDismissOverlay = useCallback(() => {
+  const handleViewCart = useCallback(() => {
     setShowSuccessOverlay(false);
+    router.push('/(tabs)/cart');
+  }, [router]);
+
+  const handleContinueShopping = useCallback(() => {
+    setShowSuccessOverlay(false);
+    // Reset quantity to 1 for potential next add
+    setQuantity(1);
   }, []);
 
-  const toggleFavorite = useCallback(() => {
-    setIsFavorite((prev) => !prev);
-  }, []);
+  const handleToggleWishlist = useCallback(() => {
+    if (product) {
+      toggleWishlist(product);
+    }
+  }, [product, toggleWishlist]);
+
+  // Header right component with cart icon
+  const HeaderRight = useCallback(() => (
+    <Pressable
+      onPress={() => router.push('/(tabs)/cart')}
+      style={styles.headerCartButton}
+      accessibilityLabel={`Panier, ${cart.totalItems} article${cart.totalItems > 1 ? 's' : ''}`}
+    >
+      <ShoppingBag size={22} color={COLORS.charcoal} strokeWidth={1.5} />
+      {cart.totalItems > 0 && (
+        <View style={styles.headerCartBadge}>
+          <Text style={styles.headerCartBadgeText}>
+            {cart.totalItems > 9 ? '9+' : cart.totalItems}
+          </Text>
+        </View>
+      )}
+    </Pressable>
+  ), [cart.totalItems, router]);
 
   if (loading) {
     return (
@@ -85,7 +122,12 @@ export default function ProductDetailScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <Stack.Screen options={{ headerTitle: '' }} />
+      <Stack.Screen
+        options={{
+          headerTitle: '',
+          headerRight: HeaderRight,
+        }}
+      />
 
       <ScrollView
         className="flex-1"
@@ -136,7 +178,7 @@ export default function ProductDetailScreen() {
 
           {/* Favorite Button */}
           <Pressable
-            onPress={toggleFavorite}
+            onPress={handleToggleWishlist}
             className="absolute top-4 right-4 w-12 h-12 bg-white/90 rounded-full items-center justify-center"
             style={{
               shadowColor: '#000',
@@ -144,11 +186,13 @@ export default function ProductDetailScreen() {
               shadowOpacity: 0.1,
               shadowRadius: 8,
             }}
+            accessibilityLabel={product && isInWishlist(product.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+            accessibilityRole="button"
           >
             <Heart
               size={22}
-              color={isFavorite ? '#f67828' : '#696969'}
-              fill={isFavorite ? '#f67828' : 'transparent'}
+              color={product && isInWishlist(product.id) ? '#f67828' : '#696969'}
+              fill={product && isInWishlist(product.id) ? '#f67828' : 'transparent'}
               strokeWidth={1.5}
             />
           </Pressable>
@@ -197,8 +241,30 @@ export default function ProductDetailScreen() {
           {/* Divider */}
           <View className="h-px bg-border-light my-6" />
 
+          {/* Quantity Selector - Moved up for better visibility */}
+          <Animated.View entering={FadeInDown.delay(280).duration(400)}>
+            <View style={styles.quantityCard}>
+              <View style={styles.quantityHeader}>
+                <Text style={styles.quantityTitle}>Quantité à ajouter</Text>
+                {inCart && (
+                  <View style={styles.inCartBadge}>
+                    <Text style={styles.inCartText}>
+                      {cartQuantity} déjà dans le panier
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <LuxuryQuantitySelector
+                value={quantity}
+                onChange={setQuantity}
+                min={1}
+                max={10}
+              />
+            </View>
+          </Animated.View>
+
           {/* Description */}
-          <Animated.View entering={FadeInDown.delay(300).duration(400)}>
+          <Animated.View entering={FadeInDown.delay(320).duration(400)}>
             <Text className="font-serif text-lg text-text-primary mb-3">Description</Text>
             <Text className="font-sans text-text-secondary leading-relaxed">
               {product.description}
@@ -207,7 +273,7 @@ export default function ProductDetailScreen() {
 
           {/* Specifications */}
           {(product.materials.length > 0 || product.weight || product.origin || product.warranty) && (
-            <Animated.View entering={FadeInDown.delay(350).duration(400)} className="mt-8">
+            <Animated.View entering={FadeInDown.delay(360).duration(400)} className="mt-8">
               <Text className="font-serif text-lg text-text-primary mb-4">Caractéristiques</Text>
               <View className="bg-background-beige rounded-xl p-5">
                 {product.materials.length > 0 && (
@@ -244,16 +310,6 @@ export default function ProductDetailScreen() {
             </Animated.View>
           )}
 
-          {/* Luxury Quantity Selector */}
-          <Animated.View entering={FadeInDown.delay(400).duration(400)}>
-            <LuxuryQuantitySelector
-              value={quantity}
-              onChange={setQuantity}
-              min={1}
-              max={10}
-            />
-          </Animated.View>
-
           {/* Spacing for bottom bar */}
           <View className="h-8" />
         </View>
@@ -268,14 +324,84 @@ export default function ProductDetailScreen() {
         cartQuantity={cartQuantity}
       />
 
-      {/* Success Overlay */}
+      {/* Success Overlay with Actions */}
       <AddToCartSuccessOverlay
         visible={showSuccessOverlay}
         productName={product.name}
         productImage={images[0]}
         quantity={quantity}
-        onDismiss={handleDismissOverlay}
+        cartTotalItems={cart.totalItems}
+        cartTotalPrice={cart.totalPrice}
+        onViewCart={handleViewCart}
+        onContinueShopping={handleContinueShopping}
+        onDismiss={handleContinueShopping}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  headerCartButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+
+  headerCartBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: COLORS.hermes,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+
+  headerCartBadgeText: {
+    fontFamily: 'Inter',
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
+
+  quantityCard: {
+    backgroundColor: '#fcf7f1',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#f0ebe3',
+  },
+
+  quantityHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+
+  quantityTitle: {
+    fontFamily: 'PlayfairDisplay',
+    fontSize: 16,
+    color: COLORS.charcoal,
+  },
+
+  inCartBadge: {
+    backgroundColor: '#ecfdf5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+
+  inCartText: {
+    fontFamily: 'Inter',
+    fontSize: 12,
+    color: '#059669',
+    fontWeight: '500',
+  },
+});

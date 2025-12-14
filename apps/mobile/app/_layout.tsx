@@ -10,6 +10,7 @@ import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { CategoryProvider } from '@/context/CategoryContext';
 import { CheckoutProvider } from '@/context/CheckoutContext';
+import { WishlistProvider } from '@/context/WishlistContext';
 
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
@@ -46,119 +47,121 @@ export default function RootLayout() {
         <AuthProvider>
           <CategoryProvider>
             <CartProvider>
-              <CheckoutProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: '#fffcf7' },
-            }}
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="product/[id]"
-              options={{
-                headerShown: true,
-                headerTitle: '',
-                headerBackTitle: 'Retour',
-                headerStyle: { backgroundColor: '#fffcf7' },
-                headerTintColor: '#2b333f',
-              }}
-            />
-            <Stack.Screen
-              name="collection/[slug]"
-              options={{
-                headerShown: true,
-                headerTitle: '',
-                headerBackTitle: 'Retour',
-                headerStyle: { backgroundColor: '#fffcf7' },
-                headerTintColor: '#2b333f',
-              }}
-            />
-            <Stack.Screen
-              name="checkout"
-              options={{
-                headerShown: false,
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }}
-            />
-            <Stack.Screen
-              name="(auth)"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="about"
-              options={{
-                headerShown: true,
-                headerTitle: 'Notre Histoire',
-                headerBackTitle: 'Retour',
-                headerStyle: { backgroundColor: '#fffcf7' },
-                headerTintColor: '#2b333f',
-              }}
-            />
-            <Stack.Screen
-              name="orders"
-              options={{
-                headerShown: true,
-                headerTitle: 'Mes commandes',
-                headerBackTitle: 'Retour',
-                headerStyle: { backgroundColor: '#fffcf7' },
-                headerTintColor: '#2b333f',
-              }}
-            />
-            <Stack.Screen
-              name="favorites"
-              options={{
-                headerShown: true,
-                headerTitle: 'Mes favoris',
-                headerBackTitle: 'Retour',
-                headerStyle: { backgroundColor: '#fffcf7' },
-                headerTintColor: '#2b333f',
-              }}
-            />
-            <Stack.Screen
-              name="profile"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="settings"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="addresses"
-              options={{
-                headerShown: true,
-                headerTitle: 'Mes adresses',
-                headerBackTitle: 'Retour',
-                headerStyle: { backgroundColor: '#fffcf7' },
-                headerTintColor: '#2b333f',
-              }}
-            />
-            <Stack.Screen
-              name="payment-methods"
-              options={{
-                headerShown: true,
-                headerTitle: 'Moyens de paiement',
-                headerBackTitle: 'Retour',
-                headerStyle: { backgroundColor: '#fffcf7' },
-                headerTintColor: '#2b333f',
-              }}
-            />
-            <Stack.Screen
-              name="help"
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack>
-          <StatusBar style="dark" />
-              </CheckoutProvider>
+              <WishlistProvider>
+                <CheckoutProvider>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      contentStyle: { backgroundColor: '#fffcf7' },
+                    }}
+                  >
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen
+                      name="product/[id]"
+                      options={{
+                        headerShown: true,
+                        headerTitle: '',
+                        headerBackTitle: 'Retour',
+                        headerStyle: { backgroundColor: '#fffcf7' },
+                        headerTintColor: '#2b333f',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="collection/[slug]"
+                      options={{
+                        headerShown: true,
+                        headerTitle: '',
+                        headerBackTitle: 'Retour',
+                        headerStyle: { backgroundColor: '#fffcf7' },
+                        headerTintColor: '#2b333f',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="checkout"
+                      options={{
+                        headerShown: false,
+                        presentation: 'modal',
+                        animation: 'slide_from_bottom',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="(auth)"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="about"
+                      options={{
+                        headerShown: true,
+                        headerTitle: 'Notre Histoire',
+                        headerBackTitle: 'Retour',
+                        headerStyle: { backgroundColor: '#fffcf7' },
+                        headerTintColor: '#2b333f',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="orders"
+                      options={{
+                        headerShown: true,
+                        headerTitle: 'Mes commandes',
+                        headerBackTitle: 'Retour',
+                        headerStyle: { backgroundColor: '#fffcf7' },
+                        headerTintColor: '#2b333f',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="favorites"
+                      options={{
+                        headerShown: true,
+                        headerTitle: 'Mes favoris',
+                        headerBackTitle: 'Retour',
+                        headerStyle: { backgroundColor: '#fffcf7' },
+                        headerTintColor: '#2b333f',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="profile"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="settings"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="addresses"
+                      options={{
+                        headerShown: true,
+                        headerTitle: 'Mes adresses',
+                        headerBackTitle: 'Retour',
+                        headerStyle: { backgroundColor: '#fffcf7' },
+                        headerTintColor: '#2b333f',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="payment-methods"
+                      options={{
+                        headerShown: true,
+                        headerTitle: 'Moyens de paiement',
+                        headerBackTitle: 'Retour',
+                        headerStyle: { backgroundColor: '#fffcf7' },
+                        headerTintColor: '#2b333f',
+                      }}
+                    />
+                    <Stack.Screen
+                      name="help"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                  </Stack>
+                  <StatusBar style="dark" />
+                </CheckoutProvider>
+              </WishlistProvider>
             </CartProvider>
           </CategoryProvider>
         </AuthProvider>

@@ -3,15 +3,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { Heart } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { ProductCard } from '@/components/ProductCard';
 import type { Product } from '@bijoux/types';
 
-// Mock favorites data - to be replaced with actual favorites system
-const mockFavorites: Product[] = [];
-
 export default function FavoritesScreen() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { wishlist } = useWishlist();
+
+  // Extract products from wishlist items
+  const favoriteProducts: Product[] = wishlist.items.map((item) => item.product);
 
   if (isLoading) {
     return (
@@ -31,7 +33,7 @@ export default function FavoritesScreen() {
           </View>
           <Text className="font-serif text-2xl text-text-primary mb-2">Mes favoris</Text>
           <Text className="font-sans text-text-muted text-center mb-6">
-            Connectez-vous pour sauvegarder vos coups de cœur
+            Connectez-vous pour sauvegarder vos coups de coeur
           </Text>
 
           <Link href="/(auth)/login" asChild>
@@ -42,7 +44,7 @@ export default function FavoritesScreen() {
 
           <Link href="/(auth)/register" asChild>
             <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full">
-              <Text className="text-hermes-500 font-sans font-medium text-center">Créer un compte</Text>
+              <Text className="text-hermes-500 font-sans font-medium text-center">Creer un compte</Text>
             </Pressable>
           </Link>
         </View>
@@ -51,7 +53,7 @@ export default function FavoritesScreen() {
   }
 
   // Empty state - no favorites
-  if (mockFavorites.length === 0) {
+  if (favoriteProducts.length === 0) {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="px-6 pt-6 pb-4">
@@ -67,11 +69,11 @@ export default function FavoritesScreen() {
             Aucun favori pour le moment
           </Text>
           <Text className="font-sans text-text-muted text-center mb-6">
-            Parcourez nos collections et ajoutez vos pièces préférées à votre liste de favoris
+            Parcourez nos collections et ajoutez vos pieces preferees a votre liste de favoris
           </Text>
           <Link href="/collections" asChild>
             <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft">
-              <Text className="text-white font-sans font-medium">Découvrir nos collections</Text>
+              <Text className="text-white font-sans font-medium">Decouvrir nos collections</Text>
             </Pressable>
           </Link>
         </View>
@@ -85,12 +87,12 @@ export default function FavoritesScreen() {
       <View className="px-6 pt-6 pb-4">
         <Text className="font-serif text-3xl text-text-primary">Mes favoris</Text>
         <Text className="font-sans text-text-muted mt-1">
-          {mockFavorites.length} article{mockFavorites.length > 1 ? 's' : ''}
+          {favoriteProducts.length} article{favoriteProducts.length > 1 ? 's' : ''}
         </Text>
       </View>
 
       <FlatList
-        data={mockFavorites}
+        data={favoriteProducts}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}

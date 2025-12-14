@@ -47,6 +47,7 @@ interface LuxuryAddToCartBarProps {
   isInCart?: boolean;
   cartQuantity?: number;
   disabled?: boolean;
+  showCartBadge?: boolean;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -58,6 +59,7 @@ export function LuxuryAddToCartBar({
   isInCart = false,
   cartQuantity = 0,
   disabled = false,
+  showCartBadge = true,
 }: LuxuryAddToCartBarProps) {
   // Calculate total price
   const totalPrice = useMemo(() => price * quantity, [price, quantity]);
@@ -101,19 +103,17 @@ export function LuxuryAddToCartBar({
     }
   }, [isInCart, isLoading, showSuccess]);
 
-  // Update color when isInCart changes
+  // CHANGED: Keep button orange always - don't change based on isInCart
+  // The success flash is handled in handlePress
   useEffect(() => {
-    buttonColorProgress.value = withTiming(isInCart ? 1 : 0, { duration: 300 });
-    if (isInCart) {
-      checkIconOpacity.value = withTiming(1, { duration: 200 });
-      checkIconScale.value = withSpring(1, springConfigs.button);
-      cartIconOpacity.value = withTiming(0, { duration: 150 });
-    } else {
+    // Always keep the button orange and show cart icon
+    if (!isLoading && !showSuccess) {
+      buttonColorProgress.value = withTiming(0, { duration: 300 });
       checkIconOpacity.value = withTiming(0, { duration: 150 });
       checkIconScale.value = 0;
       cartIconOpacity.value = withTiming(1, { duration: 200 });
     }
-  }, [isInCart]);
+  }, [isInCart, isLoading, showSuccess]);
 
   // Animate price when quantity changes
   useEffect(() => {
@@ -169,24 +169,33 @@ export function LuxuryAddToCartBar({
         withSpring(1, springConfigs.gentle)
       );
 
-      // Color to green
-      buttonColorProgress.value = withTiming(1, { duration: 250 });
+      // CHANGED: Brief green flash then return to orange
+      buttonColorProgress.value = withSequence(
+        withTiming(1, { duration: 200 }),  // Flash to green
+        withDelay(800, withTiming(0, { duration: 300 }))  // Return to orange
+      );
 
-      // Show checkmark
-      checkIconOpacity.value = withTiming(1, { duration: 150 });
+      // Show checkmark briefly then return to cart icon
+      checkIconOpacity.value = withSequence(
+        withTiming(1, { duration: 150 }),
+        withDelay(800, withTiming(0, { duration: 200 }))
+      );
       checkIconScale.value = withSequence(
         withTiming(0, { duration: 0 }),
         withDelay(50, withSpring(1.15, springConfigs.celebration)),
         withSpring(1, springConfigs.button)
       );
 
+      // Return cart icon after success
+      cartIconOpacity.value = withDelay(1000, withTiming(1, { duration: 200 }));
+
       // Success haptic
       hapticFeedback.addToCartSuccess();
 
-      // Reset success state after delay (but keep "in cart" state)
+      // Reset success state after delay
       setTimeout(() => {
         setShowSuccess(false);
-      }, 1500);
+      }, 1200);
     } catch (error) {
       // Error handling
       setIsLoading(false);
@@ -237,13 +246,13 @@ export function LuxuryAddToCartBar({
     opacity: priceOpacity.value,
   }));
 
-  // Button text based on state
+  // CHANGED: Button text - always show price, brief success message
   const buttonText = useMemo(() => {
     if (isLoading) return 'Ajout en cours...';
-    if (showSuccess) return 'Ajouté au panier';
-    if (isInCart) return `Dans le panier (${cartQuantity})`;
+    if (showSuccess) return 'Ajouté !';  // Brief success state
+    // Always show "Ajouter" with price - keeps button actionable
     return `Ajouter - ${formattedPrice}`;
-  }, [isLoading, showSuccess, isInCart, cartQuantity, formattedPrice]);
+  }, [isLoading, showSuccess, formattedPrice]);
 
   return (
     <View style={styles.container}>
@@ -293,9 +302,17 @@ export function LuxuryAddToCartBar({
           <View style={styles.buttonContent}>
             {/* Icons Container */}
             <View style={styles.iconContainer}>
-              {/* Cart Icon */}
+              {/* Cart Icon with Badge */}
               <Animated.View style={[styles.iconWrapper, cartIconStyle]}>
                 <ShoppingBag size={20} color={COLORS.white} strokeWidth={1.5} />
+                {/* Cart quantity badge */}
+                {showCartBadge && isInCart && cartQuantity > 0 && !isLoading && !showSuccess && (
+                  <View style={styles.cartBadge}>
+                    <Text style={styles.cartBadgeText}>
+                      {cartQuantity > 9 ? '9+' : cartQuantity}
+                    </Text>
+                  </View>
+                )}
               </Animated.View>
 
               {/* Check Icon */}
@@ -438,6 +455,31 @@ const styles = StyleSheet.create({
 
   iconAbsolute: {
     position: 'absolute',
+  },
+
+  cartBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -8,
+    backgroundColor: COLORS.white,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  cartBadgeText: {
+    fontFamily: 'Inter',
+    fontSize: 10,
+    fontWeight: '700',
+    color: COLORS.hermes,
   },
 
   buttonText: {

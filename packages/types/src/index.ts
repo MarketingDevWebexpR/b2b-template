@@ -403,3 +403,28 @@ export interface ExtendedUser extends User {
   defaultShippingAddressId?: string;
   defaultBillingAddressId?: string;
 }
+
+// ============================================
+// Wishlist Types
+// ============================================
+
+/**
+ * A single item in the user's wishlist.
+ * Stores the full product for offline access and display.
+ */
+export interface WishlistItem {
+  /** The product saved to wishlist */
+  product: Product;
+  /** ISO timestamp when item was added */
+  addedAt: string;
+}
+
+/**
+ * The complete wishlist state.
+ */
+export interface Wishlist {
+  /** Array of wishlist items */
+  items: WishlistItem[];
+  /** Total count of items */
+  totalItems: number;
+}
