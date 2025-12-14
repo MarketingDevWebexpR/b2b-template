@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
 
 // Prevent build-time execution - force dynamic rendering
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-function getStripe() {
+// Lazy load Stripe to avoid build-time initialization
+async function getStripe() {
+  const Stripe = (await import('stripe')).default;
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
     throw new Error('STRIPE_SECRET_KEY is not configured');
@@ -16,8 +17,8 @@ function getStripe() {
 }
 
 export async function POST(request: NextRequest) {
-  const stripe = getStripe();
   try {
+    const stripe = await getStripe();
     const { amount, currency = 'eur' } = await request.json();
 
     if (!amount || amount < 50) {
@@ -46,10 +47,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Stripe PaymentIntent error:', error);
 
+    // Dynamic import for error type checking
+    const Stripe = (await import('stripe')).default;
     if (error instanceof Stripe.errors.StripeError) {
       return NextResponse.json(
         { error: error.message },
-        { status: error.statusCode || 500 }
+        { status: (error as any).statusCode || 500 }
       );
     }
 
