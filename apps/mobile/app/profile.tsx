@@ -7,12 +7,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { User, Mail, Phone, ChevronLeft, Check } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -76,8 +76,8 @@ export default function ProfileScreen() {
 
   if (authLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#f67828" />
+      <SafeAreaView className="flex-1 bg-background">
+        <LoadingAnimation style="diamond" variant="fullScreen" />
       </SafeAreaView>
     );
   }

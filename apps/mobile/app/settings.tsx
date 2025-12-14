@@ -1,16 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Pressable,
   Switch,
-  ActivityIndicator,
   Alert,
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import {
   Settings,
   Bell,
@@ -23,6 +29,46 @@ import {
   Check,
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
+
+// Small red spinner for delete action
+function DeleteSpinner() {
+  const rotation = useSharedValue(0);
+  const scale = useSharedValue(0.8);
+
+  useEffect(() => {
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 1000, easing: Easing.linear }),
+      -1,
+      false
+    );
+    scale.value = withRepeat(
+      withTiming(1.1, { duration: 600, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }, { scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        {
+          width: 20,
+          height: 20,
+          borderRadius: 10,
+          borderWidth: 2,
+          borderColor: '#dc2626',
+          borderTopColor: 'transparent',
+        },
+        animatedStyle,
+      ]}
+    />
+  );
+}
 
 // App configuration
 const APP_VERSION = '1.0.0';
@@ -171,8 +217,8 @@ export default function SettingsScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#f67828" />
+      <SafeAreaView className="flex-1 bg-background">
+        <LoadingAnimation style="diamond" variant="fullScreen" />
       </SafeAreaView>
     );
   }
@@ -314,7 +360,7 @@ export default function SettingsScreen() {
                   </View>
                 </View>
                 {isDeleting ? (
-                  <ActivityIndicator size="small" color="#dc2626" />
+                  <DeleteSpinner />
                 ) : (
                   <ChevronRight size={20} color="#dc2626" />
                 )}

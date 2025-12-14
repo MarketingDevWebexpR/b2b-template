@@ -27,11 +27,12 @@ import Animated, {
   cancelAnimation,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
-import { Mic, X, Check, AlertCircle, Loader2 } from 'lucide-react-native';
+import { Mic, X, Check, AlertCircle } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useVoiceSearch, VoiceSearchState } from '../../hooks/useVoiceSearch';
 import { springConfigs } from '../../constants/animations';
 import { COLORS } from '../../constants/designTokens';
+import { InlineLoader } from '@/components/LoadingAnimation';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -108,37 +109,12 @@ function WaveBar({
 }
 
 /**
- * Animated spinner component for processing state
- */
-function ProcessingSpinner() {
-  const rotation = useSharedValue(0);
-
-  useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 1000, easing: Easing.linear }),
-      -1,
-      false
-    );
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
-  }));
-
-  return (
-    <Animated.View style={[styles.spinnerWrapper, animatedStyle]}>
-      <Loader2 size={32} color={COLORS.white} strokeWidth={2} />
-    </Animated.View>
-  );
-}
-
-/**
  * Icon component based on voice search state
  */
 function StateIcon({ state }: { state: VoiceSearchState }) {
   switch (state) {
     case 'processing':
-      return <ProcessingSpinner />;
+      return <InlineLoader style="shimmer" size="medium" />;
     case 'success':
       return <Check size={32} color={COLORS.white} strokeWidth={2.5} />;
     case 'error':
@@ -699,11 +675,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
-  },
-
-  spinnerWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 
   waveContainer: {

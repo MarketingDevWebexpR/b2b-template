@@ -1,10 +1,11 @@
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import type { Product, Category } from '@bijoux/types';
 import { ProductCard } from '@/components/ProductCard';
 import { api } from '@/lib/api';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
 
 export default function CollectionDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -34,8 +35,8 @@ export default function CollectionDetailScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#f67828" />
+      <View className="flex-1 bg-background">
+        <LoadingAnimation style="diamond" variant="fullScreen" />
       </View>
     );
   }

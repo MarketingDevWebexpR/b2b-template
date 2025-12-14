@@ -16,12 +16,12 @@ import Animated, {
   withDelay,
   interpolateColor,
   Easing,
-  runOnJS,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
-import { ShoppingBag, Check, Loader2 } from 'lucide-react-native';
+import { ShoppingBag, Check } from 'lucide-react-native';
+import { InlineLoader } from '@/components/LoadingAnimation';
 import { formatPrice } from '@bijoux/utils';
-import { springConfigs, timingConfigs } from '../../constants/animations';
+import { springConfigs } from '../../constants/animations';
 import { hapticFeedback, debouncedHaptic } from '../../constants/haptics';
 
 // Design tokens
@@ -79,8 +79,7 @@ export function LuxuryAddToCartBar({
   const cartIconScale = useSharedValue(1);
   const checkIconOpacity = useSharedValue(0);
   const checkIconScale = useSharedValue(0);
-  const spinnerRotation = useSharedValue(0);
-  const spinnerOpacity = useSharedValue(0);
+  const loaderOpacity = useSharedValue(0);
 
   // Animation values - Price
   const priceScale = useSharedValue(1);
@@ -150,13 +149,8 @@ export function LuxuryAddToCartBar({
     setIsLoading(true);
 
     // Start loading animation
-    spinnerOpacity.value = withTiming(1, { duration: 150 });
+    loaderOpacity.value = withTiming(1, { duration: 150 });
     cartIconOpacity.value = withTiming(0, { duration: 100 });
-    spinnerRotation.value = withRepeat(
-      withTiming(360, { duration: 800, easing: Easing.linear }),
-      -1,
-      false
-    );
 
     try {
       await onAddToCart();
@@ -165,8 +159,8 @@ export function LuxuryAddToCartBar({
       setShowSuccess(true);
       setIsLoading(false);
 
-      // Stop spinner
-      spinnerOpacity.value = withTiming(0, { duration: 100 });
+      // Stop loader
+      loaderOpacity.value = withTiming(0, { duration: 100 });
 
       // Button morph
       buttonScale.value = withSequence(
@@ -196,7 +190,7 @@ export function LuxuryAddToCartBar({
     } catch (error) {
       // Error handling
       setIsLoading(false);
-      spinnerOpacity.value = withTiming(0, { duration: 100 });
+      loaderOpacity.value = withTiming(0, { duration: 100 });
       cartIconOpacity.value = withTiming(1, { duration: 150 });
       hapticFeedback.error();
     }
@@ -234,9 +228,8 @@ export function LuxuryAddToCartBar({
     transform: [{ scale: checkIconScale.value }],
   }));
 
-  const spinnerStyle = useAnimatedStyle(() => ({
-    opacity: spinnerOpacity.value,
-    transform: [{ rotate: `${spinnerRotation.value}deg` }],
+  const loaderStyle = useAnimatedStyle(() => ({
+    opacity: loaderOpacity.value,
   }));
 
   const priceStyle = useAnimatedStyle(() => ({
@@ -310,9 +303,9 @@ export function LuxuryAddToCartBar({
                 <Check size={20} color={COLORS.white} strokeWidth={2.5} />
               </Animated.View>
 
-              {/* Spinner */}
-              <Animated.View style={[styles.iconWrapper, styles.iconAbsolute, spinnerStyle]}>
-                <Loader2 size={20} color={COLORS.white} strokeWidth={2} />
+              {/* Inline Loader */}
+              <Animated.View style={[styles.iconWrapper, styles.iconAbsolute, loaderStyle]}>
+                <InlineLoader size="small" style="rings" />
               </Animated.View>
             </View>
 

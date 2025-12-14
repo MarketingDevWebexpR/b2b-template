@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Pressable, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Image, Pressable, Dimensions } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 import { Heart } from 'lucide-react-native';
@@ -6,6 +6,7 @@ import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import type { Product } from '@bijoux/types';
 import { formatPrice } from '@bijoux/utils';
 import { useCart } from '@/context/CartContext';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { api } from '@/lib/api';
 import {
   LuxuryQuantitySelector,
@@ -66,8 +67,8 @@ export default function ProductDetailScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#f67828" />
+      <View className="flex-1 bg-background">
+        <LoadingAnimation style="shimmer" variant="fullScreen" />
       </View>
     );
   }

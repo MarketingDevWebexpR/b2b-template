@@ -17,7 +17,8 @@ import Animated, {
   interpolateColor,
   Easing,
 } from 'react-native-reanimated';
-import { ArrowRight, Check, Lock, Loader2 } from 'lucide-react-native';
+import { ArrowRight, Check, Lock } from 'lucide-react-native';
+import { InlineLoader } from '@/components/LoadingAnimation';
 import { springConfigs } from '../../constants/animations';
 import { hapticFeedback, debouncedHaptic } from '../../constants/haptics';
 
@@ -91,7 +92,6 @@ export function CheckoutButton({
 
   // Icon animations
   const arrowX = useSharedValue(0);
-  const spinnerRotation = useSharedValue(0);
   const checkScale = useSharedValue(0);
   const lockScale = useSharedValue(1);
 
@@ -141,12 +141,6 @@ export function CheckoutButton({
       case 'loading':
         idleContentOpacity.value = withTiming(0, { duration: 150 });
         loadingOpacity.value = withDelay(100, withTiming(1, { duration: 150 }));
-        // Continuous spinner rotation
-        spinnerRotation.value = withRepeat(
-          withTiming(360, { duration: 1000, easing: Easing.linear }),
-          -1,
-          false
-        );
         break;
 
       case 'success':
@@ -257,8 +251,7 @@ export function CheckoutButton({
     opacity: idleContentOpacity.value,
   }));
 
-  const spinnerStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${spinnerRotation.value}deg` }],
+  const loaderStyle = useAnimatedStyle(() => ({
     opacity: loadingOpacity.value,
   }));
 
@@ -314,8 +307,8 @@ export function CheckoutButton({
         </View>
 
         {/* Loading State Overlay */}
-        <Animated.View style={[styles.stateOverlay, spinnerStyle]}>
-          <Loader2 size={24} color={COLORS.white} strokeWidth={2} />
+        <Animated.View style={[styles.stateOverlay, loaderStyle]}>
+          <InlineLoader size="small" style="rings" />
         </Animated.View>
 
         {/* Success State Overlay */}

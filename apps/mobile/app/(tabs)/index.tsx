@@ -9,7 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import { Link } from 'expo-router';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronDown, ChevronRight, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -29,6 +29,8 @@ import { api } from '@/lib/api';
 import { useCategories } from '@/context/CategoryContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const TAB_BAR_HEIGHT = 90; // Height of bottom tab bar
+const HERO_HEIGHT = SCREEN_HEIGHT - TAB_BAR_HEIGHT;
 
 const HERO_IMAGE_URL =
   'https://images.unsplash.com/photo-1585960622850-ed33c41d6418?w=1200&q=85&auto=format&fit=crop';
@@ -146,6 +148,11 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const scrollToContent = () => {
+    scrollViewRef.current?.scrollTo({ y: HERO_HEIGHT, animated: true });
+  };
 
   const fetchProducts = async () => {
     try {
@@ -171,6 +178,7 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 bg-background">
       <ScrollView
+        ref={scrollViewRef}
         className="flex-1"
         showsVerticalScrollIndicator={false}
         bounces={true}
@@ -179,21 +187,21 @@ export default function HomeScreen() {
         }
       >
         {/* ============================================ */}
-        {/* HERO SECTION - Full Screen */}
+        {/* HERO SECTION - Full Screen minus tab bar */}
         {/* ============================================ */}
-        <View style={{ height: SCREEN_HEIGHT }}>
+        <View style={{ height: HERO_HEIGHT }}>
           {/* Background Image */}
           <Image
             source={{ uri: HERO_IMAGE_URL }}
             style={{
               position: 'absolute',
               width: SCREEN_WIDTH,
-              height: SCREEN_HEIGHT,
+              height: HERO_HEIGHT,
             }}
             resizeMode="cover"
           />
 
-          {/* Dark Gradient Overlay */}
+          {/* Dark Gradient Overlay - pointerEvents none to allow button touches */}
           <LinearGradient
             colors={[
               'rgba(0,0,0,0.5)',
@@ -205,8 +213,9 @@ export default function HomeScreen() {
             style={{
               position: 'absolute',
               width: SCREEN_WIDTH,
-              height: SCREEN_HEIGHT,
+              height: HERO_HEIGHT,
             }}
+            pointerEvents="none"
           />
 
           {/* Gold/Orange Accent Gradient at Bottom */}
@@ -216,12 +225,13 @@ export default function HomeScreen() {
             style={{
               position: 'absolute',
               width: SCREEN_WIDTH,
-              height: SCREEN_HEIGHT,
+              height: HERO_HEIGHT,
             }}
+            pointerEvents="none"
           />
 
           {/* Hero Content */}
-          <View className="flex-1 justify-center items-center px-8">
+          <View className="flex-1 justify-center items-center px-8" style={{ zIndex: 10 }}>
             {/* Decorative Top Line */}
             <Animated.View
               entering={FadeIn.delay(200).duration(800)}
@@ -262,15 +272,19 @@ export default function HomeScreen() {
             </Animated.View>
           </View>
 
-          {/* Scroll Indicator at Bottom */}
-          <View className="absolute bottom-12 left-0 right-0 items-center">
-            <Animated.View entering={FadeIn.delay(1400).duration(600)}>
+          {/* Scroll Indicator at Bottom - Tappable to scroll down */}
+          <Pressable
+            onPress={scrollToContent}
+            className="absolute bottom-8 left-0 right-0 items-center"
+            style={{ zIndex: 20 }}
+          >
+            <Animated.View entering={FadeIn.delay(1400).duration(600)} className="items-center py-4">
               <Text className="font-sans text-xs text-white/50 uppercase tracking-[3px] mb-2">
                 Défiler
               </Text>
               <ScrollIndicator />
             </Animated.View>
-          </View>
+          </Pressable>
         </View>
 
         {/* ============================================ */}

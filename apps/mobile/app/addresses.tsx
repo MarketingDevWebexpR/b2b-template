@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { View, Text, FlatList, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, Link } from 'expo-router';
 import { MapPin, Plus, Check, Home, Building2, Phone, ChevronRight } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
 
 /**
  * Address type definition
@@ -304,8 +305,8 @@ export default function AddressesScreen() {
             headerTintColor: '#2b333f',
           }}
         />
-        <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['bottom']}>
-          <ActivityIndicator size="large" color="#f67828" />
+        <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+          <LoadingAnimation style="diamond" variant="fullScreen" />
         </SafeAreaView>
       </>
     );

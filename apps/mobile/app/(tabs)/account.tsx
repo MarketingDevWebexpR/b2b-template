@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import {
@@ -14,6 +14,7 @@ import {
   LogIn,
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
 
 interface MenuItemProps {
   icon: typeof User;
@@ -58,8 +59,8 @@ export default function AccountScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#f67828" />
+      <SafeAreaView className="flex-1 bg-background">
+        <LoadingAnimation style="diamond" variant="fullScreen" />
       </SafeAreaView>
     );
   }
