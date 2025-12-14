@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   },
 
   bottomSpacer: {
-    height: 200,
+    height: 260,
   },
 
   // Summary
