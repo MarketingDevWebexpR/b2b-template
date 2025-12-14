@@ -28,7 +28,7 @@ export default function CollectionsScreen() {
         columnWrapperStyle={{ gap: 12 }}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         renderItem={({ item }) => (
-          <View className="flex-1">
+          <View style={{ flex: 1, height: 130 }}>
             <CategoryCard category={item} index={getCategoryIndex(item.id) - 1} size="large" />
           </View>
         )}

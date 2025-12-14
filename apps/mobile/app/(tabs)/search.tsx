@@ -73,7 +73,7 @@ const COLORS = {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CATEGORY_CARD_WIDTH = 100;
-const TRENDING_CARD_WIDTH = 160;
+const TRENDING_CARD_WIDTH = 220; // Wider horizontal card for elegant display
 
 const DEFAULT_PRODUCT_IMAGE =
   'https://images.unsplash.com/photo-1561828995-aa79a2db86dd?ixlib=rb-4.1.0&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max';
@@ -232,7 +232,7 @@ function SuggestionChip({
   );
 }
 
-// Trending Product Card Component
+// Trending Product Card Component - Elegant horizontal card design
 function TrendingProductCard({
   product,
   index,
@@ -250,8 +250,11 @@ function TrendingProductCard({
   const imageUrl = (rawImageUrl && rawImageUrl.trim() !== '') ? rawImageUrl : DEFAULT_PRODUCT_IMAGE;
   const displayUrl = imageError ? DEFAULT_PRODUCT_IMAGE : imageUrl;
 
+  // Format rank with leading zero for elegant display
+  const displayRank = String(index + 1).padStart(2, '0');
+
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.95, springConfigs.button);
+    scale.value = withSpring(0.97, springConfigs.button);
     debouncedHaptic(hapticFeedback.softConfirm);
   }, [scale]);
 
@@ -280,8 +283,15 @@ function TrendingProductCard({
       >
         <Animated.View
           entering={FadeInDown.delay(index * 80).duration(400)}
+          style={styles.trendingCardInner}
         >
-          <View style={styles.trendingImageContainer}>
+          {/* Rank Badge - Elegant serif number */}
+          <View style={styles.trendingRankContainer}>
+            <Text style={styles.trendingRankNumber}>{displayRank}</Text>
+          </View>
+
+          {/* Circular Product Image */}
+          <View style={styles.trendingImageWrapper}>
             <Image
               source={{ uri: displayUrl }}
               style={styles.trendingImage}
@@ -289,15 +299,19 @@ function TrendingProductCard({
               accessibilityIgnoresInvertColors
               onError={handleImageError}
             />
-            <View style={styles.trendingRank}>
-              <Text style={styles.trendingRankText}>{index + 1}</Text>
-            </View>
           </View>
+
+          {/* Product Info */}
           <View style={styles.trendingContent}>
             <Text style={styles.trendingName} numberOfLines={2}>
               {product.name}
             </Text>
             <Text style={styles.trendingPrice}>{formatPrice(product.price)}</Text>
+          </View>
+
+          {/* Chevron indicator */}
+          <View style={styles.trendingChevron}>
+            <ChevronRight size={16} color={COLORS.hermes} strokeWidth={2} />
           </View>
         </Animated.View>
       </AnimatedPressable>
@@ -1003,27 +1017,56 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
   },
 
-  // Trending
+  // Trending - Elegant horizontal card design
   trendingScroll: {
     paddingRight: 20,
   },
 
   trendingCard: {
     width: TRENDING_CARD_WIDTH,
-    marginRight: 16,
-    backgroundColor: COLORS.white,
+    marginRight: 12,
+    backgroundColor: COLORS.backgroundBeige,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.sand,
     overflow: 'hidden',
+    // Subtle shadow matching design system
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
 
-  trendingImageContainer: {
-    aspectRatio: 1,
-    backgroundColor: COLORS.backgroundBeige,
+  trendingCardInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+
+  trendingRankContainer: {
+    width: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+
+  trendingRankNumber: {
+    fontFamily: 'PlayfairDisplay',
+    fontSize: 20,
+    color: COLORS.hermes,
+    opacity: 0.5,
+  },
+
+  trendingImageWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    overflow: 'hidden',
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.taupe,
+    marginRight: 12,
   },
 
   trendingImage: {
@@ -1031,40 +1074,28 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 
-  trendingRank: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: COLORS.charcoal,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  trendingRankText: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 11,
-    color: COLORS.white,
-  },
-
   trendingContent: {
-    padding: 12,
+    flex: 1,
+    justifyContent: 'center',
   },
 
   trendingName: {
     fontFamily: 'PlayfairDisplay',
     fontSize: 13,
     color: COLORS.charcoal,
-    lineHeight: 18,
-    marginBottom: 4,
+    lineHeight: 17,
+    marginBottom: 2,
   },
 
   trendingPrice: {
     fontFamily: 'Inter-SemiBold',
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.hermes,
+  },
+
+  trendingChevron: {
+    marginLeft: 4,
+    opacity: 0.7,
   },
 
   errorContainer: {

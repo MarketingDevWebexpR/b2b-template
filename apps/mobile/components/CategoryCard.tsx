@@ -13,8 +13,8 @@ export function CategoryCard({ category, index = 0, size = 'default' }: Category
   const isLarge = size === 'large';
   const displayIndex = String(index + 1).padStart(2, '0');
 
-  // Height accounts for 2 lines of title text
-  const cardHeight = isLarge ? 240 : 200;
+  // Fixed height for consistent card layout
+  const cardHeight = isLarge ? 130 : 110;
 
   return (
     <Link href={`/collections/${category.slug}`} asChild>
@@ -22,10 +22,7 @@ export function CategoryCard({ category, index = 0, size = 'default' }: Category
         className={`bg-background-beige rounded-elegant border border-border-light ${
           isLarge ? 'p-6' : 'p-4'
         }`}
-        style={({ pressed }) => ({
-          opacity: pressed ? 0.8 : 1,
-          height: cardHeight,
-        })}
+        style={{ height: cardHeight }}
       >
         {/* Header with title and index */}
         <View className="flex-row justify-between items-start">
