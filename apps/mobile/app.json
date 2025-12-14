@@ -101,8 +101,8 @@
       [
         "@stripe/stripe-react-native",
         {
-          "merchantIdentifier": "merchant.com.maisonbijoux.app",
-          "enableGooglePay": false
+          "enableGooglePay": false,
+          "enableApplePay": false
         }
       ]
     ],
