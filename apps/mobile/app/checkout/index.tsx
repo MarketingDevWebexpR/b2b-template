@@ -4,7 +4,7 @@
  * Luxury jewelry e-commerce experience
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -72,6 +72,10 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 // Free shipping threshold
 const FREE_SHIPPING_THRESHOLD = 500;
 
+// Default product image (elegant jewelry photo)
+const DEFAULT_PRODUCT_IMAGE =
+  'https://images.unsplash.com/photo-1561828995-aa79a2db86dd?ixlib=rb-4.1.0&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max';
+
 /**
  * Cart item row component
  */
@@ -82,15 +86,23 @@ function CartItemRow({
   item: { product: { id: string; name: string; price: number; images: string[]; collection?: string }; quantity: number };
   index: number;
 }) {
+  const [imageError, setImageError] = useState(false);
+
+  // Get proper image URL with fallback
+  const rawImageUrl = item.product.images[0];
+  const imageUrl = (rawImageUrl && rawImageUrl.trim() !== '') ? rawImageUrl : DEFAULT_PRODUCT_IMAGE;
+  const displayUrl = imageError ? DEFAULT_PRODUCT_IMAGE : imageUrl;
+
   return (
     <Animated.View
       entering={FadeInDown.delay(100 + index * 50).duration(400)}
       style={styles.itemRow}
     >
       <Image
-        source={{ uri: item.product.images[0] || 'https://via.placeholder.com/80' }}
+        source={{ uri: displayUrl }}
         style={styles.itemImage}
         resizeMode="cover"
+        onError={() => setImageError(true)}
       />
       <View style={styles.itemDetails}>
         <Text style={styles.itemName} numberOfLines={2}>
