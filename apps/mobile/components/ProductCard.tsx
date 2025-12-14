@@ -35,18 +35,16 @@ export function ProductCard({ product }: ProductCardProps) {
         </View>
 
         {/* Product Info */}
-        <View className="p-3">
-          <Text className="font-serif text-sm text-text-primary" numberOfLines={2}>
+        <View className="p-3 min-h-[100px]">
+          <Text className="font-serif text-sm text-text-primary h-[38px]" numberOfLines={2}>
             {product.name}
           </Text>
           <Text className="font-sans text-hermes-500 font-medium mt-1">
             {formatPrice(product.price)}
           </Text>
-          {product.collection && (
-            <Text className="font-sans text-xs text-text-muted mt-1">
-              {product.collection}
-            </Text>
-          )}
+          <Text className="font-sans text-xs text-text-muted mt-1">
+            {product.collection || ' '}
+          </Text>
         </View>
       </Pressable>
     </Link>
