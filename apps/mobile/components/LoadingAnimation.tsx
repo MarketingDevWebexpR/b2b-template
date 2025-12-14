@@ -1,6 +1,6 @@
 /**
  * LoadingAnimation Component - Maison Bijoux
- * Elegant, visible loading animation for luxury jewelry app
+ * Elegant Lottie-based loading animation for luxury jewelry app
  */
 
 import React, { useEffect, memo } from 'react';
@@ -9,13 +9,9 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withRepeat,
-  withSequence,
-  withDelay,
-  Easing,
-  cancelAnimation,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
+import LottieView from 'lottie-react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -42,182 +38,21 @@ export interface LoadingAnimationProps {
 }
 
 const SIZE_CONFIG = {
-  small: 40,
-  medium: 60,
-  large: 80,
+  small: 60,
+  medium: 100,
+  large: 140,
 };
 
-// Elegant rotating ring with gold gradient effect
-const GoldRing = memo(function GoldRing({ size }: { size: number }) {
-  const rotation = useSharedValue(0);
-  const pulse = useSharedValue(1);
-
-  useEffect(() => {
-    // Smooth continuous rotation
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 1200, easing: Easing.linear }),
-      -1,
-      false
-    );
-
-    // Subtle breathing effect
-    pulse.value = withRepeat(
-      withSequence(
-        withTiming(1.05, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      true
-    );
-
-    return () => {
-      cancelAnimation(rotation);
-      cancelAnimation(pulse);
-    };
-  }, []);
-
-  const ringStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }, { scale: pulse.value }],
-  }));
-
-  const ringSize = size;
-  const borderWidth = size * 0.06;
-
+// Lottie Animation Component
+const LuxuryLottie = memo(function LuxuryLottie({ size }: { size: number }) {
   return (
-    <View style={[styles.ringContainer, { width: ringSize, height: ringSize }]}>
-      {/* Outer glow */}
-      <View
-        style={[
-          styles.ringGlow,
-          {
-            width: ringSize + 20,
-            height: ringSize + 20,
-            borderRadius: (ringSize + 20) / 2,
-            backgroundColor: `${COLORS.gold}20`,
-          },
-        ]}
-      />
-
-      {/* Main rotating ring */}
-      <Animated.View
-        style={[
-          styles.ring,
-          {
-            width: ringSize,
-            height: ringSize,
-            borderRadius: ringSize / 2,
-            borderWidth: borderWidth,
-            borderColor: COLORS.gold,
-            borderTopColor: COLORS.hermes,
-            borderRightColor: COLORS.goldLight,
-          },
-          ringStyle,
-        ]}
-      />
-
-      {/* Center dot */}
-      <View
-        style={[
-          styles.centerDot,
-          {
-            width: size * 0.15,
-            height: size * 0.15,
-            borderRadius: size * 0.075,
-            backgroundColor: COLORS.gold,
-          },
-        ]}
-      />
-    </View>
-  );
-});
-
-// Three dots animation
-const ThreeDots = memo(function ThreeDots({ size }: { size: number }) {
-  const dot1 = useSharedValue(0);
-  const dot2 = useSharedValue(0);
-  const dot3 = useSharedValue(0);
-
-  useEffect(() => {
-    const duration = 400;
-    const delay = 150;
-
-    dot1.value = withRepeat(
-      withSequence(
-        withTiming(-size * 0.15, { duration, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      true
-    );
-
-    dot2.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(-size * 0.15, { duration, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0, { duration, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        true
-      )
-    );
-
-    dot3.value = withDelay(
-      delay * 2,
-      withRepeat(
-        withSequence(
-          withTiming(-size * 0.15, { duration, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0, { duration, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        true
-      )
-    );
-
-    return () => {
-      cancelAnimation(dot1);
-      cancelAnimation(dot2);
-      cancelAnimation(dot3);
-    };
-  }, [size]);
-
-  const dot1Style = useAnimatedStyle(() => ({
-    transform: [{ translateY: dot1.value }],
-  }));
-
-  const dot2Style = useAnimatedStyle(() => ({
-    transform: [{ translateY: dot2.value }],
-  }));
-
-  const dot3Style = useAnimatedStyle(() => ({
-    transform: [{ translateY: dot3.value }],
-  }));
-
-  const dotSize = size * 0.18;
-  const gap = size * 0.12;
-
-  return (
-    <View style={[styles.dotsContainer, { gap }]}>
-      <Animated.View
-        style={[
-          styles.dot,
-          { width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: COLORS.gold },
-          dot1Style,
-        ]}
-      />
-      <Animated.View
-        style={[
-          styles.dot,
-          { width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: COLORS.hermes },
-          dot2Style,
-        ]}
-      />
-      <Animated.View
-        style={[
-          styles.dot,
-          { width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: COLORS.gold },
-          dot3Style,
-        ]}
+    <View style={[styles.lottieContainer, { width: size, height: size }]}>
+      <LottieView
+        source={require('../assets/animations/luxury-loader.json')}
+        autoPlay
+        loop
+        speed={1}
+        style={{ width: size, height: size }}
       />
     </View>
   );
@@ -251,7 +86,7 @@ export const LoadingAnimation = memo(function LoadingAnimation({
 
   const renderContent = () => (
     <View style={styles.contentContainer}>
-      <GoldRing size={animationSize} />
+      <LuxuryLottie size={animationSize} />
 
       {loadingText && (
         <Text style={styles.loadingText}>{loadingText}</Text>
@@ -351,40 +186,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  ringContainer: {
+  lottieContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  ringGlow: {
-    position: 'absolute',
-  },
-
-  ring: {
-    position: 'absolute',
-  },
-
-  centerDot: {
-    position: 'absolute',
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-
-  dotsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  dot: {
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
   },
 
   loadingText: {
