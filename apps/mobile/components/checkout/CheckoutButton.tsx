@@ -144,6 +144,8 @@ export function CheckoutButton({
         break;
 
       case 'success':
+        // Hide idle content immediately
+        idleContentOpacity.value = withTiming(0, { duration: 100 });
         // Color transition to success green
         colorProgress.value = withTiming(1, { duration: 300 });
         loadingOpacity.value = withTiming(0, { duration: 100 });
@@ -170,6 +172,9 @@ export function CheckoutButton({
         break;
 
       case 'error':
+        // Keep idle content hidden during error
+        idleContentOpacity.value = withTiming(0, { duration: 100 });
+        loadingOpacity.value = withTiming(0, { duration: 100 });
         // Shake animation
         scale.value = withSequence(
           withTiming(0.98, { duration: 50 }),
