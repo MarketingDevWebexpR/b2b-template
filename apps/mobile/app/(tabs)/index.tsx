@@ -266,13 +266,11 @@ export default function HomeScreen() {
               className="w-20 h-[2px] bg-hermes-500 mt-8 mb-10"
             />
 
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <Animated.View
               entering={FadeInDown.delay(1000).duration(600)}
-              className="flex-row gap-4"
             >
               <CTAButton title="Découvrir" variant="filled" href="/collections" delay={1100} />
-              <CTAButton title="Collections" variant="outline" href="/collections" delay={1200} />
             </Animated.View>
           </View>
 
