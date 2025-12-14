@@ -8,45 +8,26 @@ const projectRoot = __dirname;
 const config = getDefaultConfig(projectRoot);
 
 // Define workspace package alias mappings
-// Maps @bijoux/* imports to local lib/shared files
+// Maps @bijoux/* imports to local lib/shared files (inlined packages)
 const aliases = {
   '@bijoux/types': path.resolve(projectRoot, 'lib/shared/types.ts'),
   '@bijoux/utils': path.resolve(projectRoot, 'lib/shared/utils.ts'),
 };
 
-// Store the original resolver function
-const originalResolveRequest = config.resolver.resolveRequest;
+// Custom resolveRequest to intercept @bijoux/* imports
+// This runs BEFORE Metro's default resolution, ensuring aliases work
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Check if the module matches our aliases
+  if (aliases[moduleName]) {
+    return {
+      filePath: aliases[moduleName],
+      type: 'sourceFile',
+    };
+  }
 
-// Configure resolver for @bijoux/* aliases (inlined packages)
-config.resolver = {
-  ...config.resolver,
-
-  // extraNodeModules provides fallback resolution
-  extraNodeModules: {
-    ...config.resolver.extraNodeModules,
-    '@bijoux/types': path.resolve(projectRoot, 'lib/shared'),
-    '@bijoux/utils': path.resolve(projectRoot, 'lib/shared'),
-  },
-
-  // Custom resolveRequest to intercept @bijoux/* imports
-  // This is the most reliable way to handle aliases in Metro
-  resolveRequest: (context, moduleName, platform) => {
-    // Check if the module matches our aliases
-    if (aliases[moduleName]) {
-      return {
-        filePath: aliases[moduleName],
-        type: 'sourceFile',
-      };
-    }
-
-    // Fall back to the default resolver for everything else
-    if (originalResolveRequest) {
-      return originalResolveRequest(context, moduleName, platform);
-    }
-
-    // Use context.resolveRequest for default resolution
-    return context.resolveRequest(context, moduleName, platform);
-  },
+  // Use default Metro resolution for everything else
+  // context.resolveRequest delegates to Metro's built-in resolver
+  return context.resolveRequest(context, moduleName, platform);
 };
 
 // Watch folders for development hot reload

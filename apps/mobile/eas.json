@@ -16,8 +16,7 @@
         ]
       },
       "env": {
-        "CI": "1",
-        "EXPO_USE_FAST_RESOLVER": "true"
+        "CI": "1"
       }
     },
     "development": {
