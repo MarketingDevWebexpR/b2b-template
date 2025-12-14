@@ -475,6 +475,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: COLORS.white,
     letterSpacing: 0.5,
+    flexShrink: 0,
   },
 });
 
