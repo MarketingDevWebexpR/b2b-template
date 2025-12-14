@@ -1,8 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
+  "globalEnv": [
+    "NODE_ENV",
+    "STRIPE_SECRET_KEY",
+    "AUTH_SECRET",
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_SAGE_API_URL"
+  ],
   "tasks": {
     "build": {
+      "outputs": [".next/**", "!.next/cache/**"],
       "env": [
         "STRIPE_SECRET_KEY",
         "AUTH_SECRET",
