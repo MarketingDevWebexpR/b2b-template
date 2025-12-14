@@ -11,7 +11,9 @@ import { AuthProvider } from '@/context/AuthContext';
 import { CategoryProvider } from '@/context/CategoryContext';
 import { CheckoutProvider } from '@/context/CheckoutContext';
 import { WishlistProvider } from '@/context/WishlistContext';
+import { CartAnimationProvider } from '@/context/CartAnimationContext';
 import { LuxuryBackButton } from '@/components/navigation';
+import { FlyToCartAnimation } from '@/components/animations';
 
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
@@ -48,9 +50,10 @@ export default function RootLayout() {
         <AuthProvider>
           <CategoryProvider>
             <CartProvider>
-              <WishlistProvider>
-                <CheckoutProvider>
-                  <Stack
+              <CartAnimationProvider>
+                <WishlistProvider>
+                  <CheckoutProvider>
+                    <Stack
                     screenOptions={{
                       headerShown: false,
                       contentStyle: { backgroundColor: '#fffcf7' },
@@ -191,10 +194,13 @@ export default function RootLayout() {
                         headerShown: false,
                       }}
                     />
-                  </Stack>
-                  <StatusBar style="dark" />
-                </CheckoutProvider>
-              </WishlistProvider>
+                    </Stack>
+                    <StatusBar style="dark" />
+                    {/* Fly-to-cart animation rendered at root level */}
+                    <FlyToCartAnimation />
+                  </CheckoutProvider>
+                </WishlistProvider>
+              </CartAnimationProvider>
             </CartProvider>
           </CategoryProvider>
         </AuthProvider>

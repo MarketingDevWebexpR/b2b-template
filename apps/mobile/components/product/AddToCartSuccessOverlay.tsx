@@ -1,7 +1,17 @@
 /**
  * AddToCartSuccessOverlay Component
- * Enhanced version with actionable buttons and cart summary
- * Features: View cart / Continue shopping options
+ *
+ * @deprecated This component is deprecated and replaced by the FlyToCartAnimation.
+ * The new fly-to-cart animation provides a more premium and engaging user experience.
+ *
+ * To use the new animation:
+ * 1. Import useCartAnimation from '@/context/CartAnimationContext'
+ * 2. Call triggerFlyToCart({ productImage, startPosition }) after adding to cart
+ * 3. The animation is rendered at root level via FlyToCartAnimation component
+ *
+ * This file is kept for reference but should not be used in new code.
+ *
+ * Previous features: View cart / Continue shopping options with modal overlay
  */
 
 import React, { useEffect, useCallback, useMemo } from 'react';

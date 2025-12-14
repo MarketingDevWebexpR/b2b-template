@@ -4,7 +4,7 @@
  * and sophisticated add-to-cart button with micro-interactions
  */
 
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -40,6 +40,12 @@ const COLORS = {
   borderLight: '#f0ebe3',
 };
 
+/** Position callback for fly-to-cart animation */
+export interface ButtonPosition {
+  x: number;
+  y: number;
+}
+
 interface LuxuryAddToCartBarProps {
   price: number;
   quantity: number;
@@ -48,6 +54,8 @@ interface LuxuryAddToCartBarProps {
   cartQuantity?: number;
   disabled?: boolean;
   showCartBadge?: boolean;
+  /** Callback to report button center position when pressed */
+  onButtonPositionCapture?: (position: ButtonPosition) => void;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -60,7 +68,10 @@ export function LuxuryAddToCartBar({
   cartQuantity = 0,
   disabled = false,
   showCartBadge = true,
+  onButtonPositionCapture,
 }: LuxuryAddToCartBarProps) {
+  // Ref for the button to capture its position
+  const buttonRef = useRef<View>(null);
   // Calculate total price
   const totalPrice = useMemo(() => price * quantity, [price, quantity]);
   const formattedPrice = useMemo(() => formatPrice(totalPrice), [totalPrice]);
@@ -130,8 +141,24 @@ export function LuxuryAddToCartBar({
     rippleOpacity.value = withTiming(0, { duration: 600 });
   }, [disabled, isLoading]);
 
+  // Capture button position for fly-to-cart animation
+  const captureButtonPosition = useCallback(() => {
+    if (buttonRef.current && onButtonPositionCapture) {
+      buttonRef.current.measureInWindow((x, y, width, height) => {
+        // Return the center of the button
+        onButtonPositionCapture({
+          x: x + width / 2,
+          y: y + height / 2,
+        });
+      });
+    }
+  }, [onButtonPositionCapture]);
+
   const handlePress = useCallback(async () => {
     if (disabled || isLoading) return;
+
+    // Capture button position before starting animation
+    captureButtonPosition();
 
     setIsLoading(true);
 
@@ -253,16 +280,17 @@ export function LuxuryAddToCartBar({
       {/* Content */}
       <View style={styles.content}>
         {/* Add to Cart Button - Full Width */}
-        <AnimatedPressable
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          onPress={handlePress}
-          disabled={disabled || isLoading}
-          style={[styles.button, buttonContainerStyle]}
-          accessibilityLabel={`Ajouter ${quantity} article${quantity > 1 ? 's' : ''} au panier pour ${formattedPrice}`}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: disabled || isLoading }}
-        >
+        <View ref={buttonRef} style={styles.buttonWrapper} collapsable={false}>
+          <AnimatedPressable
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={handlePress}
+            disabled={disabled || isLoading}
+            style={[styles.button, buttonContainerStyle]}
+            accessibilityLabel={`Ajouter ${quantity} article${quantity > 1 ? 's' : ''} au panier pour ${formattedPrice}`}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: disabled || isLoading }}
+          >
           {/* Button Background with Color Animation */}
           <Animated.View style={[styles.buttonBackground, buttonBackgroundStyle]}>
             {/* Glow Effect */}
@@ -303,7 +331,8 @@ export function LuxuryAddToCartBar({
             {/* Button Text */}
             <Text style={styles.buttonText}>{buttonText}</Text>
           </View>
-        </AnimatedPressable>
+          </AnimatedPressable>
+        </View>
       </View>
     </View>
   );
@@ -348,6 +377,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 34,
+  },
+
+  buttonWrapper: {
+    flex: 1,
+    width: '100%',
   },
 
   button: {

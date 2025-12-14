@@ -1,19 +1,20 @@
 import { View, Text, ScrollView, Image, Pressable, Dimensions, StyleSheet } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Heart, ShoppingBag } from 'lucide-react-native';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import type { Product } from '@bijoux/types';
 import { formatPrice } from '@bijoux/utils';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { useCartAnimation } from '@/context/CartAnimationContext';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { api } from '@/lib/api';
 import {
   LuxuryQuantitySelector,
   LuxuryAddToCartBar,
-  AddToCartSuccessOverlay,
 } from '@/components/product';
+import type { ButtonPosition } from '@/components/product/LuxuryAddToCartBar';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -35,9 +36,12 @@ export default function ProductDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const { addToCart, isInCart, getItemQuantity, cart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { triggerFlyToCart } = useCartAnimation();
+
+  // Store the last captured button position for the animation
+  const lastButtonPosition = useRef<ButtonPosition | null>(null);
 
   const inCart = product ? isInCart(product.id) : false;
   const cartQuantity = product ? getItemQuantity(product.id) : 0;
@@ -57,26 +61,33 @@ export default function ProductDetailScreen() {
     fetchProduct();
   }, [id]);
 
+  // Handle button position capture from LuxuryAddToCartBar
+  const handleButtonPositionCapture = useCallback((position: ButtonPosition) => {
+    lastButtonPosition.current = position;
+  }, []);
+
   const handleAddToCart = useCallback(async () => {
     if (!product) return;
+
+    const images = product.images.length > 0 ? product.images : [DEFAULT_PRODUCT_IMAGE];
+    const productImage = images[0];
 
     // Simulate a small delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     addToCart(product, quantity);
-    setShowSuccessOverlay(true);
-  }, [product, quantity, addToCart]);
 
-  const handleViewCart = useCallback(() => {
-    setShowSuccessOverlay(false);
-    router.push('/(tabs)/cart');
-  }, [router]);
+    // Trigger fly-to-cart animation if we have a position
+    if (lastButtonPosition.current) {
+      triggerFlyToCart({
+        productImage,
+        startPosition: lastButtonPosition.current,
+      });
+    }
 
-  const handleContinueShopping = useCallback(() => {
-    setShowSuccessOverlay(false);
-    // Reset quantity to 1 for potential next add
+    // Reset quantity for next add
     setQuantity(1);
-  }, []);
+  }, [product, quantity, addToCart, triggerFlyToCart]);
 
   const handleToggleWishlist = useCallback(() => {
     if (product) {
@@ -322,19 +333,7 @@ export default function ProductDetailScreen() {
         onAddToCart={handleAddToCart}
         isInCart={inCart}
         cartQuantity={cartQuantity}
-      />
-
-      {/* Success Overlay with Actions */}
-      <AddToCartSuccessOverlay
-        visible={showSuccessOverlay}
-        productName={product.name}
-        productImage={images[0]}
-        quantity={quantity}
-        cartTotalItems={cart.totalItems}
-        cartTotalPrice={cart.totalPrice}
-        onViewCart={handleViewCart}
-        onContinueShopping={handleContinueShopping}
-        onDismiss={handleContinueShopping}
+        onButtonPositionCapture={handleButtonPositionCapture}
       />
     </View>
   );

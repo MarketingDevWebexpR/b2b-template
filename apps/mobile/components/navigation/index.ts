@@ -4,3 +4,4 @@
  */
 
 export { LuxuryBackButton, LuxuryBackButtonMinimal } from './LuxuryBackButton';
+export { AnimatedCartIcon } from './AnimatedCartIcon';

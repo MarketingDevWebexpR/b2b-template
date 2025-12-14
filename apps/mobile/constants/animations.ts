@@ -151,6 +151,7 @@ export const successOverlayTiming = {
 /**
  * Success overlay animation timing (V2 - user-controlled dismiss)
  * Used by AddToCartSuccessOverlayV2 component
+ * @deprecated Use flyToCartTiming instead
  */
 export const successOverlayV2Timing = {
   // Entry sequence (total ~550ms)
@@ -173,4 +174,31 @@ export const successOverlayV2Timing = {
   },
   // No auto-dismiss - user must interact
   autoDismiss: null,
+} as const;
+
+/**
+ * Fly-to-cart animation timing
+ * Premium animation where product thumbnail flies from button to cart icon
+ */
+export const flyToCartTiming = {
+  // Phase 1: Launch - thumbnail appears and scales up
+  launch: {
+    duration: 100,
+    scaleFrom: 0.3,
+    scaleTo: 0.8,
+  },
+  // Phase 2: Flight - follows Bezier curve path
+  flight: {
+    duration: 450,
+    scaleFrom: 0.8,
+    scaleTo: 0.35,
+    rotation: -15, // Subtle rotation during flight
+    curveHeight: 120, // How high the curve rises above start/end points
+  },
+  // Phase 3: Landing - fade out and trigger badge bounce
+  landing: {
+    duration: 150,
+  },
+  // Total animation time
+  total: 700,
 } as const;

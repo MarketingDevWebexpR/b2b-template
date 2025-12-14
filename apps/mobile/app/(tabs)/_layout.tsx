@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
-import { Home, Search, Grid3X3, ShoppingBag, User } from 'lucide-react-native';
-import { View, Text } from 'react-native';
-import { useCart } from '@/context/CartContext';
+import { Home, Search, Grid3X3, User } from 'lucide-react-native';
+import { View } from 'react-native';
+import { AnimatedCartIcon } from '@/components/navigation';
 
 function TabBarIcon({
   icon: Icon,
@@ -15,24 +15,6 @@ function TabBarIcon({
   return (
     <View className="items-center justify-center">
       <Icon size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
-    </View>
-  );
-}
-
-function CartTabBarIcon({ color, focused }: { color: string; focused: boolean }) {
-  const { cart } = useCart();
-  const itemCount = cart.totalItems;
-
-  return (
-    <View className="items-center justify-center">
-      <ShoppingBag size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
-      {itemCount > 0 && (
-        <View className="absolute -top-1 -right-2 bg-hermes-500 rounded-full min-w-[18px] h-[18px] items-center justify-center">
-          <Text className="text-white text-xs font-semibold">
-            {itemCount > 99 ? '99+' : itemCount}
-          </Text>
-        </View>
-      )}
     </View>
   );
 }
@@ -91,7 +73,7 @@ export default function TabLayout() {
         options={{
           title: 'Panier',
           tabBarIcon: ({ color, focused }) => (
-            <CartTabBarIcon color={color} focused={focused} />
+            <AnimatedCartIcon color={color} focused={focused} />
           ),
         }}
       />
