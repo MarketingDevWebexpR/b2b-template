@@ -3,9 +3,12 @@
  * A premium shopping cart experience with elegant animations
  */
 
+import { useState } from 'react';
 import { View, Text, ScrollView, Pressable, Image, Platform, StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { Trash2, ShoppingBag, Package, Gift } from 'lucide-react-native';
+import { useAuth } from '@/context/AuthContext';
+import { LoginPromptSheet } from '@/components/auth';
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -44,7 +47,11 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function CartScreen() {
   const { cart, removeFromCart, updateQuantity } = useCart();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
+
+  // Login prompt state for checkout
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const FREE_SHIPPING_THRESHOLD = 500;
   const remainingForFreeShipping = FREE_SHIPPING_THRESHOLD - cart.totalPrice;
@@ -64,6 +71,14 @@ export default function CartScreen() {
 
   const handleCheckoutPressOut = () => {
     checkoutScale.value = withSpring(1, springConfigs.button);
+  };
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      setShowLoginPrompt(true);
+    } else {
+      router.push('/checkout/shipping');
+    }
   };
 
   const handleRemoveItem = (productId: string) => {
@@ -260,13 +275,27 @@ export default function CartScreen() {
           <AnimatedPressable
             onPressIn={handleCheckoutPressIn}
             onPressOut={handleCheckoutPressOut}
-            onPress={() => router.push('/checkout/shipping')}
+            onPress={handleCheckout}
             style={[styles.checkoutButton, checkoutButtonStyle]}
           >
             <Text style={styles.checkoutButtonText}>Passer commande</Text>
           </AnimatedPressable>
         </View>
       </View>
+
+      {/* Login Prompt Sheet */}
+      <LoginPromptSheet
+        isVisible={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+        onLogin={() => {
+          setShowLoginPrompt(false);
+          router.push('/(auth)/login?returnTo=/checkout/shipping');
+        }}
+        onRegister={() => {
+          setShowLoginPrompt(false);
+          router.push('/(auth)/register?returnTo=/checkout/shipping');
+        }}
+      />
     </View>
   );
 }

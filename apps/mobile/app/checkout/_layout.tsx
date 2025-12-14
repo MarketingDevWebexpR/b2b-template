@@ -6,8 +6,9 @@
 
 import { useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, Redirect } from 'expo-router';
 import { X, ChevronLeft } from 'lucide-react-native';
+import { useAuth } from '@/context/AuthContext';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -148,6 +149,18 @@ function CheckoutHeader({
 }
 
 export default function CheckoutLayout() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Defense in depth: redirect unauthenticated users to login
+  // This is a safety measure in case someone navigates directly to checkout URLs
+  if (isLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/login?returnTo=/checkout/shipping" />;
+  }
+
   return (
     <Stack
       screenOptions={{

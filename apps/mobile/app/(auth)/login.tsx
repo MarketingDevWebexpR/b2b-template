@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
@@ -8,6 +8,7 @@ import { hapticFeedback } from '@/constants/haptics';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +26,12 @@ export default function LoginScreen() {
 
       if (result.success) {
         hapticFeedback.success();
-        router.replace('/(tabs)');
+        if (returnTo) {
+          // @ts-expect-error - dynamic route from returnTo param
+          router.replace(returnTo);
+        } else {
+          router.replace('/(tabs)');
+        }
       } else {
         hapticFeedback.error();
         setError(result.error || 'Email ou mot de passe incorrect');
