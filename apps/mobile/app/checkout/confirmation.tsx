@@ -39,10 +39,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import {
-  CheckoutStepIndicator,
-  OrderConfirmationOverlay,
-} from '@/components/checkout';
+import { CheckoutStepIndicator } from '@/components/checkout';
 import { useCheckout } from '@/hooks/useCheckout';
 import { springConfigs } from '@/constants/animations';
 import { hapticFeedback, debouncedHaptic } from '@/constants/haptics';
@@ -190,8 +187,7 @@ export default function ConfirmationScreen() {
   const router = useRouter();
   const { shippingAddress, resetCheckout } = useCheckout();
 
-  // State
-  const [showOverlay, setShowOverlay] = useState(true);
+  // Generate order number once
   const orderNumber = useMemo(() => generateOrderNumber(), []);
   const deliveryDate = useMemo(() => formatDeliveryDate(), []);
 
@@ -250,38 +246,18 @@ export default function ConfirmationScreen() {
   // Handle view order
   const handleViewOrder = useCallback(() => {
     debouncedHaptic(hapticFeedback.softConfirm);
-    setShowOverlay(false);
     router.push('/orders');
   }, [router]);
 
   // Handle continue shopping
   const handleContinueShopping = useCallback(() => {
     debouncedHaptic(hapticFeedback.softConfirm);
-    setShowOverlay(false);
     resetCheckout();
     router.replace('/');
   }, [router, resetCheckout]);
 
-  // Handle overlay dismiss
-  const handleOverlayViewOrder = useCallback(() => {
-    setShowOverlay(false);
-    router.push('/orders');
-  }, [router]);
-
-  const handleOverlayContinue = useCallback(() => {
-    setShowOverlay(false);
-  }, []);
-
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      {/* Order Confirmation Overlay */}
-      <OrderConfirmationOverlay
-        visible={showOverlay}
-        orderNumber={orderNumber}
-        onViewOrder={handleOverlayViewOrder}
-        onContinueShopping={handleOverlayContinue}
-      />
-
       {/* Step Indicator */}
       <CheckoutStepIndicator
         currentStep="confirmation"
