@@ -31,8 +31,12 @@ const COLORS = {
 };
 
 export default function ProductDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: idSegments } = useLocalSearchParams<{ id: string[] }>();
   const router = useRouter();
+
+  // Handle catch-all route - join segments with "/" to reconstruct full product ID
+  // This handles Sage product references like "CHAAR/VAR"
+  const id = Array.isArray(idSegments) ? idSegments.join('/') : idSegments;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
