@@ -11,6 +11,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { CategoryProvider } from '@/context/CategoryContext';
 import { CheckoutProvider } from '@/context/CheckoutContext';
 import { WishlistProvider } from '@/context/WishlistContext';
+import { LuxuryBackButton } from '@/components/navigation';
 
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
@@ -61,9 +62,10 @@ export default function RootLayout() {
                       options={{
                         headerShown: true,
                         headerTitle: '',
-                        headerBackTitle: 'Retour',
+                        headerBackVisible: false,
+                        headerLeft: () => <LuxuryBackButton />,
                         headerStyle: { backgroundColor: '#fffcf7' },
-                        headerTintColor: '#2b333f',
+                        headerShadowVisible: false,
                       }}
                     />
                     <Stack.Screen
@@ -71,9 +73,10 @@ export default function RootLayout() {
                       options={{
                         headerShown: true,
                         headerTitle: '',
-                        headerBackTitle: 'Retour',
+                        headerBackVisible: false,
+                        headerLeft: () => <LuxuryBackButton />,
                         headerStyle: { backgroundColor: '#fffcf7' },
-                        headerTintColor: '#2b333f',
+                        headerShadowVisible: false,
                       }}
                     />
                     <Stack.Screen
@@ -95,9 +98,15 @@ export default function RootLayout() {
                       options={{
                         headerShown: true,
                         headerTitle: 'Notre Histoire',
-                        headerBackTitle: 'Retour',
+                        headerBackVisible: false,
+                        headerLeft: () => <LuxuryBackButton />,
                         headerStyle: { backgroundColor: '#fffcf7' },
-                        headerTintColor: '#2b333f',
+                        headerShadowVisible: false,
+                        headerTitleStyle: {
+                          fontFamily: 'PlayfairDisplay-Medium',
+                          fontSize: 18,
+                          color: '#2b333f',
+                        },
                       }}
                     />
                     <Stack.Screen
@@ -105,9 +114,15 @@ export default function RootLayout() {
                       options={{
                         headerShown: true,
                         headerTitle: 'Mes commandes',
-                        headerBackTitle: 'Retour',
+                        headerBackVisible: false,
+                        headerLeft: () => <LuxuryBackButton />,
                         headerStyle: { backgroundColor: '#fffcf7' },
-                        headerTintColor: '#2b333f',
+                        headerShadowVisible: false,
+                        headerTitleStyle: {
+                          fontFamily: 'PlayfairDisplay-Medium',
+                          fontSize: 18,
+                          color: '#2b333f',
+                        },
                       }}
                     />
                     <Stack.Screen
@@ -115,9 +130,15 @@ export default function RootLayout() {
                       options={{
                         headerShown: true,
                         headerTitle: 'Mes favoris',
-                        headerBackTitle: 'Retour',
+                        headerBackVisible: false,
+                        headerLeft: () => <LuxuryBackButton />,
                         headerStyle: { backgroundColor: '#fffcf7' },
-                        headerTintColor: '#2b333f',
+                        headerShadowVisible: false,
+                        headerTitleStyle: {
+                          fontFamily: 'PlayfairDisplay-Medium',
+                          fontSize: 18,
+                          color: '#2b333f',
+                        },
                       }}
                     />
                     <Stack.Screen
@@ -137,9 +158,15 @@ export default function RootLayout() {
                       options={{
                         headerShown: true,
                         headerTitle: 'Mes adresses',
-                        headerBackTitle: 'Retour',
+                        headerBackVisible: false,
+                        headerLeft: () => <LuxuryBackButton />,
                         headerStyle: { backgroundColor: '#fffcf7' },
-                        headerTintColor: '#2b333f',
+                        headerShadowVisible: false,
+                        headerTitleStyle: {
+                          fontFamily: 'PlayfairDisplay-Medium',
+                          fontSize: 18,
+                          color: '#2b333f',
+                        },
                       }}
                     />
                     <Stack.Screen
@@ -147,9 +174,15 @@ export default function RootLayout() {
                       options={{
                         headerShown: true,
                         headerTitle: 'Moyens de paiement',
-                        headerBackTitle: 'Retour',
+                        headerBackVisible: false,
+                        headerLeft: () => <LuxuryBackButton />,
                         headerStyle: { backgroundColor: '#fffcf7' },
-                        headerTintColor: '#2b333f',
+                        headerShadowVisible: false,
+                        headerTitleStyle: {
+                          fontFamily: 'PlayfairDisplay-Medium',
+                          fontSize: 18,
+                          color: '#2b333f',
+                        },
                       }}
                     />
                     <Stack.Screen
