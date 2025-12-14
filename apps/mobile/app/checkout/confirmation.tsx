@@ -22,8 +22,6 @@ import {
   Mail,
   Calendar,
   MapPin,
-  ArrowRight,
-  ShoppingBag,
   Home,
 } from 'lucide-react-native';
 import Animated, {
@@ -130,14 +128,13 @@ function InfoCard({ icon, title, subtitle, delay = 0 }: InfoCardProps) {
  * Action button component
  */
 interface ActionButtonProps {
-  variant: 'primary' | 'secondary';
+  variant: 'primary';
   icon: React.ReactNode;
   label: string;
   onPress: () => void;
-  delay?: number;
 }
 
-function ActionButton({ variant, icon, label, onPress, delay = 0 }: ActionButtonProps) {
+function ActionButton({ icon, label, onPress }: ActionButtonProps) {
   const scale = useSharedValue(1);
 
   const handlePressIn = () => {
@@ -153,33 +150,24 @@ function ActionButton({ variant, icon, label, onPress, delay = 0 }: ActionButton
     transform: [{ scale: scale.value }],
   }));
 
-  const isPrimary = variant === 'primary';
-
   return (
-    <Animated.View entering={FadeInUp.delay(delay).duration(400)}>
-      <AnimatedPressable
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[
-          styles.actionButton,
-          animatedStyle,
-          isPrimary ? styles.primaryButton : styles.secondaryButton,
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-      >
-        {icon}
-        <Text
-          style={[
-            styles.actionButtonText,
-            isPrimary ? styles.primaryButtonText : styles.secondaryButtonText,
-          ]}
-        >
-          {label}
-        </Text>
-      </AnimatedPressable>
-    </Animated.View>
+    <AnimatedPressable
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={[
+        styles.actionButton,
+        styles.primaryButton,
+        animatedStyle,
+      ]}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      {icon}
+      <Text style={[styles.actionButtonText, styles.primaryButtonText]}>
+        {label}
+      </Text>
+    </AnimatedPressable>
   );
 }
 
@@ -242,12 +230,6 @@ export default function ConfirmationScreen() {
   const glowAnimatedStyle = useAnimatedStyle(() => ({
     opacity: glowOpacity.value,
   }));
-
-  // Handle view order
-  const handleViewOrder = useCallback(() => {
-    debouncedHaptic(hapticFeedback.softConfirm);
-    router.push('/orders');
-  }, [router]);
 
   // Handle continue shopping
   const handleContinueShopping = useCallback(() => {
@@ -339,24 +321,18 @@ export default function ConfirmationScreen() {
           )}
         </View>
 
-        {/* Action Buttons */}
-        <View style={styles.actionsContainer}>
-          <ActionButton
-            variant="secondary"
-            icon={<ShoppingBag size={20} color={COLORS.hermes} />}
-            label="Voir ma commande"
-            onPress={handleViewOrder}
-            delay={900}
-          />
-
+        {/* Action Button */}
+        <Animated.View
+          entering={FadeInUp.delay(900).duration(400)}
+          style={styles.actionsContainer}
+        >
           <ActionButton
             variant="primary"
             icon={<Home size={20} color={COLORS.white} />}
             label="Retour à l'accueil"
             onPress={handleContinueShopping}
-            delay={950}
           />
-        </View>
+        </Animated.View>
 
         {/* Help Text */}
         <Animated.Text
@@ -498,15 +474,14 @@ const styles = StyleSheet.create({
 
   // Actions
   actionsContainer: {
-    gap: SPACING.sm,
-    marginTop: SPACING.md,
+    marginTop: SPACING.lg,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: RADIUS.lg,
+    height: 56,
+    borderRadius: 28,
     gap: SPACING.sm,
   },
   primaryButton: {
@@ -517,21 +492,13 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
   },
-  secondaryButton: {
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: COLORS.hermes,
-  },
   actionButtonText: {
     fontFamily: FONTS.bodySemiBold,
-    fontSize: 15,
-    letterSpacing: 0.3,
+    fontSize: 16,
+    letterSpacing: 0.5,
   },
   primaryButtonText: {
     color: COLORS.white,
-  },
-  secondaryButtonText: {
-    color: COLORS.hermes,
   },
 
   // Help Text
