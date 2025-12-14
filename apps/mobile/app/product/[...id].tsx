@@ -140,7 +140,12 @@ export default function ProductDetailScreen() {
     <View className="flex-1 bg-background">
       <Stack.Screen
         options={{
+          headerShown: true,
           headerTitle: '',
+          headerBackTitle: 'Retour',
+          headerStyle: { backgroundColor: '#fffcf7' },
+          headerTintColor: '#2b333f',
+          headerShadowVisible: false,
           headerRight: HeaderRight,
         }}
       />
