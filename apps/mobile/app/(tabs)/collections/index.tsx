@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback } from 'react';
 import { CategoryCard } from '@/components/CategoryCard';
 import { useCategories } from '@/context/CategoryContext';
+import { hapticFeedback } from '@/constants/haptics';
 
 const COLORS = {
   background: '#fffcf7',
@@ -14,6 +15,7 @@ export default function CollectionsScreen() {
   const { categories, isLoading, refetch, getCategoryIndex } = useCategories();
 
   const onRefresh = useCallback(async () => {
+    hapticFeedback.pullRefresh();
     await refetch();
   }, [refetch]);
 

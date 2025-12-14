@@ -2,6 +2,7 @@ import { View, Text, Pressable } from 'react-native';
 import { Link } from 'expo-router';
 import { ArrowUpRight } from 'lucide-react-native';
 import type { Category } from '@bijoux/types';
+import { hapticFeedback } from '@/constants/haptics';
 
 interface CategoryCardProps {
   category: Category;
@@ -23,6 +24,7 @@ export function CategoryCard({ category, index = 0, size = 'default' }: Category
           isLarge ? 'p-6' : 'p-4'
         }`}
         style={{ height: cardHeight }}
+        onPressIn={() => hapticFeedback.buttonPress()}
       >
         {/* Header with title and index */}
         <View className="flex-row justify-between items-start">

@@ -11,6 +11,7 @@ import {
 import { Link } from 'expo-router';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronDown, ChevronRight, ArrowRight } from 'lucide-react-native';
+import { hapticFeedback } from '@/constants/haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   FadeInDown,
@@ -85,6 +86,7 @@ function CTAButton({
 
   const handlePressIn = () => {
     scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+    hapticFeedback.buttonPress();
   };
 
   const handlePressOut = () => {
@@ -151,6 +153,7 @@ export default function HomeScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const scrollToContent = () => {
+    hapticFeedback.softPress();
     scrollViewRef.current?.scrollTo({ y: HERO_HEIGHT, animated: true });
   };
 
@@ -170,6 +173,7 @@ export default function HomeScreen() {
   }, []);
 
   const onRefresh = useCallback(async () => {
+    hapticFeedback.pullRefresh();
     setRefreshing(true);
     await Promise.all([fetchProducts(), refetchCategories()]);
     setRefreshing(false);
@@ -307,7 +311,10 @@ export default function HomeScreen() {
                 Nos Univers
               </Animated.Text>
               <Link href="/collections" asChild>
-                <Pressable className="flex-row items-center">
+                <Pressable
+                  className="flex-row items-center"
+                  onPressIn={() => hapticFeedback.navigation()}
+                >
                   <Text className="font-sans text-sm text-hermes-500 mr-1">Voir tout</Text>
                   <ChevronRight size={16} color="#f67828" />
                 </Pressable>
@@ -375,7 +382,10 @@ export default function HomeScreen() {
             className="px-6 mt-4"
           >
             <Link href="/collections" asChild>
-              <Pressable className="flex-row items-center justify-center py-4 border border-hermes-500/30 rounded-full">
+              <Pressable
+                className="flex-row items-center justify-center py-4 border border-hermes-500/30 rounded-full"
+                onPressIn={() => hapticFeedback.navigation()}
+              >
                 <Text className="font-sans text-hermes-500 font-medium mr-2">
                   Voir toutes les créations
                 </Text>
@@ -446,7 +456,10 @@ export default function HomeScreen() {
             {/* CTA Button */}
             <Animated.View entering={FadeIn.delay(900).duration(600)}>
               <Link href="/about" asChild>
-                <Pressable className="flex-row items-center justify-center py-4 bg-luxe-charcoal rounded-full">
+                <Pressable
+                  className="flex-row items-center justify-center py-4 bg-luxe-charcoal rounded-full"
+                  onPressIn={() => hapticFeedback.navigation()}
+                >
                   <Text className="font-sans text-white font-medium mr-2">
                     Découvrir notre histoire
                   </Text>
@@ -503,7 +516,10 @@ export default function HomeScreen() {
 
             {/* Subscribe Button */}
             <Animated.View entering={FadeIn.delay(600).duration(600)}>
-              <Pressable className="bg-hermes-500 py-4 rounded-full">
+              <Pressable
+                className="bg-hermes-500 py-4 rounded-full"
+                onPressIn={() => hapticFeedback.buttonPress()}
+              >
                 <Text className="font-sans text-white font-semibold text-center tracking-wider">
                   S'inscrire à la newsletter
                 </Text>

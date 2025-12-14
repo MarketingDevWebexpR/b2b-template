@@ -18,6 +18,7 @@ import { ShoppingBag } from 'lucide-react-native';
 import { useCart } from '@/context/CartContext';
 import { useCartAnimation } from '@/context/CartAnimationContext';
 import { springConfigs } from '@/constants/animations';
+import { hapticFeedback } from '@/constants/haptics';
 
 // Design tokens
 const COLORS = {
@@ -63,6 +64,9 @@ export function AnimatedCartIcon({ color, focused }: AnimatedCartIconProps) {
   useEffect(() => {
     if (badgeBounceCount > prevBounceCount.current) {
       prevBounceCount.current = badgeBounceCount;
+
+      // Haptic feedback when item lands in cart
+      hapticFeedback.addToCartSuccess();
 
       // Badge bounce animation
       badgeScale.value = withSequence(

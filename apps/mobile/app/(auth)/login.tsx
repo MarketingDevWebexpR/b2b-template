@@ -4,6 +4,7 @@ import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { hapticFeedback } from '@/constants/haptics';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
+    hapticFeedback.formSubmit();
     setError('');
     setLoading(true);
 
@@ -22,11 +24,14 @@ export default function LoginScreen() {
       const result = await signIn(email, password);
 
       if (result.success) {
+        hapticFeedback.success();
         router.replace('/(tabs)');
       } else {
+        hapticFeedback.error();
         setError(result.error || 'Email ou mot de passe incorrect');
       }
     } catch (err) {
+      hapticFeedback.error();
       setError('Une erreur est survenue');
     } finally {
       setLoading(false);
@@ -89,7 +94,10 @@ export default function LoginScreen() {
                   className="flex-1 ml-3 font-sans text-text-primary"
                   placeholderTextColor="#8b8b8b"
                 />
-                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                <Pressable onPress={() => {
+                  hapticFeedback.toggleSwitch();
+                  setShowPassword(!showPassword);
+                }}>
                   {showPassword ? (
                     <EyeOff size={20} color="#696969" />
                   ) : (
@@ -100,13 +108,14 @@ export default function LoginScreen() {
             </View>
 
             {/* Forgot Password */}
-            <Pressable className="self-end mt-2">
+            <Pressable className="self-end mt-2" onPressIn={() => hapticFeedback.softPress()}>
               <Text className="font-sans text-sm text-hermes-500">Mot de passe oublié ?</Text>
             </Pressable>
 
             {/* Submit Button */}
             <Pressable
               onPress={handleLogin}
+              onPressIn={() => hapticFeedback.buttonPress()}
               disabled={loading}
               className={`mt-6 py-4 rounded-soft ${loading ? 'bg-hermes-400' : 'bg-hermes-500'}`}
             >
@@ -120,7 +129,7 @@ export default function LoginScreen() {
           <View className="flex-row justify-center mt-8">
             <Text className="font-sans text-text-muted">Pas encore de compte ?</Text>
             <Link href="/(auth)/register" asChild>
-              <Pressable>
+              <Pressable onPressIn={() => hapticFeedback.navigation()}>
                 <Text className="font-sans text-hermes-500 ml-1">Créer un compte</Text>
               </Pressable>
             </Link>

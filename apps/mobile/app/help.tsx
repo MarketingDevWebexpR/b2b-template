@@ -16,6 +16,7 @@ import {
   CreditCard,
   Sparkles,
 } from 'lucide-react-native';
+import { hapticFeedback } from '@/constants/haptics';
 
 // FAQ Data organized by category
 const faqData = [
@@ -137,10 +138,15 @@ interface FAQItemProps {
 }
 
 function FAQItem({ question, answer, isExpanded, onToggle }: FAQItemProps) {
+  const handleToggle = () => {
+    hapticFeedback.softPress();
+    onToggle();
+  };
+
   return (
     <View className="border-b border-border-light">
       <Pressable
-        onPress={onToggle}
+        onPress={handleToggle}
         className="flex-row items-center justify-between py-4 px-4"
       >
         <Text className="font-sans text-text-primary flex-1 pr-4">{question}</Text>
@@ -219,7 +225,10 @@ export default function HelpScreen() {
         {/* Header */}
         <View className="px-6 pt-4 pb-6">
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => {
+              hapticFeedback.navigation();
+              router.back();
+            }}
             className="flex-row items-center mb-4"
           >
             <ChevronLeft size={24} color="#1a1a1a" />

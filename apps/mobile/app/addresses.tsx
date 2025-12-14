@@ -5,6 +5,7 @@ import { Stack, useRouter, Link } from 'expo-router';
 import { MapPin, Plus, Check, Home, Building2, Phone, ChevronRight } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { ListSkeleton } from '@/components/skeleton';
+import { hapticFeedback } from '@/constants/haptics';
 
 /**
  * Address type definition
@@ -119,6 +120,7 @@ function AddressCard({ address }: { address: Address }) {
   const Icon = config.icon;
 
   const handlePress = () => {
+    hapticFeedback.listItemSelect();
     // TODO: Navigate to address edit page
     console.log('Edit address:', address.id);
   };
@@ -183,6 +185,7 @@ function AddAddressButton() {
   const router = useRouter();
 
   const handlePress = () => {
+    hapticFeedback.buttonPress();
     // TODO: Navigate to add address page
     console.log('Add new address');
   };
@@ -211,6 +214,7 @@ function EmptyState() {
   const router = useRouter();
 
   const handleAddAddress = () => {
+    hapticFeedback.buttonPress();
     // TODO: Navigate to add address page
     console.log('Add new address from empty state');
   };
@@ -255,13 +259,13 @@ function UnauthenticatedState() {
       </Text>
 
       <Link href="/(auth)/login" asChild>
-        <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft w-full mb-3">
+        <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft w-full mb-3" onPressIn={() => hapticFeedback.navigation()}>
           <Text className="text-white font-sans font-medium text-center">Se connecter</Text>
         </Pressable>
       </Link>
 
       <Link href="/(auth)/register" asChild>
-        <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full">
+        <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full" onPressIn={() => hapticFeedback.navigation()}>
           <Text className="text-hermes-500 font-sans font-medium text-center">Créer un compte</Text>
         </Pressable>
       </Link>

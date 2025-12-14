@@ -7,6 +7,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { FavoritesSkeleton } from '@/components/skeleton';
 import { ProductCard } from '@/components/ProductCard';
 import type { Product } from '@bijoux/types';
+import { hapticFeedback } from '@/constants/haptics';
 
 export default function FavoritesScreen() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -37,13 +38,13 @@ export default function FavoritesScreen() {
           </Text>
 
           <Link href="/(auth)/login" asChild>
-            <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft w-full mb-3">
+            <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft w-full mb-3" onPressIn={() => hapticFeedback.navigation()}>
               <Text className="text-white font-sans font-medium text-center">Se connecter</Text>
             </Pressable>
           </Link>
 
           <Link href="/(auth)/register" asChild>
-            <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full">
+            <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full" onPressIn={() => hapticFeedback.navigation()}>
               <Text className="text-hermes-500 font-sans font-medium text-center">Creer un compte</Text>
             </Pressable>
           </Link>
@@ -72,7 +73,7 @@ export default function FavoritesScreen() {
             Parcourez nos collections et ajoutez vos pieces preferees a votre liste de favoris
           </Text>
           <Link href="/collections" asChild>
-            <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft">
+            <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft" onPressIn={() => hapticFeedback.navigation()}>
               <Text className="text-white font-sans font-medium">Decouvrir nos collections</Text>
             </Pressable>
           </Link>

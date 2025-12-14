@@ -30,6 +30,7 @@ import {
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { SettingsSkeleton } from '@/components/skeleton';
+import { hapticFeedback } from '@/constants/haptics';
 
 // Small red spinner for delete action
 function DeleteSpinner() {
@@ -92,6 +93,11 @@ interface SettingToggleProps {
 }
 
 function SettingToggle({ label, description, value, onValueChange }: SettingToggleProps) {
+  const handleValueChange = (newValue: boolean) => {
+    hapticFeedback.toggleSwitch();
+    onValueChange(newValue);
+  };
+
   return (
     <View className="flex-row items-center justify-between py-4 border-b border-border-light">
       <View className="flex-1 mr-4">
@@ -102,7 +108,7 @@ function SettingToggle({ label, description, value, onValueChange }: SettingTogg
       </View>
       <Switch
         value={value}
-        onValueChange={onValueChange}
+        onValueChange={handleValueChange}
         trackColor={{ false: '#d4d4d4', true: '#f67828' }}
         thumbColor="#ffffff"
         ios_backgroundColor="#d4d4d4"
@@ -119,9 +125,14 @@ interface SettingLinkProps {
 }
 
 function SettingLink({ label, value, onPress, showChevron = true }: SettingLinkProps) {
+  const handlePress = () => {
+    hapticFeedback.listItemSelect();
+    onPress();
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       className="flex-row items-center justify-between py-4 border-b border-border-light"
     >
       <Text className="font-sans text-text-primary">{label}</Text>
@@ -169,6 +180,7 @@ export default function SettingsScreen() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteAccount = () => {
+    hapticFeedback.warning();
     Alert.alert(
       'Supprimer mon compte',
       'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données seront perdues.',
@@ -186,9 +198,11 @@ export default function SettingsScreen() {
               // Simulate API call for account deletion
               await new Promise((resolve) => setTimeout(resolve, 1500));
               // Sign out and redirect
+              hapticFeedback.success();
               await signOut();
               router.replace('/');
             } catch (error) {
+              hapticFeedback.error();
               Alert.alert('Erreur', 'Une erreur est survenue lors de la suppression du compte.');
             } finally {
               setIsDeleting(false);
@@ -206,6 +220,7 @@ export default function SettingsScreen() {
   };
 
   const handleLanguageSelect = (code: LanguageCode) => {
+    hapticFeedback.selection();
     setSelectedLanguage(code);
     setShowLanguageSelector(false);
     // In a real app, this would update the app's locale
@@ -234,7 +249,13 @@ export default function SettingsScreen() {
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View className="px-6 pt-4 pb-2">
-          <Pressable onPress={() => router.back()} className="flex-row items-center mb-4">
+          <Pressable
+            onPress={() => {
+              hapticFeedback.navigation();
+              router.back();
+            }}
+            className="flex-row items-center mb-4"
+          >
             <ChevronLeft size={24} color="#1a1a1a" />
             <Text className="font-sans text-text-primary ml-1">Retour</Text>
           </Pressable>

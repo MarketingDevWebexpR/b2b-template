@@ -67,7 +67,7 @@ export default function CartScreen() {
   };
 
   const handleRemoveItem = (productId: string) => {
-    hapticFeedback.softConfirm();
+    hapticFeedback.warning();
     removeFromCart(productId);
   };
 
@@ -97,7 +97,10 @@ export default function CartScreen() {
 
         <Animated.View entering={FadeInDown.delay(400).duration(500)}>
           <Link href="/collections" asChild>
-            <Pressable style={styles.emptyButton}>
+            <Pressable
+              style={styles.emptyButton}
+              onPressIn={() => hapticFeedback.navigation()}
+            >
               <Text style={styles.emptyButtonText}>Voir les collections</Text>
             </Pressable>
           </Link>
@@ -160,7 +163,10 @@ export default function CartScreen() {
           >
             {/* Product Image */}
             <Pressable
-              onPress={() => router.push(`/product/${item.product.id}`)}
+              onPress={() => {
+                hapticFeedback.navigation();
+                router.push(`/product/${item.product.id}`);
+              }}
               style={styles.itemImageContainer}
             >
               <Image
@@ -172,7 +178,10 @@ export default function CartScreen() {
 
             {/* Product Info */}
             <View style={styles.itemInfo}>
-              <Pressable onPress={() => router.push(`/product/${item.product.id}`)}>
+              <Pressable onPress={() => {
+                hapticFeedback.navigation();
+                router.push(`/product/${item.product.id}`);
+              }}>
                 <Text style={styles.itemName} numberOfLines={2}>
                   {item.product.name}
                 </Text>

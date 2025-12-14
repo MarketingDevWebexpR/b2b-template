@@ -6,6 +6,7 @@ import { Package, Clock, Truck, CheckCircle, ChevronRight, AlertCircle } from 'l
 import { useAuth } from '@/context/AuthContext';
 import { OrdersSkeleton } from '@/components/skeleton';
 import { formatPrice } from '@bijoux/utils';
+import { hapticFeedback } from '@/constants/haptics';
 
 /**
  * Order status type
@@ -240,6 +241,7 @@ function OrderCard({ order }: { order: Order }) {
   const router = useRouter();
 
   const handlePress = () => {
+    hapticFeedback.listItemSelect();
     // TODO: Navigate to order detail page
     // router.push(`/orders/${order.id}`);
     console.log('Navigate to order:', order.id);
@@ -319,7 +321,7 @@ function EmptyState() {
         Découvrez nos collections et trouvez la pièce qui vous correspond.
       </Text>
       <Link href="/collections" asChild>
-        <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft">
+        <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft" onPressIn={() => hapticFeedback.navigation()}>
           <Text className="text-white font-sans font-medium">Découvrir nos collections</Text>
         </Pressable>
       </Link>

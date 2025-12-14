@@ -15,6 +15,7 @@ import {
   LuxuryAddToCartBar,
 } from '@/components/product';
 import type { ButtonPosition } from '@/components/product/LuxuryAddToCartBar';
+import { hapticFeedback } from '@/constants/haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -91,6 +92,7 @@ export default function ProductDetailScreen() {
 
   const handleToggleWishlist = useCallback(() => {
     if (product) {
+      hapticFeedback.selection();
       toggleWishlist(product);
     }
   }, [product, toggleWishlist]);
@@ -98,7 +100,10 @@ export default function ProductDetailScreen() {
   // Header right component with cart icon
   const HeaderRight = useCallback(() => (
     <Pressable
-      onPress={() => router.push('/(tabs)/cart')}
+      onPress={() => {
+        hapticFeedback.navigation();
+        router.push('/(tabs)/cart');
+      }}
       style={styles.headerCartButton}
       accessibilityLabel={`Panier, ${cart.totalItems} article${cart.totalItems > 1 ? 's' : ''}`}
     >

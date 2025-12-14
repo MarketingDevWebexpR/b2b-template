@@ -2,6 +2,7 @@ import { View, Text, Pressable, Image } from 'react-native';
 import { Link } from 'expo-router';
 import type { Product } from '@bijoux/types';
 import { formatPrice } from '@bijoux/utils';
+import { hapticFeedback } from '@/constants/haptics';
 
 const DEFAULT_PRODUCT_IMAGE =
   'https://images.unsplash.com/photo-1561828995-aa79a2db86dd?ixlib=rb-4.1.0&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max';
@@ -15,7 +16,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/product/${product.id}`} asChild>
-      <Pressable className="bg-white rounded-elegant overflow-hidden shadow-sm">
+      <Pressable
+        className="bg-white rounded-elegant overflow-hidden shadow-sm"
+        onPressIn={() => hapticFeedback.buttonPress()}
+      >
         {/* Product Image */}
         <View className="aspect-square bg-background-beige">
           <Image

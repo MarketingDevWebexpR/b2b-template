@@ -5,6 +5,7 @@ import { Stack, useRouter, Link } from 'expo-router';
 import { CreditCard, Plus, Check, Shield, Trash2, ChevronLeft } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { ListSkeleton } from '@/components/skeleton';
+import { hapticFeedback } from '@/constants/haptics';
 
 /**
  * Card type enumeration
@@ -118,6 +119,7 @@ function PaymentMethodCard({
   const config = cardTypeConfig[paymentMethod.cardType];
 
   const handleDelete = () => {
+    hapticFeedback.warning();
     Alert.alert(
       'Supprimer cette carte ?',
       `Voulez-vous vraiment supprimer la carte ${config.label} se terminant par ${paymentMethod.lastFourDigits} ?`,
@@ -134,6 +136,7 @@ function PaymentMethodCard({
 
   const handleSetDefault = () => {
     if (!paymentMethod.isDefault) {
+      hapticFeedback.selection();
       onSetDefault(paymentMethod.id);
     }
   };
@@ -226,7 +229,10 @@ function EmptyState() {
       <Text className="font-sans text-text-muted text-center mb-6">
         Ajoutez une carte bancaire pour faciliter{'\n'}vos prochains achats.
       </Text>
-      <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft flex-row items-center">
+      <Pressable
+        className="bg-hermes-500 px-8 py-4 rounded-soft flex-row items-center"
+        onPressIn={() => hapticFeedback.buttonPress()}
+      >
         <Plus size={20} color="#ffffff" />
         <Text className="text-white font-sans font-medium ml-2">
           Ajouter une carte
@@ -262,6 +268,7 @@ function SecurityNote() {
  */
 function AddPaymentMethodButton() {
   const handleAddCard = () => {
+    hapticFeedback.buttonPress();
     // TODO: Navigate to add payment method screen or show modal
     Alert.alert(
       'Ajouter une carte',

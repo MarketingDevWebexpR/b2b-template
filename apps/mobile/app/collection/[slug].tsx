@@ -8,6 +8,7 @@ import { formatPrice } from '@bijoux/utils';
 import { useWishlist } from '@/context/WishlistContext';
 import { CollectionSkeleton } from '@/components/skeleton';
 import { api } from '@/lib/api';
+import { hapticFeedback } from '@/constants/haptics';
 
 const DEFAULT_PRODUCT_IMAGE =
   'https://images.unsplash.com/photo-1561828995-aa79a2db86dd?ixlib=rb-4.1.0&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max';
@@ -55,7 +56,10 @@ export default function CollectionScreen() {
         className="flex-1 m-2"
       >
         <Pressable
-          onPress={() => router.push(`/product/${item.id}`)}
+          onPress={() => {
+            hapticFeedback.navigation();
+            router.push(`/product/${item.id}`);
+          }}
           className="bg-white rounded-xl overflow-hidden"
           style={{
             shadowColor: '#000',
@@ -72,7 +76,10 @@ export default function CollectionScreen() {
               resizeMode="cover"
             />
             <Pressable
-              onPress={() => toggleWishlist(item)}
+              onPress={() => {
+                hapticFeedback.selection();
+                toggleWishlist(item);
+              }}
               className="absolute top-3 right-3 w-9 h-9 bg-white/90 rounded-full items-center justify-center"
               accessibilityLabel={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
             >
@@ -127,7 +134,10 @@ export default function CollectionScreen() {
             Explorez nos autres collections
           </Text>
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => {
+              hapticFeedback.navigation();
+              router.back();
+            }}
             className="mt-6 bg-hermes-500 px-8 py-3 rounded-full"
           >
             <Text className="font-sans text-white font-medium">Retour</Text>

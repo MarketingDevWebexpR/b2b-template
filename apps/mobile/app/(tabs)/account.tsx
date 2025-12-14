@@ -15,6 +15,7 @@ import {
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { AccountSkeleton } from '@/components/skeleton';
+import { hapticFeedback } from '@/constants/haptics';
 
 const COLORS = {
   background: '#fffcf7',
@@ -57,12 +58,12 @@ function MenuItem({ icon: Icon, label, href, onPress, showChevron = true, danger
   if (href) {
     return (
       <Link href={href as any} asChild>
-        <Pressable>{content}</Pressable>
+        <Pressable onPressIn={() => hapticFeedback.listItemSelect()}>{content}</Pressable>
       </Link>
     );
   }
 
-  return <Pressable onPress={onPress}>{content}</Pressable>;
+  return <Pressable onPress={onPress} onPressIn={() => hapticFeedback.listItemSelect()}>{content}</Pressable>;
 }
 
 export default function AccountScreen() {
@@ -70,6 +71,7 @@ export default function AccountScreen() {
   const router = useRouter();
 
   const handleSignOut = async () => {
+    hapticFeedback.warning();
     await signOut();
   };
 
@@ -94,13 +96,13 @@ export default function AccountScreen() {
           </Text>
 
           <Link href="/(auth)/login" asChild>
-            <Pressable style={styles.loginButton}>
+            <Pressable style={styles.loginButton} onPressIn={() => hapticFeedback.navigation()}>
               <Text style={styles.loginButtonText}>Se connecter</Text>
             </Pressable>
           </Link>
 
           <Link href="/(auth)/register" asChild>
-            <Pressable style={styles.registerButton}>
+            <Pressable style={styles.registerButton} onPressIn={() => hapticFeedback.navigation()}>
               <Text style={styles.registerButtonText}>Créer un compte</Text>
             </Pressable>
           </Link>

@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { User, Mail, Phone, ChevronLeft, Check } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { ProfileSkeleton } from '@/components/skeleton';
+import { hapticFeedback } from '@/constants/haptics';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -36,11 +37,13 @@ export default function ProfileScreen() {
   }, [user]);
 
   const handleSave = async () => {
+    hapticFeedback.formSubmit();
     setError('');
     setSuccess(false);
 
     // Validation
     if (!name.trim()) {
+      hapticFeedback.error();
       setError('Le nom est requis');
       return;
     }
@@ -53,11 +56,13 @@ export default function ProfileScreen() {
 
       // In a real app, this would call an API to update the user profile
       // For now, we just show success feedback
+      hapticFeedback.success();
       setSuccess(true);
 
       // Hide success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
+      hapticFeedback.error();
       setError('Une erreur est survenue lors de la sauvegarde');
     } finally {
       setSaving(false);
@@ -98,7 +103,10 @@ export default function ProfileScreen() {
           {/* Header */}
           <View className="px-6 pt-4 pb-6">
             <Pressable
-              onPress={() => router.back()}
+              onPress={() => {
+                hapticFeedback.navigation();
+                router.back();
+              }}
               className="flex-row items-center mb-4"
             >
               <ChevronLeft size={24} color="#1a1a1a" />
@@ -193,6 +201,7 @@ export default function ProfileScreen() {
             {/* Save Button */}
             <Pressable
               onPress={handleSave}
+              onPressIn={() => hapticFeedback.buttonPress()}
               disabled={loading}
               className={`py-4 rounded-soft ${loading ? 'bg-hermes-400' : 'bg-hermes-500'}`}
             >

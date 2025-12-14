@@ -4,6 +4,7 @@ import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { hapticFeedback } from '@/constants/haptics';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -17,20 +18,24 @@ export default function RegisterScreen() {
   const [error, setError] = useState('');
 
   const handleRegister = async () => {
+    hapticFeedback.formSubmit();
     setError('');
 
     // Validation
     if (!name || !email || !password || !confirmPassword) {
+      hapticFeedback.error();
       setError('Veuillez remplir tous les champs');
       return;
     }
 
     if (password !== confirmPassword) {
+      hapticFeedback.error();
       setError('Les mots de passe ne correspondent pas');
       return;
     }
 
     if (password.length < 6) {
+      hapticFeedback.error();
       setError('Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
@@ -41,11 +46,14 @@ export default function RegisterScreen() {
       const result = await signUp(name, email, password);
 
       if (result.success) {
+        hapticFeedback.success();
         router.replace('/(tabs)');
       } else {
+        hapticFeedback.error();
         setError(result.error || "Une erreur est survenue lors de l'inscription");
       }
     } catch (err) {
+      hapticFeedback.error();
       setError('Une erreur est survenue');
     } finally {
       setLoading(false);
@@ -126,7 +134,10 @@ export default function RegisterScreen() {
                     className="flex-1 ml-3 font-sans text-text-primary"
                     placeholderTextColor="#8b8b8b"
                   />
-                  <Pressable onPress={() => setShowPassword(!showPassword)}>
+                  <Pressable onPress={() => {
+                    hapticFeedback.toggleSwitch();
+                    setShowPassword(!showPassword);
+                  }}>
                     {showPassword ? (
                       <EyeOff size={20} color="#696969" />
                     ) : (
@@ -157,6 +168,7 @@ export default function RegisterScreen() {
               {/* Submit Button */}
               <Pressable
                 onPress={handleRegister}
+                onPressIn={() => hapticFeedback.buttonPress()}
                 disabled={loading}
                 className={`mt-6 py-4 rounded-soft ${loading ? 'bg-hermes-400' : 'bg-hermes-500'}`}
               >
@@ -170,7 +182,7 @@ export default function RegisterScreen() {
             <View className="flex-row justify-center mt-8">
               <Text className="font-sans text-text-muted">Déjà un compte ?</Text>
               <Link href="/(auth)/login" asChild>
-                <Pressable>
+                <Pressable onPressIn={() => hapticFeedback.navigation()}>
                   <Text className="font-sans text-hermes-500 ml-1">Se connecter</Text>
                 </Pressable>
               </Link>
