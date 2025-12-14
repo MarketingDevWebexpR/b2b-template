@@ -75,7 +75,7 @@ export default function ProductDetailScreen() {
   if (!product) {
     return (
       <View className="flex-1 bg-background items-center justify-center px-6">
-        <Text className="font-serif text-xl text-text-primary">Produit non trouve</Text>
+        <Text className="font-serif text-xl text-text-primary">Produit non trouvé</Text>
       </View>
     );
   }
@@ -207,11 +207,11 @@ export default function ProductDetailScreen() {
           {/* Specifications */}
           {(product.materials.length > 0 || product.weight || product.origin || product.warranty) && (
             <Animated.View entering={FadeInDown.delay(350).duration(400)} className="mt-8">
-              <Text className="font-serif text-lg text-text-primary mb-4">Caracteristiques</Text>
+              <Text className="font-serif text-lg text-text-primary mb-4">Caractéristiques</Text>
               <View className="bg-background-beige rounded-xl p-5">
                 {product.materials.length > 0 && (
                   <View className="flex-row justify-between py-3 border-b border-border-light">
-                    <Text className="font-sans text-text-muted">Materiaux</Text>
+                    <Text className="font-sans text-text-muted">Matériaux</Text>
                     <Text className="font-sans text-text-primary font-medium">
                       {product.materials.join(', ')}
                     </Text>

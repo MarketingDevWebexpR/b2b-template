@@ -120,12 +120,12 @@ export interface UseVoiceSearchReturn {
  * French error messages
  */
 const ERROR_MESSAGES: Record<VoiceSearchError, string> = {
-  permission_denied: 'Acces au microphone refuse. Veuillez l\'autoriser dans les reglages.',
-  no_speech: 'Aucune parole detectee. Veuillez reessayer.',
-  network_error: 'Erreur de connexion. Verifiez votre connexion internet.',
+  permission_denied: 'Accès au microphone refusé. Veuillez l\'autoriser dans les réglages.',
+  no_speech: 'Aucune parole détectée. Veuillez réessayer.',
+  network_error: 'Erreur de connexion. Vérifiez votre connexion internet.',
   not_available: 'La reconnaissance vocale n\'est pas disponible sur cet appareil.',
-  cancelled: 'Recherche vocale annulee.',
-  unknown: 'Une erreur inattendue s\'est produite. Veuillez reessayer.',
+  cancelled: 'Recherche vocale annulée.',
+  unknown: 'Une erreur inattendue s\'est produite. Veuillez réessayer.',
 };
 
 /**

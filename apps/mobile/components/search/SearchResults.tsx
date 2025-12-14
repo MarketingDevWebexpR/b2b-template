@@ -141,9 +141,9 @@ function EmptyState({ searchQuery }: { searchQuery: string }) {
       <View style={styles.emptyIconContainer}>
         <Search size={48} color={COLORS.taupe} strokeWidth={1.2} />
       </View>
-      <Text style={styles.emptyTitle}>Aucun resultat</Text>
+      <Text style={styles.emptyTitle}>Aucun résultat</Text>
       <Text style={styles.emptyDescription}>
-        Nous n'avons trouve aucun bijou correspondant a "{searchQuery}"
+        Nous n'avons trouvé aucun bijou correspondant à "{searchQuery}"
       </Text>
       <Text style={styles.emptySuggestion}>
         Essayez d'autres termes ou explorez nos collections
@@ -164,7 +164,7 @@ function NoResultsState() {
       </View>
       <Text style={styles.emptyTitle}>Commencez votre recherche</Text>
       <Text style={styles.emptyDescription}>
-        Decouvrez notre collection de bijoux d'exception
+        Découvrez notre collection de bijoux d'exception
       </Text>
     </Animated.View>
   );
@@ -456,7 +456,7 @@ export function SearchResults({
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text style={styles.resultCount}>
-            {results.length} resultat{results.length > 1 ? 's' : ''}
+            {results.length} résultat{results.length > 1 ? 's' : ''}
           </Text>
           <Text style={styles.searchQueryText}>
             pour "{searchQuery}"

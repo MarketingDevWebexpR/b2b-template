@@ -134,21 +134,21 @@ export function AboutSection() {
               variants={itemVariants}
             >
               <p>
-                Dans nos ateliers, chaque bijou nait de la rencontre entre
-                l&apos;excellence artisanale et la vision creatrice de nos maitres
+                Dans nos ateliers, chaque bijou naît de la rencontre entre
+                l&apos;excellence artisanale et la vision créatrice de nos maîtres
                 joailliers. Une tradition d&apos;excellence transmise depuis trois
-                generations.
+                générations.
               </p>
 
               <p>
-                Nous selectionnons les pierres les plus rares et les metaux les plus
-                precieux pour creer des pieces uniques qui traversent le temps.
-                Chaque creation est le fruit de centaines d&apos;heures de travail
+                Nous sélectionnons les pierres les plus rares et les métaux les plus
+                précieux pour créer des pièces uniques qui traversent le temps.
+                Chaque création est le fruit de centaines d&apos;heures de travail
                 minutieux.
               </p>
 
               <p>
-                De l&apos;esquisse initiale a la derniere touche de polissage, nous
+                De l&apos;esquisse initiale à la dernière touche de polissage, nous
                 cultivons l&apos;art de la perfection pour vous offrir des bijoux
                 d&apos;exception qui racontent votre histoire.
               </p>
@@ -164,7 +164,7 @@ export function AboutSection() {
                   37
                 </span>
                 <p className="mt-1 font-sans text-caption text-text-muted">
-                  Annees d&apos;excellence
+                  Années d&apos;excellence
                 </p>
               </div>
               <div>
@@ -172,7 +172,7 @@ export function AboutSection() {
                   12k+
                 </span>
                 <p className="mt-1 font-sans text-caption text-text-muted">
-                  Creations uniques
+                  Créations uniques
                 </p>
               </div>
               <div>
@@ -180,7 +180,7 @@ export function AboutSection() {
                   24
                 </span>
                 <p className="mt-1 font-sans text-caption text-text-muted">
-                  Maitres joailliers
+                  Maîtres joailliers
                 </p>
               </div>
             </motion.div>
@@ -191,7 +191,7 @@ export function AboutSection() {
                 href="/about"
                 className="group inline-flex items-center gap-3 border border-hermes-500 bg-transparent px-8 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-hermes-500 transition-all duration-400 hover:bg-hermes-500 hover:text-white"
               >
-                <span>Decouvrir notre histoire</span>
+                <span>Découvrir notre histoire</span>
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-350 group-hover:translate-x-1"
                   strokeWidth={1.5}

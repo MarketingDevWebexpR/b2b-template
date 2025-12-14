@@ -16,7 +16,7 @@ export default function CollectionsScreen() {
       <View className="px-6 pt-6 pb-4">
         <Text className="font-serif text-3xl text-text-primary">Collections</Text>
         <Text className="font-sans text-text-muted mt-1">
-          Decouvrez nos creations par categorie
+          Découvrez nos créations par catégorie
         </Text>
       </View>
 

@@ -67,7 +67,7 @@ function CompactBadge() {
   return (
     <View style={styles.compactContainer}>
       <Lock size={14} color={COLORS.success} />
-      <Text style={styles.compactText}>Paiement securise</Text>
+      <Text style={styles.compactText}>Paiement sécurisé</Text>
     </View>
   );
 }
@@ -153,8 +153,8 @@ function DefaultBadge({ animated }: { animated: boolean }) {
 
       {/* Text */}
       <Animated.View style={[styles.textContainer, textStyle]}>
-        <Text style={styles.title}>Paiement securise</Text>
-        <Text style={styles.subtitle}>Vos donnees sont protegees</Text>
+        <Text style={styles.title}>Paiement sécurisé</Text>
+        <Text style={styles.subtitle}>Vos données sont protégées</Text>
       </Animated.View>
     </View>
   );
@@ -241,9 +241,9 @@ function ProminentBadge({ animated }: { animated: boolean }) {
         </View>
 
         <Animated.View style={textStyle}>
-          <Text style={styles.prominentTitle}>Paiement 100% Securise</Text>
+          <Text style={styles.prominentTitle}>Paiement 100% Sécurisé</Text>
           <Text style={styles.prominentSubtitle}>
-            Protection SSL 256 bits - Vos donnees sont cryptees
+            Protection SSL 256 bits - Vos données sont cryptées
           </Text>
         </Animated.View>
       </Animated.View>

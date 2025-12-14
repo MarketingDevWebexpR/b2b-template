@@ -30,7 +30,7 @@ export default function FavoritesScreen() {
           </View>
           <Text className="font-serif text-2xl text-text-primary mb-2">Mes favoris</Text>
           <Text className="font-sans text-text-muted text-center mb-6">
-            Connectez-vous pour sauvegarder vos coups de coeur
+            Connectez-vous pour sauvegarder vos coups de cœur
           </Text>
 
           <Link href="/(auth)/login" asChild>
@@ -41,7 +41,7 @@ export default function FavoritesScreen() {
 
           <Link href="/(auth)/register" asChild>
             <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full">
-              <Text className="text-hermes-500 font-sans font-medium text-center">Creer un compte</Text>
+              <Text className="text-hermes-500 font-sans font-medium text-center">Créer un compte</Text>
             </Pressable>
           </Link>
         </View>
@@ -66,11 +66,11 @@ export default function FavoritesScreen() {
             Aucun favori pour le moment
           </Text>
           <Text className="font-sans text-text-muted text-center mb-6">
-            Parcourez nos collections et ajoutez vos pieces preferees a votre liste de favoris
+            Parcourez nos collections et ajoutez vos pièces préférées à votre liste de favoris
           </Text>
           <Link href="/collections" asChild>
             <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft">
-              <Text className="text-white font-sans font-medium">Decouvrir nos collections</Text>
+              <Text className="text-white font-sans font-medium">Découvrir nos collections</Text>
             </Pressable>
           </Link>
         </View>

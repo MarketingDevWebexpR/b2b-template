@@ -52,25 +52,25 @@ const statusConfig: Record<OrderStatus, {
     icon: Clock,
   },
   processing: {
-    label: 'En preparation',
+    label: 'En préparation',
     bgColor: 'bg-blue-100',
     textColor: 'text-blue-700',
     icon: Package,
   },
   shipped: {
-    label: 'Expediee',
+    label: 'Expédiée',
     bgColor: 'bg-orange-100',
     textColor: 'text-orange-700',
     icon: Truck,
   },
   delivered: {
-    label: 'Livree',
+    label: 'Livrée',
     bgColor: 'bg-green-100',
     textColor: 'text-green-700',
     icon: CheckCircle,
   },
   cancelled: {
-    label: 'Annulee',
+    label: 'Annulée',
     bgColor: 'bg-red-100',
     textColor: 'text-red-700',
     icon: AlertCircle,
@@ -87,7 +87,7 @@ const mockOrders: Order[] = [
     items: [
       {
         productId: 'prod_1',
-        productName: 'Solitaire Eternite',
+        productName: 'Solitaire Éternité',
         productImage: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200',
         quantity: 1,
         unitPrice: 8500,
@@ -105,7 +105,7 @@ const mockOrders: Order[] = [
     items: [
       {
         productId: 'prod_2',
-        productName: 'Creoles Diamantees',
+        productName: 'Créoles Diamantées',
         productImage: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=200',
         quantity: 1,
         unitPrice: 4200,
@@ -291,7 +291,7 @@ function OrderCard({ order }: { order: Order }) {
         {order.trackingNumber && (
           <View className="mt-3 pt-3 border-t border-border-light">
             <Text className="font-sans text-xs text-text-muted">
-              Numero de suivi :{' '}
+              Numéro de suivi :{' '}
               <Text className="font-medium text-text-primary">{order.trackingNumber}</Text>
             </Text>
           </View>
@@ -314,12 +314,12 @@ function EmptyState() {
         Aucune commande
       </Text>
       <Text className="font-sans text-text-muted text-center mb-6">
-        Vous n'avez pas encore passe de commande.{'\n'}
-        Decouvrez nos collections et trouvez la piece qui vous correspond.
+        Vous n'avez pas encore passé de commande.{'\n'}
+        Découvrez nos collections et trouvez la pièce qui vous correspond.
       </Text>
       <Link href="/collections" asChild>
         <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft">
-          <Text className="text-white font-sans font-medium">Decouvrir nos collections</Text>
+          <Text className="text-white font-sans font-medium">Découvrir nos collections</Text>
         </Pressable>
       </Link>
     </View>

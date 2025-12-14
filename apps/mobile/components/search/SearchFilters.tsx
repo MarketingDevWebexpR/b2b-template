@@ -88,8 +88,8 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'relevance', label: 'Pertinence' },
   { value: 'price-asc', label: 'Prix croissant' },
-  { value: 'price-desc', label: 'Prix decroissant' },
-  { value: 'newest', label: 'Nouveautes' },
+  { value: 'price-desc', label: 'Prix décroissant' },
+  { value: 'newest', label: 'Nouveautés' },
   { value: 'name-asc', label: 'Nom A-Z' },
   { value: 'name-desc', label: 'Nom Z-A' },
 ];
@@ -105,7 +105,7 @@ const MATERIAL_OPTIONS = [
   { id: 'perle', label: 'Perle' },
   { id: 'rubis', label: 'Rubis' },
   { id: 'saphir', label: 'Saphir' },
-  { id: 'emeraude', label: 'Emeraude' },
+  { id: 'emeraude', label: 'Émeraude' },
 ];
 
 // Price range presets
@@ -477,7 +477,7 @@ export function SearchFilters({
 
           {/* Categories */}
           {categories.length > 0 && (
-            <FilterSection title="Categories">
+            <FilterSection title="Catégories">
               <View style={styles.chipsContainer}>
                 {categories.map((category) => (
                   <FilterChip
@@ -492,7 +492,7 @@ export function SearchFilters({
           )}
 
           {/* Materials */}
-          <FilterSection title="Matieres">
+          <FilterSection title="Matières">
             <View style={styles.chipsContainer}>
               {MATERIAL_OPTIONS.map((material) => (
                 <FilterChip
@@ -511,11 +511,11 @@ export function SearchFilters({
           <Pressable
             style={styles.resetButton}
             onPress={handleReset}
-            accessibilityLabel="Reinitialiser les filtres"
+            accessibilityLabel="Réinitialiser les filtres"
             accessibilityRole="button"
           >
             <RotateCcw size={18} color={COLORS.charcoal} strokeWidth={1.5} />
-            <Text style={styles.resetButtonText}>Reinitialiser</Text>
+            <Text style={styles.resetButtonText}>Réinitialiser</Text>
           </Pressable>
 
           <Pressable

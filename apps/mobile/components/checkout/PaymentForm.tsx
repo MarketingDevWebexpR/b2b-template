@@ -241,7 +241,7 @@ function PaymentMethodCard({
           {/* Default badge */}
           {method.isDefault && (
             <View style={styles.defaultBadge}>
-              <Text style={styles.defaultText}>Par defaut</Text>
+              <Text style={styles.defaultText}>Par défaut</Text>
             </View>
           )}
         </View>
@@ -335,7 +335,7 @@ export function PaymentForm({
         <View style={styles.secureIndicator}>
           <Lock size={14} color={COLORS.success} />
           <Text style={styles.secureText}>
-            Vos donnees de paiement sont securisees
+            Vos données de paiement sont sécurisées
           </Text>
         </View>
       )}

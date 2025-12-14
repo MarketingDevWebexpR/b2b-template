@@ -50,14 +50,14 @@ export function StripePaymentForm({
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent?.status) {
         case 'succeeded':
-          setMessage('Paiement reussi !');
+          setMessage('Paiement réussi !');
           onSuccess();
           break;
         case 'processing':
           setMessage('Votre paiement est en cours de traitement.');
           break;
         case 'requires_payment_method':
-          setMessage('Votre paiement a echoue. Veuillez reessayer.');
+          setMessage('Votre paiement a échoué. Veuillez réessayer.');
           break;
         default:
           setMessage('Une erreur est survenue.');
@@ -112,7 +112,7 @@ export function StripePaymentForm({
         <div
           className={cn(
             'flex items-center gap-2 p-3 text-sm rounded',
-            message.includes('reussi')
+            message.includes('réussi')
               ? 'bg-green-50 text-green-700 border border-green-200'
               : 'bg-red-50 text-red-700 border border-red-200'
           )}
@@ -135,7 +135,7 @@ export function StripePaymentForm({
 
       <div className="flex items-center justify-center gap-2 text-xs text-text-muted pt-2">
         <Lock className="h-4 w-4" />
-        <span>Paiement securise par Stripe</span>
+        <span>Paiement sécurisé par Stripe</span>
       </div>
     </form>
   );

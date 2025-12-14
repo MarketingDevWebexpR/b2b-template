@@ -675,7 +675,7 @@ export function useBarcodeSearch(): {
       setProduct(foundProduct);
 
       if (!foundProduct) {
-        setError('Produit non trouve');
+        setError('Produit non trouvé');
       }
 
       return foundProduct;

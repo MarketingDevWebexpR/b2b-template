@@ -46,7 +46,7 @@ export function HeroSection() {
       <div className="absolute inset-0">
         <Image
           src="https://images.unsplash.com/photo-1585960622850-ed33c41d6418?w=1920&q=90&auto=format&fit=crop"
-          alt="Femme elegante portant un collier en or - Maison Bijoux"
+          alt="Femme élégante portant un collier en or - Maison Bijoux"
           fill
           priority
           className="object-cover object-[center_20%] scale-105"
@@ -90,7 +90,7 @@ export function HeroSection() {
             className="mt-6 font-sans text-body-lg font-light tracking-elegant text-white/90 drop-shadow-md md:text-xl"
             variants={itemVariants}
           >
-            Pieces uniques. Elegance eternelle.
+            Pièces uniques. Élégance éternelle.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -103,7 +103,7 @@ export function HeroSection() {
               href="/products"
               className="group relative inline-flex min-w-[200px] items-center justify-center overflow-hidden bg-hermes-500 px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:bg-hermes-600 hover:shadow-button-hover"
             >
-              <span className="relative z-10">Decouvrir</span>
+              <span className="relative z-10">Découvrir</span>
             </Link>
 
             {/* Secondary Button - White Outline */}

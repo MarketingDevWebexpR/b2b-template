@@ -166,8 +166,8 @@ const MOCK_ADDRESSES: readonly SavedAddress[] = [
     label: 'Bureau',
     firstName: 'Marie',
     lastName: 'Dupont',
-    address: '8 Avenue des Champs-Elysees',
-    address2: '3eme etage, Bureau 305',
+    address: '8 Avenue des Champs-Élysées',
+    address2: '3ème étage, Bureau 305',
     city: 'Paris',
     postalCode: '75008',
     country: 'France',
@@ -210,10 +210,10 @@ function generateAddressId(): string {
  */
 function validateAddressInput(input: AddressInput): string | null {
   if (!input.label?.trim()) {
-    return 'Le libelle est requis';
+    return 'Le libellé est requis';
   }
   if (!input.firstName?.trim()) {
-    return 'Le prenom est requis';
+    return 'Le prénom est requis';
   }
   if (!input.lastName?.trim()) {
     return 'Le nom est requis';
@@ -231,7 +231,7 @@ function validateAddressInput(input: AddressInput): string | null {
     return 'Le pays est requis';
   }
   if (!input.phone?.trim()) {
-    return 'Le telephone est requis';
+    return 'Le téléphone est requis';
   }
   return null;
 }
@@ -463,7 +463,7 @@ export function useAddresses(options: UseAddressesOptions = {}): AddressesState 
 
         if (addressIndex === -1) {
           triggerHaptic('error');
-          setError('Adresse non trouvee');
+          setError('Adresse non trouvée');
           return null;
         }
 
@@ -507,7 +507,7 @@ export function useAddresses(options: UseAddressesOptions = {}): AddressesState 
           setError(
             err instanceof Error
               ? err.message
-              : 'Erreur lors de la mise a jour de l\'adresse'
+              : 'Erreur lors de la mise à jour de l\'adresse'
           );
         }
         throw err;
@@ -527,7 +527,7 @@ export function useAddresses(options: UseAddressesOptions = {}): AddressesState 
 
         if (!addressToDelete) {
           triggerHaptic('error');
-          setError('Adresse non trouvee');
+          setError('Adresse non trouvée');
           return false;
         }
 
@@ -582,7 +582,7 @@ export function useAddresses(options: UseAddressesOptions = {}): AddressesState 
 
         if (!addressExists) {
           triggerHaptic('error');
-          setError('Adresse non trouvee');
+          setError('Adresse non trouvée');
           return false;
         }
 
@@ -613,7 +613,7 @@ export function useAddresses(options: UseAddressesOptions = {}): AddressesState 
           setError(
             err instanceof Error
               ? err.message
-              : 'Erreur lors de la definition de l\'adresse par defaut'
+              : 'Erreur lors de la définition de l\'adresse par défaut'
           );
         }
         return false;

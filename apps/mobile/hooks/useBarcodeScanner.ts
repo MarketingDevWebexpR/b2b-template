@@ -146,7 +146,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
       setLookupResult({
         product: product || null,
         isLoading: false,
-        error: product ? null : 'Produit non trouve',
+        error: product ? null : 'Produit non trouvé',
       });
 
       return product || null;

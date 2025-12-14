@@ -96,7 +96,7 @@ function DefaultBadge() {
     <View className="flex-row items-center bg-green-100 px-2.5 py-1 rounded-full">
       <Check size={12} color="#16a34a" />
       <Text className="font-sans text-xs font-medium text-green-700 ml-1">
-        Par defaut
+        Par défaut
       </Text>
     </View>
   );
@@ -190,7 +190,7 @@ function PaymentMethodCard({
           >
             <Check size={16} color="#f67828" />
             <Text className="font-sans text-sm text-hermes-500 ml-1.5">
-              Definir par defaut
+              Définir par défaut
             </Text>
           </Pressable>
         ) : (
@@ -244,11 +244,11 @@ function SecurityNote() {
       <Shield size={20} color="#696969" />
       <View className="flex-1 ml-3">
         <Text className="font-serif text-sm text-text-primary mb-1">
-          Vos donnees sont protegees
+          Vos données sont protégées
         </Text>
         <Text className="font-sans text-xs text-text-muted leading-relaxed">
-          Toutes vos informations de paiement sont chiffrees et securisees.
-          Nous ne stockons jamais vos numeros de carte complets conformement
+          Toutes vos informations de paiement sont chiffrées et sécurisées.
+          Nous ne stockons jamais vos numéros de carte complets conformément
           aux normes PCI-DSS.
         </Text>
       </View>
@@ -264,7 +264,7 @@ function AddPaymentMethodButton() {
     // TODO: Navigate to add payment method screen or show modal
     Alert.alert(
       'Ajouter une carte',
-      'Cette fonctionnalite sera bientot disponible.',
+      'Cette fonctionnalité sera bientôt disponible.',
       [{ text: 'OK' }]
     );
   };
@@ -388,7 +388,7 @@ export default function PaymentMethodsScreen() {
                   Moyens de paiement
                 </Text>
                 <Text className="font-sans text-text-muted mt-1">
-                  {paymentMethods.length} carte{paymentMethods.length > 1 ? 's' : ''} enregistree{paymentMethods.length > 1 ? 's' : ''}
+                  {paymentMethods.length} carte{paymentMethods.length > 1 ? 's' : ''} enregistrée{paymentMethods.length > 1 ? 's' : ''}
                 </Text>
               </View>
             }

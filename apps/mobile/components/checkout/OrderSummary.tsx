@@ -246,10 +246,10 @@ export function OrderSummary({
         onPressOut={handleHeaderPressOut}
         style={[styles.header, headerStyle]}
         accessibilityRole="button"
-        accessibilityLabel={`Recapitulatif de commande, ${itemCount} articles, ${isExpanded ? 'appuyez pour reduire' : 'appuyez pour developper'}`}
+        accessibilityLabel={`Récapitulatif de commande, ${itemCount} articles, ${isExpanded ? 'appuyez pour réduire' : 'appuyez pour développer'}`}
       >
         <View style={styles.headerLeft}>
-          <Text style={styles.headerTitle}>Recapitulatif</Text>
+          <Text style={styles.headerTitle}>Récapitulatif</Text>
           <View style={styles.itemCountBadge}>
             <Text style={styles.itemCountText}>
               {itemCount} article{itemCount > 1 ? 's' : ''}
@@ -293,7 +293,7 @@ export function OrderSummary({
           {/* Discount */}
           {discount > 0 && (
             <SummaryLine
-              label={discountCode ? `Code: ${discountCode}` : 'Reduction'}
+              label={discountCode ? `Code: ${discountCode}` : 'Réduction'}
               value={`-${formatPrice(discount)}`}
               icon={<Tag size={14} color={COLORS.success} />}
               isDiscount

@@ -73,7 +73,7 @@ const mockAddresses: Address[] = [
     type: 'office',
     firstName: 'Marie',
     lastName: 'Dupont',
-    street: '42 avenue des Champs-Elysees',
+    street: '42 avenue des Champs-Élysées',
     postalCode: '75008',
     city: 'Paris',
     country: 'France',
@@ -103,7 +103,7 @@ function DefaultBadge() {
     <View className="flex-row items-center px-2.5 py-1 rounded-full bg-hermes-100">
       <Check size={12} color="#f67828" />
       <Text className="ml-1 font-sans text-xs font-medium text-hermes-600">
-        Par defaut
+        Par défaut
       </Text>
     </View>
   );
@@ -223,7 +223,7 @@ function EmptyState() {
         Aucune adresse
       </Text>
       <Text className="font-sans text-text-muted text-center mb-6">
-        Vous n'avez pas encore ajoute d'adresse.{'\n'}
+        Vous n'avez pas encore ajouté d'adresse.{'\n'}
         Ajoutez une adresse pour faciliter vos commandes.
       </Text>
       <Pressable
@@ -250,7 +250,7 @@ function UnauthenticatedState() {
       </View>
       <Text className="font-serif text-2xl text-text-primary mb-2">Mes adresses</Text>
       <Text className="font-sans text-text-muted text-center mb-6">
-        Connectez-vous pour gerer vos adresses de livraison
+        Connectez-vous pour gérer vos adresses de livraison
       </Text>
 
       <Link href="/(auth)/login" asChild>
@@ -261,7 +261,7 @@ function UnauthenticatedState() {
 
       <Link href="/(auth)/register" asChild>
         <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full">
-          <Text className="text-hermes-500 font-sans font-medium text-center">Creer un compte</Text>
+          <Text className="text-hermes-500 font-sans font-medium text-center">Créer un compte</Text>
         </Pressable>
       </Link>
     </View>
@@ -360,7 +360,7 @@ export default function AddressesScreen() {
               <View className="mb-4">
                 <Text className="font-serif text-3xl text-text-primary">Mes adresses</Text>
                 <Text className="font-sans text-text-muted mt-1">
-                  {addresses.length} adresse{addresses.length > 1 ? 's' : ''} enregistree{addresses.length > 1 ? 's' : ''}
+                  {addresses.length} adresse{addresses.length > 1 ? 's' : ''} enregistrée{addresses.length > 1 ? 's' : ''}
                 </Text>
               </View>
             }

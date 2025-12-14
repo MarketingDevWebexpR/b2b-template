@@ -156,7 +156,7 @@ export function CartDrawer() {
                   Votre panier est vide
                 </p>
                 <p className="font-sans text-body text-text-muted text-center mb-8">
-                  Decouvrez nos collections et trouvez la piece qui vous correspond.
+                  Découvrez nos collections et trouvez la pièce qui vous correspond.
                 </p>
                 <Link
                   href="/collections"
@@ -256,7 +256,7 @@ export function CartDrawer() {
                                   'hover:text-text-primary hover:bg-background-warm',
                                   'disabled:opacity-40 disabled:cursor-not-allowed'
                                 )}
-                                aria-label="Diminuer la quantite"
+                                aria-label="Diminuer la quantité"
                               >
                                 <Minus className="w-3.5 h-3.5" strokeWidth={1.5} />
                               </button>
@@ -274,7 +274,7 @@ export function CartDrawer() {
                                   'hover:text-text-primary hover:bg-background-warm',
                                   'disabled:opacity-40 disabled:cursor-not-allowed'
                                 )}
-                                aria-label="Augmenter la quantite"
+                                aria-label="Augmenter la quantité"
                               >
                                 <Plus className="w-3.5 h-3.5" strokeWidth={1.5} />
                               </button>

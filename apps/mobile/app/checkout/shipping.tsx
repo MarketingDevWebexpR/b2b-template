@@ -303,7 +303,7 @@ export default function ShippingScreen() {
       hapticFeedback.error();
       Alert.alert(
         'Adresse requise',
-        'Veuillez selectionner ou creer une adresse de livraison.',
+        'Veuillez sélectionner ou créer une adresse de livraison.',
         [{ text: 'OK' }]
       );
       return;
@@ -339,7 +339,7 @@ export default function ShippingScreen() {
     } catch (error) {
       console.error('Error saving shipping:', error);
       hapticFeedback.error();
-      Alert.alert('Erreur', 'Une erreur est survenue. Veuillez reessayer.');
+      Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }

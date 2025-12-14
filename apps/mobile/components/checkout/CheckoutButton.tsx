@@ -324,7 +324,7 @@ export function CheckoutButton({
             <Check size={24} color={COLORS.white} strokeWidth={3} />
           </Animated.View>
           <Animated.Text style={styles.successLabel}>
-            Paiement accepte
+            Paiement accepté
           </Animated.Text>
         </Animated.View>
       </View>

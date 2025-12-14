@@ -182,7 +182,7 @@ function StepNode({ number, label, isCompleted, isCurrent, index }: StepNodeProp
     <View
       style={styles.stepNode}
       accessibilityRole="text"
-      accessibilityLabel={`Etape ${number}: ${label}${isCompleted ? ', terminee' : isCurrent ? ', en cours' : ''}`}
+      accessibilityLabel={`Étape ${number}: ${label}${isCompleted ? ', terminée' : isCurrent ? ', en cours' : ''}`}
     >
       {/* Glow Effect - only for current step */}
       {isCurrent && (
@@ -237,7 +237,7 @@ export function CheckoutStepIndicator({
     <View
       style={styles.container}
       accessibilityRole="progressbar"
-      accessibilityLabel={`Etape ${currentIndex + 1} sur ${STEPS.length}: ${currentStep}`}
+      accessibilityLabel={`Étape ${currentIndex + 1} sur ${STEPS.length}: ${currentStep}`}
       accessibilityValue={{
         min: 0,
         max: STEPS.length,

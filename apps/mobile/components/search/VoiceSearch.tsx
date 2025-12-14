@@ -408,7 +408,7 @@ export function VoiceSearch({
       case 'processing':
         return 'Traitement en cours...';
       case 'success':
-        return 'Recherche vocale terminee';
+        return 'Recherche vocale terminée';
       case 'error':
         return errorMessage || 'Une erreur est survenue';
       default:
@@ -500,7 +500,7 @@ export function VoiceSearch({
               <AnimatedPressable
                 style={[styles.micButton, micContainerStyle]}
                 onPress={handleMicPress}
-                accessibilityLabel={state === 'listening' ? 'Arreter l\'ecoute' : 'Commencer l\'ecoute'}
+                accessibilityLabel={state === 'listening' ? 'Arrêter l\'écoute' : 'Commencer l\'écoute'}
                 accessibilityRole="button"
                 accessibilityState={{ selected: state === 'listening' }}
               >
@@ -548,10 +548,10 @@ export function VoiceSearch({
                 <Pressable
                   style={[styles.button, styles.retryButton]}
                   onPress={handleRetry}
-                  accessibilityLabel="Reessayer"
+                  accessibilityLabel="Réessayer"
                   accessibilityRole="button"
                 >
-                  <Text style={styles.retryButtonText}>Reessayer</Text>
+                  <Text style={styles.retryButtonText}>Réessayer</Text>
                 </Pressable>
               )}
 

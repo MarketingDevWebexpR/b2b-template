@@ -60,7 +60,7 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
             href="/collections"
             className="text-hermes-500 hover:text-hermes-600 text-sm uppercase tracking-luxe"
           >
-            Decouvrir nos collections
+            Découvrir nos collections
           </Link>
         </div>
       </div>
@@ -169,7 +169,7 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
         <div className="px-6 pb-6 space-y-3">
           <div className="flex items-center gap-3 text-sm text-text-muted">
             <Truck className="h-4 w-4 text-hermes-500 flex-shrink-0" />
-            <span>Livraison securisee sous 3-5 jours</span>
+            <span>Livraison sécurisée sous 3-5 jours</span>
           </div>
           <div className="flex items-center gap-3 text-sm text-text-muted">
             <Shield className="h-4 w-4 text-hermes-500 flex-shrink-0" />
@@ -177,7 +177,7 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
           </div>
           <div className="flex items-center gap-3 text-sm text-text-muted">
             <Package className="h-4 w-4 text-hermes-500 flex-shrink-0" />
-            <span>Ecrin et certificat inclus</span>
+            <span>Écrin et certificat inclus</span>
           </div>
         </div>
       )}

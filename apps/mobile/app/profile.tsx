@@ -127,7 +127,7 @@ export default function ProfileScreen() {
               <View className="bg-green-50 border border-green-200 rounded-soft p-3 mb-4 flex-row items-center">
                 <Check size={18} color="#16a34a" />
                 <Text className="text-green-600 font-sans text-sm ml-2">
-                  Vos informations ont ete mises a jour
+                  Vos informations ont été mises à jour
                 </Text>
               </View>
             )}
@@ -174,7 +174,7 @@ export default function ProfileScreen() {
             {/* Phone Input (optional) */}
             <View className="mb-6">
               <Text className="font-sans text-sm text-text-secondary mb-2">
-                Telephone <Text className="text-text-muted">(optionnel)</Text>
+                Téléphone <Text className="text-text-muted">(optionnel)</Text>
               </Text>
               <View className="flex-row items-center border border-border rounded-soft px-4 py-3 bg-white">
                 <Phone size={20} color="#696969" />

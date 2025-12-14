@@ -80,10 +80,10 @@ function PermissionRequest({
         <View style={styles.permissionIconContainer}>
           <Camera size={48} color={COLORS.gold} strokeWidth={1.5} />
         </View>
-        <Text style={styles.permissionTitle}>Acces a la camera</Text>
+        <Text style={styles.permissionTitle}>Accès à la caméra</Text>
         <Text style={styles.permissionDescription}>
-          Pour scanner les codes-barres et QR codes de vos bijoux preferes,
-          nous avons besoin d'acceder a votre camera.
+          Pour scanner les codes-barres et QR codes de vos bijoux préférés,
+          nous avons besoin d'accéder à votre caméra.
         </Text>
         <AnimatedPressable
           style={[styles.permissionButton, buttonStyle]}
@@ -99,7 +99,7 @@ function PermissionRequest({
             style={styles.permissionButtonGradient}
           >
             <Text style={styles.permissionButtonText}>
-              {isLoading ? 'Verification...' : 'Autoriser la camera'}
+              {isLoading ? 'Vérification...' : 'Autoriser la caméra'}
             </Text>
           </LinearGradient>
         </AnimatedPressable>
@@ -108,7 +108,7 @@ function PermissionRequest({
           onPress={() => Linking.openSettings()}
         >
           <Text style={styles.settingsLinkText}>
-            Ouvrir les parametres
+            Ouvrir les paramètres
           </Text>
         </Pressable>
       </View>
@@ -359,7 +359,7 @@ export function BarcodeScanner({
                 onPress={handleScanAgain}
               >
                 <RefreshCw size={20} color={COLORS.white} strokeWidth={2} />
-                <Text style={styles.secondaryButtonText}>Scanner a nouveau</Text>
+                <Text style={styles.secondaryButtonText}>Scanner à nouveau</Text>
               </Pressable>
 
               {/* View Product Button */}
@@ -414,7 +414,7 @@ export function BarcodeScanner({
                   style={styles.primaryButtonGradient}
                 >
                   <RefreshCw size={20} color={COLORS.white} strokeWidth={2} />
-                  <Text style={styles.primaryButtonText}>Reessayer</Text>
+                  <Text style={styles.primaryButtonText}>Réessayer</Text>
                 </LinearGradient>
               </AnimatedPressable>
             </View>

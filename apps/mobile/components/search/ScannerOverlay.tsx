@@ -179,7 +179,7 @@ function ProductPreview({
           <View style={styles.previewContent}>
             <Text style={styles.errorText}>{error}</Text>
             <Text style={styles.errorHint}>
-              Ce code-barres ne correspond a aucun produit
+              Ce code-barres ne correspond à aucun produit
             </Text>
           </View>
         </BlurView>
@@ -379,7 +379,7 @@ export function ScannerOverlay({
             Placez le code-barres ou QR code dans le cadre
           </Text>
           <View style={styles.supportedTypes}>
-            <Text style={styles.supportedLabel}>Types supportes:</Text>
+            <Text style={styles.supportedLabel}>Types supportés:</Text>
             <Text style={styles.supportedText}>
               QR Code, EAN-13, EAN-8, UPC-A, Code 128
             </Text>

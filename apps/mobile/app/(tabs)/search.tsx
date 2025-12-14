@@ -149,7 +149,7 @@ function CategoryQuickFilter({
       onPressOut={handlePressOut}
       onPress={onPress}
       style={[styles.categoryCard, animatedStyle]}
-      accessibilityLabel={`Categorie ${category.name}${isSelected ? ', selectionnee' : ''}`}
+      accessibilityLabel={`Catégorie ${category.name}${isSelected ? ', sélectionnée' : ''}`}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
     >
@@ -277,9 +277,9 @@ function TrendingProductCard({
         onPressOut={handlePressOut}
         onPress={onPress}
         style={[styles.trendingCard, animatedStyle]}
-        accessibilityLabel={`${product.name}, ${formatPrice(product.price)}, tendance numero ${index + 1}`}
+        accessibilityLabel={`${product.name}, ${formatPrice(product.price)}, tendance numéro ${index + 1}`}
         accessibilityRole="button"
-        accessibilityHint="Appuyez pour voir les details du produit"
+        accessibilityHint="Appuyez pour voir les détails du produit"
       >
         <Animated.View
           entering={FadeInDown.delay(index * 80).duration(400)}
@@ -418,7 +418,7 @@ export default function SearchScreen() {
       } catch (error) {
         console.error('Error searching products:', error);
         setSearchResults([]);
-        setErrorMessage('Erreur lors de la recherche. Veuillez reessayer.');
+        setErrorMessage('Erreur lors de la recherche. Veuillez réessayer.');
       } finally {
         setIsLoading(false);
       }
@@ -616,7 +616,7 @@ export default function SearchScreen() {
               >
                 <View style={styles.recentHeader}>
                   <SectionHeader
-                    title="Recherches recentes"
+                    title="Recherches récentes"
                     icon={<Clock size={18} color={COLORS.stone} strokeWidth={1.5} />}
                   />
                   <Pressable onPress={handleClearAllRecent}>
@@ -673,7 +673,7 @@ export default function SearchScreen() {
               style={styles.section}
             >
               <SectionHeader
-                title="Categories"
+                title="Catégories"
                 subtitle="Explorer par type"
                 showViewAll
                 onViewAll={() => router.push('/collections')}
@@ -702,7 +702,7 @@ export default function SearchScreen() {
             >
               <SectionHeader
                 title="Tendances"
-                subtitle="Les plus recherches"
+                subtitle="Les plus recherchés"
                 icon={<Sparkles size={18} color={COLORS.hermes} strokeWidth={1.5} />}
               />
               <ScrollView

@@ -72,8 +72,8 @@ export function EmptyCart() {
         transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="mx-auto max-w-md font-sans text-body-lg text-text-muted leading-elegant mb-10"
       >
-        Decouvrez nos collections de haute joaillerie et laissez-vous seduire
-        par des pieces d'exception, creees par nos maitres artisans.
+        Découvrez nos collections de haute joaillerie et laissez-vous séduire
+        par des pièces d'exception, créées par nos maîtres artisans.
       </motion.p>
 
       {/* CTA */}
@@ -94,7 +94,7 @@ export function EmptyCart() {
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
           )}
         >
-          <span>Decouvrir nos collections</span>
+          <span>Découvrir nos collections</span>
           <ArrowRight
             className={cn(
               'w-4 h-4',

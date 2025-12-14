@@ -25,7 +25,7 @@ const faqData = [
     icon: Package,
     questions: [
       {
-        question: 'Quels sont les delais de livraison ?',
+        question: 'Quels sont les délais de livraison ?',
         answer:
           'Nous livrons en 2-3 jours ouvrés en France métropolitaine. Pour les livraisons internationales, comptez 5-7 jours ouvrés. Les commandes passées avant 14h sont expédiées le jour même.',
       },
@@ -40,7 +40,7 @@ const faqData = [
           'La livraison est offerte pour toute commande supérieure à 150€ en France métropolitaine. Pour les autres destinations, les frais de port sont calculés en fonction du pays de destination.',
       },
       {
-        question: 'Livrez-vous a l\'international ?',
+        question: 'Livrez-vous à l\'international ?',
         answer:
           'Oui, nous livrons dans plus de 30 pays. Les frais et délais varient selon la destination. Consultez notre page livraison pour plus de détails.',
       },
@@ -67,7 +67,7 @@ const faqData = [
           'Le remboursement est effectué sous 5-7 jours ouvrés après réception et vérification de votre retour. Vous serez remboursé sur le mode de paiement utilisé lors de la commande.',
       },
       {
-        question: 'Puis-je echanger un article ?',
+        question: 'Puis-je échanger un article ?',
         answer:
           "Oui, vous pouvez demander un échange de taille ou de modèle. Contactez notre service client pour organiser l'échange. Les frais de réexpédition sont offerts pour le premier échange.",
       },
@@ -75,7 +75,7 @@ const faqData = [
   },
   {
     id: 'payment',
-    title: 'Paiement et securite',
+    title: 'Paiement et sécurité',
     icon: CreditCard,
     questions: [
       {
@@ -84,7 +84,7 @@ const faqData = [
           'Nous acceptons les cartes bancaires (Visa, Mastercard, American Express), PayPal, Apple Pay et le paiement en 3 ou 4 fois sans frais via Alma pour les commandes supérieures à 100€.',
       },
       {
-        question: 'Mes donnees sont-elles securisees ?',
+        question: 'Mes données sont-elles sécurisées ?',
         answer:
           'Absolument. Toutes les transactions sont sécurisées par un cryptage SSL 256 bits. Nous ne stockons jamais vos informations bancaires. Nos processus sont certifiés PCI-DSS.',
       },
@@ -94,7 +94,7 @@ const faqData = [
           'Oui, pour toute commande supérieure à 100€, vous pouvez opter pour le paiement en 3 ou 4 fois sans frais via notre partenaire Alma. La décision d\'acceptation est instantanée.',
       },
       {
-        question: 'Ma commande est refusee, que faire ?',
+        question: 'Ma commande est refusée, que faire ?',
         answer:
           "Si votre paiement est refusé, vérifiez les informations saisies et le plafond de votre carte. Vous pouvez également essayer un autre mode de paiement ou contacter votre banque.",
       },
@@ -111,7 +111,7 @@ const faqData = [
           "Nettoyez vos bijoux en or avec de l'eau tiède savonneuse et une brosse souple. Rincez à l'eau claire et séchez avec un chiffon doux. Évitez le contact avec les parfums et produits chimiques.",
       },
       {
-        question: 'Comment preserver l\'eclat de mes pierres ?',
+        question: 'Comment préserver l\'éclat de mes pierres ?',
         answer:
           "Évitez les chocs et frottements. Rangez chaque bijou séparément dans son écrin. Pour les diamants, un nettoyage mensuel à l'eau tiède savonneuse suffit. Les pierres précieuses nécessitent plus de précautions.",
       },
@@ -232,7 +232,7 @@ export default function HelpScreen() {
             </Text>
           </View>
           <Text className="font-sans text-text-muted">
-            Trouvez rapidement des reponses a vos questions
+            Trouvez rapidement des réponses à vos questions
           </Text>
         </View>
 
@@ -266,11 +266,11 @@ export default function HelpScreen() {
         <View className="bg-background-beige px-6 py-8">
           <View className="items-center mb-6">
             <Text className="font-serif text-2xl text-text-primary text-center mb-2">
-              Besoin d'aide supplementaire ?
+              Besoin d'aide supplémentaire ?
             </Text>
             <View className="w-12 h-0.5 bg-hermes-500 mb-3" />
             <Text className="font-sans text-text-muted text-center text-sm">
-              Notre equipe est la pour vous accompagner
+              Notre équipe est là pour vous accompagner
             </Text>
           </View>
 
@@ -298,7 +298,7 @@ export default function HelpScreen() {
               </View>
               <View className="flex-1 ml-4">
                 <Text className="font-sans text-xs text-text-muted uppercase tracking-wider mb-1">
-                  Telephone
+                  Téléphone
                 </Text>
                 <Text className="font-sans text-text-primary">
                   01 42 68 53 00
@@ -322,7 +322,7 @@ export default function HelpScreen() {
                   Samedi : 10h00 - 17h00
                 </Text>
                 <Text className="font-sans text-text-muted text-sm">
-                  Dimanche : Ferme
+                  Dimanche : Fermé
                 </Text>
               </View>
             </View>
@@ -332,7 +332,7 @@ export default function HelpScreen() {
         {/* Footer Message */}
         <View className="px-6 py-8 items-center">
           <Text className="font-display text-xl text-text-primary text-center leading-relaxed mb-4">
-            "Votre satisfaction est notre priorite"
+            "Votre satisfaction est notre priorité"
           </Text>
           <View className="items-center">
             <Text className="font-serif text-lg text-hermes-500">Maison Bijoux</Text>

@@ -198,7 +198,7 @@ function ConfirmationContent() {
       >
         <Package className="h-16 w-16 text-text-muted mb-6" />
         <h1 className="font-serif text-2xl md:text-3xl text-text-primary mb-4">
-          Aucune commande trouvee
+          Aucune commande trouvée
         </h1>
         <p className="text-text-muted mb-8 max-w-md">
           Vous pouvez consulter vos commandes dans votre espace personnel.
@@ -277,7 +277,7 @@ function ConfirmationContent() {
           variants={itemVariants}
           className="text-text-muted max-w-lg mx-auto text-lg"
         >
-          Votre commande a ete confirmee. Un email de confirmation vous sera envoye sous peu.
+          Votre commande a été confirmée. Un email de confirmation vous sera envoyé sous peu.
         </motion.p>
       </motion.div>
 
@@ -287,13 +287,13 @@ function ConfirmationContent() {
         className="bg-gradient-to-br from-hermes-50 to-white border border-hermes-200 p-8 mb-8 text-center"
       >
         <span className="text-xs uppercase tracking-luxe text-hermes-600 mb-2 block">
-          Numero de commande
+          Numéro de commande
         </span>
         <p className="font-serif text-3xl md:text-4xl text-hermes-600 tracking-wide">
           {order.orderNumber}
         </p>
         <p className="text-sm text-text-muted mt-3">
-          Conservez ce numero pour suivre votre commande
+          Conservez ce numéro pour suivre votre commande
         </p>
       </motion.div>
 
@@ -340,7 +340,7 @@ function ConfirmationContent() {
                     {item.productName}
                   </h3>
                   <p className="text-sm text-text-muted">
-                    Quantite: {item.quantity}
+                    Quantité: {item.quantity}
                   </p>
                   <p className="font-medium text-hermes-600 mt-1">
                     {formatPrice(item.totalPrice)}
@@ -411,13 +411,13 @@ function ConfirmationContent() {
               </div>
               <div>
                 <h3 className="font-medium text-text-primary mb-1">
-                  Livraison estimee
+                  Livraison estimée
                 </h3>
                 <p className="text-green-700 font-medium">
                   {getEstimatedDelivery()}
                 </p>
                 <p className="text-sm text-text-muted mt-2">
-                  Vous recevrez un email avec le numero de suivi des l'expedition de votre colis.
+                  Vous recevrez un email avec le numéro de suivi dès l'expédition de votre colis.
                 </p>
               </div>
             </div>
@@ -457,7 +457,7 @@ function ConfirmationContent() {
                 1. Confirmation email
               </h3>
               <p className="text-sm text-text-muted">
-                Vous recevrez un email de confirmation avec tous les details de votre commande.
+                Vous recevrez un email de confirmation avec tous les détails de votre commande.
               </p>
             </div>
           </div>
@@ -467,10 +467,10 @@ function ConfirmationContent() {
             </div>
             <div>
               <h3 className="font-medium text-text-primary mb-1">
-                2. Preparation
+                2. Préparation
               </h3>
               <p className="text-sm text-text-muted">
-                Nos artisans preparent votre commande avec le plus grand soin.
+                Nos artisans préparent votre commande avec le plus grand soin.
               </p>
             </div>
           </div>
@@ -480,10 +480,10 @@ function ConfirmationContent() {
             </div>
             <div>
               <h3 className="font-medium text-text-primary mb-1">
-                3. Expedition
+                3. Expédition
               </h3>
               <p className="text-sm text-text-muted">
-                Votre colis sera expedie et vous recevrez le numero de suivi.
+                Votre colis sera expédié et vous recevrez le numéro de suivi.
               </p>
             </div>
           </div>
@@ -524,7 +524,7 @@ function ConfirmationContent() {
                 Emballage luxe
               </h3>
               <p className="text-sm text-text-muted">
-                Chaque piece est emballee dans un ecrin elegant avec certificat d'authenticite.
+                Chaque pièce est emballée dans un écrin élégant avec certificat d'authenticité.
               </p>
             </div>
           </div>
@@ -533,10 +533,10 @@ function ConfirmationContent() {
             <Truck className="h-10 w-10 text-hermes-500 flex-shrink-0 mx-auto md:mx-0" />
             <div>
               <h3 className="font-medium text-text-primary mb-1">
-                Livraison securisee
+                Livraison sécurisée
               </h3>
               <p className="text-sm text-text-muted">
-                Transporteur securise avec signature obligatoire a la livraison.
+                Transporteur sécurisé avec signature obligatoire à la livraison.
               </p>
             </div>
           </div>
@@ -548,7 +548,7 @@ function ConfirmationContent() {
                 Garantie 30 jours
               </h3>
               <p className="text-sm text-text-muted">
-                Retours gratuits sous 30 jours. Votre satisfaction est notre priorite.
+                Retours gratuits sous 30 jours. Votre satisfaction est notre priorité.
               </p>
             </div>
           </div>

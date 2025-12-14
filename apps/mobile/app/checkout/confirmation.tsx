@@ -311,14 +311,14 @@ export default function ConfirmationScreen() {
             entering={FadeInDown.delay(400).duration(400)}
             style={styles.successTitle}
           >
-            Commande confirmee !
+            Commande confirmée !
           </Animated.Text>
 
           <Animated.Text
             entering={FadeInDown.delay(500).duration(400)}
             style={styles.successSubtitle}
           >
-            Merci pour votre confiance. Votre commande est en cours de preparation.
+            Merci pour votre confiance. Votre commande est en cours de préparation.
           </Animated.Text>
         </Animated.View>
 
@@ -329,7 +329,7 @@ export default function ConfirmationScreen() {
         >
           <Package size={20} color={COLORS.stone} />
           <View style={styles.orderNumberContent}>
-            <Text style={styles.orderNumberLabel}>Numero de commande</Text>
+            <Text style={styles.orderNumberLabel}>Numéro de commande</Text>
             <Text style={styles.orderNumber}>{orderNumber}</Text>
           </View>
         </Animated.View>
@@ -340,14 +340,14 @@ export default function ConfirmationScreen() {
           <InfoCard
             icon={<Mail size={20} color={COLORS.hermes} />}
             title="Email de confirmation"
-            subtitle={shippingAddress?.email || 'Un email vous sera envoye'}
+            subtitle={shippingAddress?.email || 'Un email vous sera envoyé'}
             delay={700}
           />
 
           {/* Delivery Date */}
           <InfoCard
             icon={<Calendar size={20} color={COLORS.hermes} />}
-            title="Livraison estimee"
+            title="Livraison estimée"
             subtitle={deliveryDate}
             delay={750}
           />
@@ -376,7 +376,7 @@ export default function ConfirmationScreen() {
           <ActionButton
             variant="primary"
             icon={<Home size={20} color={COLORS.white} />}
-            label="Retour a l'accueil"
+            label="Retour à l'accueil"
             onPress={handleContinueShopping}
             delay={950}
           />

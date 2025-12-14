@@ -405,7 +405,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 'scrollbar-thin scrollbar-thumb-border-medium scrollbar-track-transparent'
               )}
               role="listbox"
-              aria-label="Resultats de recherche"
+              aria-label="Résultats de recherche"
             >
               {/* Loading State */}
               {isLoading && (
@@ -431,7 +431,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-luxe text-text-muted">
                           <Clock className="w-4 h-4" strokeWidth={1.5} />
-                          Recherches recentes
+                          Recherches récentes
                         </h3>
                         <button
                           onClick={clearRecentSearches}
@@ -511,7 +511,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   className="text-center py-12"
                 >
                   <p className="font-serif text-lg text-text-primary mb-2">
-                    Aucun resultat pour "{query}"
+                    Aucun résultat pour "{query}"
                   </p>
                   <p className="text-sm text-text-muted mb-6">
                     Essayez avec d'autres termes ou explorez nos suggestions
@@ -548,7 +548,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   {/* Results Header */}
                   <div className="flex items-center justify-between mb-6">
                     <span className="text-xs font-medium uppercase tracking-luxe text-text-muted">
-                      {results.totalProducts} resultat{results.totalProducts > 1 ? 's' : ''}
+                      {results.totalProducts} résultat{results.totalProducts > 1 ? 's' : ''}
                     </span>
                     <Link
                       href={`/recherche?q=${encodeURIComponent(query)}`}

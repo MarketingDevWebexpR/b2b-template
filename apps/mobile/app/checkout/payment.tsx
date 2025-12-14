@@ -161,7 +161,7 @@ export default function PaymentScreen() {
     hapticFeedback.softConfirm();
     Alert.alert(
       'Ajouter une carte',
-      'Cette fonctionnalite sera disponible prochainement.',
+      'Cette fonctionnalité sera disponible prochainement.',
       [{ text: 'OK' }]
     );
   }, []);
@@ -198,7 +198,7 @@ export default function PaymentScreen() {
     } catch (error) {
       console.error('Payment error:', error);
       setButtonState('error');
-      setPaymentError('Le paiement a echoue. Veuillez reessayer.');
+      setPaymentError('Le paiement a échoué. Veuillez réessayer.');
       hapticFeedback.error();
 
       // Reset button state after error animation
@@ -288,7 +288,7 @@ export default function PaymentScreen() {
         {/* Shipping Address Summary */}
         {shippingAddress && (
           <View style={styles.addressSummary}>
-            <Text style={styles.addressLabel}>Livraison a :</Text>
+            <Text style={styles.addressLabel}>Livraison à :</Text>
             <Text style={styles.addressText} numberOfLines={1}>
               {shippingAddress.firstName} {shippingAddress.lastName}, {shippingAddress.city}
             </Text>
@@ -306,7 +306,7 @@ export default function PaymentScreen() {
         {/* Terms */}
         <Text style={styles.termsText}>
           En passant commande, vous acceptez nos{' '}
-          <Text style={styles.termsLink}>conditions generales</Text>
+          <Text style={styles.termsLink}>conditions générales</Text>
         </Text>
       </View>
     </SafeAreaView>

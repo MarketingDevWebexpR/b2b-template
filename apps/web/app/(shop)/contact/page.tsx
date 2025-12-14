@@ -86,24 +86,24 @@ interface FAQItem {
  */
 const faqItems: FAQItem[] = [
   {
-    question: 'Quels sont les delais de livraison ?',
+    question: 'Quels sont les délais de livraison ?',
     answer:
-      'Pour la France metropolitaine, comptez 2 a 5 jours ouvrables. Les expeditions internationales peuvent prendre entre 5 et 10 jours selon la destination. Toutes nos pieces sont livrees dans un ecrin luxe avec service de suivi.',
+      'Pour la France métropolitaine, comptez 2 à 5 jours ouvrables. Les expéditions internationales peuvent prendre entre 5 et 10 jours selon la destination. Toutes nos pièces sont livrées dans un écrin luxe avec service de suivi.',
   },
   {
     question: 'Proposez-vous des services de personnalisation ?',
     answer:
-      'Oui, notre atelier realise des gravures personnalisees et des creations sur-mesure. Prenez rendez-vous en boutique ou contactez-nous pour discuter de votre projet avec nos maitres joailliers.',
+      'Oui, notre atelier réalise des gravures personnalisées et des créations sur-mesure. Prenez rendez-vous en boutique ou contactez-nous pour discuter de votre projet avec nos maîtres joailliers.',
   },
   {
     question: 'Comment entretenir mes bijoux ?',
     answer:
-      'Nous recommandons de nettoyer vos bijoux avec un chiffon doux apres chaque utilisation. Evitez le contact avec les parfums et produits chimiques. Un entretien professionnel annuel en boutique est offert pour toute creation Maison Bijoux.',
+      'Nous recommandons de nettoyer vos bijoux avec un chiffon doux après chaque utilisation. Évitez le contact avec les parfums et produits chimiques. Un entretien professionnel annuel en boutique est offert pour toute création Maison Bijoux.',
   },
   {
     question: 'Quelle est votre politique de retour ?',
     answer:
-      'Vous disposez de 30 jours pour retourner un article dans son etat d\'origine. Les pieces sur-mesure et gravees ne sont pas echangeables. Contactez notre service client pour initier un retour.',
+      'Vous disposez de 30 jours pour retourner un article dans son état d\'origine. Les pièces sur-mesure et gravées ne sont pas échangeables. Contactez notre service client pour initier un retour.',
   },
 ];
 
@@ -120,7 +120,7 @@ const contactInfo = {
   hours: [
     { days: 'Lundi - Vendredi', time: '10h00 - 19h00' },
     { days: 'Samedi', time: '10h00 - 18h00' },
-    { days: 'Dimanche', time: 'Ferme' },
+    { days: 'Dimanche', time: 'Fermé' },
   ],
 };
 
@@ -130,9 +130,9 @@ const contactInfo = {
 const subjectOptions = [
   'Renseignement produit',
   'Commande en cours',
-  'Service apres-vente',
+  'Service après-vente',
   'Rendez-vous en boutique',
-  'Creation sur-mesure',
+  'Création sur-mesure',
   'Autre demande',
 ];
 
@@ -223,13 +223,13 @@ export default function ContactPage() {
     }
 
     if (!formData.subject) {
-      newErrors.subject = 'Veuillez selectionner un sujet';
+      newErrors.subject = 'Veuillez sélectionner un sujet';
     }
 
     if (!formData.message.trim()) {
       newErrors.message = 'Veuillez entrer votre message';
     } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Votre message doit contenir au moins 10 caracteres';
+      newErrors.message = 'Votre message doit contenir au moins 10 caractères';
     }
 
     setErrors(newErrors);
@@ -310,7 +310,7 @@ export default function ContactPage() {
               className="mx-auto mt-8 max-w-prose-narrow font-sans text-body-lg leading-elegant text-text-muted"
               variants={itemVariants}
             >
-              Notre equipe est a votre disposition pour repondre a toutes vos
+              Notre équipe est à votre disposition pour répondre à toutes vos
               questions et vous accompagner dans vos choix.
             </motion.p>
           </motion.div>
@@ -346,11 +346,11 @@ export default function ContactPage() {
                     <Check className="h-8 w-8 text-white" strokeWidth={2} />
                   </div>
                   <h3 className="font-serif text-heading-4 text-text-primary">
-                    Message envoye
+                    Message envoyé
                   </h3>
                   <p className="mt-3 font-sans text-body text-text-muted">
-                    Merci pour votre message. Notre equipe vous repondra dans
-                    les plus brefs delais.
+                    Merci pour votre message. Notre équipe vous répondra dans
+                    les plus brefs délais.
                   </p>
                   <button
                     type="button"
@@ -473,7 +473,7 @@ export default function ContactPage() {
                         }
                       >
                         <option value="" disabled>
-                          Selectionnez un sujet
+                          Sélectionnez un sujet
                         </option>
                         {subjectOptions.map((option) => (
                           <option key={option} value={option}>
@@ -642,7 +642,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-sans text-caption uppercase tracking-luxe text-text-muted">
-                        Telephone
+                        Téléphone
                       </h3>
                       <a
                         href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}
@@ -704,7 +704,7 @@ export default function ContactPage() {
                       <span
                         className={cn(
                           'font-sans text-body',
-                          schedule.time === 'Ferme'
+                          schedule.time === 'Fermé'
                             ? 'text-text-light'
                             : 'text-text-muted'
                         )}
@@ -812,7 +812,7 @@ export default function ContactPage() {
               className="font-serif text-heading-1 text-text-primary"
               variants={fadeInUp}
             >
-              Questions frequentes
+              Questions fréquentes
             </motion.h2>
 
             <motion.div
@@ -850,14 +850,14 @@ export default function ContactPage() {
             viewport={{ once: true }}
           >
             <p className="font-sans text-body text-text-muted">
-              Vous n&apos;avez pas trouve la reponse a votre question ?
+              Vous n&apos;avez pas trouvé la réponse à votre question ?
             </p>
             <a
               href={`mailto:${contactInfo.email}`}
               className="mt-4 inline-flex items-center gap-2 font-sans text-caption uppercase tracking-luxe text-hermes-500 transition-colors hover:text-hermes-600"
             >
               <Mail className="h-4 w-4" strokeWidth={1.5} />
-              <span>Contactez notre equipe</span>
+              <span>Contactez notre équipe</span>
             </a>
           </motion.div>
         </Container>

@@ -179,7 +179,7 @@ export function LuxuryQuantitySelector({
   return (
     <View style={styles.container}>
       {/* Section Label */}
-      <Text style={styles.label}>Quantite</Text>
+      <Text style={styles.label}>Quantité</Text>
 
       <View style={styles.selectorRow}>
         {/* Minus Button */}
@@ -189,7 +189,7 @@ export function LuxuryQuantitySelector({
           onPress={handleDecrement}
           disabled={disabled}
           style={[styles.button, minusButtonStyle, isAtMin && styles.buttonDisabled]}
-          accessibilityLabel="Diminuer la quantite"
+          accessibilityLabel="Diminuer la quantité"
           accessibilityRole="button"
           accessibilityState={{ disabled: isAtMin || disabled }}
         >
@@ -221,7 +221,7 @@ export function LuxuryQuantitySelector({
           onPress={handleIncrement}
           disabled={disabled || isAtMax}
           style={[styles.button, plusButtonStyle, isAtMax && styles.buttonDisabled]}
-          accessibilityLabel="Augmenter la quantite"
+          accessibilityLabel="Augmenter la quantité"
           accessibilityRole="button"
           accessibilityState={{ disabled: isAtMax || disabled }}
         >

@@ -59,18 +59,18 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               L'art de la joaillerie d'exception
             </h2>
             <p className="text-white/80 text-lg leading-relaxed">
-              Decouvrez notre collection exclusive de pieces uniques,
-              creees par les meilleurs artisans joailliers.
+              Découvrez notre collection exclusive de pièces uniques,
+              créées par les meilleurs artisans joailliers.
             </p>
             <div className="flex items-center gap-8 pt-4">
               <div className="text-center">
                 <p className="text-2xl font-serif text-hermes-500">25+</p>
-                <p className="text-sm text-white/70 mt-1">Annees d'excellence</p>
+                <p className="text-sm text-white/70 mt-1">Années d'excellence</p>
               </div>
               <div className="w-[1px] h-12 bg-white/30" />
               <div className="text-center">
                 <p className="text-2xl font-serif text-hermes-500">1000+</p>
-                <p className="text-sm text-white/70 mt-1">Creations uniques</p>
+                <p className="text-sm text-white/70 mt-1">Créations uniques</p>
               </div>
               <div className="w-[1px] h-12 bg-white/30" />
               <div className="text-center">
@@ -97,7 +97,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               ))}
             </div>
             <p className="text-sm text-white/70">
-              Rejoignez notre communaute exclusive
+              Rejoignez notre communauté exclusive
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             )}
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            <span className="hidden sm:inline">Retour a l'accueil</span>
+            <span className="hidden sm:inline">Retour à l'accueil</span>
             <span className="sm:hidden">Accueil</span>
           </Link>
         </header>
@@ -144,10 +144,10 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
                 Aide
               </Link>
               <Link href="#" className="hover:text-gold-500 transition-colors">
-                Confidentialite
+                Confidentialité
               </Link>
               <Link href="#" className="hover:text-gold-500 transition-colors">
-                Mentions legales
+                Mentions légales
               </Link>
             </div>
           </div>

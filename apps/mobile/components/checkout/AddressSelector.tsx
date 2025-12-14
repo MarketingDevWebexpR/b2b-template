@@ -287,7 +287,7 @@ function AddressCard({ address, isSelected, onSelect, disabled }: AddressCardPro
             </Text>
             {address.isDefault && (
               <View style={styles.defaultBadge}>
-                <Text style={styles.defaultBadgeText}>Par defaut</Text>
+                <Text style={styles.defaultBadgeText}>Par défaut</Text>
               </View>
             )}
           </View>
@@ -676,7 +676,7 @@ function NewAddressForm({ onSubmit, isLoading }: NewAddressFormProps) {
 
   // Validation
   const errors: Partial<Record<keyof NewAddress, string>> = {};
-  if (!formData.firstName.trim()) errors.firstName = 'Prenom requis';
+  if (!formData.firstName.trim()) errors.firstName = 'Prénom requis';
   if (!formData.lastName.trim()) errors.lastName = 'Nom requis';
   if (!formData.address.trim()) errors.address = 'Adresse requise';
   if (!formData.city.trim()) errors.city = 'Ville requise';
@@ -686,9 +686,9 @@ function NewAddressForm({ onSubmit, isLoading }: NewAddressFormProps) {
     errors.postalCode = 'Code postal invalide';
   }
   if (!formData.phone.trim()) {
-    errors.phone = 'Telephone requis';
+    errors.phone = 'Téléphone requis';
   } else if (!/^(\+33|0)[1-9](\d{2}){4}$/.test(formData.phone.replace(/\s/g, ''))) {
-    errors.phone = 'Numero invalide';
+    errors.phone = 'Numéro invalide';
   }
 
   const isValid = Object.keys(errors).length === 0;
@@ -718,7 +718,7 @@ function NewAddressForm({ onSubmit, isLoading }: NewAddressFormProps) {
       <View style={styles.row}>
         <View style={styles.halfField}>
           <LuxuryInput
-            label="Prenom"
+            label="Prénom"
             value={formData.firstName}
             onChangeText={updateField('firstName')}
             onBlur={markTouched('firstName')}
@@ -792,7 +792,7 @@ function NewAddressForm({ onSubmit, isLoading }: NewAddressFormProps) {
 
       {/* Phone */}
       <LuxuryInput
-        label="Telephone"
+        label="Téléphone"
         value={formData.phone}
         onChangeText={updateField('phone')}
         onBlur={markTouched('phone')}
@@ -820,7 +820,7 @@ function NewAddressForm({ onSubmit, isLoading }: NewAddressFormProps) {
         <AnimatedCheckbox
           checked={setAsDefault}
           onToggle={() => setSetAsDefault(!setAsDefault)}
-          label="Definir comme adresse par defaut"
+          label="Définir comme adresse par défaut"
           disabled={!saveAddress}
         />
       </View>

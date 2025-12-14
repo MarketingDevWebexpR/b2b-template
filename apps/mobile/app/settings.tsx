@@ -30,9 +30,9 @@ const BUILD_NUMBER = '1';
 
 // Language options
 const LANGUAGES = [
-  { code: 'fr', label: 'Francais' },
+  { code: 'fr', label: 'Français' },
   { code: 'en', label: 'English' },
-  { code: 'es', label: 'Espanol' },
+  { code: 'es', label: 'Español' },
   { code: 'de', label: 'Deutsch' },
 ] as const;
 
@@ -125,7 +125,7 @@ export default function SettingsScreen() {
   const handleDeleteAccount = () => {
     Alert.alert(
       'Supprimer mon compte',
-      'Etes-vous sur de vouloir supprimer votre compte ? Cette action est irreversible et toutes vos donnees seront perdues.',
+      'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données seront perdues.',
       [
         {
           text: 'Annuler',
@@ -166,7 +166,7 @@ export default function SettingsScreen() {
   };
 
   const getLanguageLabel = (code: LanguageCode): string => {
-    return LANGUAGES.find((lang) => lang.code === code)?.label || 'Francais';
+    return LANGUAGES.find((lang) => lang.code === code)?.label || 'Français';
   };
 
   if (isLoading) {
@@ -197,7 +197,7 @@ export default function SettingsScreen() {
               <Settings size={24} color="#f67828" />
             </View>
             <View className="ml-4">
-              <Text className="font-serif text-3xl text-text-primary">Parametres</Text>
+              <Text className="font-serif text-3xl text-text-primary">Paramètres</Text>
             </View>
           </View>
         </View>
@@ -209,13 +209,13 @@ export default function SettingsScreen() {
           <View className="bg-white rounded-soft border border-border-light px-4">
             <SettingToggle
               label="Notifications push"
-              description="Recevez des alertes sur votre telephone"
+              description="Recevez des alertes sur votre téléphone"
               value={pushEnabled}
               onValueChange={setPushEnabled}
             />
             <SettingToggle
               label="Notifications par email"
-              description="Promotions et nouveautes"
+              description="Promotions et nouveautés"
               value={emailEnabled}
               onValueChange={setEmailEnabled}
             />
@@ -228,11 +228,11 @@ export default function SettingsScreen() {
           </View>
 
           {/* Privacy Section */}
-          <SectionHeader icon={Shield} title="Confidentialite" />
+          <SectionHeader icon={Shield} title="Confidentialité" />
           <View className="bg-white rounded-soft border border-border-light px-4">
             <SettingToggle
               label="Statistiques d'utilisation"
-              description="Aidez-nous a ameliorer l'application"
+              description="Aidez-nous à améliorer l'application"
               value={analyticsEnabled}
               onValueChange={setAnalyticsEnabled}
             />
@@ -272,7 +272,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* About Section */}
-          <SectionHeader icon={Info} title="A propos" />
+          <SectionHeader icon={Info} title="À propos" />
           <View className="bg-white rounded-soft border border-border-light px-4">
             <View className="flex-row items-center justify-between py-4 border-b border-border-light">
               <Text className="font-sans text-text-primary">Version de l'application</Text>
@@ -281,11 +281,11 @@ export default function SettingsScreen() {
               </Text>
             </View>
             <SettingLink
-              label="Conditions generales d'utilisation"
+              label="Conditions générales d'utilisation"
               onPress={() => handleOpenLink('https://example.com/terms')}
             />
             <SettingLink
-              label="Politique de confidentialite"
+              label="Politique de confidentialité"
               onPress={() => handleOpenLink('https://example.com/privacy')}
               showChevron={true}
             />
@@ -309,7 +309,7 @@ export default function SettingsScreen() {
                       Supprimer mon compte
                     </Text>
                     <Text className="font-sans text-xs text-red-400 mt-0.5">
-                      Cette action est irreversible
+                      Cette action est irréversible
                     </Text>
                   </View>
                 </View>

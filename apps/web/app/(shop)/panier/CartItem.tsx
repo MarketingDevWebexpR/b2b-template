@@ -129,7 +129,7 @@ function CartItemComponent({
             <QuantityButton
               onClick={handleDecrement}
               disabled={quantity <= 1}
-              aria-label="Diminuer la quantite"
+              aria-label="Diminuer la quantité"
             >
               <Minus className="w-3.5 h-3.5" strokeWidth={1.5} />
             </QuantityButton>
@@ -139,14 +139,14 @@ function CartItemComponent({
                 'w-8 text-center',
                 'font-sans text-body font-medium text-text-primary'
               )}
-              aria-label={`Quantite: ${quantity}`}
+              aria-label={`Quantité: ${quantity}`}
             >
               {quantity}
             </span>
 
             <QuantityButton
               onClick={handleIncrement}
-              aria-label="Augmenter la quantite"
+              aria-label="Augmenter la quantité"
             >
               <Plus className="w-3.5 h-3.5" strokeWidth={1.5} />
             </QuantityButton>
@@ -215,7 +215,7 @@ function CartItemComponent({
           "mt-1 font-sans text-caption text-text-muted whitespace-nowrap",
           quantity <= 1 && "invisible"
         )}>
-          {formatPrice(product.price)} / piece
+          {formatPrice(product.price)} / pièce
         </span>
       </div>
 

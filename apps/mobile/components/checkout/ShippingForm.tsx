@@ -431,7 +431,7 @@ export const ShippingForm = forwardRef<ShippingFormRef, ShippingFormProps>(
         <View style={styles.row}>
           <View style={styles.halfField}>
             <LuxuryTextInput
-              label="Prenom"
+              label="Prénom"
               value={formData.firstName}
               onChangeText={updateField('firstName')}
               onFieldBlur={handleFieldBlur('firstName')}
@@ -462,7 +462,7 @@ export const ShippingForm = forwardRef<ShippingFormRef, ShippingFormProps>(
 
         {/* Phone */}
         <LuxuryTextInput
-          label="Telephone"
+          label="Téléphone"
           value={formData.phone}
           onChangeText={updateField('phone')}
           onFieldBlur={handleFieldBlur('phone')}
@@ -495,7 +495,7 @@ export const ShippingForm = forwardRef<ShippingFormRef, ShippingFormProps>(
 
         {/* Address Line 2 */}
         <LuxuryTextInput
-          label="Complement d'adresse (optionnel)"
+          label="Complément d'adresse (optionnel)"
           value={formData.address2 || ''}
           onChangeText={updateField('address2')}
           onFieldBlur={handleFieldBlur('address2')}

@@ -243,7 +243,7 @@ export default function HomeScreen() {
               className="font-sans text-lg text-white/80 text-center mt-6 tracking-wide"
               style={{ fontStyle: 'italic' }}
             >
-              Pieces uniques. Elegance eternelle.
+              Pièces uniques. Élégance éternelle.
             </Animated.Text>
 
             {/* Decorative Orange Line */}
@@ -257,7 +257,7 @@ export default function HomeScreen() {
               entering={FadeInDown.delay(1000).duration(600)}
               className="flex-row gap-4"
             >
-              <CTAButton title="Decouvrir" variant="filled" href="/collections" delay={1100} />
+              <CTAButton title="Découvrir" variant="filled" href="/collections" delay={1100} />
               <CTAButton title="Collections" variant="outline" href="/collections" delay={1200} />
             </Animated.View>
           </View>
@@ -266,7 +266,7 @@ export default function HomeScreen() {
           <View className="absolute bottom-12 left-0 right-0 items-center">
             <Animated.View entering={FadeIn.delay(1400).duration(600)}>
               <Text className="font-sans text-xs text-white/50 uppercase tracking-[3px] mb-2">
-                Defiler
+                Défiler
               </Text>
               <ScrollIndicator />
             </Animated.View>
@@ -330,13 +330,13 @@ export default function HomeScreen() {
               entering={FadeInDown.delay(100).duration(600)}
               className="font-sans text-xs text-hermes-500 uppercase tracking-[4px] mb-2"
             >
-              Selection Exclusive
+              Sélection Exclusive
             </Animated.Text>
             <Animated.Text
               entering={FadeInDown.delay(200).duration(600)}
               className="font-serif text-3xl text-text-primary"
             >
-              Pieces d'Exception
+              Pièces d'Exception
             </Animated.Text>
           </View>
 
@@ -363,7 +363,7 @@ export default function HomeScreen() {
             <Link href="/collections" asChild>
               <Pressable className="flex-row items-center justify-center py-4 border border-hermes-500/30 rounded-full">
                 <Text className="font-sans text-hermes-500 font-medium mr-2">
-                  Voir toutes les creations
+                  Voir toutes les créations
                 </Text>
                 <ArrowRight size={18} color="#f67828" />
               </Pressable>
@@ -417,15 +417,15 @@ export default function HomeScreen() {
               entering={FadeInDown.delay(500).duration(600)}
               className="font-sans text-text-muted leading-relaxed mb-8"
             >
-              Depuis des generations, notre maison perpétue la tradition d'excellence de la
-              joaillerie francaise. Chaque piece est creee avec passion, precision et un
-              savoir-faire transmis de maitre en apprenti.
+              Depuis des générations, notre maison perpétue la tradition d'excellence de la
+              joaillerie française. Chaque pièce est créée avec passion, précision et un
+              savoir-faire transmis de maître en apprenti.
             </Animated.Text>
 
             {/* Stats Row */}
             <View className="flex-row justify-around py-8 border-t border-b border-border-light mb-8">
-              <StatItem value="35+" label="Annees" delay={600} />
-              <StatItem value="500+" label="Creations" delay={700} />
+              <StatItem value="35+" label="Années" delay={600} />
+              <StatItem value="500+" label="Créations" delay={700} />
               <StatItem value="100%" label="Artisanal" delay={800} />
             </View>
 
@@ -434,7 +434,7 @@ export default function HomeScreen() {
               <Link href="/about" asChild>
                 <Pressable className="flex-row items-center justify-center py-4 bg-luxe-charcoal rounded-full">
                   <Text className="font-sans text-white font-medium mr-2">
-                    Decouvrir notre histoire
+                    Découvrir notre histoire
                   </Text>
                   <ArrowRight size={18} color="#fff" />
                 </Pressable>
@@ -459,7 +459,7 @@ export default function HomeScreen() {
               entering={FadeInDown.delay(300).duration(600)}
               className="font-serif text-3xl text-luxe-cream text-center mb-3"
             >
-              Restez Inspire
+              Restez Inspiré
             </Animated.Text>
 
             {/* Subtitle */}
@@ -467,8 +467,8 @@ export default function HomeScreen() {
               entering={FadeInDown.delay(400).duration(600)}
               className="font-sans text-luxe-taupe text-center mb-8 px-4"
             >
-              Inscrivez-vous pour recevoir nos dernieres creations et offres exclusives
-              en avant-premiere.
+              Inscrivez-vous pour recevoir nos dernières créations et offres exclusives
+              en avant-première.
             </Animated.Text>
 
             {/* Email Input */}
@@ -491,7 +491,7 @@ export default function HomeScreen() {
             <Animated.View entering={FadeIn.delay(600).duration(600)}>
               <Pressable className="bg-hermes-500 py-4 rounded-full">
                 <Text className="font-sans text-white font-semibold text-center tracking-wider">
-                  S'inscrire a la newsletter
+                  S'inscrire à la newsletter
                 </Text>
               </Pressable>
             </Animated.View>
@@ -501,7 +501,7 @@ export default function HomeScreen() {
               entering={FadeIn.delay(700).duration(600)}
               className="font-sans text-xs text-luxe-taupe/60 text-center mt-4"
             >
-              En vous inscrivant, vous acceptez notre politique de confidentialite.
+              En vous inscrivant, vous acceptez notre politique de confidentialité.
             </Animated.Text>
           </View>
         </View>

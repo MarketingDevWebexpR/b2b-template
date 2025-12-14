@@ -123,7 +123,7 @@ function DeliveryInfoBadge() {
         <Truck size={18} color={COLORS.success} strokeWidth={1.5} />
       </View>
       <View style={styles.deliveryTextContainer}>
-        <Text style={styles.deliveryTitle}>Livraison estimee</Text>
+        <Text style={styles.deliveryTitle}>Livraison estimée</Text>
         <Text style={styles.deliverySubtitle}>3-5 jours ouvrables</Text>
       </View>
     </Animated.View>
@@ -199,7 +199,7 @@ export default function CheckoutIndexScreen() {
           entering={FadeInDown.duration(400)}
           style={styles.sectionTitle}
         >
-          Recapitulatif
+          Récapitulatif
         </Animated.Text>
 
         {/* Cart Items */}
@@ -220,7 +220,7 @@ export default function CheckoutIndexScreen() {
           entering={FadeInDown.delay(300).duration(400)}
           style={styles.summaryContainer}
         >
-          <Text style={styles.summaryTitle}>Details du prix</Text>
+          <Text style={styles.summaryTitle}>Détails du prix</Text>
 
           {/* Subtotal */}
           <View style={styles.summaryRow}>

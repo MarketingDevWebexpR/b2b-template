@@ -16,7 +16,7 @@ const registerSchema = z
     name: z
       .string()
       .min(1, 'Le nom est requis')
-      .min(2, 'Le nom doit contenir au moins 2 caracteres'),
+      .min(2, 'Le nom doit contenir au moins 2 caractères'),
     email: z
       .string()
       .min(1, 'L\'email est requis')
@@ -24,7 +24,7 @@ const registerSchema = z
     password: z
       .string()
       .min(1, 'Le mot de passe est requis')
-      .min(8, 'Le mot de passe doit contenir au moins 8 caracteres')
+      .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
         'Le mot de passe doit contenir une majuscule, une minuscule et un chiffre'
@@ -131,7 +131,7 @@ export function RegisterForm() {
       }, 2000);
     } catch (error) {
       setErrors({
-        general: 'Une erreur est survenue. Veuillez reessayer.',
+        general: 'Une erreur est survenue. Veuillez réessayer.',
       });
     } finally {
       setIsLoading(false);
@@ -152,10 +152,10 @@ export function RegisterForm() {
             <Check className="w-8 h-8 text-luxury-black" />
           </div>
           <h3 className="text-xl font-serif text-luxury-pearl">
-            Compte cree avec succes !
+            Compte créé avec succès !
           </h3>
           <p className="text-luxury-silver">
-            Vous allez etre redirige vers la page de connexion...
+            Vous allez être redirigé vers la page de connexion...
           </p>
           <div className="flex justify-center pt-4">
             <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
@@ -215,7 +215,7 @@ export function RegisterForm() {
           label="Mot de passe"
           name="password"
           type={showPassword ? 'text' : 'password'}
-          placeholder="Minimum 8 caracteres"
+          placeholder="Minimum 8 caractères"
           value={formData.password}
           onChange={handleChange}
           error={errors.password}
@@ -242,7 +242,7 @@ export function RegisterForm() {
         <div className="mt-2 space-y-1">
           <PasswordRequirement
             met={formData.password.length >= 8}
-            text="Au moins 8 caracteres"
+            text="Au moins 8 caractères"
           />
           <PasswordRequirement
             met={/[A-Z]/.test(formData.password)}
@@ -332,7 +332,7 @@ export function RegisterForm() {
             </Link>{' '}
             et la{' '}
             <Link href="#" className="text-gold-500 hover:text-gold-400 transition-colors">
-              politique de confidentialite
+              politique de confidentialité
             </Link>
           </span>
         </label>
@@ -349,12 +349,12 @@ export function RegisterForm() {
         isLoading={isLoading}
         className="w-full uppercase tracking-wider"
       >
-        Creer mon compte
+        Créer mon compte
       </Button>
 
       {/* Login link - mobile only */}
       <p className="text-center text-sm text-luxury-silver md:hidden">
-        Deja un compte ?{' '}
+        Déjà un compte ?{' '}
         <Link
           href="/login"
           className="text-gold-500 hover:text-gold-400 transition-colors"

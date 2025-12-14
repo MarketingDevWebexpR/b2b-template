@@ -454,7 +454,7 @@ export function OrderConfirmationOverlay({
 
         {/* Title */}
         <Animated.View style={titleStyle}>
-          <Text style={styles.title}>Commande confirmee !</Text>
+          <Text style={styles.title}>Commande confirmée !</Text>
         </Animated.View>
 
         {/* Subtitle */}

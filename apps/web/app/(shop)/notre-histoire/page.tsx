@@ -65,80 +65,80 @@ const timelineEvents = [
     year: '1987',
     title: 'La Fondation',
     description:
-      'Maison Bijoux voit le jour dans le quartier historique du Marais, fondee par Pierre-Alexandre Beaumont, maitre joaillier forme aupres des plus grandes maisons parisiennes.',
+      'Maison Bijoux voit le jour dans le quartier historique du Marais, fondée par Pierre-Alexandre Beaumont, maître joaillier formé auprès des plus grandes maisons parisiennes.',
   },
   {
     year: '1995',
     title: 'L\'Atelier Historique',
     description:
-      'Ouverture de notre atelier Place Vendome, symbole de notre engagement envers l\'excellence. Une equipe de douze artisans perpetue les gestes ancestraux de la haute joaillerie.',
+      'Ouverture de notre atelier Place Vendôme, symbole de notre engagement envers l\'excellence. Une équipe de douze artisans perpétue les gestes ancestraux de la haute joaillerie.',
   },
   {
     year: '2005',
     title: 'Reconnaissance Internationale',
     description:
-      'Notre maison recoit le label "Entreprise du Patrimoine Vivant", recompensant notre savoir-faire d\'exception et notre contribution a l\'heritage artisanal francais.',
+      'Notre maison reçoit le label "Entreprise du Patrimoine Vivant", récompensant notre savoir-faire d\'exception et notre contribution à l\'héritage artisanal français.',
   },
   {
     year: '2015',
     title: 'L\'Innovation Responsable',
     description:
-      'Engagement pionnier dans la joaillerie ethique : certification RJC et approvisionnement exclusif en or certifie Fairmined et diamants traces de la mine au bijou.',
+      'Engagement pionnier dans la joaillerie éthique : certification RJC et approvisionnement exclusif en or certifié Fairmined et diamants tracés de la mine au bijou.',
   },
   {
     year: '2024',
-    title: 'Une Nouvelle Ere',
+    title: 'Une Nouvelle Ère',
     description:
-      'Sophie Beaumont, petite-fille du fondateur, prend la direction artistique. Une vision contemporaine qui preserve l\'ADN de la maison tout en l\'ouvrant aux nouvelles generations.',
+      'Sophie Beaumont, petite-fille du fondateur, prend la direction artistique. Une vision contemporaine qui préserve l\'ADN de la maison tout en l\'ouvrant aux nouvelles générations.',
   },
 ];
 
 const craftValues = [
   {
     icon: Diamond,
-    title: 'Expertise Seculaire',
+    title: 'Expertise Séculaire',
     description:
-      'Trois generations de maitres joailliers transmettent un savoir-faire unique, perpétuant les techniques traditionnelles tout en embrassant l\'innovation.',
+      'Trois générations de maîtres joailliers transmettent un savoir-faire unique, perpétuant les techniques traditionnelles tout en embrassant l\'innovation.',
   },
   {
     icon: Gem,
-    title: 'Materiaux d\'Exception',
+    title: 'Matériaux d\'Exception',
     description:
-      'Chaque pierre est selectionnee a la main par nos gemmologues. Nous travaillons uniquement avec les metaux les plus purs et les gemmes les plus rares.',
+      'Chaque pierre est sélectionnée à la main par nos gemmologues. Nous travaillons uniquement avec les métaux les plus purs et les gemmes les plus rares.',
   },
   {
     icon: Award,
     title: 'Excellence Artisanale',
     description:
-      'Chaque creation necessite entre 100 et 500 heures de travail. Un souci du detail qui fait de chaque piece une oeuvre unique et intemporelle.',
+      'Chaque création nécessite entre 100 et 500 heures de travail. Un souci du détail qui fait de chaque pièce une œuvre unique et intemporelle.',
   },
   {
     icon: Heart,
     title: 'Passion Authentique',
     description:
-      'La passion guide chaque geste de nos artisans. C\'est cette emotion sincere qui confere a nos bijoux leur ame et leur caractere unique.',
+      'La passion guide chaque geste de nos artisans. C\'est cette émotion sincère qui confère à nos bijoux leur âme et leur caractère unique.',
   },
 ];
 
 const materials = [
   {
     name: 'Or 18 Carats',
-    description: 'Or jaune, rose et blanc de la plus haute purete, certifie Fairmined pour une tracabilite totale.',
+    description: 'Or jaune, rose et blanc de la plus haute pureté, certifié Fairmined pour une traçabilité totale.',
     image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&q=80',
   },
   {
     name: 'Diamants Naturels',
-    description: 'Diamants certifies GIA, selectionnes pour leur eclat exceptionnel et leur provenance ethique.',
+    description: 'Diamants certifiés GIA, sélectionnés pour leur éclat exceptionnel et leur provenance éthique.',
     image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80',
   },
   {
-    name: 'Pierres Precieuses',
-    description: 'Rubis de Birmanie, saphirs du Cachemire, emeraudes de Colombie - les gemmes les plus convoitees.',
+    name: 'Pierres Précieuses',
+    description: 'Rubis de Birmanie, saphirs du Cachemire, émeraudes de Colombie - les gemmes les plus convoitées.',
     image: 'https://images.unsplash.com/photo-1551122087-f99a4f8a8b4a?w=600&q=80',
   },
   {
     name: 'Perles Fines',
-    description: 'Perles des mers du Sud et d\'Akoya, selectionnees pour leur lustre parfait et leur nacre immaculee.',
+    description: 'Perles des mers du Sud et d\'Akoya, sélectionnées pour leur lustre parfait et leur nacre immaculée.',
     image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80',
   },
 ];
@@ -151,7 +151,7 @@ const teamMembers = [
   },
   {
     name: 'Jean-Marc Lefebvre',
-    role: 'Maitre Joaillier',
+    role: 'Maître Joaillier',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
   },
   {
@@ -226,9 +226,9 @@ function HeroSection() {
           className="mx-auto mt-6 max-w-2xl font-sans text-body-lg font-light tracking-elegant text-white/90 md:text-xl"
           variants={fadeInUp}
         >
-          Trois generations d'excellence artisanale au service de la beaute.
+          Trois générations d'excellence artisanale au service de la beauté.
           <br className="hidden md:block" />
-          Une passion transmise, un heritage preserve.
+          Une passion transmise, un héritage préservé.
         </motion.p>
 
         {/* Decorative Line */}
@@ -251,7 +251,7 @@ function HeroSection() {
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           <span className="font-sans text-overline uppercase tracking-luxe">
-            Decouvrir
+            Découvrir
           </span>
           <svg
             className="h-5 w-5"
@@ -298,7 +298,7 @@ function TimelineSection() {
             className="font-serif text-heading-1 text-text-primary md:text-display-2"
             variants={fadeInUp}
           >
-            Les Grandes Etapes
+            Les Grandes Étapes
           </motion.h2>
           <motion.div
             className="mx-auto mt-6 h-px w-24 bg-hermes-500"
@@ -397,7 +397,7 @@ function CraftsmanshipSection() {
             >
               <span className="font-serif text-heading-3 text-white">37</span>
               <p className="font-sans text-caption text-white/90">
-                annees d'excellence
+                années d'excellence
               </p>
             </motion.div>
           </motion.div>
@@ -433,10 +433,10 @@ function CraftsmanshipSection() {
               className="mb-12 font-sans text-body-lg leading-elegant text-text-muted"
               variants={fadeInUp}
             >
-              Dans nos ateliers, chaque bijou nait de la rencontre entre
-              l'excellence artisanale et la vision creatrice de nos maitres
+              Dans nos ateliers, chaque bijou naît de la rencontre entre
+              l'excellence artisanale et la vision créatrice de nos maîtres
               joailliers. Une tradition d'excellence transmise depuis trois
-              generations.
+              générations.
             </motion.p>
 
             {/* Values Grid */}
@@ -489,20 +489,20 @@ function MaterialsSection() {
             className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
             variants={fadeInUp}
           >
-            La Quete de l'Excellence
+            La Quête de l'Excellence
           </motion.span>
           <motion.h2
             className="font-serif text-heading-1 text-text-primary md:text-display-2"
             variants={fadeInUp}
           >
-            Matieres Nobles
+            Matières Nobles
           </motion.h2>
           <motion.p
             className="mx-auto mt-6 max-w-2xl font-sans text-body-lg leading-elegant text-text-muted"
             variants={fadeInUp}
           >
-            Nous selectionnons avec une exigence absolue les materiaux les plus
-            precieux, issus des sources les plus ethiques au monde.
+            Nous sélectionnons avec une exigence absolue les matériaux les plus
+            précieux, issus des sources les plus éthiques au monde.
           </motion.p>
           <motion.div
             className="mx-auto mt-8 h-px w-24 bg-hermes-500"
@@ -573,14 +573,14 @@ function TeamSection() {
             className="font-serif text-heading-1 text-text-primary md:text-display-2"
             variants={fadeInUp}
           >
-            Notre Equipe
+            Notre Équipe
           </motion.h2>
           <motion.p
             className="mx-auto mt-6 max-w-2xl font-sans text-body-lg leading-elegant text-text-muted"
             variants={fadeInUp}
           >
-            Derriere chaque creation, des artisans passionnes qui consacrent leur
-            vie a l'excellence. Rencontrez les gardiens de notre savoir-faire.
+            Derrière chaque création, des artisans passionnés qui consacrent leur
+            vie à l'excellence. Rencontrez les gardiens de notre savoir-faire.
           </motion.p>
           <motion.div
             className="mx-auto mt-8 h-px w-24 bg-hermes-500"
@@ -692,16 +692,16 @@ function CTASection() {
             className="font-serif text-heading-1 text-white md:text-display-2"
             variants={fadeInUp}
           >
-            Decouvrez Nos Collections
+            Découvrez Nos Collections
           </motion.h2>
 
           <motion.p
             className="mx-auto mt-6 max-w-2xl font-sans text-body-lg leading-elegant text-white/80"
             variants={fadeInUp}
           >
-            Chaque piece de notre collection incarne des decennies de savoir-faire
-            et une passion inalterable pour la beaute. Laissez-vous seduire par
-            l'elegance intemporelle de nos creations.
+            Chaque pièce de notre collection incarne des décennies de savoir-faire
+            et une passion inaltérable pour la beauté. Laissez-vous séduire par
+            l'élégance intemporelle de nos créations.
           </motion.p>
 
           <motion.div

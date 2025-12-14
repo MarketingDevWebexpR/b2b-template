@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Page non trouvee | Maison Bijoux',
-  description: 'La page que vous recherchez n\'existe pas ou a ete deplacee.',
+  title: 'Page non trouvée | Maison Bijoux',
+  description: 'La page que vous recherchez n\'existe pas ou a été déplacée.',
   robots: {
     index: false,
     follow: false,
@@ -37,13 +37,13 @@ export default function NotFound() {
 
       {/* Title */}
       <h1 className="mb-4 text-center font-serif text-heading-2 text-luxury-cream md:text-heading-1">
-        Page non trouvee
+        Page non trouvée
       </h1>
 
       {/* Description */}
       <p className="mb-10 max-w-md text-center text-luxury-silver">
-        La page que vous recherchez n'existe pas ou a ete deplacee. Nous vous
-        invitons a retourner a l'accueil pour continuer votre exploration.
+        La page que vous recherchez n'existe pas ou a été déplacée. Nous vous
+        invitons à retourner à l'accueil pour continuer votre exploration.
       </p>
 
       {/* CTA Button */}
@@ -51,10 +51,10 @@ export default function NotFound() {
         href="/"
         className="group relative inline-flex items-center justify-center overflow-hidden bg-gold-gradient px-10 py-4 font-sans text-sm font-medium uppercase tracking-widest text-luxury-black transition-all duration-500 hover:shadow-luxury-lg"
       >
-        <span className="relative z-10">Retour a l'accueil</span>
+        <span className="relative z-10">Retour à l'accueil</span>
         <div className="absolute inset-0 -translate-x-full bg-gold-600 transition-transform duration-500 group-hover:translate-x-0" />
         <span className="absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-          Retour a l'accueil
+          Retour à l'accueil
         </span>
       </Link>
 

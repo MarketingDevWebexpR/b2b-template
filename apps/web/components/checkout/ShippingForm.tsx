@@ -44,7 +44,7 @@ const SAVED_ADDRESSES: SavedAddress[] = [
     lastName: 'Dupont',
     phone: '+33 1 42 68 53 00',
     address: '25 Rue de la Paix',
-    addressLine2: '3eme etage',
+    addressLine2: '3ème étage',
     city: 'Paris',
     postalCode: '75002',
     country: 'France',
@@ -57,17 +57,17 @@ const SAVED_ADDRESSES: SavedAddress[] = [
 const shippingSchema = z.object({
   firstName: z
     .string()
-    .min(2, 'Le prenom doit contenir au moins 2 caracteres'),
+    .min(2, 'Le prénom doit contenir au moins 2 caractères'),
   lastName: z
     .string()
-    .min(2, 'Le nom doit contenir au moins 2 caracteres'),
+    .min(2, 'Le nom doit contenir au moins 2 caractères'),
   phone: z
     .string()
-    .min(10, 'Veuillez entrer un numero de telephone valide')
-    .regex(/^[0-9+\s-]+$/, 'Format de telephone invalide'),
+    .min(10, 'Veuillez entrer un numéro de téléphone valide')
+    .regex(/^[0-9+\s-]+$/, 'Format de téléphone invalide'),
   address: z
     .string()
-    .min(5, 'Veuillez entrer une adresse complete'),
+    .min(5, 'Veuillez entrer une adresse complète'),
   addressLine2: z.string().optional(),
   city: z
     .string()
@@ -76,7 +76,7 @@ const shippingSchema = z.object({
     .string()
     .min(4, 'Code postal invalide')
     .regex(/^[0-9]{4,5}$/, 'Code postal invalide'),
-  country: z.string().min(2, 'Veuillez selectionner un pays'),
+  country: z.string().min(2, 'Veuillez sélectionner un pays'),
 });
 
 /**
@@ -255,7 +255,7 @@ export function ShippingForm({
           Adresse de livraison
         </h2>
         <p className="text-sm text-text-muted">
-          Vos bijoux seront livres a cette adresse de maniere securisee.
+          Vos bijoux seront livrés à cette adresse de manière sécurisée.
         </p>
       </div>
 
@@ -308,7 +308,7 @@ export function ShippingForm({
                   </span>
                   {addr.isDefault && (
                     <span className="text-xs px-2 py-0.5 bg-hermes-500/10 text-hermes-600 rounded-full">
-                      Par defaut
+                      Par défaut
                     </span>
                   )}
                 </div>
@@ -396,10 +396,10 @@ export function ShippingForm({
           {/* Name fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Prenom"
+              label="Prénom"
               name="firstName"
               type="text"
-              placeholder="Votre prenom"
+              placeholder="Votre prénom"
               value={formData.firstName}
               onChange={handleChange}
               error={errors.firstName}
@@ -428,7 +428,7 @@ export function ShippingForm({
 
           {/* Contact field */}
           <Input
-            label="Telephone"
+            label="Téléphone"
             name="phone"
             type="tel"
             placeholder="+33 6 12 34 56 78"
@@ -447,7 +447,7 @@ export function ShippingForm({
             label="Adresse"
             name="address"
             type="text"
-            placeholder="Numero et nom de rue"
+            placeholder="Numéro et nom de rue"
             value={formData.address}
             onChange={handleChange}
             error={errors.address}
@@ -460,10 +460,10 @@ export function ShippingForm({
 
           {/* Address line 2 (optional) */}
           <Input
-            label="Complement d'adresse"
+            label="Complément d'adresse"
             name="addressLine2"
             type="text"
-            placeholder="Appartement, batiment, etage... (optionnel)"
+            placeholder="Appartement, bâtiment, étage... (optionnel)"
             value={formData.addressLine2}
             onChange={handleChange}
             error={errors.addressLine2}
@@ -561,7 +561,7 @@ export function ShippingForm({
 
       {/* Security note */}
       <p className="text-xs text-text-muted text-center pt-2">
-        Vos informations sont protegees et ne seront jamais partagees.
+        Vos informations sont protégées et ne seront jamais partagées.
       </p>
     </form>
   );

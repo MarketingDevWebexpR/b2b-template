@@ -247,7 +247,7 @@ export function LuxuryAddToCartBar({
   // Button text based on state
   const buttonText = useMemo(() => {
     if (isLoading) return 'Ajout en cours...';
-    if (showSuccess) return 'Ajoute au panier';
+    if (showSuccess) return 'Ajouté au panier';
     if (isInCart) return `Dans le panier (${cartQuantity})`;
     return `Ajouter - ${formattedPrice}`;
   }, [isLoading, showSuccess, isInCart, cartQuantity, formattedPrice]);

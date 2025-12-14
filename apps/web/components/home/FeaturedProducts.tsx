@@ -40,9 +40,9 @@ const headerVariants = {
 export interface FeaturedProductsProps {
   /** Array of products to display */
   products: Product[];
-  /** Section title - defaults to "Pieces d'Exception" */
+  /** Section title - defaults to "Pièces d'Exception" */
   title?: string;
-  /** Section subtitle - defaults to "Selection exclusive" */
+  /** Section subtitle - defaults to "Sélection exclusive" */
   subtitle?: string;
   /** Section description */
   description?: string;
@@ -62,9 +62,9 @@ export interface FeaturedProductsProps {
 
 export function FeaturedProducts({
   products,
-  title = "Pieces d'Exception",
-  subtitle = 'Selection exclusive',
-  description = "Decouvrez notre selection de pieces d'exception, creees avec passion par nos maitres joailliers.",
+  title = "Pièces d'Exception",
+  subtitle = 'Sélection exclusive',
+  description = "Découvrez notre sélection de pièces d'exception, créées avec passion par nos maîtres joailliers.",
   viewAllLink = '/products',
   viewAllText = 'Voir tout',
   maxProducts = 8,
