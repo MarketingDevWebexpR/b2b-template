@@ -321,6 +321,70 @@ export const CART_TOKENS = {
 } as const;
 
 // =============================================================================
+// SKELETON LOADING TOKENS
+// =============================================================================
+
+/**
+ * Skeleton Loading System
+ *
+ * Elegant, luxury-grade skeleton loading placeholders.
+ * The color palette uses warm bone tones that complement the
+ * cream background (#fffcf7) for a cohesive premium feel.
+ *
+ * Shimmer animation creates a pearl-like luminescence effect
+ * rather than a harsh flash - subtle and sophisticated.
+ */
+export const SKELETON_TOKENS = {
+  // Base colors - warm bone tones
+  colors: {
+    base: '#f5f0e8',          // Warm bone - primary skeleton background
+    baseLight: '#faf7f2',     // Lighter variant for subtle elements
+    baseDark: '#ebe4d8',      // Darker variant for emphasis/images
+
+    // Shimmer gradient (pearl-like effect)
+    shimmerStart: '#f5f0e8',
+    shimmerMiddle: '#fffcf7', // Matches app background for seamless highlight
+    shimmerEnd: '#f5f0e8',
+
+    // Warm gold shimmer (premium variant)
+    shimmerGoldStart: '#f5f0e8',
+    shimmerGoldMiddle: '#fdf9f0',
+    shimmerGoldEnd: '#f5f0e8',
+
+    // Semantic mappings
+    text: '#f0ebe3',
+    image: '#ebe4d8',
+    button: '#ebe4d8',
+    card: '#faf7f2',
+  },
+
+  // Animation timing - slower = more luxurious
+  animation: {
+    duration: 1800,           // 1.8s cycle - leisurely, luxury pace
+    staggerDelay: 80,         // 80ms between items for cascade effect
+    gradientWidth: 0.35,      // 35% width shimmer band
+  },
+
+  // Border radius presets
+  radius: {
+    text: RADIUS.xs,          // 4px for text lines
+    image: RADIUS.md,         // 12px for images
+    button: RADIUS.xl,        // 20px for buttons
+    card: RADIUS.md,          // 12px for cards
+    circle: RADIUS.round,     // 9999px for circular elements
+  },
+
+  // Common skeleton dimensions
+  dimensions: {
+    textLineHeight: 14,
+    headingHeight: 24,
+    buttonHeight: 44,
+    imageAspectRatio: 1,      // Square images
+    cardPadding: SPACING.md,
+  },
+} as const;
+
+// =============================================================================
 // EXPORTS
 // =============================================================================
 
@@ -342,4 +406,5 @@ export default {
   SEARCH_TOKENS,
   SCANNER_TOKENS,
   CART_TOKENS,
+  SKELETON_TOKENS,
 };

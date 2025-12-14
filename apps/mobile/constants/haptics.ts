@@ -84,7 +84,7 @@ export interface HapticPatternConfig {
   /** Notification type (for notification type) */
   notificationType?: NotificationType;
   /** Sequence steps (for sequence type) */
-  sequence?: HapticSequenceStep[];
+  sequence?: readonly HapticSequenceStep[];
   /** Custom debounce time in ms (default: 50ms) */
   debounceMs?: number;
   /** Whether this pattern is iOS-only (Android fallback provided) */
@@ -1354,7 +1354,7 @@ const executeHapticStep = async (step: HapticSequenceStep): Promise<void> => {
  * Execute a haptic sequence with proper timing
  */
 const executeHapticSequence = async (
-  sequence: HapticSequenceStep[],
+  sequence: readonly HapticSequenceStep[],
   sequenceId: string
 ): Promise<void> => {
   if (Platform.OS === 'web') return;

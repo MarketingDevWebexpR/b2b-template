@@ -94,10 +94,10 @@ interface StepNodeProps {
 }
 
 function StepNode({ number, label, isCompleted, isCurrent, index }: StepNodeProps) {
-  // Animation shared values
+  // Animation shared values - initialize progress based on completion state
   const scale = useSharedValue(1);
-  const progress = useSharedValue(0);
-  const checkScale = useSharedValue(0);
+  const progress = useSharedValue(isCompleted ? 1 : 0);
+  const checkScale = useSharedValue(isCompleted ? 1 : 0);
   const glowOpacity = useSharedValue(0);
 
   useEffect(() => {
