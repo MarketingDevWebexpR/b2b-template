@@ -138,15 +138,16 @@ function StepNode({ number, label, isCompleted, isCurrent, index }: StepNodeProp
 
   // Animated circle style
   const circleStyle = useAnimatedStyle(() => {
+    // Completed and current steps should both be orange (hermes)
     const backgroundColor = interpolateColor(
       progress.value,
       [0, 1],
-      isCurrent ? [COLORS.hermes, COLORS.hermes] : [COLORS.sand, COLORS.success]
+      isCurrent ? [COLORS.hermes, COLORS.hermes] : [COLORS.sand, COLORS.hermes]
     );
     const borderColor = interpolateColor(
       progress.value,
       [0, 1],
-      isCurrent ? [COLORS.hermes, COLORS.hermes] : [COLORS.taupe, COLORS.success]
+      isCurrent ? [COLORS.hermes, COLORS.hermes] : [COLORS.taupe, COLORS.hermes]
     );
 
     return {
