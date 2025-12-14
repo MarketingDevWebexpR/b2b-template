@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Bold',
     fontSize: 32,
     color: COLORS.charcoal,
     letterSpacing: 0.5,

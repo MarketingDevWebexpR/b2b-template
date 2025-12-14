@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   },
 
   emptyTitle: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Bold',
     fontSize: 26,
     color: COLORS.charcoal,
     marginBottom: 12,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   },
 
   emptySubtitle: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Regular',
     fontSize: 15,
     color: COLORS.textMuted,
     textAlign: 'center',
@@ -312,9 +312,8 @@ const styles = StyleSheet.create({
   },
 
   emptyButtonText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-SemiBold',
     fontSize: 15,
-    fontWeight: '600',
     color: COLORS.white,
     letterSpacing: 0.3,
   },
@@ -327,14 +326,14 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Bold',
     fontSize: 32,
     color: COLORS.charcoal,
     letterSpacing: 0.3,
   },
 
   headerSubtitle: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: COLORS.textMuted,
     marginTop: 4,
@@ -366,7 +365,7 @@ const styles = StyleSheet.create({
   },
 
   shippingText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Regular',
     fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 8,
@@ -403,9 +402,8 @@ const styles = StyleSheet.create({
   },
 
   freeShippingText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Medium',
     fontSize: 14,
-    fontWeight: '500',
     color: COLORS.success,
   },
 
@@ -442,14 +440,14 @@ const styles = StyleSheet.create({
   },
 
   itemName: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Medium',
     fontSize: 16,
     color: COLORS.charcoal,
     lineHeight: 22,
   },
 
   itemCollection: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Regular',
     fontSize: 11,
     color: COLORS.hermes,
     textTransform: 'uppercase',
@@ -458,9 +456,8 @@ const styles = StyleSheet.create({
   },
 
   itemPrice: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-SemiBold',
     fontSize: 16,
-    fontWeight: '600',
     color: COLORS.hermes,
     marginTop: 4,
   },
@@ -525,13 +522,13 @@ const styles = StyleSheet.create({
   },
 
   summaryLabel: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: COLORS.textMuted,
   },
 
   summaryValue: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: COLORS.charcoal,
   },
@@ -551,13 +548,13 @@ const styles = StyleSheet.create({
   },
 
   totalLabel: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-SemiBold',
     fontSize: 18,
     color: COLORS.charcoal,
   },
 
   totalValue: {
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'PlayfairDisplay-Bold',
     fontSize: 20,
     color: COLORS.hermes,
   },
@@ -570,9 +567,8 @@ const styles = StyleSheet.create({
   },
 
   checkoutButtonText: {
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-SemiBold',
     fontSize: 16,
-    fontWeight: '600',
     color: COLORS.white,
     letterSpacing: 0.5,
   },
