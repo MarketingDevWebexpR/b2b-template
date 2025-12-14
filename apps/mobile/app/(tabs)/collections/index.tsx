@@ -1,8 +1,14 @@
-import { View, Text, FlatList, RefreshControl } from 'react-native';
+import { View, Text, FlatList, RefreshControl, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback } from 'react';
 import { CategoryCard } from '@/components/CategoryCard';
 import { useCategories } from '@/context/CategoryContext';
+
+const COLORS = {
+  background: '#fffcf7',
+  charcoal: '#2b333f',
+  muted: '#696969',
+};
 
 export default function CollectionsScreen() {
   const { categories, isLoading, refetch, getCategoryIndex } = useCategories();
@@ -12,10 +18,10 @@ export default function CollectionsScreen() {
   }, [refetch]);
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-6 pt-6 pb-4">
-        <Text className="font-serif text-3xl text-text-primary">Collections</Text>
-        <Text className="font-sans text-text-muted mt-1">
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Collections</Text>
+        <Text style={styles.headerSubtitle}>
           Découvrez nos créations par catégorie
         </Text>
       </View>
@@ -37,12 +43,12 @@ export default function CollectionsScreen() {
         }
         ListEmptyComponent={
           isLoading ? (
-            <View className="flex-1 items-center justify-center py-20">
-              <Text className="text-text-muted">Chargement...</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Chargement...</Text>
             </View>
           ) : (
-            <View className="flex-1 items-center justify-center py-20">
-              <Text className="text-text-muted">Aucune collection disponible</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Aucune collection disponible</Text>
             </View>
           )
         }
@@ -50,3 +56,38 @@ export default function CollectionsScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
+  },
+  headerTitle: {
+    fontFamily: 'PlayfairDisplay-Bold',
+    fontSize: 32,
+    color: COLORS.charcoal,
+    letterSpacing: 0.3,
+  },
+  headerSubtitle: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: COLORS.muted,
+    marginTop: 4,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+  emptyText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: COLORS.muted,
+  },
+});

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import {
@@ -16,6 +16,22 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 
+const COLORS = {
+  background: '#fffcf7',
+  backgroundBeige: '#fcf7f1',
+  charcoal: '#2b333f',
+  hermes: '#f67828',
+  hermesLight: '#fff7ed',
+  hermes100: '#fff7ed',
+  hermes500: '#f67828',
+  hermes600: '#ea580c',
+  white: '#ffffff',
+  muted: '#696969',
+  borderLight: '#f0ebe3',
+  danger: '#dc2626',
+  stone: '#b8a99a',
+};
+
 interface MenuItemProps {
   icon: typeof User;
   label: string;
@@ -27,14 +43,14 @@ interface MenuItemProps {
 
 function MenuItem({ icon: Icon, label, href, onPress, showChevron = true, danger }: MenuItemProps) {
   const content = (
-    <View className="flex-row items-center py-4 border-b border-border-light">
-      <View className="w-10 h-10 rounded-full bg-background-beige items-center justify-center">
-        <Icon size={20} color={danger ? '#dc2626' : '#696969'} />
+    <View style={styles.menuItem}>
+      <View style={styles.menuIconContainer}>
+        <Icon size={20} color={danger ? COLORS.danger : COLORS.muted} />
       </View>
-      <Text className={`flex-1 ml-3 font-sans ${danger ? 'text-red-600' : 'text-text-primary'}`}>
+      <Text style={[styles.menuLabel, danger && styles.menuLabelDanger]}>
         {label}
       </Text>
-      {showChevron && <ChevronRight size={20} color="#b8a99a" />}
+      {showChevron && <ChevronRight size={20} color={COLORS.stone} />}
     </View>
   );
 
@@ -59,7 +75,7 @@ export default function AccountScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView style={styles.container}>
         <LoadingAnimation variant="fullScreen" />
       </SafeAreaView>
     );
@@ -67,25 +83,25 @@ export default function AccountScreen() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
-        <View className="flex-1 items-center justify-center px-6">
-          <View className="w-20 h-20 rounded-full bg-background-beige items-center justify-center mb-6">
-            <User size={36} color="#696969" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.notAuthContainer}>
+          <View style={styles.notAuthIconContainer}>
+            <User size={36} color={COLORS.muted} />
           </View>
-          <Text className="font-serif text-2xl text-text-primary mb-2">Mon compte</Text>
-          <Text className="font-sans text-text-muted text-center mb-6">
+          <Text style={styles.notAuthTitle}>Mon compte</Text>
+          <Text style={styles.notAuthSubtitle}>
             Connectez-vous pour accéder à votre espace personnel
           </Text>
 
           <Link href="/(auth)/login" asChild>
-            <Pressable className="bg-hermes-500 px-8 py-4 rounded-soft w-full mb-3">
-              <Text className="text-white font-sans font-medium text-center">Se connecter</Text>
+            <Pressable style={styles.loginButton}>
+              <Text style={styles.loginButtonText}>Se connecter</Text>
             </Pressable>
           </Link>
 
           <Link href="/(auth)/register" asChild>
-            <Pressable className="border border-hermes-500 px-8 py-4 rounded-soft w-full">
-              <Text className="text-hermes-500 font-sans font-medium text-center">Créer un compte</Text>
+            <Pressable style={styles.registerButton}>
+              <Text style={styles.registerButtonText}>Créer un compte</Text>
             </Pressable>
           </Link>
         </View>
@@ -94,46 +110,46 @@ export default function AccountScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pt-6 pb-6">
-          <Text className="font-serif text-3xl text-text-primary">Mon compte</Text>
-          <View className="flex-row items-center mt-4">
-            <View className="w-14 h-14 rounded-full bg-hermes-100 items-center justify-center">
-              <Text className="font-serif text-xl text-hermes-600">
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Mon compte</Text>
+          <View style={styles.userRow}>
+            <View style={styles.avatarContainer}>
+              <Text style={styles.avatarText}>
                 {user?.name?.charAt(0) || 'U'}
               </Text>
             </View>
-            <View className="ml-4">
-              <Text className="font-serif text-lg text-text-primary">{user?.name}</Text>
-              <Text className="font-sans text-sm text-text-muted">{user?.email}</Text>
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>{user?.name}</Text>
+              <Text style={styles.userEmail}>{user?.email}</Text>
             </View>
           </View>
         </View>
 
         {/* Menu Items */}
-        <View className="px-6">
-          <Text className="font-sans text-xs text-text-muted uppercase tracking-wider mb-2">
+        <View style={styles.menuContainer}>
+          <Text style={styles.sectionTitle}>
             Mes achats
           </Text>
           <MenuItem icon={Package} label="Mes commandes" href="/orders" />
           <MenuItem icon={Heart} label="Mes favoris" href="/favorites" />
 
-          <Text className="font-sans text-xs text-text-muted uppercase tracking-wider mt-6 mb-2">
+          <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
             Mon compte
           </Text>
           <MenuItem icon={User} label="Informations personnelles" href="/profile" />
           <MenuItem icon={MapPin} label="Mes adresses" href="/addresses" />
           <MenuItem icon={CreditCard} label="Moyens de paiement" href="/payment-methods" />
 
-          <Text className="font-sans text-xs text-text-muted uppercase tracking-wider mt-6 mb-2">
+          <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
             Aide
           </Text>
           <MenuItem icon={HelpCircle} label="Centre d'aide" href="/help" />
           <MenuItem icon={Settings} label="Paramètres" href="/settings" />
 
-          <View className="mt-6 mb-8">
+          <View style={styles.logoutSection}>
             <MenuItem
               icon={LogOut}
               label="Se déconnecter"
@@ -147,3 +163,161 @@ export default function AccountScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+
+  // Header
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 24,
+  },
+  headerTitle: {
+    fontFamily: 'PlayfairDisplay-Bold',
+    fontSize: 32,
+    color: COLORS.charcoal,
+    letterSpacing: 0.3,
+  },
+  userRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  avatarContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.hermes100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    fontFamily: 'PlayfairDisplay-SemiBold',
+    fontSize: 20,
+    color: COLORS.hermes600,
+  },
+  userInfo: {
+    marginLeft: 16,
+  },
+  userName: {
+    fontFamily: 'PlayfairDisplay-Medium',
+    fontSize: 18,
+    color: COLORS.charcoal,
+  },
+  userEmail: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: COLORS.muted,
+    marginTop: 2,
+  },
+
+  // Menu
+  menuContainer: {
+    paddingHorizontal: 24,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
+  },
+  menuIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.backgroundBeige,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuLabel: {
+    flex: 1,
+    marginLeft: 12,
+    fontFamily: 'Inter-Regular',
+    fontSize: 15,
+    color: COLORS.charcoal,
+  },
+  menuLabelDanger: {
+    color: COLORS.danger,
+  },
+  sectionTitle: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 11,
+    color: COLORS.muted,
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+    marginBottom: 8,
+  },
+  sectionTitleSpaced: {
+    marginTop: 24,
+  },
+  logoutSection: {
+    marginTop: 24,
+    marginBottom: 32,
+  },
+
+  // Not authenticated
+  notAuthContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  notAuthIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.backgroundBeige,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  notAuthTitle: {
+    fontFamily: 'PlayfairDisplay-Bold',
+    fontSize: 26,
+    color: COLORS.charcoal,
+    marginBottom: 8,
+  },
+  notAuthSubtitle: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 15,
+    color: COLORS.muted,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  loginButton: {
+    backgroundColor: COLORS.hermes500,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    width: '100%',
+    marginBottom: 12,
+  },
+  loginButtonText: {
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 15,
+    color: COLORS.white,
+    textAlign: 'center',
+  },
+  registerButton: {
+    borderWidth: 1,
+    borderColor: COLORS.hermes500,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    width: '100%',
+  },
+  registerButtonText: {
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 15,
+    color: COLORS.hermes500,
+    textAlign: 'center',
+  },
+});
