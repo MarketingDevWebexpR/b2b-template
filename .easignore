@@ -1,0 +1,56 @@
+# EAS Build Ignore File for pnpm Monorepo
+# This file controls what gets uploaded to EAS Build servers
+
+# Exclude all node_modules - EAS will run pnpm install
+node_modules/
+
+# Exclude local development files
+.expo/
+.turbo/
+*.log
+*.local
+
+# Exclude generated files that will be recreated
+apps/mobile/ios/
+apps/mobile/android/
+apps/mobile/.expo/
+apps/web/.next/
+apps/web/out/
+
+# Exclude documentation (not needed for build)
+docs/
+*.md
+!README.md
+
+# Exclude test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+coverage/
+
+# Exclude editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclude git
+.git/
+
+# Exclude playwright
+.playwright-mcp/
+
+# Exclude local env files (use EAS secrets instead)
+.env*.local
+
+# Exclude local lock files
+package-lock.json
+
+# Keep these critical files (not ignored):
+# - pnpm-lock.yaml (required for reproducible builds)
+# - pnpm-workspace.yaml (defines workspace structure)
+# - .npmrc (pnpm configuration)
+# - packages/ (workspace packages)
+# - apps/mobile/ (the app being built)
