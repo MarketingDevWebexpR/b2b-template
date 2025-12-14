@@ -22,7 +22,7 @@ import { ShoppingBag, Check } from 'lucide-react-native';
 import { InlineLoader } from '@/components/LoadingAnimation';
 import { formatPrice } from '@bijoux/utils';
 import { springConfigs } from '../../constants/animations';
-import { hapticFeedback, debouncedHaptic } from '../../constants/haptics';
+import { hapticFeedback } from '../../constants/haptics';
 
 // Design tokens
 const COLORS = {
@@ -83,10 +83,6 @@ export function LuxuryAddToCartBar({
   const checkIconScale = useSharedValue(0);
   const loaderOpacity = useSharedValue(0);
 
-  // Animation values - Price
-  const priceScale = useSharedValue(1);
-  const priceOpacity = useSharedValue(1);
-
   // Start idle glow animation
   useEffect(() => {
     if (!isInCart && !isLoading && !showSuccess) {
@@ -115,20 +111,11 @@ export function LuxuryAddToCartBar({
     }
   }, [isInCart, isLoading, showSuccess]);
 
-  // Animate price when quantity changes
-  useEffect(() => {
-    priceScale.value = withSequence(
-      withTiming(1.08, { duration: 100 }),
-      withSpring(1, springConfigs.number)
-    );
-    debouncedHaptic(hapticFeedback.quantityChange);
-  }, [totalPrice]);
-
   // Handle button press
   const handlePressIn = useCallback(() => {
     if (disabled || isLoading) return;
     buttonScale.value = withSpring(0.96, springConfigs.button);
-    debouncedHaptic(hapticFeedback.addToCartPress);
+    hapticFeedback.addToCartPress();
     glowOpacity.value = withTiming(0, { duration: 100 });
   }, [disabled, isLoading]);
 
@@ -241,11 +228,6 @@ export function LuxuryAddToCartBar({
     opacity: loaderOpacity.value,
   }));
 
-  const priceStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: priceScale.value }],
-    opacity: priceOpacity.value,
-  }));
-
   // CHANGED: Button text - always show price, brief success message
   const buttonText = useMemo(() => {
     if (isLoading) return 'Ajout en cours...';
@@ -270,15 +252,7 @@ export function LuxuryAddToCartBar({
 
       {/* Content */}
       <View style={styles.content}>
-        {/* Price Section */}
-        <View style={styles.priceSection}>
-          <Text style={styles.priceLabel}>TOTAL</Text>
-          <Animated.Text style={[styles.priceValue, priceStyle]}>
-            {formattedPrice}
-          </Animated.Text>
-        </View>
-
-        {/* Add to Cart Button */}
+        {/* Add to Cart Button - Full Width */}
         <AnimatedPressable
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
@@ -370,37 +344,15 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 34,
-    gap: 16,
-  },
-
-  priceSection: {
-    minWidth: 100,
-    paddingTop: 8,
-  },
-
-  priceLabel: {
-    fontFamily: 'Inter',
-    fontSize: 11,
-    lineHeight: 14,
-    color: COLORS.stone,
-    letterSpacing: 1.5,
-    marginBottom: 4,
-  },
-
-  priceValue: {
-    fontFamily: 'PlayfairDisplay',
-    fontSize: 22,
-    lineHeight: 28,
-    color: COLORS.charcoal,
-    letterSpacing: 0.3,
   },
 
   button: {
     flex: 1,
+    width: '100%',
     height: 56,
     borderRadius: 28,
     overflow: 'hidden',
