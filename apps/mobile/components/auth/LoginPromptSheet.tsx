@@ -83,9 +83,9 @@ const SHEET_CONFIG = {
 /** French copy for the component */
 const COPY = {
   title: 'Finalisez votre commande',
-  subtitle: 'Connectez-vous pour proceder au paiement et suivre vos creations d\'exception.',
+  subtitle: 'Connectez-vous pour procéder au paiement et suivre vos créations d\'exception.',
   loginButton: 'Se connecter',
-  registerButton: 'Creer un compte',
+  registerButton: 'Créer un compte',
   dismissLink: 'Continuer mes achats',
 } as const;
 
@@ -94,7 +94,7 @@ const A11Y_LABELS = {
   sheet: 'Invite de connexion',
   closeButton: 'Fermer et continuer les achats',
   loginButton: 'Se connecter pour finaliser la commande',
-  registerButton: 'Creer un nouveau compte',
+  registerButton: 'Créer un nouveau compte',
   dismissLink: 'Fermer et continuer mes achats',
 } as const;
 
