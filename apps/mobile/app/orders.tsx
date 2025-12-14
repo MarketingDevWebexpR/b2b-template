@@ -242,9 +242,7 @@ function OrderCard({ order }: { order: Order }) {
 
   const handlePress = () => {
     hapticFeedback.listItemSelect();
-    // TODO: Navigate to order detail page
-    // router.push(`/orders/${order.id}`);
-    console.log('Navigate to order:', order.id);
+    router.push(`/orders/${order.id}`);
   };
 
   return (
