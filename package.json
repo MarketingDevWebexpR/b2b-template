@@ -2,7 +2,7 @@
   "name": "monorepo-bijoux",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -14,7 +14,13 @@
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "eas:build:dev": "eas build --profile development --platform ios",
+    "eas:build:preview": "eas build --profile preview --platform ios",
+    "eas:build:prod": "eas build --profile production --platform ios",
+    "eas:build:all": "eas build --profile production --platform all",
+    "eas:submit:ios": "eas submit --platform ios",
+    "eas:build:submit": "eas build --profile production --platform ios --auto-submit"
   },
   "devDependencies": {
     "prettier": "^3.4.0",
