@@ -61,7 +61,7 @@ export default function RootLayout() {
                   >
                     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                     <Stack.Screen
-                      name="product/[id]"
+                      name="product/[...id]"
                       options={{
                         headerShown: true,
                         headerTitle: '',

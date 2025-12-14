@@ -155,6 +155,12 @@ export function SearchBar({
     voiceButtonScale.value = withSpring(1, springConfigs.button);
   }, [voiceButtonScale]);
 
+  const handleVoicePress = useCallback(() => {
+    // Dismiss keyboard before opening voice search
+    Keyboard.dismiss();
+    onVoicePress?.();
+  }, [onVoicePress]);
+
   const handleCameraPressIn = useCallback(() => {
     cameraButtonScale.value = withSpring(0.85, springConfigs.button);
     debouncedHaptic(hapticFeedback.quantityButtonPress);
@@ -163,6 +169,12 @@ export function SearchBar({
   const handleCameraPressOut = useCallback(() => {
     cameraButtonScale.value = withSpring(1, springConfigs.button);
   }, [cameraButtonScale]);
+
+  const handleCameraPress = useCallback(() => {
+    // Dismiss keyboard before opening camera
+    Keyboard.dismiss();
+    onCameraPress?.();
+  }, [onCameraPress]);
 
   const handleFocus = useCallback(() => {
     debouncedHaptic(hapticFeedback.softConfirm);
@@ -308,7 +320,7 @@ export function SearchBar({
               style={[styles.actionButton, voiceButtonAnimatedStyle]}
               onPressIn={handleVoicePressIn}
               onPressOut={handleVoicePressOut}
-              onPress={onVoicePress}
+              onPress={handleVoicePress}
               hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
               accessibilityLabel="Recherche vocale"
               accessibilityRole="button"
@@ -325,7 +337,7 @@ export function SearchBar({
             style={[styles.actionButton, cameraButtonAnimatedStyle]}
             onPressIn={handleCameraPressIn}
             onPressOut={handleCameraPressOut}
-            onPress={onCameraPress}
+            onPress={handleCameraPress}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 10 }}
             accessibilityLabel="Scanner un code-barres"
             accessibilityRole="button"

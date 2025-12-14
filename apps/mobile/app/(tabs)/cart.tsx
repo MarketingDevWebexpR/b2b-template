@@ -43,6 +43,15 @@ const COLORS = {
   danger: '#dc2626',
 };
 
+const DEFAULT_PRODUCT_IMAGE =
+  'https://images.unsplash.com/photo-1561828995-aa79a2db86dd?ixlib=rb-4.1.0&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max';
+
+// Helper to get valid image URL
+function getProductImage(images: string[] | undefined): string {
+  const firstImage = images?.[0];
+  return (firstImage && firstImage.trim() !== '') ? firstImage : DEFAULT_PRODUCT_IMAGE;
+}
+
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function CartScreen() {
@@ -185,7 +194,7 @@ export default function CartScreen() {
               style={styles.itemImageContainer}
             >
               <Image
-                source={{ uri: item.product.images[0] || 'https://via.placeholder.com/100' }}
+                source={{ uri: getProductImage(item.product.images) }}
                 style={styles.itemImage}
                 resizeMode="cover"
               />

@@ -105,6 +105,15 @@ const DEFAULT_FILTERS: FilterState = {
   sortBy: 'relevance',
 };
 
+// Get initials from category name (max 2 characters)
+function getCategoryInitials(name: string): string {
+  const words = name.trim().split(/\s+/);
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+}
+
 // Category Quick Filter Component
 function CategoryQuickFilter({
   category,
@@ -132,16 +141,7 @@ function CategoryQuickFilter({
     transform: [{ scale: scale.value }],
   }));
 
-  // Category images (placeholder, would come from API)
-  const categoryImages: Record<string, string> = {
-    'bagues': 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200&q=80',
-    'colliers': 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=200&q=80',
-    'bracelets': 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=200&q=80',
-    'boucles': 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=200&q=80',
-    'montres': 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=200&q=80',
-  };
-
-  const imageUrl = categoryImages[category.slug] || category.image || DEFAULT_PRODUCT_IMAGE;
+  const initials = getCategoryInitials(category.name);
 
   return (
     <AnimatedPressable
@@ -156,13 +156,10 @@ function CategoryQuickFilter({
       <Animated.View
         entering={FadeInDown.delay(index * 60).duration(400)}
       >
-        <View style={[styles.categoryImageContainer, isSelected && styles.categoryImageSelected]}>
-          <Image
-            source={{ uri: imageUrl }}
-            style={styles.categoryImage}
-            resizeMode="cover"
-            accessibilityIgnoresInvertColors
-          />
+        <View style={[styles.categoryInitialsContainer, isSelected && styles.categoryInitialsSelected]}>
+          <Text style={[styles.categoryInitialsText, isSelected && styles.categoryInitialsTextSelected]}>
+            {initials}
+          </Text>
           {isSelected && (
             <Animated.View entering={FadeIn.duration(200)} style={styles.categorySelectedOverlay}>
               <View style={styles.categoryCheckmark}>
@@ -963,28 +960,37 @@ const styles = StyleSheet.create({
     width: CATEGORY_CARD_WIDTH,
   },
 
-  categoryImageContainer: {
+  categoryInitialsContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
     overflow: 'hidden',
-    backgroundColor: COLORS.sand,
+    backgroundColor: '#fff7ed', // Very light orange
     borderWidth: 2,
     borderColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  categoryImageSelected: {
+  categoryInitialsSelected: {
     borderColor: COLORS.hermes,
+    backgroundColor: '#ffedd5', // Slightly darker when selected
   },
 
-  categoryImage: {
-    width: '100%',
-    height: '100%',
+  categoryInitialsText: {
+    fontFamily: 'PlayfairDisplay-Bold',
+    fontSize: 24,
+    color: COLORS.hermes,
+    letterSpacing: 1,
+  },
+
+  categoryInitialsTextSelected: {
+    color: COLORS.hermes,
   },
 
   categorySelectedOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(246, 120, 40, 0.4)',
+    backgroundColor: 'rgba(246, 120, 40, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
