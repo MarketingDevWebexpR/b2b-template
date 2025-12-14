@@ -23,9 +23,6 @@
       "config": {
         "usesNonExemptEncryption": false
       },
-      "entitlements": {
-        "com.apple.developer.in-app-payments": ["merchant.com.maisonbijoux.app"]
-      },
       "infoPlist": {
         "NSCameraUsageDescription": "Maison Bijoux utilise la camera pour scanner les codes-barres et QR codes de vos bijoux preferes.",
         "NSMicrophoneUsageDescription": "Maison Bijoux utilise le microphone pour la recherche vocale de produits.",
@@ -104,9 +101,8 @@
       [
         "@stripe/stripe-react-native",
         {
-          "merchantIdentifier": "merchant.com.maisonbijoux.app",
           "enableGooglePay": false,
-          "enableApplePay": true
+          "enableApplePay": false
         }
       ]
     ],
