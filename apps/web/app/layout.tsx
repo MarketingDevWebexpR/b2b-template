@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Playfair_Display, Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
 import { Providers } from '@/context/Providers';
 import './globals.css';
 
@@ -123,6 +124,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     >
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );

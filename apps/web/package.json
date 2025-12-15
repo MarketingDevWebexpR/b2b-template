@@ -11,11 +11,12 @@
     "clean": "rm -rf .next node_modules"
   },
   "dependencies": {
+    "@bijoux/config-tailwind": "workspace:*",
     "@bijoux/types": "workspace:*",
     "@bijoux/utils": "workspace:*",
-    "@bijoux/config-tailwind": "workspace:*",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.5.3",
+    "@vercel/analytics": "^1.6.1",
     "clsx": "^2.1.0",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.350.0",
