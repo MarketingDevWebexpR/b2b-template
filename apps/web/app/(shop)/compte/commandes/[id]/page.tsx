@@ -447,14 +447,14 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <div className="space-y-3">
                 <button
                   type="button"
-                  className="flex w-full items-center justify-center gap-2 border border-border-light bg-white px-6 py-3 font-sans text-body-sm uppercase tracking-luxe text-text-secondary transition-all duration-300 hover:border-hermes-500/30 hover:text-hermes-500"
+                  className="flex w-full items-center justify-center gap-2 rounded-soft border border-border-light bg-white px-6 py-3 font-sans text-body-sm uppercase tracking-luxe text-text-secondary transition-all duration-300 hover:border-hermes-500/30 hover:text-hermes-500"
                 >
                   <FileText className="h-4 w-4" strokeWidth={1.5} />
                   Voir la facture
                 </button>
                 <button
                   type="button"
-                  className="flex w-full items-center justify-center gap-2 border border-border-light bg-white px-6 py-3 font-sans text-body-sm uppercase tracking-luxe text-text-secondary transition-all duration-300 hover:border-hermes-500/30 hover:text-hermes-500"
+                  className="flex w-full items-center justify-center gap-2 rounded-soft border border-border-light bg-white px-6 py-3 font-sans text-body-sm uppercase tracking-luxe text-text-secondary transition-all duration-300 hover:border-hermes-500/30 hover:text-hermes-500"
                 >
                   <Download className="h-4 w-4" strokeWidth={1.5} />
                   Telecharger le recu

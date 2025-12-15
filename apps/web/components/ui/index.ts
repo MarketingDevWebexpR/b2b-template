@@ -93,3 +93,7 @@ export type {
   InlineAlertProps,
   ToastAlertProps,
 } from './Alert';
+
+// SageSyncBadge (ERP sync status indicator)
+export { SageSyncBadge } from './SageSyncBadge';
+export type { SageSyncBadgeProps, SyncStatus } from './SageSyncBadge';

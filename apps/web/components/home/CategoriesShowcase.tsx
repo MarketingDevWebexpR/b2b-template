@@ -38,7 +38,7 @@ function CategoryCard({ category, index }: CategoryCardProps) {
     <motion.div variants={itemVariants} className="h-full">
       <Link
         href={`/collections/${category.slug}`}
-        className="group relative flex h-[200px] flex-col border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant"
+        className="group relative flex h-[200px] flex-col rounded-soft border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant overflow-hidden"
         aria-label={`Découvrir la collection ${category.name}`}
       >
         {/* Index number */}
@@ -136,7 +136,7 @@ export function CategoriesShowcase({ categories }: CategoriesShowcaseProps) {
         >
           <Link
             href="/collections"
-            className="group inline-flex items-center gap-3 border border-hermes-500 bg-transparent px-8 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-hermes-500 transition-all duration-400 hover:bg-hermes-500 hover:text-white"
+            className="group inline-flex items-center gap-3 rounded-soft border border-hermes-500 bg-transparent px-8 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-hermes-500 transition-all duration-400 hover:bg-hermes-500 hover:text-white"
           >
             <span>Voir toutes les collections</span>
             <ArrowUpRight

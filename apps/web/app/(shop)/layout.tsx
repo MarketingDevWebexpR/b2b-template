@@ -1,5 +1,6 @@
 import { Header, Footer } from '@/components/layout';
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar';
+import { SageSyncBadge } from '@/components/ui/SageSyncBadge';
 
 interface ShopLayoutProps {
   children: React.ReactNode;
@@ -26,6 +27,9 @@ export default function ShopLayout({ children }: ShopLayoutProps) {
 
       {/* Site footer */}
       <Footer />
+
+      {/* Sage ERP sync status indicator */}
+      <SageSyncBadge />
     </div>
   );
 }

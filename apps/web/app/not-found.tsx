@@ -49,7 +49,7 @@ export default function NotFound() {
       {/* CTA Button */}
       <Link
         href="/"
-        className="group relative inline-flex items-center justify-center overflow-hidden bg-hermes-500 px-10 py-4 font-sans text-sm font-medium uppercase tracking-widest text-luxe-white transition-all duration-500 hover:shadow-lg"
+        className="group relative inline-flex items-center justify-center overflow-hidden rounded-soft bg-hermes-500 px-10 py-4 font-sans text-sm font-medium uppercase tracking-widest text-luxe-white transition-all duration-500 hover:shadow-lg"
       >
         <span className="relative z-10">Retour à l'accueil</span>
         <div className="absolute inset-0 -translate-x-full bg-hermes-600 transition-transform duration-500 group-hover:translate-x-0" />

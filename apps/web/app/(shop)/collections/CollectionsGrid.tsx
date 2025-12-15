@@ -38,7 +38,7 @@ function CollectionCard({ category, index }: CollectionCardProps) {
     <motion.div variants={itemVariants}>
       <Link
         href={`/collections/${category.slug}`}
-        className="group relative flex h-[200px] flex-col border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant"
+        className="group relative flex h-[200px] flex-col rounded-soft border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant overflow-hidden"
         aria-label={`Découvrir la collection ${category.name}`}
       >
         {/* Index number */}

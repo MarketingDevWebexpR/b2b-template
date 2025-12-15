@@ -182,7 +182,7 @@ export function ProductInfo({ product, onAddToCart, className }: ProductInfoProp
           onClick={handleAddToCart}
           disabled={isOutOfStock || isAdding}
           className={cn(
-            'w-full py-4 px-8 font-sans text-sm font-medium uppercase tracking-luxe',
+            'w-full py-4 px-8 font-sans text-sm font-medium uppercase tracking-luxe rounded-soft',
             'transition-all duration-300',
             'focus:outline-none focus:ring-2 focus:ring-hermes-500 focus:ring-offset-2',
             isOutOfStock

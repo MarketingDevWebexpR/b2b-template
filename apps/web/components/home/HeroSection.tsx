@@ -100,19 +100,12 @@ export function HeroSection() {
           >
             {/* Primary Button - Hermes Orange */}
             <Link
-              href="/products"
-              className="group relative inline-flex min-w-[200px] items-center justify-center overflow-hidden bg-hermes-500 px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:bg-hermes-600 hover:shadow-button-hover"
+              href="/collections"
+              className="group relative inline-flex min-w-[200px] items-center justify-center overflow-hidden rounded-soft bg-hermes-500 px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:bg-hermes-600 hover:shadow-button-hover"
             >
               <span className="relative z-10">Découvrir</span>
             </Link>
 
-            {/* Secondary Button - White Outline */}
-            <Link
-              href="/categories"
-              className="group relative inline-flex min-w-[200px] items-center justify-center overflow-hidden border border-white/80 bg-white/10 px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white backdrop-blur-sm transition-all duration-400 hover:bg-white hover:text-luxe-charcoal"
-            >
-              <span className="relative z-10">Collections</span>
-            </Link>
           </motion.div>
 
           {/* Decorative Line */}

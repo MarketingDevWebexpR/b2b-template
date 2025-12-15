@@ -233,7 +233,7 @@ export default async function OrdersPage() {
               </p>
               <Link
                 href="/collections"
-                className="inline-flex items-center gap-2 border border-hermes-500 bg-hermes-500 px-8 py-3 font-sans text-body-sm font-medium uppercase tracking-luxe text-white transition-all duration-300 hover:bg-hermes-600"
+                className="inline-flex items-center gap-2 rounded-soft border border-hermes-500 bg-hermes-500 px-8 py-3 font-sans text-body-sm font-medium uppercase tracking-luxe text-white transition-all duration-300 hover:bg-hermes-600"
               >
                 Decouvrir nos Collections
               </Link>

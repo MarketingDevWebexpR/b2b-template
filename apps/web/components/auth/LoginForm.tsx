@@ -262,7 +262,7 @@ export function LoginForm() {
           href="/register"
           className="text-gold-500 hover:text-gold-400 transition-colors"
         >
-          Creer un compte
+          Créer un compte
         </Link>
       </p>
     </form>

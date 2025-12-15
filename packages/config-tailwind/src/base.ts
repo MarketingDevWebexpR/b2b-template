@@ -80,9 +80,13 @@ export const baseConfig: Partial<Config> = {
         '96': '24rem',
       },
       borderRadius: {
-        soft: '0.375rem',
-        elegant: '0.5rem',
-        luxe: '0.75rem',
+        xs: '0.25rem',      // 4px
+        soft: '0.5rem',     // 8px - aligned with mobile
+        elegant: '0.75rem', // 12px - aligned with mobile (card radius)
+        luxe: '1rem',       // 16px
+        xl: '1.25rem',      // 20px - chip radius
+        xxl: '1.5rem',      // 24px - modal radius
+        pill: '1.75rem',    // 28px - pill button radius
       },
       fontSize: {
         'display-hero': ['5rem', { lineHeight: '1.05', letterSpacing: '-0.03em', fontWeight: '300' }],
@@ -158,9 +162,13 @@ export const designTokens = {
     '2xl': 48,
   },
   radii: {
-    sm: 4,
-    md: 8,
-    lg: 12,
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+    xxl: 24,
+    pill: 28,
     full: 9999,
   },
 } as const;

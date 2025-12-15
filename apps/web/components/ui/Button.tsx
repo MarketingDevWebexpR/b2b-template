@@ -78,7 +78,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           // Base styles
           'relative inline-flex items-center justify-center',
           'font-sans font-medium tracking-wide',
-          'rounded-none', // Sharp edges for luxury aesthetic
+          'rounded-soft', // Soft rounded corners aligned with mobile
           'transition-all duration-300 ease-luxury',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 focus-visible:ring-offset-luxury-black',
           'disabled:cursor-not-allowed disabled:opacity-70',

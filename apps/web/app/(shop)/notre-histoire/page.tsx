@@ -716,7 +716,7 @@ function CTASection() {
             {/* Primary CTA */}
             <Link
               href="/products"
-              className="group inline-flex min-w-[220px] items-center justify-center gap-3 bg-hermes-500 px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:bg-hermes-600 hover:shadow-button-hover"
+              className="group inline-flex min-w-[220px] items-center justify-center gap-3 rounded-soft bg-hermes-500 px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:bg-hermes-600 hover:shadow-button-hover"
             >
               <span>Voir les Collections</span>
               <ArrowRight
@@ -728,7 +728,7 @@ function CTASection() {
             {/* Secondary CTA */}
             <Link
               href="/contact"
-              className="group inline-flex min-w-[220px] items-center justify-center gap-3 border border-white/40 bg-transparent px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:border-white hover:bg-white/10"
+              className="group inline-flex min-w-[220px] items-center justify-center gap-3 rounded-soft border border-white/40 bg-transparent px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:border-white hover:bg-white/10"
             >
               <span>Nous Contacter</span>
             </Link>

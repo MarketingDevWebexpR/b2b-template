@@ -39,7 +39,7 @@ export default function LoginPage() {
             href="/register"
             className="text-gold-500 hover:text-gold-400 transition-colors font-medium"
           >
-            Creer un compte
+            Créer un compte
           </Link>
         </p>
       </div>

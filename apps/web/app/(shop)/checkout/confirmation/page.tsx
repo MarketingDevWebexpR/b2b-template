@@ -206,13 +206,13 @@ function ConfirmationContent() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/compte/commandes"
-            className="inline-flex items-center justify-center px-8 py-4 bg-luxe-charcoal !text-white font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-hermes-500"
+            className="inline-flex items-center justify-center px-8 py-4 rounded-soft bg-luxe-charcoal !text-white font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-hermes-500"
           >
             Mes commandes
           </Link>
           <Link
             href="/collections"
-            className="inline-flex items-center justify-center px-8 py-4 border border-luxe-charcoal text-text-primary font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-luxe-charcoal hover:text-white"
+            className="inline-flex items-center justify-center px-8 py-4 rounded-soft border border-luxe-charcoal text-text-primary font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-luxe-charcoal hover:text-white"
           >
             Continuer mes achats
           </Link>
@@ -497,14 +497,14 @@ function ConfirmationContent() {
       >
         <Link
           href="/compte/commandes"
-          className="inline-flex items-center justify-center px-8 py-4 border border-luxe-charcoal text-text-primary font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-luxe-charcoal hover:text-white"
+          className="inline-flex items-center justify-center px-8 py-4 rounded-soft border border-luxe-charcoal text-text-primary font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-luxe-charcoal hover:text-white"
         >
           <Clock className="w-4 h-4 mr-2" />
           Suivre ma commande
         </Link>
         <Link
           href="/collections"
-          className="inline-flex items-center justify-center px-8 py-4 bg-luxe-charcoal !text-white font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-hermes-500"
+          className="inline-flex items-center justify-center px-8 py-4 rounded-soft bg-luxe-charcoal !text-white font-sans text-sm uppercase tracking-luxe font-medium transition-all duration-300 hover:bg-hermes-500"
         >
           Continuer mes achats
           <ArrowRight className="w-4 h-4 ml-2" />

@@ -124,7 +124,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               'font-sans',
               'bg-luxury-charcoal text-luxury-pearl',
               'border border-luxury-gray',
-              'rounded-none', // Sharp edges for luxury aesthetic
+              'rounded-soft', // Soft rounded corners aligned with mobile
               'placeholder:text-luxury-silver',
               'transition-all duration-300 ease-luxury',
               // Focus styles

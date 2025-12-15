@@ -189,7 +189,7 @@ export function AboutSection() {
             <motion.div className="mt-10" variants={itemVariants}>
               <Link
                 href="/about"
-                className="group inline-flex items-center gap-3 border border-hermes-500 bg-transparent px-8 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-hermes-500 transition-all duration-400 hover:bg-hermes-500 hover:text-white"
+                className="group inline-flex items-center gap-3 rounded-soft border border-hermes-500 bg-transparent px-8 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-hermes-500 transition-all duration-400 hover:bg-hermes-500 hover:text-white"
               >
                 <span>Découvrir notre histoire</span>
                 <ArrowRight
