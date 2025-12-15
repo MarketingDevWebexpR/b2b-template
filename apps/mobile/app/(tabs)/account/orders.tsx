@@ -1,6 +1,5 @@
 import { View, Text, FlatList, Pressable, Image } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useRouter, Link } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import { useEffect } from 'react';
 import { Package, Clock, Truck, CheckCircle, ChevronRight, AlertCircle } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
@@ -352,20 +351,9 @@ export default function OrdersScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            headerTitle: 'Mes commandes',
-            headerBackTitle: 'Retour',
-            headerStyle: { backgroundColor: '#fffcf7' },
-            headerTintColor: '#2b333f',
-          }}
-        />
-        <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <OrdersSkeleton count={3} />
-        </SafeAreaView>
-      </>
+      <View className="flex-1 bg-background">
+        <OrdersSkeleton count={3} />
+      </View>
     );
   }
 
@@ -379,21 +367,11 @@ export default function OrdersScreen() {
   const orders = mockOrders;
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: 'Mes commandes',
-          headerBackTitle: 'Retour',
-          headerStyle: { backgroundColor: '#fffcf7' },
-          headerTintColor: '#2b333f',
-        }}
-      />
-      <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-        {orders.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <FlatList
+    <View className="flex-1 bg-background">
+      {orders.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <FlatList
             data={orders}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => <OrderCard order={item} />}
@@ -401,16 +379,15 @@ export default function OrdersScreen() {
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <View className="mb-4">
-                <Text className="font-serif text-3xl text-text-primary">Mes commandes</Text>
-                <Text className="font-sans text-text-muted mt-1">
+                <Text className="font-serif text-2xl text-text-primary">Mes commandes</Text>
+                <Text className="font-sans text-sm text-text-muted mt-2">
                   {orders.length} commande{orders.length > 1 ? 's' : ''}
                 </Text>
               </View>
             }
-            ListFooterComponent={<View className="h-4" />}
-          />
-        )}
-      </SafeAreaView>
-    </>
+          ListFooterComponent={<View className="h-4" />}
+        />
+      )}
+    </View>
   );
 }

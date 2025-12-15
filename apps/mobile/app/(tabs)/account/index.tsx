@@ -1,5 +1,4 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import {
   User,
@@ -77,15 +76,15 @@ export default function AccountScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <AccountSkeleton />
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.notAuthContainer}>
           <View style={styles.notAuthIconContainer}>
             <User size={36} color={COLORS.muted} />
@@ -107,12 +106,12 @@ export default function AccountScreen() {
             </Pressable>
           </Link>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -135,21 +134,21 @@ export default function AccountScreen() {
           <Text style={styles.sectionTitle}>
             Mes achats
           </Text>
-          <MenuItem icon={Package} label="Mes commandes" href="/orders" />
-          <MenuItem icon={Heart} label="Mes favoris" href="/favorites" />
+          <MenuItem icon={Package} label="Mes commandes" href="/(tabs)/account/orders" />
+          <MenuItem icon={Heart} label="Mes favoris" href="/(tabs)/account/favorites" />
 
           <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
             Mon compte
           </Text>
-          <MenuItem icon={User} label="Informations personnelles" href="/profile" />
-          <MenuItem icon={MapPin} label="Mes adresses" href="/addresses" />
-          <MenuItem icon={CreditCard} label="Moyens de paiement" href="/payment-methods" />
+          <MenuItem icon={User} label="Informations personnelles" href="/(tabs)/account/profile" />
+          <MenuItem icon={MapPin} label="Mes adresses" href="/(tabs)/account/addresses" />
+          <MenuItem icon={CreditCard} label="Moyens de paiement" href="/(tabs)/account/payment-methods" />
 
           <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
             Aide
           </Text>
-          <MenuItem icon={HelpCircle} label="Centre d'aide" href="/help" />
-          <MenuItem icon={Settings} label="Paramètres" href="/settings" />
+          <MenuItem icon={HelpCircle} label="Centre d'aide" href="/(tabs)/account/help" />
+          <MenuItem icon={Settings} label="Paramètres" href="/(tabs)/account/settings" />
 
           <View style={styles.logoutSection}>
             <MenuItem
@@ -162,7 +161,7 @@ export default function AccountScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

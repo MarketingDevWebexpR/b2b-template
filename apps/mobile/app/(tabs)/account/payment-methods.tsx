@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, FlatList, Pressable, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useRouter, Link } from 'expo-router';
-import { CreditCard, Plus, Check, Shield, Trash2, ChevronLeft } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { CreditCard, Plus, Check, Shield, Trash2 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { ListSkeleton } from '@/components/skeleton';
 import { hapticFeedback } from '@/constants/haptics';
@@ -341,20 +340,9 @@ export default function PaymentMethodsScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            headerTitle: 'Moyens de paiement',
-            headerBackTitle: 'Retour',
-            headerStyle: { backgroundColor: '#fffcf7' },
-            headerTintColor: '#2b333f',
-          }}
-        />
-        <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <ListSkeleton titleWidth={180} itemCount={3} variant="card" />
-        </SafeAreaView>
-      </>
+      <View className="flex-1 bg-background">
+        <ListSkeleton titleWidth={180} itemCount={3} variant="card" />
+      </View>
     );
   }
 
@@ -364,21 +352,11 @@ export default function PaymentMethodsScreen() {
   }
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: 'Moyens de paiement',
-          headerBackTitle: 'Retour',
-          headerStyle: { backgroundColor: '#fffcf7' },
-          headerTintColor: '#2b333f',
-        }}
-      />
-      <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-        {paymentMethods.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <FlatList
+    <View className="flex-1 bg-background">
+      {paymentMethods.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <FlatList
             data={paymentMethods}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -392,24 +370,23 @@ export default function PaymentMethodsScreen() {
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <View className="mb-4">
-                <Text className="font-serif text-3xl text-text-primary">
+                <Text className="font-serif text-2xl text-text-primary">
                   Moyens de paiement
                 </Text>
-                <Text className="font-sans text-text-muted mt-1">
+                <Text className="font-sans text-sm text-text-muted mt-2">
                   {paymentMethods.length} carte{paymentMethods.length > 1 ? 's' : ''} enregistrée{paymentMethods.length > 1 ? 's' : ''}
                 </Text>
               </View>
             }
-            ListFooterComponent={
-              <View>
-                <AddPaymentMethodButton />
-                <SecurityNote />
-                <View className="h-8" />
-              </View>
-            }
-          />
-        )}
-      </SafeAreaView>
-    </>
+          ListFooterComponent={
+            <View>
+              <AddPaymentMethodButton />
+              <SecurityNote />
+              <View className="h-8" />
+            </View>
+          }
+        />
+      )}
+    </View>
   );
 }

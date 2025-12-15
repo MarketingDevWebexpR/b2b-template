@@ -1,5 +1,4 @@
 import { View, Text, FlatList, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { Heart } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
@@ -18,16 +17,16 @@ export default function FavoritesScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-1 bg-background">
         <FavoritesSkeleton productCount={4} />
-      </SafeAreaView>
+      </View>
     );
   }
 
   // Unauthenticated state
   if (!isAuthenticated) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-1 bg-background">
         <View className="flex-1 items-center justify-center px-6">
           <View className="w-20 h-20 rounded-full bg-background-beige items-center justify-center mb-6">
             <Heart size={36} color="#696969" />
@@ -49,17 +48,17 @@ export default function FavoritesScreen() {
             </Pressable>
           </Link>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // Empty state - no favorites
   if (favoriteProducts.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
-        <View className="px-6 pt-6 pb-4">
-          <Text className="font-serif text-3xl text-text-primary">Mes favoris</Text>
-          <Text className="font-sans text-text-muted mt-1">0 article</Text>
+      <View className="flex-1 bg-background">
+        <View className="px-6 pt-4 pb-4">
+          <Text className="font-serif text-2xl text-text-primary">Mes favoris</Text>
+          <Text className="font-sans text-sm text-text-muted mt-2">0 article</Text>
         </View>
 
         <View className="flex-1 items-center justify-center px-6">
@@ -78,16 +77,16 @@ export default function FavoritesScreen() {
             </Pressable>
           </Link>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // Favorites list
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <View className="px-6 pt-6 pb-4">
-        <Text className="font-serif text-3xl text-text-primary">Mes favoris</Text>
-        <Text className="font-sans text-text-muted mt-1">
+    <View className="flex-1 bg-background">
+      <View className="px-6 pt-4 pb-4">
+        <Text className="font-serif text-2xl text-text-primary">Mes favoris</Text>
+        <Text className="font-sans text-sm text-text-muted mt-2">
           {favoriteProducts.length} article{favoriteProducts.length > 1 ? 's' : ''}
         </Text>
       </View>
@@ -110,6 +109,6 @@ export default function FavoritesScreen() {
           </View>
         }
       />
-    </SafeAreaView>
+    </View>
   );
 }

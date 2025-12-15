@@ -4,12 +4,14 @@ import { Link, useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { hapticFeedback } from '@/constants/haptics';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const { signIn } = useAuth();
+  const { showWelcomeToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,12 +28,26 @@ export default function LoginScreen() {
 
       if (result.success) {
         hapticFeedback.success();
+
+        // Get user name from the result
+        const userName = result.user?.name || email.split('@')[0].replace(/[._]/g, ' ');
+
+        // Navigate first
         if (returnTo) {
           // @ts-expect-error - dynamic route from returnTo param
           router.replace(returnTo);
         } else {
           router.replace('/(tabs)');
         }
+
+        // Show welcome toast with a slight delay to allow navigation to complete
+        setTimeout(() => {
+          showWelcomeToast({
+            userName: userName,
+            tagline: 'Votre experience joailliere vous attend',
+            autoDismissMs: 3500,
+          });
+        }, 500);
       } else {
         hapticFeedback.error();
         setError(result.error || 'Email ou mot de passe incorrect');

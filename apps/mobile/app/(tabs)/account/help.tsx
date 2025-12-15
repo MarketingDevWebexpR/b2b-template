@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   HelpCircle,
@@ -10,7 +9,6 @@ import {
   Mail,
   Phone,
   Clock,
-  ChevronLeft,
   Package,
   RotateCcw,
   CreditCard,
@@ -220,30 +218,15 @@ export default function HelpScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+    <View className="flex-1 bg-background">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View className="px-6 pt-4 pb-6">
-          <Pressable
-            onPress={() => {
-              hapticFeedback.navigation();
-              router.back();
-            }}
-            className="flex-row items-center mb-4"
-          >
-            <ChevronLeft size={24} color="#1a1a1a" />
-            <Text className="font-sans text-text-primary ml-1">Retour</Text>
-          </Pressable>
-          <View className="flex-row items-center mb-2">
-            <HelpCircle size={28} color="#f67828" />
-            <Text className="font-serif text-3xl text-text-primary ml-3">
-              Centre d'aide
+          {/* Header */}
+          <View className="px-6 pt-4 pb-6">
+            <Text className="font-serif text-2xl text-text-primary">Centre d'aide</Text>
+            <Text className="font-sans text-sm text-text-muted mt-2">
+              Trouvez rapidement des réponses à vos questions
             </Text>
           </View>
-          <Text className="font-sans text-text-muted">
-            Trouvez rapidement des réponses à vos questions
-          </Text>
-        </View>
 
         {/* Search Bar (Visual only) */}
         <View className="px-6 mb-8">
@@ -354,6 +337,6 @@ export default function HelpScreen() {
         {/* Bottom Spacing */}
         <View className="h-8" />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

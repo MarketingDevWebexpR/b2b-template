@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { View, Text, FlatList, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useRouter, Link } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import { MapPin, Plus, Check, Home, Building2, Phone, ChevronRight } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { ListSkeleton } from '@/components/skeleton';
@@ -299,40 +298,18 @@ export default function AddressesScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            headerTitle: 'Mes adresses',
-            headerBackTitle: 'Retour',
-            headerStyle: { backgroundColor: '#fffcf7' },
-            headerTintColor: '#2b333f',
-          }}
-        />
-        <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <ListSkeleton titleWidth={140} itemCount={2} variant="card" />
-        </SafeAreaView>
-      </>
+      <View className="flex-1 bg-background">
+        <ListSkeleton titleWidth={140} itemCount={2} variant="card" />
+      </View>
     );
   }
 
   // Not authenticated - show unauthenticated state or redirect
   if (!isAuthenticated) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            headerTitle: 'Mes adresses',
-            headerBackTitle: 'Retour',
-            headerStyle: { backgroundColor: '#fffcf7' },
-            headerTintColor: '#2b333f',
-          }}
-        />
-        <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-          <UnauthenticatedState />
-        </SafeAreaView>
-      </>
+      <View className="flex-1 bg-background">
+        <UnauthenticatedState />
+      </View>
     );
   }
 
@@ -341,21 +318,11 @@ export default function AddressesScreen() {
   const addresses = mockAddresses;
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: 'Mes adresses',
-          headerBackTitle: 'Retour',
-          headerStyle: { backgroundColor: '#fffcf7' },
-          headerTintColor: '#2b333f',
-        }}
-      />
-      <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-        {addresses.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <FlatList
+    <View className="flex-1 bg-background">
+      {addresses.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <FlatList
             data={addresses}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => <AddressCard address={item} />}
@@ -363,21 +330,20 @@ export default function AddressesScreen() {
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <View className="mb-4">
-                <Text className="font-serif text-3xl text-text-primary">Mes adresses</Text>
-                <Text className="font-sans text-text-muted mt-1">
+                <Text className="font-serif text-2xl text-text-primary">Mes adresses</Text>
+                <Text className="font-sans text-sm text-text-muted mt-2">
                   {addresses.length} adresse{addresses.length > 1 ? 's' : ''} enregistrée{addresses.length > 1 ? 's' : ''}
                 </Text>
               </View>
             }
-            ListFooterComponent={
-              <View className="mt-2">
-                <AddAddressButton />
-                <View className="h-4" />
-              </View>
-            }
-          />
-        )}
-      </SafeAreaView>
-    </>
+          ListFooterComponent={
+            <View className="mt-2">
+              <AddAddressButton />
+              <View className="h-4" />
+            </View>
+          }
+        />
+      )}
+    </View>
   );
 }

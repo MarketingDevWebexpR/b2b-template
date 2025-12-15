@@ -8,9 +8,8 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { User, Mail, Phone, ChevronLeft, Check } from 'lucide-react-native';
+import { User, Mail, Phone, Check } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { ProfileSkeleton } from '@/components/skeleton';
 import { hapticFeedback } from '@/constants/haptics';
@@ -81,9 +80,9 @@ export default function ProfileScreen() {
 
   if (authLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-1 bg-background">
         <ProfileSkeleton />
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -94,29 +93,19 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+    <View className="flex-1 bg-background">
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
-        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-          {/* Header */}
-          <View className="px-6 pt-4 pb-6">
-            <Pressable
-              onPress={() => {
-                hapticFeedback.navigation();
-                router.back();
-              }}
-              className="flex-row items-center mb-4"
-            >
-              <ChevronLeft size={24} color="#1a1a1a" />
-              <Text className="font-sans text-text-primary ml-1">Retour</Text>
-            </Pressable>
-            <Text className="font-serif text-3xl text-text-primary">Mon profil</Text>
-            <Text className="font-sans text-text-muted mt-2">
-              Modifiez vos informations personnelles
-            </Text>
-          </View>
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1"
+        >
+          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+            {/* Header */}
+            <View className="px-6 pt-4 pb-6">
+              <Text className="font-serif text-2xl text-text-primary">Mon profil</Text>
+              <Text className="font-sans text-sm text-text-muted mt-2">
+                Modifiez vos informations personnelles
+              </Text>
+            </View>
 
           {/* Avatar Section */}
           <View className="items-center py-6">
@@ -212,6 +201,6 @@ export default function ProfileScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

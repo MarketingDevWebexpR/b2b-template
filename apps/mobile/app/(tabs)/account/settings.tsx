@@ -8,7 +8,6 @@ import {
   Alert,
   Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, {
   useSharedValue,
@@ -25,7 +24,6 @@ import {
   Info,
   Trash2,
   ChevronRight,
-  ChevronLeft,
   Check,
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
@@ -232,9 +230,9 @@ export default function SettingsScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-1 bg-background">
         <SettingsSkeleton />
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -245,29 +243,12 @@ export default function SettingsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+    <View className="flex-1 bg-background">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View className="px-6 pt-4 pb-2">
-          <Pressable
-            onPress={() => {
-              hapticFeedback.navigation();
-              router.back();
-            }}
-            className="flex-row items-center mb-4"
-          >
-            <ChevronLeft size={24} color="#1a1a1a" />
-            <Text className="font-sans text-text-primary ml-1">Retour</Text>
-          </Pressable>
-          <View className="flex-row items-center">
-            <View className="w-12 h-12 rounded-full bg-background-beige items-center justify-center">
-              <Settings size={24} color="#f67828" />
-            </View>
-            <View className="ml-4">
-              <Text className="font-serif text-3xl text-text-primary">Paramètres</Text>
-            </View>
+          {/* Header */}
+          <View className="px-6 pt-4 pb-2">
+            <Text className="font-serif text-2xl text-text-primary">Paramètres</Text>
           </View>
-        </View>
 
         {/* Settings Content */}
         <View className="px-6">
@@ -398,6 +379,6 @@ export default function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

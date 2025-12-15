@@ -12,8 +12,10 @@ import { CategoryProvider } from '@/context/CategoryContext';
 import { CheckoutProvider } from '@/context/CheckoutContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import { CartAnimationProvider } from '@/context/CartAnimationContext';
+import { ToastProvider } from '@/context/ToastContext';
 import { LuxuryBackButton } from '@/components/navigation';
 import { FlyToCartAnimation } from '@/components/animations';
+import { ToastContainer } from '@/components/toast';
 
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
@@ -48,12 +50,13 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <CategoryProvider>
-            <CartProvider>
-              <CartAnimationProvider>
-                <WishlistProvider>
-                  <CheckoutProvider>
-                    <Stack
+          <ToastProvider>
+            <CategoryProvider>
+              <CartProvider>
+                <CartAnimationProvider>
+                  <WishlistProvider>
+                    <CheckoutProvider>
+                      <Stack
                     screenOptions={{
                       headerShown: false,
                       contentStyle: { backgroundColor: '#fffcf7' },
@@ -112,97 +115,18 @@ export default function RootLayout() {
                         },
                       }}
                     />
-                    <Stack.Screen
-                      name="orders"
-                      options={{
-                        headerShown: true,
-                        headerTitle: 'Mes commandes',
-                        headerBackVisible: false,
-                        headerLeft: () => <LuxuryBackButton />,
-                        headerStyle: { backgroundColor: '#fffcf7' },
-                        headerShadowVisible: false,
-                        headerTitleStyle: {
-                          fontFamily: 'PlayfairDisplay-Medium',
-                          fontSize: 18,
-                          color: '#2b333f',
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="favorites"
-                      options={{
-                        headerShown: true,
-                        headerTitle: 'Mes favoris',
-                        headerBackVisible: false,
-                        headerLeft: () => <LuxuryBackButton />,
-                        headerStyle: { backgroundColor: '#fffcf7' },
-                        headerShadowVisible: false,
-                        headerTitleStyle: {
-                          fontFamily: 'PlayfairDisplay-Medium',
-                          fontSize: 18,
-                          color: '#2b333f',
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="profile"
-                      options={{
-                        headerShown: false,
-                      }}
-                    />
-                    <Stack.Screen
-                      name="settings"
-                      options={{
-                        headerShown: false,
-                      }}
-                    />
-                    <Stack.Screen
-                      name="addresses"
-                      options={{
-                        headerShown: true,
-                        headerTitle: 'Mes adresses',
-                        headerBackVisible: false,
-                        headerLeft: () => <LuxuryBackButton />,
-                        headerStyle: { backgroundColor: '#fffcf7' },
-                        headerShadowVisible: false,
-                        headerTitleStyle: {
-                          fontFamily: 'PlayfairDisplay-Medium',
-                          fontSize: 18,
-                          color: '#2b333f',
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="payment-methods"
-                      options={{
-                        headerShown: true,
-                        headerTitle: 'Moyens de paiement',
-                        headerBackVisible: false,
-                        headerLeft: () => <LuxuryBackButton />,
-                        headerStyle: { backgroundColor: '#fffcf7' },
-                        headerShadowVisible: false,
-                        headerTitleStyle: {
-                          fontFamily: 'PlayfairDisplay-Medium',
-                          fontSize: 18,
-                          color: '#2b333f',
-                        },
-                      }}
-                    />
-                    <Stack.Screen
-                      name="help"
-                      options={{
-                        headerShown: false,
-                      }}
-                    />
-                    </Stack>
-                    <StatusBar style="dark" />
-                    {/* Fly-to-cart animation rendered at root level */}
-                    <FlyToCartAnimation />
-                  </CheckoutProvider>
-                </WishlistProvider>
-              </CartAnimationProvider>
-            </CartProvider>
-          </CategoryProvider>
+                      </Stack>
+                      <StatusBar style="dark" />
+                      {/* Fly-to-cart animation rendered at root level */}
+                      <FlyToCartAnimation />
+                      {/* Toast notifications rendered at root level */}
+                      <ToastContainer />
+                    </CheckoutProvider>
+                  </WishlistProvider>
+                </CartAnimationProvider>
+              </CartProvider>
+            </CategoryProvider>
+          </ToastProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
