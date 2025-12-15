@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import {
   User,
@@ -66,6 +67,7 @@ function MenuItem({ icon: Icon, label, href, onPress, showChevron = true, danger
 }
 
 export default function AccountScreen() {
+  const insets = useSafeAreaInsets();
   const { isAuthenticated, user, signOut, isLoading } = useAuth();
   const router = useRouter();
 
@@ -114,7 +116,7 @@ export default function AccountScreen() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
           <Text style={styles.headerTitle}>Mon compte</Text>
           <View style={styles.userRow}>
             <View style={styles.avatarContainer}>
