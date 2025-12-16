@@ -97,7 +97,7 @@ const checkVariants = {
     scale: 1,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 20,
     },
@@ -111,7 +111,7 @@ const lineVariants = {
     backgroundColor: 'rgb(246, 120, 40)',
     transition: {
       duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
     },
   },
 };
@@ -123,7 +123,7 @@ const verticalLineVariants = {
     backgroundColor: 'rgb(246, 120, 40)',
     transition: {
       duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
     },
   },
 };
@@ -333,7 +333,7 @@ export function Stepper({
                     }
                     transition={{
                       duration: 0.5,
-                      ease: [0.25, 0.46, 0.45, 0.94],
+                      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
                     }}
                   />
                 </div>

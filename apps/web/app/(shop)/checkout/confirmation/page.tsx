@@ -72,7 +72,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
     },
   },
 };
@@ -84,7 +84,7 @@ const scaleVariants = {
     scale: 1,
     transition: {
       duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
     },
   },
 };
@@ -95,7 +95,7 @@ const checkmarkVariants = {
     pathLength: 1,
     opacity: 1,
     transition: {
-      pathLength: { duration: 0.8, ease: 'easeOut', delay: 0.3 },
+      pathLength: { duration: 0.8, ease: 'easeOut' as const, delay: 0.3 },
       opacity: { duration: 0.2 },
     },
   },
@@ -242,7 +242,7 @@ function ConfirmationContent() {
             className="absolute inset-0 rounded-full bg-green-100"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }}
           />
           {/* Sparkle effects */}
           <motion.div

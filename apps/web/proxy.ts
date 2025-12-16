@@ -1,19 +1,26 @@
 import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 /**
- * Auth middleware for protecting routes
- * Redirects unauthenticated users to login page
+ * Next.js 16 Proxy for protecting routes
+ * Migrated from middleware.ts to proxy.ts
+ *
+ * Key differences from middleware:
+ * - Runs on Node.js runtime (not Edge)
+ * - Function exported as 'proxy' instead of 'middleware'
+ * - Makes the app's network boundary explicit
  *
  * Protected routes:
  * - /compte/* - User account pages
  * - /checkout/* - Checkout flow
  * - B2B routes (tableau-de-bord, commandes, devis, entreprise, etc.)
  */
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
-  const { pathname } = req.nextUrl;
 
+/**
+ * Helper function to check if a path is a protected route
+ */
+function isProtectedRoute(pathname: string): boolean {
   // Shop protected routes
   const isShopProtectedRoute =
     pathname.startsWith('/compte') || pathname.startsWith('/checkout');
@@ -32,9 +39,18 @@ export default auth((req) => {
     pathname.startsWith('/approbations') ||
     pathname.startsWith('/rapports');
 
-  const isProtectedRoute = isShopProtectedRoute || isB2BProtectedRoute;
+  return isShopProtectedRoute || isB2BProtectedRoute;
+}
 
-  if (isProtectedRoute && !isLoggedIn) {
+/**
+ * Proxy function - exported as named 'proxy' for Next.js 16
+ * Uses NextAuth v5's auth() wrapper for session handling
+ */
+export const proxy = auth((req) => {
+  const isLoggedIn = !!req.auth;
+  const { pathname } = req.nextUrl;
+
+  if (isProtectedRoute(pathname) && !isLoggedIn) {
     const loginUrl = new URL('/login', req.url);
     // Add callback URL to redirect back after login
     loginUrl.searchParams.set('callbackUrl', pathname);
@@ -45,8 +61,15 @@ export default auth((req) => {
 });
 
 /**
+ * Also export as default for compatibility
+ */
+export default proxy;
+
+/**
  * Matcher configuration
- * Only run middleware on specified routes
+ * Only run proxy on specified routes
+ *
+ * Note: In Next.js 16, the matcher config works the same way as in middleware
  */
 export const config = {
   matcher: [

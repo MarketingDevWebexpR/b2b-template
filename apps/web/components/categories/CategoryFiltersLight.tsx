@@ -116,7 +116,7 @@ const filterSectionVariants = {
     opacity: 1,
     height: 'auto',
     transition: {
-      height: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] },
+      height: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
       opacity: { duration: 0.15, delay: 0.05 },
     },
   },
@@ -136,7 +136,7 @@ const drawerVariants = {
     x: 0,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       damping: 30,
       stiffness: 300,
     },
@@ -144,7 +144,7 @@ const drawerVariants = {
   exit: {
     x: '-100%',
     opacity: 0,
-    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
   },
 };
 

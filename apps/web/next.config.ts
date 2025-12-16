@@ -1,7 +1,16 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  // Enable React Compiler for automatic memoization
+  // This eliminates the need for manual useMemo/useCallback
+  reactCompiler: true,
+
+  // Enable Turbopack as the default bundler for development
+  turbopack: {},
+
   // Transpile workspace packages to ensure they work correctly in the build
   transpilePackages: ['@bijoux/types', '@bijoux/utils', '@bijoux/config-tailwind'],
+
   images: {
     remotePatterns: [
       {
@@ -18,6 +27,7 @@ const nextConfig = {
       },
     ],
   },
+
   // Redirects: Collections merged into Categories
   async redirects() {
     return [

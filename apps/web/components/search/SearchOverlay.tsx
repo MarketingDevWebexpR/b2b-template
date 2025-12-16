@@ -59,11 +59,11 @@ const overlayVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }
+    transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }
   },
   exit: {
     opacity: 0,
-    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }
+    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }
   }
 };
 
@@ -74,14 +74,14 @@ const contentVariants = {
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
       delay: 0.1
     }
   },
   exit: {
     opacity: 0,
     y: -10,
-    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }
+    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }
   }
 };
 
@@ -99,7 +99,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }
+    transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }
   }
 };
 
