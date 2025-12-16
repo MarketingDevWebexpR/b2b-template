@@ -29,14 +29,18 @@ export type ReportType = 'spending' | 'category' | 'trend' | 'products';
  * Employee spending data for reports.
  */
 export interface EmployeeSpending {
-  /** Employee name */
-  name: string;
-  /** Amount spent in the period */
-  amount: number;
-  /** Spending limit for the period */
-  limit: number;
-  /** Percentage of limit used */
-  percentage: number;
+  /** Employee unique identifier */
+  employeeId: string;
+  /** Employee full name */
+  employeeName: string;
+  /** Total spending in the period */
+  totalSpending: number;
+  /** Number of orders in the period */
+  ordersCount: number;
+  /** Average order value */
+  averageOrder: number;
+  /** Percentage of total company spending */
+  percentOfTotal: number;
 }
 
 // ============================================
@@ -47,12 +51,16 @@ export interface EmployeeSpending {
  * Spending data grouped by product category.
  */
 export interface CategorySpending {
+  /** Category unique identifier */
+  categoryId: string;
   /** Category name */
-  category: string;
-  /** Amount spent in the category */
-  amount: number;
-  /** Number of orders in the category */
-  orders: number;
+  categoryName: string;
+  /** Total spending in the category */
+  totalSpending: number;
+  /** Number of items purchased in the category */
+  itemsCount: number;
+  /** Percentage of total spending */
+  percentOfTotal: number;
 }
 
 // ============================================
@@ -63,10 +71,14 @@ export interface CategorySpending {
  * Monthly spending trend data point.
  */
 export interface MonthlyTrend {
-  /** Month name (e.g., "Janvier", "Fevrier") */
+  /** Month identifier (e.g., "2024-07", "2024-08") */
   month: string;
-  /** Amount spent in the month */
-  amount: number;
+  /** Total spending in the month */
+  spending: number;
+  /** Number of orders in the month */
+  ordersCount: number;
+  /** Average order value */
+  averageOrder: number;
 }
 
 // ============================================
@@ -77,14 +89,18 @@ export interface MonthlyTrend {
  * Top-selling product data for reports.
  */
 export interface TopProduct {
+  /** Product unique identifier */
+  productId: string;
+  /** Product name */
+  productName: string;
   /** Product SKU */
   sku: string;
-  /** Product name */
-  name: string;
   /** Quantity sold */
   quantity: number;
-  /** Revenue generated */
-  revenue: number;
+  /** Total spending on this product */
+  totalSpending: number;
+  /** Average price per unit */
+  averagePrice: number;
 }
 
 // ============================================
@@ -122,7 +138,7 @@ export interface ReportData {
   /** Spending by category */
   byCategory: CategorySpending[];
   /** Monthly spending trend */
-  trend: MonthlyTrend[];
+  monthlyTrend: MonthlyTrend[];
   /** Top-selling products */
   topProducts: TopProduct[];
 }

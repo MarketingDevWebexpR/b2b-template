@@ -185,7 +185,7 @@ export default function RapportsPage() {
 
             {/* Monthly Trend */}
             {reportType === 'trend' && (
-              <MonthlyTrendReport data={reports.trend} />
+              <MonthlyTrendReport data={reports.monthlyTrend} />
             )}
 
             {/* Top Products */}
@@ -212,46 +212,51 @@ function SpendingByEmployeeReport({ data }: { data: EmployeeSpending[] }) {
         Depenses par employe
       </h2>
       <div className="space-y-6">
-        {data.map((employee) => (
-          <div key={employee.name}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center">
-                  <span className="font-sans text-body-sm font-medium text-hermes-600">
-                    {employee.name.split(' ').map((n) => n[0]).join('')}
-                  </span>
+        {data.map((employee) => {
+          const employeeName = employee.employeeName || '';
+          const totalSpending = employee.totalSpending || 0;
+          const percentOfTotal = employee.percentOfTotal || 0;
+          return (
+            <div key={employee.employeeId}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center">
+                    <span className="font-sans text-body-sm font-medium text-hermes-600">
+                      {employeeName.split(' ').map((n: string) => n[0]).join('')}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-sans text-body-sm font-medium text-text-primary">
+                      {employeeName}
+                    </p>
+                    <p className="font-sans text-caption text-text-muted">
+                      {formatCurrency(totalSpending)}
+                      {' - '}
+                      {employee.ordersCount} commandes
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-sans text-body-sm font-medium text-text-primary">
-                    {employee.name}
-                  </p>
-                  <p className="font-sans text-caption text-text-muted">
-                    {formatCurrency(employee.amount)}
-                    {' / '}
-                    {formatCurrency(employee.limit)}
-                  </p>
-                </div>
+                <span
+                  className={cn(
+                    'font-sans text-body-sm font-medium',
+                    percentOfTotal > 40 ? 'text-amber-600' : 'text-text-primary'
+                  )}
+                >
+                  {percentOfTotal}%
+                </span>
               </div>
-              <span
-                className={cn(
-                  'font-sans text-body-sm font-medium',
-                  employee.percentage > 80 ? 'text-amber-600' : 'text-text-primary'
-                )}
-              >
-                {employee.percentage}%
-              </span>
+              <div className="h-3 bg-background-muted rounded-full overflow-hidden">
+                <div
+                  className={cn(
+                    'h-full rounded-full transition-all duration-500',
+                    percentOfTotal > 40 ? 'bg-amber-500' : 'bg-hermes-500'
+                  )}
+                  style={{ width: `${Math.min(percentOfTotal, 100)}%` }}
+                />
+              </div>
             </div>
-            <div className="h-3 bg-background-muted rounded-full overflow-hidden">
-              <div
-                className={cn(
-                  'h-full rounded-full transition-all duration-500',
-                  employee.percentage > 80 ? 'bg-amber-500' : 'bg-hermes-500'
-                )}
-                style={{ width: `${employee.percentage}%` }}
-              />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -261,7 +266,7 @@ function SpendingByEmployeeReport({ data }: { data: EmployeeSpending[] }) {
  * Spending by Category Report Component
  */
 function SpendingByCategoryReport({ data }: { data: CategorySpending[] }) {
-  const total = data.reduce((sum, c) => sum + c.amount, 0);
+  const total = data.reduce((sum, c) => sum + (c.totalSpending || 0), 0);
 
   return (
     <div className="overflow-x-auto">
@@ -275,7 +280,7 @@ function SpendingByCategoryReport({ data }: { data: CategorySpending[] }) {
               Montant
             </th>
             <th className="px-6 py-3 text-right font-sans text-caption font-medium text-text-muted">
-              Commandes
+              Articles
             </th>
             <th className="px-6 py-3 text-right font-sans text-caption font-medium text-text-muted">
               Part
@@ -284,19 +289,21 @@ function SpendingByCategoryReport({ data }: { data: CategorySpending[] }) {
         </thead>
         <tbody className="divide-y divide-border-light">
           {data.map((cat) => {
-            const percentage = Math.round((cat.amount / total) * 100);
+            const catTotalSpending = cat.totalSpending || 0;
+            const catItemsCount = cat.itemsCount || 0;
+            const percentage = total > 0 ? Math.round((catTotalSpending / total) * 100) : 0;
             return (
-              <tr key={cat.category} className="hover:bg-background-muted transition-colors">
+              <tr key={cat.categoryId} className="hover:bg-background-muted transition-colors">
                 <td className="px-6 py-4">
                   <p className="font-sans text-body-sm font-medium text-text-primary">
-                    {cat.category}
+                    {cat.categoryName}
                   </p>
                 </td>
                 <td className="px-6 py-4 text-right font-sans text-body-sm text-text-primary">
-                  {formatCurrency(cat.amount)}
+                  {formatCurrency(catTotalSpending)}
                 </td>
                 <td className="px-6 py-4 text-right font-sans text-body-sm text-text-secondary">
-                  {cat.orders}
+                  {catItemsCount}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
@@ -324,7 +331,8 @@ function SpendingByCategoryReport({ data }: { data: CategorySpending[] }) {
  * Monthly Trend Report Component
  */
 function MonthlyTrendReport({ data }: { data: MonthlyTrend[] }) {
-  const maxAmount = Math.max(...data.map((m) => m.amount));
+  const trendData = data || [];
+  const maxAmount = trendData.length > 0 ? Math.max(...trendData.map((m) => m.spending || 0)) : 0;
 
   return (
     <div className="p-6">
@@ -332,10 +340,11 @@ function MonthlyTrendReport({ data }: { data: MonthlyTrend[] }) {
         Evolution des depenses
       </h2>
       <div className="space-y-4">
-        {data.map((month, index) => {
-          const percentage = Math.round((month.amount / maxAmount) * 100);
-          const prevAmount = data[index - 1]?.amount ?? month.amount;
-          const change = Math.round(((month.amount - prevAmount) / prevAmount) * 100);
+        {trendData.map((month, index) => {
+          const monthSpending = month.spending || 0;
+          const prevAmount = (trendData[index - 1]?.spending || 0) || monthSpending;
+          const percentage = maxAmount > 0 ? Math.round((monthSpending / maxAmount) * 100) : 0;
+          const change = prevAmount > 0 ? Math.round(((monthSpending - prevAmount) / prevAmount) * 100) : 0;
           return (
             <div key={month.month} className="flex items-center gap-4">
               <span className="w-24 font-sans text-body-sm text-text-secondary">
@@ -347,7 +356,7 @@ function MonthlyTrendReport({ data }: { data: MonthlyTrend[] }) {
                   style={{ width: `${percentage}%` }}
                 >
                   <span className="font-sans text-caption font-medium text-white">
-                    {formatCurrency(month.amount, 'EUR')}
+                    {formatCurrency(monthSpending, 'EUR')}
                   </span>
                 </div>
               </div>
@@ -394,7 +403,7 @@ function TopProductsReport({ data }: { data: TopProduct[] }) {
         </thead>
         <tbody className="divide-y divide-border-light">
           {data.map((product, index) => (
-            <tr key={product.sku} className="hover:bg-background-muted transition-colors">
+            <tr key={product.productId} className="hover:bg-background-muted transition-colors">
               <td className="px-6 py-4">
                 <div
                   className={cn(
@@ -410,7 +419,7 @@ function TopProductsReport({ data }: { data: TopProduct[] }) {
               </td>
               <td className="px-6 py-4">
                 <p className="font-sans text-body-sm font-medium text-text-primary">
-                  {product.name}
+                  {product.productName}
                 </p>
                 <p className="font-mono text-caption text-text-muted">
                   {product.sku}
@@ -420,7 +429,7 @@ function TopProductsReport({ data }: { data: TopProduct[] }) {
                 {product.quantity} unites
               </td>
               <td className="px-6 py-4 text-right font-sans text-body-sm font-medium text-text-primary">
-                {formatCurrency(product.revenue)}
+                {formatCurrency(product.totalSpending)}
               </td>
             </tr>
           ))}

@@ -261,7 +261,7 @@ interface UpdateCompanyInput {
 /**
  * Granular permissions for B2B employees.
  */
-type EmployeePermission = 'orders.create' | 'orders.view' | 'orders.view_all' | 'orders.cancel' | 'orders.approve' | 'orders.bulk_create' | 'quotes.create' | 'quotes.view' | 'quotes.view_all' | 'quotes.accept' | 'quotes.reject' | 'quotes.negotiate' | 'spending.unlimited' | 'spending.view_reports' | 'company.view' | 'company.edit' | 'company.manage_employees' | 'company.manage_addresses' | 'company.view_credit' | 'company.view_invoices' | 'approvals.view' | 'approvals.approve' | 'approvals.delegate' | 'admin.full_access';
+type EmployeePermission = 'orders.create' | 'orders.view' | 'orders.view_all' | 'orders.cancel' | 'orders.approve' | 'orders.bulk_create' | 'quotes.create' | 'quotes.view' | 'quotes.view_all' | 'quotes.accept' | 'quotes.reject' | 'quotes.negotiate' | 'products.view' | 'products.view_prices' | 'products.view_stock' | 'spending.unlimited' | 'spending.view_reports' | 'company.view' | 'company.edit' | 'company.manage_employees' | 'company.manage_addresses' | 'company.view_credit' | 'company.view_invoices' | 'approvals.view' | 'approvals.approve' | 'approvals.delegate' | 'admin.full_access';
 /**
  * Permission group for common use cases.
  */
@@ -1985,47 +1985,63 @@ type ReportType = 'spending' | 'category' | 'trend' | 'products';
  * Employee spending data for reports.
  */
 interface EmployeeSpending {
-    /** Employee name */
-    name: string;
-    /** Amount spent in the period */
-    amount: number;
-    /** Spending limit for the period */
-    limit: number;
-    /** Percentage of limit used */
-    percentage: number;
+    /** Employee unique identifier */
+    employeeId: string;
+    /** Employee full name */
+    employeeName: string;
+    /** Total spending in the period */
+    totalSpending: number;
+    /** Number of orders in the period */
+    ordersCount: number;
+    /** Average order value */
+    averageOrder: number;
+    /** Percentage of total company spending */
+    percentOfTotal: number;
 }
 /**
  * Spending data grouped by product category.
  */
 interface CategorySpending {
+    /** Category unique identifier */
+    categoryId: string;
     /** Category name */
-    category: string;
-    /** Amount spent in the category */
-    amount: number;
-    /** Number of orders in the category */
-    orders: number;
+    categoryName: string;
+    /** Total spending in the category */
+    totalSpending: number;
+    /** Number of items purchased in the category */
+    itemsCount: number;
+    /** Percentage of total spending */
+    percentOfTotal: number;
 }
 /**
  * Monthly spending trend data point.
  */
 interface MonthlyTrend {
-    /** Month name (e.g., "Janvier", "Fevrier") */
+    /** Month identifier (e.g., "2024-07", "2024-08") */
     month: string;
-    /** Amount spent in the month */
-    amount: number;
+    /** Total spending in the month */
+    spending: number;
+    /** Number of orders in the month */
+    ordersCount: number;
+    /** Average order value */
+    averageOrder: number;
 }
 /**
  * Top-selling product data for reports.
  */
 interface TopProduct {
+    /** Product unique identifier */
+    productId: string;
+    /** Product name */
+    productName: string;
     /** Product SKU */
     sku: string;
-    /** Product name */
-    name: string;
     /** Quantity sold */
     quantity: number;
-    /** Revenue generated */
-    revenue: number;
+    /** Total spending on this product */
+    totalSpending: number;
+    /** Average price per unit */
+    averagePrice: number;
 }
 /**
  * Summary statistics for the report dashboard.
@@ -2053,7 +2069,7 @@ interface ReportData {
     /** Spending by category */
     byCategory: CategorySpending[];
     /** Monthly spending trend */
-    trend: MonthlyTrend[];
+    monthlyTrend: MonthlyTrend[];
     /** Top-selling products */
     topProducts: TopProduct[];
 }
@@ -2073,29 +2089,29 @@ interface ReportData {
  * ```ts
  * const item: BulkOrderItem = {
  *   sku: 'BRA-001',
- *   name: 'Bracelet Or 18K - Maille Figaro',
  *   quantity: 5,
+ *   product: productCatalogEntry,
+ *   isValid: true,
  *   unitPrice: 450,
- *   available: true,
- *   stock: 25,
+ *   lineTotal: 2250,
  * };
  * ```
  */
 interface BulkOrderItem {
     /** Stock Keeping Unit (product reference) */
     sku: string;
-    /** Product name */
-    name: string;
     /** Quantity requested */
     quantity: number;
+    /** Reference to the product catalog entry (if found) */
+    product?: ProductCatalogEntry;
+    /** Whether the item is valid for ordering */
+    isValid: boolean;
     /** Price per unit (in EUR) */
-    unitPrice: number;
-    /** Whether the requested quantity is available */
-    available: boolean;
-    /** Current stock level */
-    stock: number;
-    /** Error message if item has validation issues */
-    error?: string;
+    unitPrice?: number;
+    /** Total price for this line (unitPrice * quantity) */
+    lineTotal?: number;
+    /** Error messages if item has validation issues */
+    errors?: string[];
 }
 /**
  * Summary of a bulk order with aggregated totals.
@@ -2132,32 +2148,45 @@ interface BulkOrderSummary {
  * @example
  * ```ts
  * const product: ProductCatalogEntry = {
+ *   productId: 'prod_001',
  *   sku: 'BRA-001',
  *   name: 'Bracelet Or 18K - Maille Figaro',
- *   price: 450,
- *   stock: 25,
- *   available: true,
+ *   description: 'Bracelet en or 18K avec maille figaro',
+ *   unitPrice: 450,
+ *   currency: 'EUR',
+ *   minQuantity: 1,
+ *   maxQuantity: 100,
+ *   availableStock: 25,
  *   category: 'bracelets',
+ *   brand: 'Maison',
  * };
  * ```
  */
 interface ProductCatalogEntry {
+    /** Product unique identifier */
+    productId: string;
     /** Stock Keeping Unit (product reference) */
     sku: string;
     /** Product name */
     name: string;
-    /** Price per unit (in EUR) */
-    price: number;
-    /** Current stock level */
-    stock: number;
-    /** Whether the product is available for ordering */
-    available: boolean;
-    /** Product category code */
-    category?: string;
+    /** Product description */
+    description: string;
+    /** Price per unit */
+    unitPrice: number;
+    /** Currency code (ISO 4217) */
+    currency: string;
     /** Minimum order quantity */
-    minOrderQuantity?: number;
-    /** Maximum order quantity (based on stock or limits) */
-    maxOrderQuantity?: number;
+    minQuantity: number;
+    /** Maximum order quantity */
+    maxQuantity: number;
+    /** Current available stock level */
+    availableStock: number;
+    /** Product category name */
+    category: string;
+    /** Product brand name */
+    brand: string;
+    /** Product image URL */
+    imageUrl?: string;
 }
 /**
  * Result of bulk order validation.
@@ -2165,28 +2194,42 @@ interface ProductCatalogEntry {
  * @example
  * ```ts
  * const result: BulkOrderValidationResult = {
- *   valid: false,
+ *   isValid: false,
  *   errors: [
- *     { sku: 'BRA-001', code: 'INSUFFICIENT_STOCK', message: 'Stock insuffisant' }
+ *     { row: 1, field: 'sku', code: 'PRODUCT_NOT_FOUND', message: 'SKU non trouve' }
  *   ],
  *   warnings: [],
+ *   validItems: [],
+ *   invalidCount: 1,
+ *   totalAmount: 0,
+ *   currency: 'EUR',
  * };
  * ```
  */
 interface BulkOrderValidationResult {
     /** Whether the entire bulk order is valid */
-    valid: boolean;
+    isValid: boolean;
     /** List of validation errors */
     errors: BulkOrderValidationError[];
     /** List of validation warnings (non-blocking) */
     warnings: BulkOrderValidationWarning[];
+    /** List of valid items that passed validation */
+    validItems: BulkOrderItem[];
+    /** Number of invalid items */
+    invalidCount: number;
+    /** Total amount for valid items */
+    totalAmount: number;
+    /** Currency code for the total amount */
+    currency: string;
 }
 /**
  * Validation error for a bulk order item.
  */
 interface BulkOrderValidationError {
-    /** SKU that has the error */
-    sku: string;
+    /** Row number in the bulk order (1-indexed) */
+    row: number;
+    /** Field that has the error */
+    field: string;
     /** Error code for programmatic handling */
     code: BulkOrderErrorCode;
     /** Human-readable error message */
@@ -2206,7 +2249,7 @@ interface BulkOrderValidationWarning {
 /**
  * Error codes for bulk order validation.
  */
-type BulkOrderErrorCode = 'UNKNOWN_SKU' | 'INSUFFICIENT_STOCK' | 'INVALID_QUANTITY' | 'PRODUCT_UNAVAILABLE' | 'EXCEEDS_ORDER_LIMIT' | 'BELOW_MIN_QUANTITY';
+type BulkOrderErrorCode = 'UNKNOWN_SKU' | 'PRODUCT_NOT_FOUND' | 'INSUFFICIENT_STOCK' | 'INVALID_QUANTITY' | 'PRODUCT_UNAVAILABLE' | 'EXCEEDS_ORDER_LIMIT' | 'BELOW_MIN_QUANTITY' | 'BELOW_MINIMUM';
 /**
  * Warning codes for bulk order validation.
  */
@@ -2236,6 +2279,1049 @@ interface BulkOrderCsvParseResult {
         line: number;
         message: string;
     }>;
+}
+
+/**
+ * Warehouse Types
+ *
+ * Defines types for warehouse/point-of-sale management in B2B e-commerce.
+ * Supports multi-location inventory, pickup points, and delivery options.
+ *
+ * @packageDocumentation
+ */
+/**
+ * Type of warehouse/location
+ */
+type WarehouseType = 'store' | 'depot' | 'warehouse' | 'distribution_center';
+/**
+ * Status of the warehouse
+ */
+type WarehouseStatus = 'active' | 'inactive' | 'maintenance' | 'closed';
+/**
+ * Warehouse physical address
+ */
+interface WarehouseAddress {
+    /** Street address line 1 */
+    street1: string;
+    /** Street address line 2 (optional) */
+    street2?: string;
+    /** City */
+    city: string;
+    /** Postal/ZIP code */
+    postalCode: string;
+    /** State/Province/Region */
+    region?: string;
+    /** Country code (ISO 3166-1 alpha-2) */
+    countryCode: string;
+    /** Country name */
+    country: string;
+    /** Latitude for map display */
+    latitude?: number;
+    /** Longitude for map display */
+    longitude?: number;
+}
+/**
+ * Time slot for opening hours
+ */
+interface TimeSlot {
+    /** Opening time (HH:mm format) */
+    open: string;
+    /** Closing time (HH:mm format) */
+    close: string;
+}
+/**
+ * Day of week
+ */
+type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+/**
+ * Opening hours for a specific day
+ */
+interface DaySchedule {
+    /** Day of the week */
+    day: DayOfWeek;
+    /** Whether the warehouse is open on this day */
+    isOpen: boolean;
+    /** Time slots (supports lunch breaks) */
+    slots: TimeSlot[];
+}
+/**
+ * Special opening hours (holidays, special events)
+ */
+interface SpecialSchedule {
+    /** Date (YYYY-MM-DD format) */
+    date: string;
+    /** Description (e.g., "Christmas Eve") */
+    description?: string;
+    /** Whether the warehouse is open */
+    isOpen: boolean;
+    /** Time slots if open */
+    slots?: TimeSlot[];
+}
+/**
+ * Complete opening hours configuration
+ */
+interface OpeningHours {
+    /** Regular weekly schedule */
+    regular: DaySchedule[];
+    /** Special dates (holidays, etc.) */
+    special?: SpecialSchedule[];
+    /** Timezone (IANA format) */
+    timezone: string;
+}
+/**
+ * Type of delivery option
+ */
+type DeliveryOptionType = 'store_pickup' | 'express_pickup' | 'standard_delivery' | 'express_delivery' | 'scheduled_delivery' | 'locker_pickup';
+/**
+ * Delivery option configuration
+ */
+interface DeliveryOption {
+    /** Unique identifier */
+    id: string;
+    /** Type of delivery */
+    type: DeliveryOptionType;
+    /** Display name */
+    name: string;
+    /** Description */
+    description?: string;
+    /** Estimated delivery time (human readable) */
+    estimatedTime: string;
+    /** Estimated delivery time in hours (for calculations) */
+    estimatedHours?: number;
+    /** Price (HT - tax excluded) */
+    priceHT: number;
+    /** Currency */
+    currency: string;
+    /** Whether this option is free above certain order value */
+    freeAbove?: number;
+    /** Minimum order value to unlock this option */
+    minOrderValue?: number;
+    /** Maximum order weight in kg */
+    maxWeight?: number;
+    /** Whether this option is available */
+    isAvailable: boolean;
+    /** Available time slots for scheduled delivery */
+    timeSlots?: TimeSlot[];
+}
+/**
+ * Contact information for the warehouse
+ */
+interface WarehouseContact {
+    /** Contact name */
+    name?: string;
+    /** Phone number */
+    phone?: string;
+    /** Email address */
+    email?: string;
+    /** Fax number */
+    fax?: string;
+}
+/**
+ * Warehouse capabilities and features
+ */
+interface WarehouseCapabilities {
+    /** Supports click & collect */
+    pickupEnabled: boolean;
+    /** Supports delivery from this location */
+    deliveryEnabled: boolean;
+    /** Has professional counter service */
+    hasCounter: boolean;
+    /** Has showroom/display area */
+    hasShowroom: boolean;
+    /** Supports dangerous goods */
+    handlesDangerousGoods: boolean;
+    /** Has forklift for heavy items */
+    hasForklift: boolean;
+    /** Maximum item weight that can be handled (kg) */
+    maxItemWeight?: number;
+    /** Supports returns */
+    acceptsReturns: boolean;
+}
+/**
+ * Complete Warehouse entity
+ */
+interface Warehouse {
+    /** Unique identifier */
+    id: string;
+    /** Internal code (for reference) */
+    code: string;
+    /** Display name */
+    name: string;
+    /** Type of location */
+    type: WarehouseType;
+    /** Status */
+    status: WarehouseStatus;
+    /** Physical address */
+    address: WarehouseAddress;
+    /** Contact information */
+    contact?: WarehouseContact;
+    /** Opening hours */
+    openingHours: OpeningHours;
+    /** Available delivery options */
+    deliveryOptions: DeliveryOption[];
+    /** Capabilities and features */
+    capabilities: WarehouseCapabilities;
+    /** Associated company IDs (for restricted warehouses) */
+    allowedCompanyIds?: string[];
+    /** Whether this is the default warehouse */
+    isDefault: boolean;
+    /** Sort order for display */
+    sortOrder: number;
+    /** Custom metadata */
+    metadata?: Record<string, unknown>;
+    /** Creation timestamp */
+    createdAt: string;
+    /** Last update timestamp */
+    updatedAt: string;
+}
+/**
+ * Warehouse summary for lists
+ */
+interface WarehouseSummary {
+    /** Unique identifier */
+    id: string;
+    /** Internal code */
+    code: string;
+    /** Display name */
+    name: string;
+    /** Type of location */
+    type: WarehouseType;
+    /** City (for quick display) */
+    city: string;
+    /** Whether pickup is available */
+    pickupEnabled: boolean;
+    /** Whether delivery is available */
+    deliveryEnabled: boolean;
+    /** Whether currently open */
+    isOpen: boolean;
+    /** Next opening time if closed */
+    nextOpenAt?: string;
+    /** Distance from user (if location available) */
+    distanceKm?: number;
+}
+/**
+ * Input for creating a warehouse
+ */
+interface CreateWarehouseInput {
+    code: string;
+    name: string;
+    type: WarehouseType;
+    address: WarehouseAddress;
+    contact?: WarehouseContact;
+    openingHours: OpeningHours;
+    deliveryOptions?: DeliveryOption[];
+    capabilities?: Partial<WarehouseCapabilities>;
+    allowedCompanyIds?: string[];
+    isDefault?: boolean;
+    sortOrder?: number;
+}
+/**
+ * Input for updating a warehouse
+ */
+interface UpdateWarehouseInput {
+    name?: string;
+    status?: WarehouseStatus;
+    address?: Partial<WarehouseAddress>;
+    contact?: WarehouseContact;
+    openingHours?: OpeningHours;
+    deliveryOptions?: DeliveryOption[];
+    capabilities?: Partial<WarehouseCapabilities>;
+    allowedCompanyIds?: string[];
+    isDefault?: boolean;
+    sortOrder?: number;
+}
+/**
+ * Filters for warehouse search
+ */
+interface WarehouseFilters {
+    /** Search by name or code */
+    search?: string;
+    /** Filter by type */
+    types?: WarehouseType[];
+    /** Filter by status */
+    statuses?: WarehouseStatus[];
+    /** Filter by pickup availability */
+    pickupEnabled?: boolean;
+    /** Filter by delivery availability */
+    deliveryEnabled?: boolean;
+    /** Filter by city */
+    city?: string;
+    /** Filter by country */
+    countryCode?: string;
+    /** Filter by proximity (requires lat/lng) */
+    nearLocation?: {
+        latitude: number;
+        longitude: number;
+        radiusKm: number;
+    };
+    /** Only show currently open warehouses */
+    isOpenNow?: boolean;
+}
+
+/**
+ * Pricing Types
+ *
+ * Defines types for B2B pricing, price lists, volume discounts, and personalized pricing.
+ * Supports multi-tier pricing, customer-specific rates, and promotional pricing.
+ *
+ * @packageDocumentation
+ */
+/**
+ * Type of price list
+ */
+type PriceListType = 'standard' | 'contract' | 'promotional' | 'tier' | 'seasonal';
+/**
+ * Status of a price list
+ */
+type PriceListStatus = 'active' | 'inactive' | 'scheduled' | 'expired';
+/**
+ * Currency code (ISO 4217)
+ */
+type CurrencyCode = 'EUR' | 'USD' | 'GBP' | 'CHF' | 'CAD';
+/**
+ * Volume discount tier
+ */
+interface VolumeDiscount {
+    /** Minimum quantity to activate this tier */
+    minQuantity: number;
+    /** Maximum quantity for this tier (optional) */
+    maxQuantity?: number;
+    /** Discount percentage (0-100) */
+    discountPercent?: number;
+    /** Fixed unit price (alternative to percentage) */
+    fixedUnitPrice?: number;
+    /** Label for display (e.g., "Lot de 10") */
+    label?: string;
+}
+/**
+ * Volume discount configuration for a product
+ */
+interface VolumeDiscountConfig {
+    /** Product ID */
+    productId: string;
+    /** Volume discount tiers */
+    tiers: VolumeDiscount[];
+    /** Whether tiers are cumulative */
+    isCumulative: boolean;
+    /** Minimum order quantity */
+    minOrderQuantity: number;
+    /** Order quantity step (e.g., multiples of 5) */
+    quantityStep: number;
+}
+/**
+ * Unit of measure for pricing
+ */
+type UnitOfMeasure = 'unit' | 'pack' | 'box' | 'case' | 'pallet' | 'kg' | 'g' | 'm' | 'm2' | 'm3' | 'l' | 'ml';
+/**
+ * Unit of measure configuration
+ */
+interface UnitConfig {
+    /** Primary unit */
+    baseUnit: UnitOfMeasure;
+    /** Conversion factor from base unit */
+    conversionFactor: number;
+    /** Number of items per unit (e.g., 10 per pack) */
+    quantityPerUnit: number;
+    /** Display label */
+    displayLabel: string;
+    /** Short label */
+    shortLabel: string;
+}
+/**
+ * Tax rate configuration
+ */
+interface TaxRate {
+    /** Tax rate percentage */
+    rate: number;
+    /** Tax type/name */
+    name: string;
+    /** Whether price includes tax */
+    isIncluded: boolean;
+}
+/**
+ * Base product price
+ */
+interface BasePrice {
+    /** Unit price excluding tax */
+    priceHT: number;
+    /** Unit price including tax */
+    priceTTC: number;
+    /** Currency */
+    currency: CurrencyCode;
+    /** Tax rate */
+    taxRate: TaxRate;
+    /** Unit of measure */
+    unit: UnitOfMeasure;
+    /** Unit configuration */
+    unitConfig?: UnitConfig;
+}
+/**
+ * Product pricing with all variations
+ */
+interface ProductPricing {
+    /** Product ID */
+    productId: string;
+    /** Product SKU */
+    sku: string;
+    /** Variant ID (if applicable) */
+    variantId?: string;
+    /** Price list ID */
+    priceListId: string;
+    /** Base price */
+    basePrice: BasePrice;
+    /** Volume discounts */
+    volumeDiscounts?: VolumeDiscount[];
+    /** Pack size (if sold in packs) */
+    packSize?: number;
+    /** Pack price (if different from unit price * packSize) */
+    packPrice?: number;
+    /** Minimum order quantity */
+    minOrderQuantity: number;
+    /** Quantity step (multiples) */
+    quantityStep: number;
+    /** Price valid from */
+    validFrom?: string;
+    /** Price valid until */
+    validUntil?: string;
+    /** Last price update */
+    updatedAt: string;
+}
+/**
+ * Price list entity
+ */
+interface PriceList {
+    /** Unique identifier */
+    id: string;
+    /** Internal code */
+    code: string;
+    /** Display name */
+    name: string;
+    /** Description */
+    description?: string;
+    /** Type of price list */
+    type: PriceListType;
+    /** Status */
+    status: PriceListStatus;
+    /** Currency */
+    currency: CurrencyCode;
+    /** Priority (higher = more important) */
+    priority: number;
+    /** Whether this is the default price list */
+    isDefault: boolean;
+    /** Valid from date */
+    validFrom?: string;
+    /** Valid until date */
+    validUntil?: string;
+    /** Assigned company IDs */
+    companyIds?: string[];
+    /** Assigned company tier */
+    companyTier?: string;
+    /** Discount percentage from base price */
+    globalDiscount?: number;
+    /** Markup percentage from base price */
+    globalMarkup?: number;
+    /** Rounding rule */
+    roundingRule?: PriceRoundingRule;
+    /** Creation timestamp */
+    createdAt: string;
+    /** Last update timestamp */
+    updatedAt: string;
+}
+/**
+ * Price rounding rule
+ */
+interface PriceRoundingRule {
+    /** Round to nearest value (e.g., 0.05 for 5 cents) */
+    roundTo: number;
+    /** Rounding direction */
+    direction: 'up' | 'down' | 'nearest';
+}
+/**
+ * Price list summary for lists
+ */
+interface PriceListSummary {
+    id: string;
+    code: string;
+    name: string;
+    type: PriceListType;
+    status: PriceListStatus;
+    currency: CurrencyCode;
+    companiesCount: number;
+    productsCount: number;
+}
+/**
+ * Customer-specific price override
+ */
+interface CustomerPriceOverride {
+    /** Unique identifier */
+    id: string;
+    /** Company ID */
+    companyId: string;
+    /** Product ID */
+    productId: string;
+    /** SKU */
+    sku: string;
+    /** Negotiated unit price (HT) */
+    negotiatedPriceHT: number;
+    /** Original price (HT) for reference */
+    originalPriceHT: number;
+    /** Discount percentage from original */
+    discountPercent: number;
+    /** Contract reference */
+    contractRef?: string;
+    /** Valid from */
+    validFrom?: string;
+    /** Valid until */
+    validUntil?: string;
+    /** Notes */
+    notes?: string;
+    /** Created by employee ID */
+    createdBy: string;
+    /** Creation timestamp */
+    createdAt: string;
+}
+/**
+ * Fully calculated price for display
+ */
+interface CalculatedPrice {
+    /** Product ID */
+    productId: string;
+    /** Variant ID */
+    variantId?: string;
+    /** Unit price excluding tax */
+    unitPriceHT: number;
+    /** Unit price including tax */
+    unitPriceTTC: number;
+    /** Currency */
+    currency: CurrencyCode;
+    /** Tax rate applied */
+    taxRate: number;
+    /** Original price before discounts */
+    originalPriceHT?: number;
+    /** Discount percentage applied */
+    discountPercent?: number;
+    /** Volume discount applicable */
+    volumeDiscountApplied?: VolumeDiscount;
+    /** Price source (which price list/override) */
+    priceSource: {
+        type: 'price_list' | 'customer_override' | 'contract';
+        id: string;
+        name: string;
+    };
+    /** Whether price is negotiated/special */
+    isNegotiated: boolean;
+    /** Whether price is promotional */
+    isPromotional: boolean;
+    /** Promotion end date */
+    promotionEndsAt?: string;
+    /** Unit of measure */
+    unit: UnitOfMeasure;
+    /** Unit label */
+    unitLabel: string;
+    /** Pack configuration (if applicable) */
+    pack?: {
+        size: number;
+        priceHT: number;
+        priceTTC: number;
+        savingsPercent: number;
+    };
+}
+/**
+ * Input for creating a price list
+ */
+interface CreatePriceListInput {
+    code: string;
+    name: string;
+    description?: string;
+    type: PriceListType;
+    currency: CurrencyCode;
+    priority?: number;
+    isDefault?: boolean;
+    validFrom?: string;
+    validUntil?: string;
+    companyIds?: string[];
+    companyTier?: string;
+    globalDiscount?: number;
+    globalMarkup?: number;
+    roundingRule?: PriceRoundingRule;
+}
+/**
+ * Input for updating a price list
+ */
+interface UpdatePriceListInput {
+    name?: string;
+    description?: string;
+    status?: PriceListStatus;
+    priority?: number;
+    isDefault?: boolean;
+    validFrom?: string;
+    validUntil?: string;
+    companyIds?: string[];
+    companyTier?: string;
+    globalDiscount?: number;
+    globalMarkup?: number;
+    roundingRule?: PriceRoundingRule;
+}
+/**
+ * Input for setting product price in a price list
+ */
+interface SetProductPriceInput {
+    productId: string;
+    variantId?: string;
+    priceHT: number;
+    taxRate?: number;
+    volumeDiscounts?: VolumeDiscount[];
+    packSize?: number;
+    packPrice?: number;
+    minOrderQuantity?: number;
+    quantityStep?: number;
+    validFrom?: string;
+    validUntil?: string;
+}
+/**
+ * Input for creating customer price override
+ */
+interface CreateCustomerPriceInput {
+    companyId: string;
+    productId: string;
+    negotiatedPriceHT: number;
+    contractRef?: string;
+    validFrom?: string;
+    validUntil?: string;
+    notes?: string;
+}
+/**
+ * Filters for price list search
+ */
+interface PriceListFilters {
+    /** Search by name or code */
+    search?: string;
+    /** Filter by type */
+    types?: PriceListType[];
+    /** Filter by status */
+    statuses?: PriceListStatus[];
+    /** Filter by currency */
+    currency?: CurrencyCode;
+    /** Filter by company ID */
+    companyId?: string;
+    /** Only show active/valid price lists */
+    activeOnly?: boolean;
+}
+/**
+ * Request for price calculation
+ */
+interface PriceCalculationRequest {
+    /** Product ID */
+    productId: string;
+    /** Variant ID */
+    variantId?: string;
+    /** Quantity for volume discount calculation */
+    quantity?: number;
+    /** Company ID for customer-specific pricing */
+    companyId?: string;
+    /** Warehouse ID for location-specific pricing */
+    warehouseId?: string;
+    /** Currency override */
+    currency?: CurrencyCode;
+}
+
+/**
+ * Stock Types
+ *
+ * Defines types for multi-warehouse stock management in B2B e-commerce.
+ * Supports real-time availability, stock reservations, and backorder handling.
+ *
+ * @packageDocumentation
+ */
+/**
+ * Stock availability status
+ */
+type StockStatus$1 = 'in_stock' | 'low_stock' | 'out_of_stock' | 'backorder' | 'discontinued' | 'preorder';
+/**
+ * Stock reservation status
+ */
+type ReservationStatus = 'pending' | 'confirmed' | 'released' | 'fulfilled';
+/**
+ * Stock information for a specific warehouse
+ */
+interface WarehouseStock {
+    /** Warehouse ID */
+    warehouseId: string;
+    /** Warehouse name (for display) */
+    warehouseName: string;
+    /** Warehouse code */
+    warehouseCode: string;
+    /** Available quantity */
+    availableQuantity: number;
+    /** Reserved quantity (pending orders) */
+    reservedQuantity: number;
+    /** Total physical quantity */
+    physicalQuantity: number;
+    /** Stock status */
+    status: StockStatus$1;
+    /** Low stock threshold */
+    lowStockThreshold: number;
+    /** Expected restock date */
+    nextRestockDate?: string;
+    /** Expected restock quantity */
+    nextRestockQuantity?: number;
+    /** Whether pickup is available at this warehouse */
+    pickupAvailable: boolean;
+    /** Pickup delay (e.g., "2h", "24h", "48h") */
+    pickupDelay?: string;
+    /** Pickup ready time (ISO 8601) */
+    pickupReadyAt?: string;
+    /** Whether delivery is available from this warehouse */
+    deliveryAvailable: boolean;
+    /** Estimated delivery delay (e.g., "24h", "2-3 jours") */
+    deliveryDelay?: string;
+    /** Last stock update timestamp */
+    updatedAt: string;
+}
+/**
+ * Complete stock information for a product across all warehouses
+ */
+interface ProductStock {
+    /** Product ID */
+    productId: string;
+    /** Product SKU */
+    sku: string;
+    /** Variant ID (if applicable) */
+    variantId?: string;
+    /** Global stock status (best available) */
+    globalStatus: StockStatus$1;
+    /** Total available quantity across all warehouses */
+    totalAvailable: number;
+    /** Stock by warehouse */
+    warehouseStock: WarehouseStock[];
+    /** Whether the product is available anywhere */
+    isAvailable: boolean;
+    /** Best warehouse for pickup (closest with stock) */
+    bestPickupWarehouseId?: string;
+    /** Best warehouse for delivery (fastest) */
+    bestDeliveryWarehouseId?: string;
+    /** Last global update timestamp */
+    updatedAt: string;
+}
+/**
+ * Stock reservation for cart/order
+ */
+interface StockReservation {
+    /** Unique reservation ID */
+    id: string;
+    /** Product ID */
+    productId: string;
+    /** Variant ID */
+    variantId?: string;
+    /** SKU */
+    sku: string;
+    /** Warehouse ID where stock is reserved */
+    warehouseId: string;
+    /** Reserved quantity */
+    quantity: number;
+    /** Reservation status */
+    status: ReservationStatus;
+    /** Cart ID (if from cart) */
+    cartId?: string;
+    /** Order ID (if from order) */
+    orderId?: string;
+    /** Company ID */
+    companyId: string;
+    /** Employee ID who created reservation */
+    employeeId: string;
+    /** Reservation expiration time */
+    expiresAt: string;
+    /** Creation timestamp */
+    createdAt: string;
+    /** Last update timestamp */
+    updatedAt: string;
+}
+/**
+ * Reservation summary for a cart/order
+ */
+interface ReservationSummary {
+    /** Cart or Order ID */
+    referenceId: string;
+    /** Reference type */
+    referenceType: 'cart' | 'order';
+    /** Total items reserved */
+    totalItems: number;
+    /** Total quantity reserved */
+    totalQuantity: number;
+    /** Reservations by warehouse */
+    reservationsByWarehouse: {
+        warehouseId: string;
+        warehouseName: string;
+        itemCount: number;
+        totalQuantity: number;
+    }[];
+    /** Items that couldn't be reserved */
+    unavailableItems: {
+        productId: string;
+        sku: string;
+        requestedQuantity: number;
+        availableQuantity: number;
+        reason: string;
+    }[];
+    /** Reservation expiration */
+    expiresAt: string;
+    /** Creation timestamp */
+    createdAt: string;
+}
+/**
+ * Type of stock movement
+ */
+type StockMovementType = 'receipt' | 'sale' | 'transfer' | 'adjustment' | 'return' | 'damage' | 'reservation' | 'release';
+/**
+ * Stock movement record
+ */
+interface StockMovement {
+    /** Unique movement ID */
+    id: string;
+    /** Product ID */
+    productId: string;
+    /** SKU */
+    sku: string;
+    /** Warehouse ID */
+    warehouseId: string;
+    /** Movement type */
+    type: StockMovementType;
+    /** Quantity (positive or negative) */
+    quantity: number;
+    /** Stock before movement */
+    previousQuantity: number;
+    /** Stock after movement */
+    newQuantity: number;
+    /** Reference (order ID, transfer ID, etc.) */
+    referenceId?: string;
+    /** Reference type */
+    referenceType?: string;
+    /** Reason/notes */
+    reason?: string;
+    /** User who made the movement */
+    createdBy: string;
+    /** Creation timestamp */
+    createdAt: string;
+}
+/**
+ * Type of stock alert
+ */
+type StockAlertType = 'low_stock' | 'out_of_stock' | 'restock_due' | 'overstock' | 'expiring_soon' | 'reservation_expiring';
+/**
+ * Stock alert for monitoring
+ */
+interface StockAlert {
+    /** Alert ID */
+    id: string;
+    /** Alert type */
+    type: StockAlertType;
+    /** Severity level */
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    /** Product ID */
+    productId: string;
+    /** SKU */
+    sku: string;
+    /** Product name (for display) */
+    productName: string;
+    /** Warehouse ID */
+    warehouseId: string;
+    /** Warehouse name */
+    warehouseName: string;
+    /** Alert message */
+    message: string;
+    /** Current quantity */
+    currentQuantity: number;
+    /** Threshold that triggered alert */
+    threshold?: number;
+    /** Whether alert has been acknowledged */
+    acknowledged: boolean;
+    /** User who acknowledged */
+    acknowledgedBy?: string;
+    /** Acknowledgement timestamp */
+    acknowledgedAt?: string;
+    /** Creation timestamp */
+    createdAt: string;
+}
+/**
+ * Request to check product availability
+ */
+interface AvailabilityCheckRequest {
+    /** Product ID */
+    productId: string;
+    /** Variant ID */
+    variantId?: string;
+    /** Requested quantity */
+    quantity: number;
+    /** Preferred warehouse ID */
+    preferredWarehouseId?: string;
+    /** Company ID for personalized availability */
+    companyId?: string;
+    /** Whether to include alternative warehouses */
+    includeAlternatives?: boolean;
+}
+/**
+ * Availability check result
+ */
+interface AvailabilityResult {
+    /** Product ID */
+    productId: string;
+    /** Variant ID */
+    variantId?: string;
+    /** Requested quantity */
+    requestedQuantity: number;
+    /** Whether fully available */
+    isAvailable: boolean;
+    /** Available quantity */
+    availableQuantity: number;
+    /** Primary fulfillment option */
+    primaryOption?: FulfillmentOption;
+    /** Alternative fulfillment options */
+    alternativeOptions: FulfillmentOption[];
+    /** Partial availability options */
+    partialOptions?: PartialFulfillmentOption[];
+    /** Expected availability date if not in stock */
+    expectedAvailableDate?: string;
+    /** Message to display */
+    message: string;
+}
+/**
+ * Fulfillment option from a warehouse
+ */
+interface FulfillmentOption {
+    /** Warehouse ID */
+    warehouseId: string;
+    /** Warehouse name */
+    warehouseName: string;
+    /** Available quantity */
+    availableQuantity: number;
+    /** Fulfillment type */
+    type: 'pickup' | 'delivery';
+    /** Estimated ready/delivery time */
+    estimatedTime: string;
+    /** Estimated time in hours (for sorting) */
+    estimatedHours: number;
+    /** Additional cost (if any) */
+    additionalCost?: number;
+    /** Whether this is the recommended option */
+    isRecommended: boolean;
+}
+/**
+ * Partial fulfillment option (split across warehouses)
+ */
+interface PartialFulfillmentOption {
+    /** Fulfillment parts */
+    parts: {
+        warehouseId: string;
+        warehouseName: string;
+        quantity: number;
+        type: 'pickup' | 'delivery';
+        estimatedTime: string;
+    }[];
+    /** Total quantity fulfilled */
+    totalQuantity: number;
+    /** Whether this completes the order */
+    completesOrder: boolean;
+}
+/**
+ * Input for creating a stock reservation
+ */
+interface CreateReservationInput {
+    productId: string;
+    variantId?: string;
+    warehouseId: string;
+    quantity: number;
+    cartId?: string;
+    orderId?: string;
+    /** Duration in minutes */
+    durationMinutes?: number;
+}
+/**
+ * Input for recording stock movement
+ */
+interface CreateStockMovementInput {
+    productId: string;
+    warehouseId: string;
+    type: StockMovementType;
+    quantity: number;
+    referenceId?: string;
+    referenceType?: string;
+    reason?: string;
+}
+/**
+ * Input for stock adjustment
+ */
+interface StockAdjustmentInput {
+    productId: string;
+    warehouseId: string;
+    newQuantity: number;
+    reason: string;
+}
+/**
+ * Input for stock transfer between warehouses
+ */
+interface StockTransferInput {
+    productId: string;
+    sourceWarehouseId: string;
+    destinationWarehouseId: string;
+    quantity: number;
+    reason?: string;
+}
+/**
+ * Filters for stock queries
+ */
+interface StockFilters {
+    /** Filter by product IDs */
+    productIds?: string[];
+    /** Filter by SKUs */
+    skus?: string[];
+    /** Filter by warehouse IDs */
+    warehouseIds?: string[];
+    /** Filter by status */
+    statuses?: StockStatus$1[];
+    /** Filter products with low stock */
+    lowStockOnly?: boolean;
+    /** Filter products out of stock */
+    outOfStockOnly?: boolean;
+    /** Filter products with pending reservations */
+    hasReservations?: boolean;
+    /** Filter by category ID */
+    categoryId?: string;
+    /** Filter by brand */
+    brand?: string;
+}
+/**
+ * Filters for stock alerts
+ */
+interface StockAlertFilters {
+    /** Filter by alert types */
+    types?: StockAlertType[];
+    /** Filter by severity */
+    severities?: ('low' | 'medium' | 'high' | 'critical')[];
+    /** Filter by warehouse IDs */
+    warehouseIds?: string[];
+    /** Show only unacknowledged alerts */
+    unacknowledgedOnly?: boolean;
+    /** Date range start */
+    dateFrom?: string;
+    /** Date range end */
+    dateTo?: string;
+}
+/**
+ * Filters for stock movement history
+ */
+interface StockMovementFilters {
+    /** Filter by product ID */
+    productId?: string;
+    /** Filter by warehouse ID */
+    warehouseId?: string;
+    /** Filter by movement types */
+    types?: StockMovementType[];
+    /** Date range start */
+    dateFrom?: string;
+    /** Date range end */
+    dateTo?: string;
+    /** Filter by user */
+    createdBy?: string;
 }
 
 interface SageStatistiqueArticle {
@@ -2527,4 +3613,4 @@ interface Wishlist {
     totalItems: number;
 }
 
-export type { ApiResponse, ApprovalAction, ApprovalActionInput, ApprovalAttachment, ApprovalDelegation, ApprovalEntityType, ApprovalFilters, ApprovalLevel, ApprovalRequest, ApprovalStatus, ApprovalStep, ApprovalSummary, ApprovalTrigger, ApprovalTriggerType, ApprovalWorkflow, ApproverDecision, Order$1 as B2BOrder, OrderItem$1 as B2BOrderItem, OrderStatus$1 as B2BOrderStatus, OrderTotals$1 as B2BOrderTotals, BillingAddress, BulkOrderCsvInput, BulkOrderCsvParseResult, BulkOrderErrorCode, BulkOrderItem, BulkOrderSummary, BulkOrderValidationError, BulkOrderValidationResult, BulkOrderValidationWarning, BulkOrderWarningCode, CancelOrderInput, CardBrand, Cart, CartItem, CartItemWithDetails, CartState, Category, CategoryRestriction, CategorySpending, CheckoutState, CheckoutStep, Company, CompanyAddress, CompanyAddressType, CompanySettings, CompanyStatus, CompanySummary, CompanyTier, CompanyTierConfig, CreateApprovalWorkflowInput, CreateCompanyInput, CreateOrderInput, CreateOrderRequest, CreateOrderResponse, CreateQuoteInput, CreateSpendingLimitInput, CreateSpendingRuleInput, DailySpending, Department, Employee, EmployeeActivity, EmployeeActivityType, EmployeeInvitation, EmployeePermission, EmployeeRole, EmployeeSpending, EmployeeStatus, EmployeeSummary, ExtendedUser, InviteEmployeeInput, LimitExceededAlert, LoginFormData, MockUser, MonthlyTrend, NavItem, NearLimitAlert, Order, OrderAttachment, OrderFilters, OrderHistoryEntry, OrderHistoryEventType, OrderItem, OrderItemInput, OrderListResponse, OrderPayment, OrderShipping, OrderShippingAddress, OrderSortField, OrderSortOptions, OrderStatistics, OrderStatus, OrderSummary, OrderTotals, PaymentInfo, PaymentMethod, PaymentMethodType, PaymentStatus, PaymentTermType, PaymentTerms, PermissionGroup, Product, ProductCatalogEntry, ProductFilters, ProductRestriction, Quote, QuoteAttachment, QuoteFilters, QuoteHistoryEntry, QuoteHistoryEventType, QuoteItem, QuoteItemInput, QuoteMessage, QuoteResponseInput, QuoteStatus, QuoteSummary, QuoteTerms, QuoteTotals, RegisterFormData, ReportData, ReportPeriod, ReportSummary, ReportType, ReturnOrderInput, RoleConfig, SageArticle, SageFamille, SageInfoLibre, SageStatistiqueArticle, ShippingAddress, ShippingAddressInput, SpendingAdjustmentInput, SpendingByCategory, SpendingByDepartment, SpendingByEmployee, SpendingFilters, SpendingLimit, SpendingLimitEntityType, SpendingPeriod, SpendingReport, SpendingRule, SpendingRuleAction, SpendingTransaction, StockInfo, StockStatus, TopProduct, UpdateApprovalWorkflowInput, UpdateCompanyInput, UpdateEmployeeInput, UpdateOrderInput, UpdateQuoteInput, UpdateSpendingLimitInput, User, Wishlist, WishlistItem };
+export type { ApiResponse, ApprovalAction, ApprovalActionInput, ApprovalAttachment, ApprovalDelegation, ApprovalEntityType, ApprovalFilters, ApprovalLevel, ApprovalRequest, ApprovalStatus, ApprovalStep, ApprovalSummary, ApprovalTrigger, ApprovalTriggerType, ApprovalWorkflow, ApproverDecision, AvailabilityCheckRequest, AvailabilityResult, Order$1 as B2BOrder, OrderItem$1 as B2BOrderItem, OrderStatus$1 as B2BOrderStatus, OrderTotals$1 as B2BOrderTotals, BasePrice, BillingAddress, BulkOrderCsvInput, BulkOrderCsvParseResult, BulkOrderErrorCode, BulkOrderItem, BulkOrderSummary, BulkOrderValidationError, BulkOrderValidationResult, BulkOrderValidationWarning, BulkOrderWarningCode, CalculatedPrice, CancelOrderInput, CardBrand, Cart, CartItem, CartItemWithDetails, CartState, Category, CategoryRestriction, CategorySpending, CheckoutState, CheckoutStep, Company, CompanyAddress, CompanyAddressType, CompanySettings, CompanyStatus, CompanySummary, CompanyTier, CompanyTierConfig, CreateApprovalWorkflowInput, CreateCompanyInput, CreateCustomerPriceInput, CreateOrderInput, CreateOrderRequest, CreateOrderResponse, CreatePriceListInput, CreateQuoteInput, CreateReservationInput, CreateSpendingLimitInput, CreateSpendingRuleInput, CreateStockMovementInput, CreateWarehouseInput, CurrencyCode, CustomerPriceOverride, DailySpending, DayOfWeek, DaySchedule, DeliveryOption, DeliveryOptionType, Department, Employee, EmployeeActivity, EmployeeActivityType, EmployeeInvitation, EmployeePermission, EmployeeRole, EmployeeSpending, EmployeeStatus, EmployeeSummary, ExtendedUser, FulfillmentOption, InviteEmployeeInput, LimitExceededAlert, LoginFormData, MockUser, MonthlyTrend, NavItem, NearLimitAlert, OpeningHours, Order, OrderAttachment, OrderFilters, OrderHistoryEntry, OrderHistoryEventType, OrderItem, OrderItemInput, OrderListResponse, OrderPayment, OrderShipping, OrderShippingAddress, OrderSortField, OrderSortOptions, OrderStatistics, OrderStatus, OrderSummary, OrderTotals, PartialFulfillmentOption, PaymentInfo, PaymentMethod, PaymentMethodType, PaymentStatus, PaymentTermType, PaymentTerms, PermissionGroup, PriceCalculationRequest, PriceList, PriceListFilters, PriceListStatus, PriceListSummary, PriceListType, PriceRoundingRule, Product, ProductCatalogEntry, ProductFilters, ProductPricing, ProductRestriction, ProductStock, Quote, QuoteAttachment, QuoteFilters, QuoteHistoryEntry, QuoteHistoryEventType, QuoteItem, QuoteItemInput, QuoteMessage, QuoteResponseInput, QuoteStatus, QuoteSummary, QuoteTerms, QuoteTotals, RegisterFormData, ReportData, ReportPeriod, ReportSummary, ReportType, ReservationStatus, ReservationSummary, ReturnOrderInput, RoleConfig, SageArticle, SageFamille, SageInfoLibre, SageStatistiqueArticle, SetProductPriceInput, ShippingAddress, ShippingAddressInput, SpecialSchedule, SpendingAdjustmentInput, SpendingByCategory, SpendingByDepartment, SpendingByEmployee, SpendingFilters, SpendingLimit, SpendingLimitEntityType, SpendingPeriod, SpendingReport, SpendingRule, SpendingRuleAction, SpendingTransaction, StockAdjustmentInput, StockAlert, StockAlertFilters, StockAlertType, StockFilters, StockInfo, StockMovement, StockMovementFilters, StockMovementType, StockReservation, StockStatus, StockTransferInput, TaxRate, TimeSlot, TopProduct, UnitConfig, UnitOfMeasure, UpdateApprovalWorkflowInput, UpdateCompanyInput, UpdateEmployeeInput, UpdateOrderInput, UpdatePriceListInput, UpdateQuoteInput, UpdateSpendingLimitInput, UpdateWarehouseInput, User, VolumeDiscount, VolumeDiscountConfig, Warehouse, WarehouseAddress, WarehouseCapabilities, WarehouseContact, WarehouseFilters, WarehouseStatus, WarehouseStock, WarehouseSummary, WarehouseType, Wishlist, WishlistItem };

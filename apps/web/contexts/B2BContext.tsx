@@ -498,31 +498,31 @@ const mockReportsData: ReportData = {
     pendingApprovals: 3,
   },
   byEmployee: [
-    { name: 'Marie Dupont', amount: 8500, limit: 15000, percentage: 57 },
-    { name: 'Pierre Martin', amount: 3200, limit: 5000, percentage: 64 },
-    { name: 'Sophie Bernard', amount: 1800, limit: 2000, percentage: 90 },
+    { employeeId: 'emp_001', employeeName: 'Marie Dupont', totalSpending: 8500, ordersCount: 30, averageOrder: 283.33, percentOfTotal: 57 },
+    { employeeId: 'emp_002', employeeName: 'Pierre Martin', totalSpending: 3200, ordersCount: 12, averageOrder: 266.67, percentOfTotal: 24 },
+    { employeeId: 'emp_003', employeeName: 'Sophie Bernard', totalSpending: 1800, ordersCount: 6, averageOrder: 300.00, percentOfTotal: 13 },
   ],
   byCategory: [
-    { category: 'Bracelets', amount: 4500, orders: 12 },
-    { category: 'Colliers', amount: 3200, orders: 8 },
-    { category: 'Bagues', amount: 2800, orders: 15 },
-    { category: 'Boucles d\'oreilles', amount: 2000, orders: 10 },
-    { category: 'Montres', amount: 1000, orders: 3 },
+    { categoryId: 'cat_001', categoryName: 'Bracelets', totalSpending: 4500, itemsCount: 12, percentOfTotal: 33.3 },
+    { categoryId: 'cat_002', categoryName: 'Colliers', totalSpending: 3200, itemsCount: 8, percentOfTotal: 23.7 },
+    { categoryId: 'cat_003', categoryName: 'Bagues', totalSpending: 2800, itemsCount: 15, percentOfTotal: 20.7 },
+    { categoryId: 'cat_004', categoryName: "Boucles d'oreilles", totalSpending: 2000, itemsCount: 10, percentOfTotal: 14.8 },
+    { categoryId: 'cat_005', categoryName: 'Montres', totalSpending: 1000, itemsCount: 3, percentOfTotal: 7.4 },
   ],
-  trend: [
-    { month: 'Juillet', amount: 8500 },
-    { month: 'Aout', amount: 7200 },
-    { month: 'Septembre', amount: 9100 },
-    { month: 'Octobre', amount: 11500 },
-    { month: 'Novembre', amount: 12800 },
-    { month: 'Decembre', amount: 13500 },
+  monthlyTrend: [
+    { month: '2024-07', spending: 8500, ordersCount: 28, averageOrder: 303.57 },
+    { month: '2024-08', spending: 7200, ordersCount: 24, averageOrder: 300.00 },
+    { month: '2024-09', spending: 9100, ordersCount: 32, averageOrder: 284.38 },
+    { month: '2024-10', spending: 11500, ordersCount: 40, averageOrder: 287.50 },
+    { month: '2024-11', spending: 12800, ordersCount: 44, averageOrder: 290.91 },
+    { month: '2024-12', spending: 13500, ordersCount: 48, averageOrder: 281.25 },
   ],
   topProducts: [
-    { sku: 'BRA-001', name: 'Bracelet Or 18K - Maille Figaro', quantity: 45, revenue: 20250 },
-    { sku: 'COL-002', name: 'Collier Argent - Perles Eau Douce', quantity: 38, revenue: 8360 },
-    { sku: 'BAG-002', name: 'Bague Or Jaune - Alliance Classique', quantity: 32, revenue: 11200 },
-    { sku: 'BOU-001', name: 'Boucles Or Rose - Creoles Petites', quantity: 28, revenue: 7840 },
-    { sku: 'BRA-002', name: 'Bracelet Argent 925 - Maille Venitienne', quantity: 25, revenue: 3000 },
+    { productId: 'prod_001', productName: 'Bracelet Or 18K - Maille Figaro', sku: 'BRA-001', quantity: 45, totalSpending: 20250, averagePrice: 450 },
+    { productId: 'prod_002', productName: 'Collier Argent - Perles Eau Douce', sku: 'COL-002', quantity: 38, totalSpending: 8360, averagePrice: 220 },
+    { productId: 'prod_003', productName: 'Bague Or Jaune - Alliance Classique', sku: 'BAG-002', quantity: 32, totalSpending: 11200, averagePrice: 350 },
+    { productId: 'prod_004', productName: 'Boucles Or Rose - Creoles Petites', sku: 'BOU-001', quantity: 28, totalSpending: 7840, averagePrice: 280 },
+    { productId: 'prod_005', productName: 'Bracelet Argent 925 - Maille Venitienne', sku: 'BRA-002', quantity: 25, totalSpending: 3000, averagePrice: 120 },
   ],
 };
 
@@ -531,84 +531,116 @@ const mockReportsData: ReportData = {
  */
 const mockProductCatalog: Record<string, ProductCatalogEntry> = {
   'BRA-001': {
+    productId: 'prod_001',
     sku: 'BRA-001',
     name: 'Bracelet Or 18K - Maille Figaro',
-    price: 450,
-    stock: 25,
-    available: true,
+    description: 'Bracelet en or 18 carats avec maille figaro classique',
+    unitPrice: 450,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 25,
+    availableStock: 25,
     category: 'bracelets',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 25,
+    brand: 'Maison',
+    imageUrl: '/images/products/bracelet-or-figaro.jpg',
   },
   'BRA-002': {
+    productId: 'prod_002',
     sku: 'BRA-002',
     name: 'Bracelet Argent 925 - Maille Venitienne',
-    price: 120,
-    stock: 50,
-    available: true,
+    description: 'Bracelet en argent 925 avec maille venitienne',
+    unitPrice: 120,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 50,
+    availableStock: 50,
     category: 'bracelets',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 50,
+    brand: 'Maison',
+    imageUrl: '/images/products/bracelet-argent-venitienne.jpg',
   },
   'COL-001': {
+    productId: 'prod_003',
     sku: 'COL-001',
     name: 'Collier Or 18K - Pendentif Coeur',
-    price: 680,
-    stock: 15,
-    available: true,
+    description: 'Collier en or 18 carats avec pendentif coeur',
+    unitPrice: 680,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 15,
+    availableStock: 15,
     category: 'colliers',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 15,
+    brand: 'Maison',
+    imageUrl: '/images/products/collier-or-coeur.jpg',
   },
   'COL-002': {
+    productId: 'prod_004',
     sku: 'COL-002',
     name: 'Collier Argent - Perles Eau Douce',
-    price: 220,
-    stock: 30,
-    available: true,
+    description: 'Collier en argent avec perles eau douce',
+    unitPrice: 220,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 30,
+    availableStock: 30,
     category: 'colliers',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 30,
+    brand: 'Maison',
+    imageUrl: '/images/products/collier-argent-perles.jpg',
   },
   'BAG-001': {
+    productId: 'prod_005',
     sku: 'BAG-001',
     name: 'Bague Or Blanc - Solitaire Diamant',
-    price: 1200,
-    stock: 8,
-    available: true,
+    description: 'Bague en or blanc avec solitaire diamant',
+    unitPrice: 1200,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 8,
+    availableStock: 8,
     category: 'bagues',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 8,
+    brand: 'Maison',
+    imageUrl: '/images/products/bague-or-blanc-solitaire.jpg',
   },
   'BAG-002': {
+    productId: 'prod_006',
     sku: 'BAG-002',
     name: 'Bague Or Jaune - Alliance Classique',
-    price: 350,
-    stock: 20,
-    available: true,
+    description: 'Alliance classique en or jaune',
+    unitPrice: 350,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 20,
+    availableStock: 20,
     category: 'bagues',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 20,
+    brand: 'Maison',
+    imageUrl: '/images/products/bague-or-jaune-alliance.jpg',
   },
   'BOU-001': {
+    productId: 'prod_007',
     sku: 'BOU-001',
     name: 'Boucles Or Rose - Creoles Petites',
-    price: 280,
-    stock: 35,
-    available: true,
+    description: 'Boucles oreilles creoles petites en or rose',
+    unitPrice: 280,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 35,
+    availableStock: 35,
     category: 'boucles',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 35,
+    brand: 'Maison',
+    imageUrl: '/images/products/boucles-or-rose-creoles.jpg',
   },
   'BOU-002': {
+    productId: 'prod_008',
     sku: 'BOU-002',
     name: 'Boucles Argent - Puces Zirconium',
-    price: 85,
-    stock: 100,
-    available: true,
+    description: 'Boucles oreilles puces en argent avec zirconium',
+    unitPrice: 85,
+    currency: 'EUR',
+    minQuantity: 1,
+    maxQuantity: 100,
+    availableStock: 100,
     category: 'boucles',
-    minOrderQuantity: 1,
-    maxOrderQuantity: 100,
+    brand: 'Maison',
+    imageUrl: '/images/products/boucles-argent-puces.jpg',
   },
 };
 
@@ -1001,13 +1033,13 @@ export function B2BProvider({
         },
         byEmployee: mockReportsData.byEmployee.map((e) => ({
           ...e,
-          amount: Math.round(e.amount * periodMultiplier),
-          percentage: Math.min(100, Math.round(e.percentage * periodMultiplier / (period === 'year' ? 12 : 1))),
+          totalSpending: Math.round((e.totalSpending || 0) * periodMultiplier),
+          percentOfTotal: Math.min(100, Math.round((e.percentOfTotal || 0) * periodMultiplier / (period === 'year' ? 12 : 1))),
         })),
         byCategory: mockReportsData.byCategory.map((c) => ({
           ...c,
-          amount: Math.round(c.amount * periodMultiplier),
-          orders: Math.round(c.orders * periodMultiplier),
+          totalSpending: Math.round((c.totalSpending || 0) * periodMultiplier),
+          itemsCount: Math.round((c.itemsCount || 0) * periodMultiplier),
         })),
       });
     } catch (err) {
@@ -1043,24 +1075,23 @@ export function B2BProvider({
         if (!product) {
           return {
             sku: normalizedSku,
-            name: 'Produit non trouve',
             quantity,
-            unitPrice: 0,
-            available: false,
-            stock: 0,
-            error: 'SKU inconnu',
+            isValid: false,
+            errors: ['SKU inconnu'],
           };
         }
 
-        const available = product.stock >= quantity;
+        const productStock = product.availableStock ?? 0;
+        const productUnitPrice = product.unitPrice ?? 0;
+        const available = productStock >= quantity;
         return {
           sku: normalizedSku,
-          name: product.name,
           quantity,
-          unitPrice: product.price,
-          available,
-          stock: product.stock,
-          error: available ? undefined : `Stock insuffisant (${product.stock} disponibles)`,
+          product,
+          isValid: available,
+          unitPrice: productUnitPrice,
+          lineTotal: productUnitPrice * quantity,
+          errors: available ? undefined : [`Stock insuffisant (${productStock} disponibles)`],
         };
       });
     },
@@ -1075,60 +1106,83 @@ export function B2BProvider({
 
       const errors: BulkOrderValidationResult['errors'] = [];
       const warnings: BulkOrderValidationResult['warnings'] = [];
+      const validItems: BulkOrderItem[] = [];
+      let totalAmount = 0;
 
-      for (const item of items) {
+      items.forEach((item, index) => {
         const product = mockProductCatalog[item.sku];
 
         if (!product) {
           errors.push({
-            sku: item.sku,
+            row: index + 1,
+            field: 'sku',
             code: 'UNKNOWN_SKU',
             message: `SKU inconnu: ${item.sku}`,
           });
-          continue;
+          return;
         }
 
         if (item.quantity <= 0) {
           errors.push({
-            sku: item.sku,
+            row: index + 1,
+            field: 'quantity',
             code: 'INVALID_QUANTITY',
             message: 'La quantite doit etre superieure a 0',
           });
-        } else if (item.quantity > product.stock) {
+          return;
+        }
+
+        const productAvailableStock = product.availableStock ?? 0;
+        if (item.quantity > productAvailableStock) {
           errors.push({
-            sku: item.sku,
+            row: index + 1,
+            field: 'quantity',
             code: 'INSUFFICIENT_STOCK',
-            message: `Stock insuffisant: ${product.stock} disponibles, ${item.quantity} demandes`,
+            message: `Stock insuffisant: ${productAvailableStock} disponibles, ${item.quantity} demandes`,
           });
-        } else if (item.quantity > product.stock * 0.8) {
+          return;
+        }
+
+        if (item.quantity > productAvailableStock * 0.8) {
           warnings.push({
             sku: item.sku,
             code: 'LOW_STOCK',
-            message: `Stock limite: ${product.stock} disponibles`,
+            message: `Stock limite: ${productAvailableStock} disponibles`,
           });
         }
 
-        if (product.minOrderQuantity && item.quantity < product.minOrderQuantity) {
+        if (product.minQuantity && item.quantity < product.minQuantity) {
           errors.push({
-            sku: item.sku,
+            row: index + 1,
+            field: 'quantity',
             code: 'BELOW_MIN_QUANTITY',
-            message: `Quantite minimum: ${product.minOrderQuantity}`,
+            message: `Quantite minimum: ${product.minQuantity}`,
           });
+          return;
         }
 
-        if (product.maxOrderQuantity && item.quantity > product.maxOrderQuantity) {
+        if (product.maxQuantity && item.quantity > product.maxQuantity) {
           errors.push({
-            sku: item.sku,
+            row: index + 1,
+            field: 'quantity',
             code: 'EXCEEDS_ORDER_LIMIT',
-            message: `Quantite maximum: ${product.maxOrderQuantity}`,
+            message: `Quantite maximum: ${product.maxQuantity}`,
           });
+          return;
         }
-      }
+
+        validItems.push(item);
+        totalAmount += item.lineTotal ?? 0;
+      });
 
       return {
-        valid: errors.length === 0,
+        isValid: errors.length === 0,
         errors,
         warnings,
+        validItems,
+        invalidCount: errors.length,
+        totalAmount,
+        currency: 'EUR',
       };
     },
     []

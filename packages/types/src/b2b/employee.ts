@@ -27,6 +27,11 @@ export type EmployeePermission =
   | 'quotes.reject'           // Can reject quotes
   | 'quotes.negotiate'        // Can negotiate quote terms
 
+  // Product permissions
+  | 'products.view'           // Can view products
+  | 'products.view_prices'    // Can view product prices
+  | 'products.view_stock'     // Can view stock levels
+
   // Spending permissions
   | 'spending.unlimited'      // No spending limits
   | 'spending.view_reports'   // Can view spending reports

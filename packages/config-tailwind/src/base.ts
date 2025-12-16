@@ -1,13 +1,135 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Design System Luxe - Shared across Web and Mobile
- * Hermes-inspired luxury jewelry e-commerce
+ * Design System B2B Professionnel
+ * Plateforme distributeur B2B - Inspiré Rexel, Sonepar, Setin
  */
 export const baseConfig: Partial<Config> = {
   theme: {
     extend: {
       colors: {
+        // ===== PALETTE B2B PROFESSIONNELLE =====
+
+        // Primaire B2B - Bleu professionnel (actions principales)
+        'b2b-primary': {
+          DEFAULT: '#0059a1',
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#0059a1',
+          600: '#004d8a',
+          700: '#003d6d',
+          800: '#002d51',
+          900: '#001d35',
+        },
+
+        // Accent B2B - Orange action (CTAs, éléments clés)
+        'b2b-accent': {
+          DEFAULT: '#f67828',
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f67828',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+        },
+
+        // Succès B2B - Vert (stock disponible, confirmations)
+        'b2b-success': {
+          DEFAULT: '#10b981',
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
+        },
+
+        // Danger B2B - Rouge (rupture stock, erreurs, alertes)
+        'b2b-danger': {
+          DEFAULT: '#ef4444',
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
+        },
+
+        // Warning B2B - Orange/Jaune (stock faible, attention)
+        'b2b-warning': {
+          DEFAULT: '#f59e0b',
+          50: '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#d97706',
+          700: '#b45309',
+          800: '#92400e',
+          900: '#78350f',
+        },
+
+        // Info B2B - Bleu clair (informations, tips)
+        'b2b-info': {
+          DEFAULT: '#3b82f6',
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+        },
+
+        // Fonds B2B - Tons neutres professionnels
+        'b2b-bg': {
+          DEFAULT: '#ffffff',
+          primary: '#ffffff',
+          secondary: '#f8fafc',
+          tertiary: '#f1f5f9',
+          muted: '#e2e8f0',
+          dark: '#1e293b',
+        },
+
+        // Texte B2B - Lisibilité optimale
+        'b2b-text': {
+          DEFAULT: '#1e293b',
+          primary: '#1e293b',
+          secondary: '#475569',
+          muted: '#94a3b8',
+          light: '#cbd5e1',
+          inverse: '#ffffff',
+        },
+
+        // Bordures B2B
+        'b2b-border': {
+          DEFAULT: '#e2e8f0',
+          light: '#f1f5f9',
+          medium: '#cbd5e1',
+          dark: '#94a3b8',
+        },
+
+        // ===== PALETTE LEGACY (compatibilité) =====
+
         // Palette de fonds - tons chauds et lumineux
         background: {
           DEFAULT: '#fffcf7',
@@ -26,7 +148,7 @@ export const baseConfig: Partial<Config> = {
           light: '#8b8b8b',
           inverse: '#fffcf7',
         },
-        // Accent Hermes
+        // Accent Hermes (legacy)
         hermes: {
           DEFAULT: '#f67828',
           50: '#fff7ed',
@@ -40,7 +162,7 @@ export const baseConfig: Partial<Config> = {
           800: '#9a3412',
           900: '#7c2d12',
         },
-        // Palette neutre luxe
+        // Palette neutre luxe (legacy)
         luxe: {
           white: '#ffffff',
           cream: '#fffcf7',
@@ -52,7 +174,7 @@ export const baseConfig: Partial<Config> = {
           charcoal: '#2b333f',
           noir: '#1a1a1a',
         },
-        // Bordures
+        // Bordures (legacy)
         border: {
           DEFAULT: '#e2d8ce',
           light: '#f0ebe3',
@@ -61,8 +183,12 @@ export const baseConfig: Partial<Config> = {
         },
       },
       fontFamily: {
+        // B2B Professional - Inter for everything
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        heading: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        // Legacy (compatibilité)
         serif: ['Playfair Display', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Cormorant Garamond', 'Georgia', 'serif'],
       },
       spacing: {
@@ -89,6 +215,21 @@ export const baseConfig: Partial<Config> = {
         pill: '1.75rem',    // 28px - pill button radius
       },
       fontSize: {
+        // ===== B2B TYPOGRAPHY (optimisée lisibilité) =====
+        'b2b-page-title': ['1.75rem', { lineHeight: '2rem', fontWeight: '600', letterSpacing: '-0.01em' }],
+        'b2b-section-title': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600', letterSpacing: '-0.005em' }],
+        'b2b-card-title': ['1rem', { lineHeight: '1.5rem', fontWeight: '500' }],
+        'b2b-body': ['0.875rem', { lineHeight: '1.25rem' }],
+        'b2b-body-sm': ['0.8125rem', { lineHeight: '1.125rem' }],
+        'b2b-caption': ['0.75rem', { lineHeight: '1rem' }],
+        'b2b-label': ['0.75rem', { lineHeight: '1rem', fontWeight: '500', letterSpacing: '0.025em' }],
+        'b2b-price': ['1.125rem', { lineHeight: '1.5rem', fontWeight: '600' }],
+        'b2b-price-lg': ['1.5rem', { lineHeight: '2rem', fontWeight: '700' }],
+        'b2b-price-sm': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '600' }],
+        'b2b-sku': ['0.75rem', { lineHeight: '1rem', fontWeight: '500' }],
+        'b2b-badge': ['0.6875rem', { lineHeight: '1rem', fontWeight: '600', letterSpacing: '0.02em' }],
+
+        // ===== LEGACY TYPOGRAPHY (compatibilité) =====
         'display-hero': ['5rem', { lineHeight: '1.05', letterSpacing: '-0.03em', fontWeight: '300' }],
         'display-1': ['4rem', { lineHeight: '1.1', letterSpacing: '-0.025em', fontWeight: '300' }],
         'display-2': ['3.25rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '400' }],
@@ -130,7 +271,89 @@ export const baseConfig: Partial<Config> = {
   },
 };
 
-// Platform-agnostic design tokens for use in both web and native
+// ===== B2B DESIGN TOKENS =====
+export const b2bTokens = {
+  colors: {
+    primary: {
+      default: '#0059a1',
+      light: '#eff6ff',
+      dark: '#003d6d',
+    },
+    accent: {
+      default: '#f67828',
+      light: '#fff7ed',
+      dark: '#c2410c',
+    },
+    success: {
+      default: '#10b981',
+      light: '#ecfdf5',
+      dark: '#047857',
+    },
+    danger: {
+      default: '#ef4444',
+      light: '#fef2f2',
+      dark: '#b91c1c',
+    },
+    warning: {
+      default: '#f59e0b',
+      light: '#fffbeb',
+      dark: '#b45309',
+    },
+    info: {
+      default: '#3b82f6',
+      light: '#eff6ff',
+      dark: '#1d4ed8',
+    },
+    background: {
+      primary: '#ffffff',
+      secondary: '#f8fafc',
+      tertiary: '#f1f5f9',
+      muted: '#e2e8f0',
+    },
+    text: {
+      primary: '#1e293b',
+      secondary: '#475569',
+      muted: '#94a3b8',
+      inverse: '#ffffff',
+    },
+    border: {
+      light: '#f1f5f9',
+      default: '#e2e8f0',
+      medium: '#cbd5e1',
+      dark: '#94a3b8',
+    },
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+    '2xl': 32,
+    '3xl': 48,
+  },
+  radii: {
+    none: 0,
+    sm: 4,
+    md: 6,
+    lg: 8,
+    xl: 12,
+    full: 9999,
+  },
+  typography: {
+    pageTitle: { size: 28, weight: 600, lineHeight: 32 },
+    sectionTitle: { size: 20, weight: 600, lineHeight: 28 },
+    cardTitle: { size: 16, weight: 500, lineHeight: 24 },
+    body: { size: 14, weight: 400, lineHeight: 20 },
+    bodySm: { size: 13, weight: 400, lineHeight: 18 },
+    caption: { size: 12, weight: 400, lineHeight: 16 },
+    label: { size: 12, weight: 500, lineHeight: 16 },
+    price: { size: 18, weight: 600, lineHeight: 24 },
+    priceLg: { size: 24, weight: 700, lineHeight: 32 },
+  },
+} as const;
+
+// ===== LEGACY DESIGN TOKENS (compatibilité) =====
 export const designTokens = {
   colors: {
     background: {

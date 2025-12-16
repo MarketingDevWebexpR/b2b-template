@@ -1,20 +1,36 @@
 /**
- * UI Components - Maison Bijoux Design System
+ * UI Components - Maison Bijoux B2B Design System
  *
- * Hermes-inspired luxury design components for checkout flow and e-commerce.
+ * Professional B2B design components for distributor e-commerce platform.
  *
  * Design Principles:
- * - Elegance through simplicity and restraint
- * - Hermes orange (#f67828) as primary accent
- * - Light cream/white backgrounds with warm tones
- * - Serif typography for headings, sans-serif for body
- * - Subtle animations and refined transitions
- * - Generous spacing for visual breathing room
+ * - Professional, clean interface optimized for productivity
+ * - B2B blue (#0059a1) as primary, orange (#f67828) as accent
+ * - Light backgrounds with clear visual hierarchy
+ * - Inter font for optimal readability
+ * - Fast, responsive interactions
+ * - High-density information display
  */
 
 // Button
 export { Button, buttonVariants, buttonSizes } from './Button';
 export type { ButtonProps } from './Button';
+
+// Select
+export { Select, selectSizes } from './Select';
+export type { SelectProps, SelectOption } from './Select';
+
+// Checkbox & Radio
+export { Checkbox, Radio, CheckboxGroup, checkboxSizes } from './Checkbox';
+export type { CheckboxProps, CheckboxGroupProps } from './Checkbox';
+
+// Switch
+export { Switch, switchSizes } from './Switch';
+export type { SwitchProps } from './Switch';
+
+// Slider
+export { Slider, RangeSlider, sliderSizes } from './Slider';
+export type { SliderProps, RangeSliderProps } from './Slider';
 
 // Container
 export { Container } from './Container';
@@ -97,3 +113,39 @@ export type {
 // SageSyncBadge (ERP sync status indicator)
 export { SageSyncBadge } from './SageSyncBadge';
 export type { SageSyncBadgeProps, SyncStatus } from './SageSyncBadge';
+
+// Modal
+export { Modal, ConfirmModal, modalSizes } from './Modal';
+export type { ModalProps, ConfirmModalProps } from './Modal';
+
+// Drawer
+export { Drawer, drawerSizes } from './Drawer';
+export type { DrawerProps } from './Drawer';
+
+// Popover & Dropdown
+export { Popover, DropdownMenu } from './Popover';
+export type { PopoverProps, DropdownMenuProps, DropdownMenuItem } from './Popover';
+
+// Tooltip
+export { Tooltip, InfoTooltip } from './Tooltip';
+export type { TooltipProps, InfoTooltipProps } from './Tooltip';
+
+// Toast
+export { ToastProvider, ToastItem, useToast, toast } from './Toast';
+export type { Toast, ToastVariant, ToastPosition, ToastProviderProps, ToastContextValue } from './Toast';
+
+// Tabs
+export { Tabs, TabsList, TabsTrigger, TabsContent, PillTabs } from './Tabs';
+export type { TabsProps, TabsListProps, TabsTriggerProps, TabsContentProps, PillTabsProps } from './Tabs';
+
+// Accordion
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent, FAQAccordion } from './Accordion';
+export type { AccordionProps, AccordionItemProps, AccordionTriggerProps, AccordionContentProps, FAQItem, FAQAccordionProps } from './Accordion';
+
+// DataTable
+export { DataTable } from './DataTable';
+export type { DataTableProps, DataTableColumn, SortState } from './DataTable';
+
+// Pagination
+export { Pagination, PaginationWithInfo, paginationSizes } from './Pagination';
+export type { PaginationProps, PaginationWithInfoProps } from './Pagination';

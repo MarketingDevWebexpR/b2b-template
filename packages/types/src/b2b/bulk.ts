@@ -14,29 +14,29 @@
  * ```ts
  * const item: BulkOrderItem = {
  *   sku: 'BRA-001',
- *   name: 'Bracelet Or 18K - Maille Figaro',
  *   quantity: 5,
+ *   product: productCatalogEntry,
+ *   isValid: true,
  *   unitPrice: 450,
- *   available: true,
- *   stock: 25,
+ *   lineTotal: 2250,
  * };
  * ```
  */
 export interface BulkOrderItem {
   /** Stock Keeping Unit (product reference) */
   sku: string;
-  /** Product name */
-  name: string;
   /** Quantity requested */
   quantity: number;
+  /** Reference to the product catalog entry (if found) */
+  product?: ProductCatalogEntry;
+  /** Whether the item is valid for ordering */
+  isValid: boolean;
   /** Price per unit (in EUR) */
-  unitPrice: number;
-  /** Whether the requested quantity is available */
-  available: boolean;
-  /** Current stock level */
-  stock: number;
-  /** Error message if item has validation issues */
-  error?: string;
+  unitPrice?: number;
+  /** Total price for this line (unitPrice * quantity) */
+  lineTotal?: number;
+  /** Error messages if item has validation issues */
+  errors?: string[];
 }
 
 /**
@@ -75,32 +75,45 @@ export interface BulkOrderSummary {
  * @example
  * ```ts
  * const product: ProductCatalogEntry = {
+ *   productId: 'prod_001',
  *   sku: 'BRA-001',
  *   name: 'Bracelet Or 18K - Maille Figaro',
- *   price: 450,
- *   stock: 25,
- *   available: true,
+ *   description: 'Bracelet en or 18K avec maille figaro',
+ *   unitPrice: 450,
+ *   currency: 'EUR',
+ *   minQuantity: 1,
+ *   maxQuantity: 100,
+ *   availableStock: 25,
  *   category: 'bracelets',
+ *   brand: 'Maison',
  * };
  * ```
  */
 export interface ProductCatalogEntry {
+  /** Product unique identifier */
+  productId: string;
   /** Stock Keeping Unit (product reference) */
   sku: string;
   /** Product name */
   name: string;
-  /** Price per unit (in EUR) */
-  price: number;
-  /** Current stock level */
-  stock: number;
-  /** Whether the product is available for ordering */
-  available: boolean;
-  /** Product category code */
-  category?: string;
+  /** Product description */
+  description: string;
+  /** Price per unit */
+  unitPrice: number;
+  /** Currency code (ISO 4217) */
+  currency: string;
   /** Minimum order quantity */
-  minOrderQuantity?: number;
-  /** Maximum order quantity (based on stock or limits) */
-  maxOrderQuantity?: number;
+  minQuantity: number;
+  /** Maximum order quantity */
+  maxQuantity: number;
+  /** Current available stock level */
+  availableStock: number;
+  /** Product category name */
+  category: string;
+  /** Product brand name */
+  brand: string;
+  /** Product image URL */
+  imageUrl?: string;
 }
 
 /**
@@ -109,29 +122,43 @@ export interface ProductCatalogEntry {
  * @example
  * ```ts
  * const result: BulkOrderValidationResult = {
- *   valid: false,
+ *   isValid: false,
  *   errors: [
- *     { sku: 'BRA-001', code: 'INSUFFICIENT_STOCK', message: 'Stock insuffisant' }
+ *     { row: 1, field: 'sku', code: 'PRODUCT_NOT_FOUND', message: 'SKU non trouve' }
  *   ],
  *   warnings: [],
+ *   validItems: [],
+ *   invalidCount: 1,
+ *   totalAmount: 0,
+ *   currency: 'EUR',
  * };
  * ```
  */
 export interface BulkOrderValidationResult {
   /** Whether the entire bulk order is valid */
-  valid: boolean;
+  isValid: boolean;
   /** List of validation errors */
   errors: BulkOrderValidationError[];
   /** List of validation warnings (non-blocking) */
   warnings: BulkOrderValidationWarning[];
+  /** List of valid items that passed validation */
+  validItems: BulkOrderItem[];
+  /** Number of invalid items */
+  invalidCount: number;
+  /** Total amount for valid items */
+  totalAmount: number;
+  /** Currency code for the total amount */
+  currency: string;
 }
 
 /**
  * Validation error for a bulk order item.
  */
 export interface BulkOrderValidationError {
-  /** SKU that has the error */
-  sku: string;
+  /** Row number in the bulk order (1-indexed) */
+  row: number;
+  /** Field that has the error */
+  field: string;
   /** Error code for programmatic handling */
   code: BulkOrderErrorCode;
   /** Human-readable error message */
@@ -155,11 +182,13 @@ export interface BulkOrderValidationWarning {
  */
 export type BulkOrderErrorCode =
   | 'UNKNOWN_SKU'
+  | 'PRODUCT_NOT_FOUND'
   | 'INSUFFICIENT_STOCK'
   | 'INVALID_QUANTITY'
   | 'PRODUCT_UNAVAILABLE'
   | 'EXCEEDS_ORDER_LIMIT'
-  | 'BELOW_MIN_QUANTITY';
+  | 'BELOW_MIN_QUANTITY'
+  | 'BELOW_MINIMUM';
 
 /**
  * Warning codes for bulk order validation.

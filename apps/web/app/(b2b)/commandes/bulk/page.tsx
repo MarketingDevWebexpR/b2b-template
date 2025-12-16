@@ -34,24 +34,23 @@ export default function BulkOrderPage() {
       if (!product) {
         return {
           sku: normalizedSku,
-          name: 'Produit non trouve',
           quantity,
-          unitPrice: 0,
-          available: false,
-          stock: 0,
-          error: 'SKU inconnu',
+          isValid: false,
+          errors: ['SKU inconnu'],
         };
       }
 
-      const available = product.stock >= quantity;
+      const productStock = product.availableStock ?? 0;
+      const productPrice = product.unitPrice ?? 0;
+      const available = productStock >= quantity;
       return {
         sku: normalizedSku,
-        name: product.name,
         quantity,
-        unitPrice: product.price,
-        available,
-        stock: product.stock,
-        error: available ? undefined : `Stock insuffisant (${formatNumber(product.stock)} disponibles)`,
+        product,
+        isValid: available,
+        unitPrice: productPrice,
+        lineTotal: productPrice * quantity,
+        errors: available ? undefined : [`Stock insuffisant (${formatNumber(productStock)} disponibles)`],
       };
     },
     [productCatalog]
@@ -191,11 +190,11 @@ export default function BulkOrderPage() {
   const summary = useMemo(() => {
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalAmount = items.reduce(
-      (sum, item) => sum + item.quantity * item.unitPrice,
+      (sum, item) => sum + (item.lineTotal ?? 0),
       0
     );
-    const errorCount = items.filter((item) => item.error).length;
-    const availableItems = items.filter((item) => item.available);
+    const errorCount = items.filter((item) => !item.isValid).length;
+    const availableItems = items.filter((item) => item.isValid);
 
     return {
       totalItems: items.length,
@@ -436,7 +435,7 @@ export default function BulkOrderPage() {
                     key={`${item.sku}-${index}`}
                     className={cn(
                       'p-4 flex items-center gap-4',
-                      item.error && 'bg-red-50'
+                      !item.isValid && 'bg-red-50'
                     )}
                   >
                     <div className="flex-1 min-w-0">
@@ -444,7 +443,7 @@ export default function BulkOrderPage() {
                         <span className="font-mono text-body-sm font-medium text-hermes-500">
                           {item.sku}
                         </span>
-                        {!item.available && (
+                        {!item.isValid && (
                           <svg
                             className="w-4 h-4 text-red-500"
                             fill="currentColor"
@@ -460,11 +459,11 @@ export default function BulkOrderPage() {
                         )}
                       </div>
                       <p className="font-sans text-body-sm text-text-secondary truncate">
-                        {item.name}
+                        {item.product?.name ?? 'Produit non trouve'}
                       </p>
-                      {item.error && (
+                      {item.errors && item.errors.length > 0 && (
                         <p className="font-sans text-caption text-red-600">
-                          {item.error}
+                          {item.errors[0]}
                         </p>
                       )}
                     </div>
@@ -512,10 +511,10 @@ export default function BulkOrderPage() {
                     </div>
                     <div className="w-24 text-right">
                       <p className="font-sans text-body-sm font-medium text-text-primary">
-                        {formatCurrency(item.quantity * item.unitPrice)}
+                        {formatCurrency(item.quantity * (item.unitPrice ?? 0))}
                       </p>
                       <p className="font-sans text-caption text-text-muted">
-                        {formatCurrency(item.unitPrice)} /u
+                        {formatCurrency(item.unitPrice ?? 0)} /u
                       </p>
                     </div>
                     <button
