@@ -1,0 +1,99 @@
+{
+  "name": "@maison/hooks",
+  "version": "0.0.0",
+  "description": "Shared React hooks for Maison e-commerce B2B",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarketingDevWebexpR/monorepo_bijoux.git",
+    "directory": "packages/hooks"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./b2b": {
+      "import": {
+        "types": "./dist/b2b/index.d.ts",
+        "default": "./dist/b2b/index.js"
+      },
+      "require": {
+        "types": "./dist/b2b/index.d.cts",
+        "default": "./dist/b2b/index.cjs"
+      }
+    },
+    "./cart": {
+      "import": {
+        "types": "./dist/cart/index.d.ts",
+        "default": "./dist/cart/index.js"
+      },
+      "require": {
+        "types": "./dist/cart/index.d.cts",
+        "default": "./dist/cart/index.cjs"
+      }
+    },
+    "./api": {
+      "import": {
+        "types": "./dist/api/index.d.ts",
+        "default": "./dist/api/index.js"
+      },
+      "require": {
+        "types": "./dist/api/index.d.cts",
+        "default": "./dist/api/index.cjs"
+      }
+    },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
+      },
+      "require": {
+        "types": "./dist/utils/index.d.cts",
+        "default": "./dist/utils/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules .turbo",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@maison/api-client": "workspace:*",
+    "@maison/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "react": "^18.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "@maison/api-client": "workspace:*",
+    "@maison/types": "workspace:*",
+    "react": ">=18.0.0"
+  }
+}

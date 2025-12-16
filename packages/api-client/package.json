@@ -1,0 +1,70 @@
+{
+  "name": "@maison/api-client",
+  "version": "0.0.0",
+  "description": "Unified API client facade for multi-source e-commerce",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarketingDevWebexpR/b2b-template.git",
+    "directory": "packages/api-client"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./interfaces": {
+      "import": {
+        "types": "./dist/interfaces/index.d.ts",
+        "default": "./dist/interfaces/index.js"
+      },
+      "require": {
+        "types": "./dist/interfaces/index.d.cts",
+        "default": "./dist/interfaces/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules .turbo",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@maison/api-core": "workspace:*",
+    "@maison/types": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "@maison/types": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@maison/types": {
+      "optional": false
+    }
+  }
+}

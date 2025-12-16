@@ -1,0 +1,57 @@
+ WARN  Issue while reading "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/.npmrc". Failed to replace env in config: ${GITHUB_TOKEN}
+
+> @maison/hooks@0.0.0 build /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/hooks
+> tsup
+
+CLI Building entry: {"index":"src/index.ts","b2b/index":"src/b2b/index.ts","cart/index":"src/cart/index.ts","api/index":"src/api/index.ts","utils/index":"src/utils/index.ts"}
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/hooks/tsup.config.ts
+CLI Target: esnext
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS dist/utils/index.cjs     4.20 KB
+CJS dist/index.cjs           34.29 KB
+CJS dist/b2b/index.cjs       20.78 KB
+CJS dist/api/index.cjs       6.94 KB
+CJS dist/cart/index.cjs      16.75 KB
+CJS dist/utils/index.cjs.map 8.32 KB
+CJS dist/index.cjs.map       85.84 KB
+CJS dist/b2b/index.cjs.map   52.38 KB
+CJS dist/cart/index.cjs.map  39.81 KB
+CJS dist/api/index.cjs.map   15.16 KB
+CJS ⚡️ Build success in 67ms
+ESM dist/index.js              664.00 B
+ESM dist/chunk-W4T47TEI.js     13.87 KB
+ESM dist/cart/index.js         166.00 B
+ESM dist/chunk-HBZXFFBZ.js     9.96 KB
+ESM dist/chunk-MLTLTBV6.js     42.00 B
+ESM dist/chunk-J655YIA7.js     5.71 KB
+ESM dist/utils/index.js        195.00 B
+ESM dist/api/index.js          260.00 B
+ESM dist/chunk-T4JN4A26.js     3.04 KB
+ESM dist/b2b/index.js          242.00 B
+ESM dist/cart/index.js.map     71.00 B
+ESM dist/chunk-HBZXFFBZ.js.map 24.81 KB
+ESM dist/chunk-W4T47TEI.js.map 37.09 KB
+ESM dist/chunk-MLTLTBV6.js.map 71.00 B
+ESM dist/api/index.js.map      71.00 B
+ESM dist/chunk-J655YIA7.js.map 14.74 KB
+ESM dist/chunk-T4JN4A26.js.map 8.01 KB
+ESM dist/utils/index.js.map    71.00 B
+ESM dist/index.js.map          71.00 B
+ESM dist/b2b/index.js.map      71.00 B
+ESM ⚡️ Build success in 67ms
+DTS Build start
+DTS ⚡️ Build success in 2905ms
+DTS dist/index.d.cts       971.00 B
+DTS dist/b2b/index.d.cts   10.61 KB
+DTS dist/cart/index.d.cts  5.36 KB
+DTS dist/api/index.d.cts   4.49 KB
+DTS dist/utils/index.d.cts 2.46 KB
+DTS dist/index.d.ts        967.00 B
+DTS dist/b2b/index.d.ts    10.61 KB
+DTS dist/cart/index.d.ts   5.36 KB
+DTS dist/api/index.d.ts    4.49 KB
+DTS dist/utils/index.d.ts  2.46 KB

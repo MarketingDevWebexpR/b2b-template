@@ -1,0 +1,240 @@
+import { defineConfig, loadEnv } from "@medusajs/framework/utils";
+
+// Load environment variables
+loadEnv(process.env["NODE_ENV"] ?? "development", process.cwd());
+
+/**
+ * Medusa V2 Configuration
+ *
+ * This configuration file defines all settings for the Medusa backend,
+ * including database connections, modules, admin panel, and API settings.
+ *
+ * Environment variables should be defined in .env or .env.local files.
+ * See .env.template for required variables.
+ */
+export default defineConfig({
+  /**
+   * Project Configuration
+   */
+  projectConfig: {
+    /**
+     * Database Configuration
+     * Using PostgreSQL for production-ready persistence
+     */
+    databaseUrl: process.env["DATABASE_URL"] ?? "postgres://localhost:5432/medusa",
+    databaseDriverOptions: {
+      ssl:
+        process.env["NODE_ENV"] === "production"
+          ? { rejectUnauthorized: false }
+          : false,
+    },
+    databaseLogging: process.env["NODE_ENV"] === "development",
+
+    /**
+     * HTTP Configuration
+     */
+    http: {
+      storeCors: process.env["STORE_CORS"] ?? "http://localhost:3000",
+      adminCors: process.env["ADMIN_CORS"] ?? "http://localhost:7001",
+      authCors: process.env["AUTH_CORS"] ?? "http://localhost:3000,http://localhost:7001",
+      jwtSecret: process.env["JWT_SECRET"] ?? "supersecret-jwt-token-change-in-production",
+      cookieSecret: process.env["COOKIE_SECRET"] ?? "supersecret-cookie-token-change-in-production",
+    },
+
+    /**
+     * Redis Configuration (optional, for caching and events)
+     * Only set if REDIS_URL is defined
+     */
+    ...(process.env["REDIS_URL"] ? { redisUrl: process.env["REDIS_URL"] } : {}),
+
+    /**
+     * Worker Mode Configuration
+     * "shared" - API and background workers run in same process
+     * "worker" - Dedicated worker process
+     * "server" - API server only
+     */
+    workerMode: (process.env["MEDUSA_WORKER_MODE"] as "shared" | "worker" | "server") ?? "shared",
+  },
+
+  /**
+   * Admin Panel Configuration
+   */
+  admin: {
+    /**
+     * Disable admin in production if serving from separate deployment
+     */
+    disable: process.env["DISABLE_ADMIN"] === "true",
+
+    /**
+     * Admin URL path
+     */
+    path: "/app",
+
+    /**
+     * Backend URL for admin panel API calls
+     */
+    backendUrl: process.env["MEDUSA_BACKEND_URL"] ?? "http://localhost:9000",
+  },
+
+  /**
+   * Module Configuration
+   *
+   * Medusa V2 uses a modular architecture. Enable/configure modules here.
+   * Custom modules for B2B features will be registered in src/modules/
+   */
+  modules: [
+    /**
+     * Event Bus Module
+     * Handles async events between modules
+     */
+    {
+      resolve: "@medusajs/medusa/event-bus-local",
+      options: {
+        // Use Redis in production for distributed events
+        // resolve: "@medusajs/medusa/event-bus-redis",
+        // options: { redisUrl: process.env["REDIS_URL"] }
+      },
+    },
+
+    /**
+     * Cache Module
+     * In-memory cache for development, Redis for production
+     */
+    {
+      resolve: "@medusajs/medusa/cache-inmemory",
+      options: {
+        // Use Redis in production:
+        // resolve: "@medusajs/medusa/cache-redis",
+        // options: { redisUrl: process.env["REDIS_URL"] }
+      },
+    },
+
+    /**
+     * Workflow Engine Module
+     * Orchestrates complex business processes
+     */
+    {
+      resolve: "@medusajs/medusa/workflow-engine-inmemory",
+      options: {
+        // Use Redis in production:
+        // resolve: "@medusajs/medusa/workflow-engine-redis",
+        // options: { redisUrl: process.env["REDIS_URL"] }
+      },
+    },
+
+    /**
+     * File Storage Module
+     * Local storage for development
+     */
+    {
+      resolve: "@medusajs/medusa/file-local",
+      options: {
+        // Configure S3 for production:
+        // resolve: "@medusajs/medusa/file-s3",
+        // options: {
+        //   bucket: process.env["S3_BUCKET"],
+        //   region: process.env["S3_REGION"],
+        //   accessKeyId: process.env["S3_ACCESS_KEY_ID"],
+        //   secretAccessKey: process.env["S3_SECRET_ACCESS_KEY"],
+        // }
+      },
+    },
+
+    /**
+     * Notification Module
+     * Handles email and other notifications
+     */
+    {
+      resolve: "@medusajs/medusa/notification-local",
+      options: {
+        // Configure email provider for production:
+        // resolve: "@medusajs/medusa/notification-sendgrid",
+        // options: {
+        //   apiKey: process.env["SENDGRID_API_KEY"],
+        //   from: process.env["SENDGRID_FROM"],
+        // }
+      },
+    },
+
+    // =========================================================================
+    // CUSTOM B2B MODULES
+    // =========================================================================
+
+    /**
+     * B2B Company Module
+     * Company/organization management for B2B customers
+     * - Company profiles with status and tier management
+     * - Credit limit management
+     * - Company-customer relationships with roles and permissions
+     */
+    {
+      resolve: "./src/modules/b2b-company",
+    },
+
+    /**
+     * B2B Spending Module
+     * Budget and spending limit management
+     * - Multi-level spending limits (company, department, role, employee)
+     * - Configurable spending rules with actions
+     * - Transaction tracking and automatic limit resets
+     */
+    {
+      resolve: "./src/modules/b2b-spending",
+      options: {
+        // Default warning threshold percentage (0-100)
+        defaultWarningThreshold: 80,
+      },
+    },
+
+    /**
+     * B2B Approval Module
+     * Order approval workflows for B2B
+     * - Multi-level approval workflows
+     * - Configurable triggers (amount, category, always)
+     * - Delegation support for approvers
+     * - Auto-escalation and expiration
+     */
+    {
+      resolve: "./src/modules/b2b-approval",
+      options: {
+        // Default hours before escalation
+        defaultEscalationHours: 24,
+        // Default hours before request expires
+        defaultExpirationHours: 72,
+      },
+    },
+
+    /**
+     * B2B Quote Module
+     * Quote request and management system
+     * - Full quote lifecycle (draft → order)
+     * - Price negotiation between buyer and seller
+     * - Buyer/seller messaging
+     * - Quote-to-order conversion
+     */
+    {
+      resolve: "./src/modules/b2b-quote",
+      options: {
+        // Default quote validity in days
+        defaultValidityDays: 30,
+      },
+    },
+  ],
+
+  /**
+   * Plugin Configuration
+   *
+   * External plugins can be configured here.
+   * Note: Medusa V2 favors modules over plugins for new functionality.
+   */
+  plugins: [],
+
+  /**
+   * Feature Flags
+   *
+   * Enable/disable experimental or beta features
+   */
+  featureFlags: {
+    // Enable as needed
+  },
+});

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // Enable emit for packages
+    "noEmit": false,
+
+    // Declaration files for consumers
+    "declaration": true,
+    "declarationMap": true,
+
+    // Enable composite for project references
+    "composite": true,
+
+    // Output configuration (tsup overrides this)
+    "outDir": "./dist",
+    "rootDir": "./src"
+  }
+}

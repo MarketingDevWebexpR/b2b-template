@@ -1,0 +1,46 @@
+ WARN  Issue while reading "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/.npmrc". Failed to replace env in config: ${GITHUB_TOKEN}
+
+> @maison/state@0.0.0 build /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/state
+> tsup
+
+CLI Building entry: src/index.ts, src/actions/index.ts, src/reducers/index.ts, src/selectors/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/state/tsup.config.ts
+CLI Target: es2022
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+Entry module "dist/reducers/index.cjs" is using named and default exports together. Consumers of your bundle will have to use `chunk.default` to access the default export, which may not be what you want. Use `output.exports: "named"` to disable this warning.
+DTS Build start
+CJS dist/index.cjs               67.20 KB
+CJS dist/actions/index.cjs       17.23 KB
+CJS dist/reducers/index.cjs      29.30 KB
+CJS dist/selectors/index.cjs     24.35 KB
+CJS dist/index.cjs.map           192.13 KB
+CJS dist/actions/index.cjs.map   63.68 KB
+CJS dist/selectors/index.cjs.map 61.31 KB
+CJS dist/reducers/index.cjs.map  87.21 KB
+CJS ⚡️ Build success in 431ms
+ESM dist/selectors/index.js     19.78 KB
+ESM dist/reducers/index.js      29.06 KB
+ESM dist/actions/index.js       15.33 KB
+ESM dist/index.js               60.25 KB
+ESM dist/reducers/index.js.map  87.20 KB
+ESM dist/selectors/index.js.map 61.31 KB
+ESM dist/actions/index.js.map   63.68 KB
+ESM dist/index.js.map           192.12 KB
+ESM ⚡️ Build success in 433ms
+DTS ⚡️ Build success in 2834ms
+DTS dist/index.d.cts            7.56 KB
+DTS dist/reducers/index.d.cts   5.43 KB
+DTS dist/actions/index.d.cts    25.64 KB
+DTS dist/selectors/index.d.cts  32.87 KB
+DTS dist/actions-yzTWTrGA.d.cts 18.65 KB
+DTS dist/state-RCP8oCT3.d.cts   8.32 KB
+DTS dist/index.d.ts             7.55 KB
+DTS dist/reducers/index.d.ts    5.43 KB
+DTS dist/actions/index.d.ts     25.64 KB
+DTS dist/selectors/index.d.ts   32.87 KB
+DTS dist/actions-ONThwaCz.d.ts  18.65 KB
+DTS dist/state-RCP8oCT3.d.ts    8.32 KB

@@ -1,0 +1,35 @@
+ WARN  Issue while reading "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/.npmrc". Failed to replace env in config: ${GITHUB_TOKEN}
+
+> @maison/api-core@0.0.0 build /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/api-core
+> tsup
+
+CLI Building entry: {"index":"src/index.ts","client":"src/client.ts"}
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/api-core/tsup.config.ts
+CLI Target: es2022
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+ESM dist/client.js             122.00 B
+ESM dist/chunk-ZJODLBWI.js     6.84 KB
+ESM dist/index.js              22.95 KB
+ESM dist/client.js.map         70.00 B
+ESM dist/chunk-ZJODLBWI.js.map 17.02 KB
+ESM dist/index.js.map          66.47 KB
+ESM ⚡️ Build success in 174ms
+CJS dist/index.cjs              24.76 KB
+CJS dist/chunk-KPPB5KWR.cjs     7.12 KB
+CJS dist/client.cjs             283.00 B
+CJS dist/chunk-KPPB5KWR.cjs.map 17.02 KB
+CJS dist/index.cjs.map          66.54 KB
+CJS dist/client.cjs.map         71.00 B
+CJS ⚡️ Build success in 174ms
+DTS Build start
+DTS ⚡️ Build success in 1699ms
+DTS dist/index.d.cts           33.51 KB
+DTS dist/client.d.cts          60.00 B
+DTS dist/client-kRKdhjzn.d.cts 3.96 KB
+DTS dist/index.d.ts            33.51 KB
+DTS dist/client.d.ts           59.00 B
+DTS dist/client-kRKdhjzn.d.ts  3.96 KB

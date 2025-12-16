@@ -1,0 +1,38 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "MarketingDevWebexpR/monorepo_bijoux_B2B" }
+  ],
+  "commit": false,
+  "fixed": [
+    [
+      "@maison/types",
+      "@maison/utils",
+      "@maison/config",
+      "@maison/config-tailwind",
+      "@maison/api-core",
+      "@maison/api-client",
+      "@maison/api-medusa",
+      "@maison/api-bridge",
+      "@maison/api-sage",
+      "@maison/state",
+      "@maison/hooks",
+      "@maison/ui-mobile",
+      "@maison/ui-b2b"
+    ]
+  ],
+  "linked": [],
+  "access": "restricted",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@maison/mobile",
+    "@maison/web",
+    "@maison/backend-medusa"
+  ],
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
+}

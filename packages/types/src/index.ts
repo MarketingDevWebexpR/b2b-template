@@ -428,3 +428,13 @@ export interface Wishlist {
   /** Total count of items */
   totalItems: number;
 }
+
+// ============================================
+// B2B Types - Re-exports
+// ============================================
+
+/**
+ * B2B (Business-to-Business) types for enterprise e-commerce.
+ * Includes: Companies, Employees, Quotes, Approvals, Spending Limits.
+ */
+export * from './b2b';

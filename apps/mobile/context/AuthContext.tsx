@@ -17,8 +17,8 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signUp: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>;
+  signUp: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>;
   signOut: () => Promise<void>;
 }
 
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadUser();
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string; user?: User }> => {
     try {
       // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
 
       setUser(publicUser);
-      return { success: true };
+      return { success: true, user: publicUser };
     } catch (error) {
       console.error('Sign in error:', error);
       return { success: false, error: 'Une erreur est survenue lors de la connexion' };
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     email: string,
     password: string
-  ): Promise<{ success: boolean; error?: string }> => {
+  ): Promise<{ success: boolean; error?: string; user?: User }> => {
     try {
       // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
 
       setUser(publicUser);
-      return { success: true };
+      return { success: true, user: publicUser };
     } catch (error) {
       console.error('Sign up error:', error);
       return { success: false, error: "Une erreur est survenue lors de l'inscription" };

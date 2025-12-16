@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss';
-import { webConfig } from '@bijoux/config-tailwind/web';
+import { webConfig } from '@maison/config-tailwind/web';
 
 const config: Config = {
   ...webConfig,

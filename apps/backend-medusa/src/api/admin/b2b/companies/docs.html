@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API B2B Companies - Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css">
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #fafafa;
+        }
+
+        #swagger-ui {
+            max-width: 1460px;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: none;
+        }
+
+        .swagger-ui .info {
+            margin: 50px 0;
+        }
+
+        .swagger-ui .info .title {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .custom-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .custom-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .custom-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .custom-header .meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .custom-header .meta-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #e8e8e8;
+            margin-top: 50px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Custom Swagger UI theme adjustments */
+        .swagger-ui .opblock.opblock-get {
+            border-color: #61affe;
+            background: rgba(97, 175, 254, .1);
+        }
+
+        .swagger-ui .opblock.opblock-post {
+            border-color: #49cc90;
+            background: rgba(73, 204, 144, .1);
+        }
+
+        .swagger-ui .opblock.opblock-put {
+            border-color: #fca130;
+            background: rgba(252, 161, 48, .1);
+        }
+
+        .swagger-ui .opblock.opblock-delete {
+            border-color: #f93e3e;
+            background: rgba(249, 62, 62, .1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 8px;
+            color: #c00;
+        }
+
+        .error h2 {
+            margin-top: 0;
+        }
+
+        .error pre {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-header">
+        <h1>API B2B Companies</h1>
+        <p>Documentation de l'API d'administration pour la gestion des entreprises B2B</p>
+        <div class="meta">
+            <div class="meta-item">Version 1.0.0</div>
+            <div class="meta-item">OpenAPI 3.0.3</div>
+            <div class="meta-item">Format YAML</div>
+        </div>
+    </div>
+
+    <div id="loading" class="loading">
+        Chargement de la documentation...
+    </div>
+
+    <div id="error" class="error" style="display: none;">
+        <h2>Erreur de chargement</h2>
+        <p>Impossible de charger la spécification OpenAPI.</p>
+        <pre id="error-details"></pre>
+    </div>
+
+    <div id="swagger-ui"></div>
+
+    <div class="footer">
+        <p>
+            <strong>API B2B Companies</strong> - Gestion des entreprises B2B
+        </p>
+        <p>
+            Documentation générée avec <a href="https://swagger.io/tools/swagger-ui/" target="_blank">Swagger UI</a>
+        </p>
+    </div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            // Determine the OpenAPI spec URL
+            const specUrl = new URL('openapi.yaml', window.location.href).toString();
+
+            // Initialize Swagger UI
+            try {
+                const ui = SwaggerUIBundle({
+                    url: specUrl,
+                    dom_id: '#swagger-ui',
+                    deepLinking: true,
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl
+                    ],
+                    layout: "StandaloneLayout",
+                    defaultModelsExpandDepth: 3,
+                    defaultModelExpandDepth: 3,
+                    docExpansion: "list",
+                    filter: true,
+                    showExtensions: true,
+                    showCommonExtensions: true,
+                    displayRequestDuration: true,
+                    tryItOutEnabled: true,
+                    persistAuthorization: true,
+                    supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                    validatorUrl: null, // Disable validator badge
+                    onComplete: function() {
+                        document.getElementById('loading').style.display = 'none';
+                        console.log('Swagger UI loaded successfully');
+                    },
+                    onFailure: function(error) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error').style.display = 'block';
+                        document.getElementById('error-details').textContent = JSON.stringify(error, null, 2);
+                        console.error('Failed to load Swagger UI:', error);
+                    }
+                });
+
+                window.ui = ui;
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-details').textContent = error.message;
+                console.error('Error initializing Swagger UI:', error);
+            }
+        };
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Ctrl/Cmd + K: Focus on filter
+            if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+                event.preventDefault();
+                const filterInput = document.querySelector('.filter-container input');
+                if (filterInput) {
+                    filterInput.focus();
+                }
+            }
+
+            // Ctrl/Cmd + /: Expand/Collapse all
+            if ((event.ctrlKey || event.metaKey) && event.key === '/') {
+                event.preventDefault();
+                const expandButtons = document.querySelectorAll('.expand-operation');
+                if (expandButtons.length > 0) {
+                    const firstButton = expandButtons[0];
+                    const isExpanded = firstButton.classList.contains('expanded');
+                    expandButtons.forEach(button => {
+                        if (isExpanded) {
+                            button.click();
+                        } else if (!button.classList.contains('expanded')) {
+                            button.click();
+                        }
+                    });
+                }
+            }
+        });
+
+        // Add console helper
+        console.log('%cAPI B2B Companies Documentation', 'font-size: 20px; font-weight: bold; color: #667eea;');
+        console.log('%cRaccourcis clavier:', 'font-weight: bold; margin-top: 10px;');
+        console.log('  Ctrl/Cmd + K : Focus sur la recherche');
+        console.log('  Ctrl/Cmd + / : Développer/Réduire tout');
+        console.log('\n%cAccès à l\'instance Swagger UI:', 'font-weight: bold; margin-top: 10px;');
+        console.log('  window.ui - Instance SwaggerUI');
+    </script>
+</body>
+</html>

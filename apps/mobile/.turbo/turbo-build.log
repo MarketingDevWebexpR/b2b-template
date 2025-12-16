@@ -1,0 +1,6 @@
+ WARN  Issue while reading "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/.npmrc". Failed to replace env in config: ${GITHUB_TOKEN}
+
+> @maison/mobile@1.0.0 build /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/apps/mobile
+> echo 'Mobile build skipped - use EAS for production builds' && tsc --noEmit
+
+Mobile build skipped - use EAS for production builds

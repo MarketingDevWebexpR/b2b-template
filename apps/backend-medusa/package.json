@@ -1,0 +1,41 @@
+{
+  "name": "@maison/backend-medusa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Medusa V2 backend for B2B e-commerce - companies, quotes, approvals, spending limits",
+  "keywords": [
+    "medusa",
+    "e-commerce",
+    "b2b",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "medusa develop",
+    "build": "echo 'Backend build skipped - use medusa:build for production' && tsc --noEmit",
+    "medusa:build": "medusa build",
+    "start": "medusa start",
+    "seed": "medusa exec ./src/scripts/seed.ts",
+    "db:generate": "medusa db:generate",
+    "db:migrate": "medusa db:migrate",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .medusa node_modules dist"
+  },
+  "dependencies": {
+    "@medusajs/admin-sdk": "^2.12.2",
+    "@medusajs/framework": "latest",
+    "@medusajs/medusa": "latest",
+    "awilix": "^8.0.1",
+    "pg": "^8.11.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@medusajs/types": "latest",
+    "@swc/core": "^1.4.0",
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

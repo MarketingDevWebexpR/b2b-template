@@ -9,6 +9,16 @@
             "date": 1765646146900,
             "name": "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux/logs/mcp-puppeteer-2025-12-13.log",
             "hash": "1698d414e3a7be039b463295fc5625d27fd754858cc639372a97e17db6692492"
+        },
+        {
+            "date": 1765730072480,
+            "name": "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux/logs/mcp-puppeteer-2025-12-14.log",
+            "hash": "254b827d100b36bb2ab4f3ba0764c92c7efc49b39b05afe1485e99127283360d"
+        },
+        {
+            "date": 1765780796212,
+            "name": "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux/logs/mcp-puppeteer-2025-12-15.log",
+            "hash": "1a205e7deda0f7be7ce4152b074daafbace367a1220e3d7e14d3fcc6e3c4c659"
         }
     ],
     "hashType": "sha256"

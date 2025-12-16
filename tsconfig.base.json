@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    // Type Safety - Maximum strictness
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    // Module System
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    // Interop & Compatibility
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Emit Control (disabled by default - apps/packages override as needed)
+    "noEmit": true,
+
+    // Source Maps & Debugging
+    "sourceMap": true,
+    "declarationMap": true,
+
+    // Library Support
+    "lib": ["ES2022"]
+  },
+  "exclude": ["node_modules", "dist", ".turbo", ".next", ".expo"]
+}

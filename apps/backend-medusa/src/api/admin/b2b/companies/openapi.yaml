@@ -1,0 +1,782 @@
+openapi: 3.0.3
+info:
+  title: API B2B Companies - Administration
+  description: |
+    API d'administration pour la gestion des entreprises B2B.
+
+    Cette API permet de gérer le cycle de vie complet des comptes entreprises, incluant:
+    - La création et la gestion des entreprises
+    - Le suivi du crédit et des limites de paiement
+    - La gestion des informations fiscales et de contact
+    - Les paramètres de configuration par entreprise
+  version: 1.0.0
+  contact:
+    name: Support API
+    email: support@example.com
+
+servers:
+  - url: http://localhost:9000
+    description: Serveur de développement
+  - url: https://api.example.com
+    description: Serveur de production
+
+tags:
+  - name: Companies
+    description: Gestion des entreprises B2B
+
+paths:
+  /admin/b2b/companies:
+    get:
+      tags:
+        - Companies
+      summary: Lister les entreprises
+      description: |
+        Récupère une liste paginée d'entreprises avec filtres optionnels.
+
+        Permet de filtrer par statut, niveau tarifaire et recherche textuelle.
+      operationId: listCompanies
+      parameters:
+        - name: status
+          in: query
+          description: Filtrer par statut de l'entreprise
+          required: false
+          schema:
+            type: string
+            enum:
+              - pending
+              - active
+              - suspended
+              - inactive
+              - closed
+          example: active
+        - name: tier
+          in: query
+          description: Filtrer par niveau tarifaire
+          required: false
+          schema:
+            type: string
+            enum:
+              - standard
+              - premium
+              - enterprise
+              - vip
+          example: premium
+        - name: search
+          in: query
+          description: Recherche textuelle sur le nom, email ou slug
+          required: false
+          schema:
+            type: string
+          example: "Entreprise"
+        - name: limit
+          in: query
+          description: Nombre maximum de résultats à retourner
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: offset
+          in: query
+          description: Nombre de résultats à ignorer (pagination)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+      responses:
+        '200':
+          description: Liste des entreprises récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  companies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Company'
+                  count:
+                    type: integer
+                    description: Nombre total d'entreprises correspondant aux critères
+                    example: 150
+                  limit:
+                    type: integer
+                    description: Limite appliquée à la requête
+                    example: 20
+                  offset:
+                    type: integer
+                    description: Offset appliqué à la requête
+                    example: 0
+              example:
+                companies:
+                  - id: "comp_01HXXX"
+                    name: "Bijouterie Martin"
+                    slug: "bijouterie-martin"
+                    email: "contact@bijouterie-martin.fr"
+                    phone: "+33123456789"
+                    tax_id: "FR12345678901"
+                    status: "active"
+                    tier: "premium"
+                    credit_limit: 50000
+                    payment_terms:
+                      net_days: 30
+                      early_payment_discount: 2
+                    settings:
+                      auto_approve_orders: true
+                      require_purchase_order: false
+                    created_at: "2024-01-15T10:30:00Z"
+                    updated_at: "2024-01-20T14:45:00Z"
+                count: 150
+                limit: 20
+                offset: 0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Companies
+      summary: Créer une entreprise
+      description: |
+        Crée une nouvelle entreprise B2B dans le système.
+
+        Le nom et l'email sont obligatoires. Un slug unique est généré automatiquement à partir du nom.
+      operationId: createCompany
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyInput'
+            example:
+              name: "Joaillerie Dupont"
+              email: "contact@joaillerie-dupont.fr"
+              phone: "+33987654321"
+              tax_id: "FR98765432109"
+              tier: "enterprise"
+              credit_limit: 100000
+              payment_terms:
+                net_days: 45
+                early_payment_discount: 3
+              settings:
+                auto_approve_orders: false
+                require_purchase_order: true
+                max_order_amount: 25000
+      responses:
+        '201':
+          description: Entreprise créée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  company:
+                    $ref: '#/components/schemas/Company'
+              example:
+                company:
+                  id: "comp_01HYYY"
+                  name: "Joaillerie Dupont"
+                  slug: "joaillerie-dupont"
+                  email: "contact@joaillerie-dupont.fr"
+                  phone: "+33987654321"
+                  tax_id: "FR98765432109"
+                  status: "pending"
+                  tier: "enterprise"
+                  credit_limit: 100000
+                  payment_terms:
+                    net_days: 45
+                    early_payment_discount: 3
+                  settings:
+                    auto_approve_orders: false
+                    require_purchase_order: true
+                    max_order_amount: 25000
+                  created_at: "2024-01-25T09:15:00Z"
+                  updated_at: "2024-01-25T09:15:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Conflit - Une entreprise avec cet email existe déjà
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  message: "Une entreprise avec l'email contact@joaillerie-dupont.fr existe déjà"
+                  type: "duplicate_error"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/b2b/companies/{id}:
+    get:
+      tags:
+        - Companies
+      summary: Obtenir les détails d'une entreprise
+      description: |
+        Récupère les informations détaillées d'une entreprise spécifique.
+
+        Inclut les adresses associées, le crédit disponible et le taux d'utilisation du crédit.
+      operationId: getCompany
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant unique de l'entreprise
+          required: true
+          schema:
+            type: string
+          example: "comp_01HXXX"
+      responses:
+        '200':
+          description: Détails de l'entreprise récupérés avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  company:
+                    $ref: '#/components/schemas/CompanyDetailed'
+              example:
+                company:
+                  id: "comp_01HXXX"
+                  name: "Bijouterie Martin"
+                  slug: "bijouterie-martin"
+                  email: "contact@bijouterie-martin.fr"
+                  phone: "+33123456789"
+                  tax_id: "FR12345678901"
+                  status: "active"
+                  tier: "premium"
+                  credit_limit: 50000
+                  payment_terms:
+                    net_days: 30
+                    early_payment_discount: 2
+                  settings:
+                    auto_approve_orders: true
+                    require_purchase_order: false
+                  addresses:
+                    - id: "addr_01HXXX"
+                      address_1: "12 Rue de la Paix"
+                      address_2: "Bâtiment A"
+                      city: "Paris"
+                      postal_code: "75002"
+                      country_code: "FR"
+                      is_billing: true
+                      is_shipping: true
+                  created_at: "2024-01-15T10:30:00Z"
+                  updated_at: "2024-01-20T14:45:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Companies
+      summary: Mettre à jour une entreprise
+      description: |
+        Met à jour les informations d'une entreprise existante.
+
+        Tous les champs sont optionnels. Seuls les champs fournis seront modifiés.
+      operationId: updateCompany
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant unique de l'entreprise
+          required: true
+          schema:
+            type: string
+          example: "comp_01HXXX"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompanyInput'
+            example:
+              name: "Bijouterie Martin & Fils"
+              phone: "+33123456788"
+              tier: "enterprise"
+              credit_limit: 75000
+              settings:
+                auto_approve_orders: true
+                require_purchase_order: true
+                max_order_amount: 20000
+      responses:
+        '200':
+          description: Entreprise mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  company:
+                    $ref: '#/components/schemas/Company'
+              example:
+                company:
+                  id: "comp_01HXXX"
+                  name: "Bijouterie Martin & Fils"
+                  slug: "bijouterie-martin"
+                  email: "contact@bijouterie-martin.fr"
+                  phone: "+33123456788"
+                  tax_id: "FR12345678901"
+                  status: "active"
+                  tier: "enterprise"
+                  credit_limit: 75000
+                  payment_terms:
+                    net_days: 30
+                    early_payment_discount: 2
+                  settings:
+                    auto_approve_orders: true
+                    require_purchase_order: true
+                    max_order_amount: 20000
+                  created_at: "2024-01-15T10:30:00Z"
+                  updated_at: "2024-01-25T16:20:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Companies
+      summary: Supprimer une entreprise
+      description: |
+        Effectue une suppression logique de l'entreprise en changeant son statut à 'closed'.
+
+        Les données de l'entreprise sont conservées pour l'historique.
+      operationId: deleteCompany
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant unique de l'entreprise
+          required: true
+          schema:
+            type: string
+          example: "comp_01HXXX"
+      responses:
+        '200':
+          description: Entreprise supprimée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Identifiant de l'entreprise supprimée
+                  object:
+                    type: string
+                    enum:
+                      - company
+                    description: Type d'objet
+                  deleted:
+                    type: boolean
+                    description: Confirmation de la suppression
+              example:
+                id: "comp_01HXXX"
+                object: "company"
+                deleted: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+components:
+  schemas:
+    Company:
+      type: object
+      description: Représentation d'une entreprise B2B
+      required:
+        - id
+        - name
+        - slug
+        - email
+        - status
+        - tier
+        - credit_limit
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Identifiant unique de l'entreprise
+          example: "comp_01HXXX"
+        name:
+          type: string
+          description: Nom de l'entreprise
+          example: "Bijouterie Martin"
+        slug:
+          type: string
+          description: Slug unique généré à partir du nom
+          example: "bijouterie-martin"
+        email:
+          type: string
+          format: email
+          description: Adresse email principale
+          example: "contact@bijouterie-martin.fr"
+        phone:
+          type: string
+          nullable: true
+          description: Numéro de téléphone
+          example: "+33123456789"
+        tax_id:
+          type: string
+          nullable: true
+          description: Numéro d'identification fiscale (SIRET, VAT, etc.)
+          example: "FR12345678901"
+        status:
+          type: string
+          enum:
+            - pending
+            - active
+            - suspended
+            - inactive
+            - closed
+          description: |
+            Statut de l'entreprise:
+            - **pending**: En attente de validation
+            - **active**: Compte actif et opérationnel
+            - **suspended**: Suspendu temporairement
+            - **inactive**: Inactif mais pas fermé
+            - **closed**: Compte fermé définitivement
+          example: "active"
+        tier:
+          type: string
+          enum:
+            - standard
+            - premium
+            - enterprise
+            - vip
+          description: |
+            Niveau tarifaire de l'entreprise:
+            - **standard**: Tarification standard
+            - **premium**: Tarifs préférentiels
+            - **enterprise**: Tarifs entreprise
+            - **vip**: Tarifs VIP avec avantages exclusifs
+          example: "premium"
+        credit_limit:
+          type: number
+          format: float
+          description: Limite de crédit autorisée en centimes
+          minimum: 0
+          example: 50000
+        payment_terms:
+          type: object
+          nullable: true
+          description: Conditions de paiement spécifiques
+          properties:
+            net_days:
+              type: integer
+              description: Nombre de jours pour le paiement net
+              example: 30
+            early_payment_discount:
+              type: number
+              description: Pourcentage de remise pour paiement anticipé
+              example: 2
+          additionalProperties: true
+        settings:
+          type: object
+          nullable: true
+          description: Paramètres de configuration spécifiques à l'entreprise
+          properties:
+            auto_approve_orders:
+              type: boolean
+              description: Approbation automatique des commandes
+              example: true
+            require_purchase_order:
+              type: boolean
+              description: Exige un bon de commande
+              example: false
+            max_order_amount:
+              type: number
+              description: Montant maximum de commande sans approbation
+              example: 15000
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+          description: Date de création
+          example: "2024-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Date de dernière modification
+          example: "2024-01-20T14:45:00Z"
+
+    CompanyDetailed:
+      allOf:
+        - $ref: '#/components/schemas/Company'
+        - type: object
+          properties:
+            addresses:
+              type: array
+              description: Liste des adresses associées
+              items:
+                $ref: '#/components/schemas/Address'
+
+    Address:
+      type: object
+      description: Adresse associée à une entreprise
+      properties:
+        id:
+          type: string
+          description: Identifiant unique de l'adresse
+          example: "addr_01HXXX"
+        address_1:
+          type: string
+          description: Ligne d'adresse 1
+          example: "12 Rue de la Paix"
+        address_2:
+          type: string
+          nullable: true
+          description: Ligne d'adresse 2 (complément)
+          example: "Bâtiment A"
+        city:
+          type: string
+          description: Ville
+          example: "Paris"
+        postal_code:
+          type: string
+          description: Code postal
+          example: "75002"
+        country_code:
+          type: string
+          description: Code pays ISO 3166-1 alpha-2
+          example: "FR"
+        is_billing:
+          type: boolean
+          description: Adresse de facturation
+          example: true
+        is_shipping:
+          type: boolean
+          description: Adresse de livraison
+          example: true
+
+    CreateCompanyInput:
+      type: object
+      description: Données requises pour créer une entreprise
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          description: Nom de l'entreprise (obligatoire)
+          minLength: 1
+          maxLength: 255
+          example: "Joaillerie Dupont"
+        email:
+          type: string
+          format: email
+          description: Adresse email principale (obligatoire)
+          example: "contact@joaillerie-dupont.fr"
+        phone:
+          type: string
+          nullable: true
+          description: Numéro de téléphone
+          example: "+33987654321"
+        tax_id:
+          type: string
+          nullable: true
+          description: Numéro d'identification fiscale
+          example: "FR98765432109"
+        tier:
+          type: string
+          enum:
+            - standard
+            - premium
+            - enterprise
+            - vip
+          description: Niveau tarifaire
+          default: standard
+          example: "enterprise"
+        credit_limit:
+          type: number
+          format: float
+          description: Limite de crédit en centimes
+          minimum: 0
+          default: 0
+          example: 100000
+        payment_terms:
+          type: object
+          nullable: true
+          description: Conditions de paiement
+          additionalProperties: true
+          example:
+            net_days: 45
+            early_payment_discount: 3
+        settings:
+          type: object
+          nullable: true
+          description: Paramètres de configuration
+          additionalProperties: true
+          example:
+            auto_approve_orders: false
+            require_purchase_order: true
+            max_order_amount: 25000
+
+    UpdateCompanyInput:
+      type: object
+      description: Données pour mettre à jour une entreprise (tous les champs sont optionnels)
+      properties:
+        name:
+          type: string
+          description: Nom de l'entreprise
+          minLength: 1
+          maxLength: 255
+          example: "Bijouterie Martin & Fils"
+        email:
+          type: string
+          format: email
+          description: Adresse email principale
+          example: "nouveau@email.fr"
+        phone:
+          type: string
+          nullable: true
+          description: Numéro de téléphone
+          example: "+33123456788"
+        tax_id:
+          type: string
+          nullable: true
+          description: Numéro d'identification fiscale
+          example: "FR12345678902"
+        status:
+          type: string
+          enum:
+            - pending
+            - active
+            - suspended
+            - inactive
+            - closed
+          description: Statut de l'entreprise
+          example: "active"
+        tier:
+          type: string
+          enum:
+            - standard
+            - premium
+            - enterprise
+            - vip
+          description: Niveau tarifaire
+          example: "enterprise"
+        credit_limit:
+          type: number
+          format: float
+          description: Limite de crédit en centimes
+          minimum: 0
+          example: 75000
+        payment_terms:
+          type: object
+          nullable: true
+          description: Conditions de paiement
+          additionalProperties: true
+        settings:
+          type: object
+          nullable: true
+          description: Paramètres de configuration
+          additionalProperties: true
+
+    Error:
+      type: object
+      description: Objet d'erreur standard
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - message
+            - type
+          properties:
+            message:
+              type: string
+              description: Message d'erreur lisible
+              example: "La ressource demandée n'a pas été trouvée"
+            type:
+              type: string
+              description: Type d'erreur
+              example: "not_found"
+            code:
+              type: string
+              description: Code d'erreur spécifique
+              example: "COMPANY_NOT_FOUND"
+            details:
+              type: object
+              description: Détails supplémentaires sur l'erreur
+              additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Requête invalide - Paramètres manquants ou incorrects
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Paramètres de requête invalides"
+              type: "invalid_request"
+
+    Unauthorized:
+      description: Non autorisé - Token d'authentification manquant ou invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Token d'authentification requis"
+              type: "unauthorized"
+
+    NotFound:
+      description: Ressource non trouvée
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "L'entreprise avec l'ID 'comp_01HXXX' n'a pas été trouvée"
+              type: "not_found"
+              code: "COMPANY_NOT_FOUND"
+
+    InternalServerError:
+      description: Erreur interne du serveur
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              message: "Une erreur interne s'est produite"
+              type: "internal_error"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token JWT d'authentification pour l'API d'administration.
+
+        Format: `Bearer <token>`
+
+security:
+  - BearerAuth: []

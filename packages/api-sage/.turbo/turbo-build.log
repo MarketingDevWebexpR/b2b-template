@@ -1,0 +1,23 @@
+ WARN  Issue while reading "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/.npmrc". Failed to replace env in config: ${GITHUB_TOKEN}
+
+> @maison/api-sage@0.0.0 build /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/api-sage
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/api-sage/tsup.config.ts
+CLI Target: es2022
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS dist/index.cjs     19.33 KB
+CJS dist/index.cjs.map 49.68 KB
+CJS ⚡️ Build success in 205ms
+ESM dist/index.js     19.14 KB
+ESM dist/index.js.map 49.66 KB
+ESM ⚡️ Build success in 205ms
+DTS Build start
+DTS ⚡️ Build success in 1335ms
+DTS dist/index.d.cts 12.40 KB
+DTS dist/index.d.ts  12.40 KB

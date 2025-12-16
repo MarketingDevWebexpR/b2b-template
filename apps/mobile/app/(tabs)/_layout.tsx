@@ -43,7 +43,6 @@ export default function TabLayout() {
       }}
       screenListeners={{
         tabPress: () => {
-          // Trigger haptic feedback on every tab press (including already active tab)
           hapticFeedback.tabSwitch();
         },
       }}
