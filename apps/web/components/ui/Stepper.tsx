@@ -131,8 +131,8 @@ const verticalLineVariants = {
 /**
  * Stepper component for multi-step checkout flow.
  *
- * Design principles (Hermes-inspired):
- * - Elegant, minimal indicators with Hermes orange accent
+ * B2B professional design:
+ * - Clean, minimal indicators with accent color
  * - Smooth animations for state transitions
  * - Clear visual hierarchy showing progress
  * - Accessible with proper ARIA attributes
@@ -220,16 +220,16 @@ export function Stepper({
                   disabled={!isClickable}
                   className={cn(
                     'relative z-10 flex items-center justify-center rounded-full border-2',
-                    'transition-all duration-350 ease-luxe',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2',
+                    'transition-all duration-150',
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
                     sizeConfig.indicator,
                     isClickable && 'cursor-pointer hover:scale-105',
                     !isClickable && status !== 'active' && 'cursor-default',
                     status === 'active' && 'cursor-default',
                     // Status-based colors
-                    status === 'inactive' && 'border-border bg-white',
-                    status === 'active' && 'border-hermes-500 bg-hermes-500',
-                    status === 'completed' && 'border-hermes-500 bg-hermes-500'
+                    status === 'inactive' && 'border-neutral-200 bg-white',
+                    status === 'active' && 'border-accent bg-accent',
+                    status === 'completed' && 'border-accent bg-accent'
                   )}
                   aria-label={`${step.label}${status === 'completed' ? ' (termine)' : status === 'active' ? ' (en cours)' : ''}`}
                   aria-current={status === 'active' ? 'step' : undefined}
@@ -250,7 +250,7 @@ export function Stepper({
                       className={cn(
                         'font-sans font-medium',
                         sizeConfig.fontSize,
-                        status === 'active' ? 'text-white' : 'text-text-muted'
+                        status === 'active' ? 'text-white' : 'text-neutral-500'
                       )}
                     >
                       {step.icon || index + 1}
@@ -269,10 +269,10 @@ export function Stepper({
                       'block font-sans font-medium',
                       sizeConfig.labelSize,
                       status === 'active'
-                        ? 'text-text-primary'
+                        ? 'text-neutral-900'
                         : status === 'completed'
-                        ? 'text-text-secondary'
-                        : 'text-text-muted'
+                        ? 'text-neutral-600'
+                        : 'text-neutral-500'
                     )}
                   >
                     {step.label}
@@ -282,7 +282,7 @@ export function Stepper({
                       className={cn(
                         'mt-0.5 block font-sans',
                         sizeConfig.descriptionSize,
-                        'text-text-light'
+                        'text-neutral-400'
                       )}
                     >
                       {step.description}
@@ -311,14 +311,14 @@ export function Stepper({
                   {/* Background line */}
                   <div
                     className={cn(
-                      'absolute inset-0 bg-border',
+                      'absolute inset-0 bg-neutral-200',
                       isHorizontal ? '' : ''
                     )}
                   />
                   {/* Progress line */}
                   <motion.div
                     className={cn(
-                      'absolute inset-0 bg-hermes-500',
+                      'absolute inset-0 bg-accent',
                       isHorizontal ? 'origin-left' : 'origin-top'
                     )}
                     initial={false}
@@ -376,10 +376,10 @@ export function CompactStepper({
             className={cn(
               'rounded-full',
               index === currentStep
-                ? 'h-2.5 w-2.5 bg-hermes-500'
+                ? 'h-2.5 w-2.5 bg-accent'
                 : index < currentStep
-                ? 'h-2 w-2 bg-hermes-300'
-                : 'h-2 w-2 bg-border'
+                ? 'h-2 w-2 bg-accent/50'
+                : 'h-2 w-2 bg-neutral-200'
             )}
             initial={false}
             animate={{
@@ -393,10 +393,10 @@ export function CompactStepper({
 
       {/* Current step label */}
       <div className="text-center">
-        <span className="font-sans text-xs uppercase tracking-elegant text-text-muted">
+        <span className="font-sans text-xs uppercase tracking-wide text-neutral-500">
           Etape {currentStep + 1} sur {steps.length}
         </span>
-        <h2 className="mt-1 font-serif text-lg text-text-primary">
+        <h2 className="mt-1 font-sans font-semibold text-lg text-neutral-900">
           {currentStepData?.label}
         </h2>
       </div>

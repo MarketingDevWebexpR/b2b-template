@@ -16,7 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 
 /**
- * Alert variant styles - Hermes-inspired luxury design
+ * Alert variant styles - B2B professional design
  */
 const alertVariants = {
   // Success - order confirmed, payment successful
@@ -51,20 +51,20 @@ const alertVariants = {
     description: 'text-blue-700',
   },
 
-  // Hermes accent - special announcements, promotions
-  hermes: {
-    container: 'bg-hermes-50 border-hermes-200 text-hermes-800',
-    icon: 'text-hermes-500',
-    title: 'text-hermes-900',
-    description: 'text-hermes-700',
+  // Accent - special announcements, promotions
+  accent: {
+    container: 'bg-accent/5 border-accent/20 text-accent',
+    icon: 'text-accent',
+    title: 'text-accent',
+    description: 'text-accent/80',
   },
 
   // Neutral - general notifications
   neutral: {
-    container: 'bg-background-muted border-border text-text-secondary',
-    icon: 'text-text-muted',
-    title: 'text-text-primary',
-    description: 'text-text-muted',
+    container: 'bg-neutral-100 border-neutral-200 text-neutral-600',
+    icon: 'text-neutral-500',
+    title: 'text-neutral-900',
+    description: 'text-neutral-500',
   },
 };
 
@@ -76,7 +76,7 @@ const defaultIcons = {
   error: AlertCircle,
   warning: AlertTriangle,
   info: Info,
-  hermes: Info,
+  accent: Info,
   neutral: Info,
 };
 
@@ -162,8 +162,8 @@ export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 /**
  * Alert component for displaying feedback messages.
  *
- * Design principles (Hermes-inspired):
- * - Subtle, refined backgrounds that don't overwhelm
+ * B2B professional design:
+ * - Clean backgrounds
  * - Clear iconography for quick recognition
  * - Smooth entrance/exit animations
  * - Accessible with proper ARIA roles
@@ -207,7 +207,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(
         role="alert"
         className={cn(
           // Base styles
-          'relative flex rounded-soft border',
+          'relative flex rounded-lg border',
           // Variant styles
           variantStyles.container,
           // Size styles
@@ -262,7 +262,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(
             type="button"
             onClick={onDismiss}
             className={cn(
-              'flex-shrink-0 rounded-soft p-1',
+              'flex-shrink-0 rounded-lg p-1',
               'transition-colors duration-200',
               'hover:bg-black/5',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
@@ -270,8 +270,8 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(
               variant === 'error' && 'focus-visible:ring-red-500',
               variant === 'warning' && 'focus-visible:ring-amber-500',
               variant === 'info' && 'focus-visible:ring-blue-500',
-              variant === 'hermes' && 'focus-visible:ring-hermes-500',
-              variant === 'neutral' && 'focus-visible:ring-text-muted'
+              variant === 'accent' && 'focus-visible:ring-accent',
+              variant === 'neutral' && 'focus-visible:ring-neutral-500'
             )}
             aria-label="Fermer l'alerte"
           >
@@ -408,7 +408,7 @@ export function ToastAlert({
       {isVisible && (
         <motion.div
           className={cn(
-            'fixed z-50 max-w-sm shadow-elegant-lg',
+            'fixed z-50 max-w-sm shadow-lg',
             toastPositions[position],
             className
           )}

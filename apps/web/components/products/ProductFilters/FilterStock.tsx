@@ -81,8 +81,8 @@ export function FilterStock({
                   'flex items-center justify-between py-1.5 px-2 -mx-2 rounded',
                   'transition-colors duration-150',
                   isSelected
-                    ? 'bg-b2b-primary/5'
-                    : 'hover:bg-b2b-bg-tertiary'
+                    ? 'bg-accent/5'
+                    : 'hover:bg-neutral-100'
                 )}
               >
                 <Radio
@@ -97,8 +97,8 @@ export function FilterStock({
                 {showCounts && option.count !== undefined && (
                   <span
                     className={cn(
-                      'text-b2b-caption tabular-nums ml-2',
-                      isSelected ? 'text-b2b-primary' : 'text-b2b-text-muted'
+                      'text-xs tabular-nums ml-2',
+                      isSelected ? 'text-accent' : 'text-neutral-500'
                     )}
                   >
                     ({option.count.toLocaleString('fr-FR')})

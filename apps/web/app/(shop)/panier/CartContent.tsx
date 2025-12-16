@@ -35,9 +35,9 @@ export function CartContent() {
       {/* Cart Items Column */}
       <div>
         {/* Cart Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-border-light mb-2">
-          <h2 className="font-serif text-heading-4 text-text-primary">
-            Vos articles ({cart.totalItems})
+        <div className="flex items-center justify-between pb-4 border-b border-stroke-light mb-2">
+          <h2 className="font-sans text-heading-4 text-content-primary">
+            Vos articles ({cart.itemCount})
           </h2>
         </div>
 
@@ -45,7 +45,7 @@ export function CartContent() {
         <AnimatePresence mode="popLayout">
           {cart.items.map((item, index) => (
             <CartItem
-              key={item.product.id}
+              key={item.productId}
               item={item}
               index={index}
               onUpdateQuantity={updateQuantity}
@@ -57,7 +57,7 @@ export function CartContent() {
 
       {/* Order Summary Column */}
       <div className="lg:pl-8">
-        <OrderSummary subtotal={cart.totalPrice} itemCount={cart.totalItems} />
+        <OrderSummary subtotal={cart.totalTTC} itemCount={cart.itemCount} />
       </div>
     </div>
   );
@@ -72,8 +72,8 @@ function CartSkeleton() {
       {/* Cart Items Skeleton */}
       <div>
         {/* Header Skeleton */}
-        <div className="flex items-center justify-between pb-4 border-b border-border-light mb-2">
-          <div className="h-7 w-40 bg-background-warm rounded animate-pulse" />
+        <div className="flex items-center justify-between pb-4 border-b border-stroke-light mb-2">
+          <div className="h-7 w-40 bg-surface-secondary rounded animate-pulse" />
         </div>
 
         {/* Items Skeleton */}
@@ -99,31 +99,31 @@ function CartItemSkeleton() {
       className={cn(
         'grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr_auto_auto] gap-4 md:gap-6',
         'py-6 md:py-8',
-        'border-b border-border-light'
+        'border-b border-stroke-light'
       )}
     >
       {/* Image Skeleton */}
-      <div className="aspect-square bg-background-warm rounded animate-pulse" />
+      <div className="aspect-square bg-surface-secondary rounded animate-pulse" />
 
       {/* Content Skeleton */}
       <div className="flex flex-col justify-between">
         <div>
-          <div className="h-6 w-48 bg-background-warm rounded animate-pulse mb-2" />
-          <div className="h-4 w-24 bg-background-warm rounded animate-pulse" />
+          <div className="h-6 w-48 bg-surface-secondary rounded animate-pulse mb-2" />
+          <div className="h-4 w-24 bg-surface-secondary rounded animate-pulse" />
         </div>
-        <div className="h-8 w-32 bg-background-warm rounded animate-pulse mt-4 md:hidden" />
+        <div className="h-8 w-32 bg-surface-secondary rounded animate-pulse mt-4 md:hidden" />
       </div>
 
       {/* Quantity Skeleton (Desktop) */}
       <div className="hidden md:flex items-center gap-3">
-        <div className="w-10 h-10 bg-background-warm rounded animate-pulse" />
-        <div className="w-12 h-6 bg-background-warm rounded animate-pulse" />
-        <div className="w-10 h-10 bg-background-warm rounded animate-pulse" />
+        <div className="w-10 h-10 bg-surface-secondary rounded animate-pulse" />
+        <div className="w-12 h-6 bg-surface-secondary rounded animate-pulse" />
+        <div className="w-10 h-10 bg-surface-secondary rounded animate-pulse" />
       </div>
 
       {/* Price Skeleton (Desktop) */}
       <div className="hidden md:flex flex-col items-end justify-between">
-        <div className="h-7 w-24 bg-background-warm rounded animate-pulse" />
+        <div className="h-7 w-24 bg-surface-secondary rounded animate-pulse" />
       </div>
     </div>
   );
@@ -140,16 +140,16 @@ function OrderSummarySkeleton() {
       transition={{ duration: 0.5, delay: 0.2 }}
       className={cn(
         'sticky top-32',
-        'bg-background-warm',
+        'bg-surface-secondary',
         'p-6 md:p-8',
-        'border border-border-light'
+        'border border-stroke-light'
       )}
     >
       {/* Header */}
       <div className="h-7 w-32 bg-background-beige rounded animate-pulse mb-6" />
 
       {/* Lines */}
-      <div className="space-y-4 pb-6 border-b border-border-light">
+      <div className="space-y-4 pb-6 border-b border-stroke-light">
         <div className="flex justify-between">
           <div className="h-5 w-32 bg-background-beige rounded animate-pulse" />
           <div className="h-5 w-20 bg-background-beige rounded animate-pulse" />

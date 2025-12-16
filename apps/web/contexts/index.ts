@@ -135,3 +135,30 @@ export {
 } from './B2BContext';
 
 export type { B2BAction as LegacyB2BAction } from './B2BContext';
+
+// ============================================================================
+// Feature Flags Context
+// ============================================================================
+
+export {
+  FeatureProvider,
+  useFeatures,
+  // Module-specific hooks
+  useCatalogFeatures,
+  useCartFeatures,
+  useCheckoutFeatures,
+  useOrdersFeatures,
+  useQuotesFeatures,
+  useApprovalsFeatures,
+  useCompanyFeatures,
+  useListsFeatures,
+  useComparisonFeatures,
+  useDashboardFeatures,
+  useQuickOrderFeatures,
+  useWarehouseFeatures,
+} from './FeatureContext';
+
+export type {
+  FeatureContextValue,
+  FeatureProviderProps,
+} from './FeatureContext';

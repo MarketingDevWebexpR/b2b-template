@@ -57,36 +57,36 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
         transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
         className={cn(
           'sticky top-32',
-          'bg-background-warm',
+          'bg-surface-secondary',
           'p-6 md:p-8',
-          'border border-border-light'
+          'border border-stroke-light'
         )}
       >
         {/* Header */}
-        <h2 className="font-serif text-heading-4 text-text-primary mb-6">
+        <h2 className="font-sans text-heading-4 text-content-primary mb-6">
           Recapitulatif
         </h2>
 
         {/* Order Lines */}
-        <div className="space-y-4 pb-6 border-b border-border-light">
+        <div className="space-y-4 pb-6 border-b border-stroke-light">
           {/* Subtotal */}
           <div className="flex items-center justify-between">
-            <span className="font-sans text-body text-text-secondary">
+            <span className="font-sans text-body text-content-secondary">
               Sous-total ({itemCount} {itemCount > 1 ? 'articles' : 'article'})
             </span>
-            <span className="font-sans text-body font-medium text-text-primary">
+            <span className="font-sans text-body font-medium text-content-primary">
               {formatPrice(subtotal)}
             </span>
           </div>
 
           {/* Shipping */}
           <div className="flex items-center justify-between">
-            <span className="font-sans text-body text-text-secondary">
+            <span className="font-sans text-body text-content-secondary">
               Livraison estimee
             </span>
-            <span className="font-sans text-body font-medium text-text-primary">
+            <span className="font-sans text-body font-medium text-content-primary">
               {shippingEstimate === 0 ? (
-                <span className="text-hermes-500">Offerte</span>
+                <span className="text-primary">Offerte</span>
               ) : (
                 formatPrice(shippingEstimate)
               )}
@@ -96,9 +96,9 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
           {/* Free shipping progress */}
           {amountUntilFreeShipping > 0 && (
             <div className="pt-2">
-              <p className="font-sans text-caption text-text-muted mb-2">
+              <p className="font-sans text-caption text-content-muted mb-2">
                 Plus que{' '}
-                <span className="font-medium text-hermes-500">
+                <span className="font-medium text-primary">
                   {formatPrice(amountUntilFreeShipping)}
                 </span>{' '}
                 pour beneficier de la livraison offerte
@@ -110,7 +110,7 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
                     width: `${Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100)}%`,
                   }}
                   transition={{ duration: 0.6, ease: 'easeOut' }}
-                  className="h-full bg-hermes-500"
+                  className="h-full bg-primary"
                 />
               </div>
             </div>
@@ -119,10 +119,10 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
 
         {/* Total */}
         <div className="flex items-center justify-between py-6">
-          <span className="font-serif text-heading-4 text-text-primary">
+          <span className="font-sans text-heading-4 text-content-primary">
             Total
           </span>
-          <span className="font-serif text-heading-3 text-text-primary">
+          <span className="font-sans text-heading-3 text-content-primary">
             {formatPrice(total)}
           </span>
         </div>
@@ -135,11 +135,11 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
             'w-full',
             'flex items-center justify-center',
             'px-8 py-4',
-            'bg-luxe-charcoal !text-white',
+            'bg-neutral-900 !text-white',
             'text-sm uppercase tracking-widest font-medium',
-            'transition-all duration-350 ease-luxe',
-            'hover:bg-hermes-500',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2',
+            'transition-all duration-300 duration-200',
+            'hover:bg-primary',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
             'disabled:opacity-60 disabled:cursor-not-allowed'
           )}
         >
@@ -152,20 +152,20 @@ export function OrderSummary({ subtotal, itemCount }: OrderSummaryProps) {
 
         {/* Continue Shopping Link */}
         <Link
-          href="/collections"
+          href="/categories"
           className={cn(
             'block mt-4 text-center',
-            'font-sans text-caption uppercase tracking-elegant',
-            'text-text-muted',
-            'transition-colors duration-250 ease-luxe',
-            'hover:text-hermes-500'
+            'font-sans text-caption uppercase tracking-wider',
+            'text-neutral-500',
+            'transition-colors duration-200',
+            'hover:text-accent'
           )}
         >
           Continuer mes achats
         </Link>
 
         {/* Trust Badges */}
-        <div className="mt-8 pt-6 border-t border-border-light">
+        <div className="mt-8 pt-6 border-t border-stroke-light">
           <div className="grid grid-cols-3 gap-4">
             <TrustBadge
               icon={<ShieldCheck className="w-5 h-5" strokeWidth={1.25} />}
@@ -197,8 +197,8 @@ interface TrustBadgeProps {
 function TrustBadge({ icon, label }: TrustBadgeProps) {
   return (
     <div className="flex flex-col items-center text-center">
-      <span className="text-text-muted mb-2">{icon}</span>
-      <span className="font-sans text-[10px] md:text-caption uppercase tracking-elegant text-text-muted leading-tight">
+      <span className="text-content-muted mb-2">{icon}</span>
+      <span className="font-sans text-[10px] md:text-caption uppercase  text-content-muted leading-tight">
         {label}
       </span>
     </div>

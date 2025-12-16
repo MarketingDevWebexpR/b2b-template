@@ -174,7 +174,7 @@ function DataTable<T>({
     <div
       className={cn(
         'w-full overflow-hidden',
-        bordered && 'border border-b2b-border rounded-lg',
+        bordered && 'border border-neutral-200 rounded-lg',
         className
       )}
       {...props}
@@ -190,7 +190,7 @@ function DataTable<T>({
           {/* Header */}
           <thead
             className={cn(
-              'bg-b2b-bg-secondary',
+              'bg-neutral-50',
               stickyHeader && 'sticky top-0 z-10'
             )}
           >
@@ -202,7 +202,7 @@ function DataTable<T>({
                     cellPadding,
                     'w-12',
                     'text-left',
-                    'border-b border-b2b-border'
+                    'border-b border-neutral-200'
                   )}
                 >
                   <input
@@ -214,9 +214,9 @@ function DataTable<T>({
                     onChange={handleSelectAll}
                     className={cn(
                       'w-4 h-4',
-                      'rounded border-b2b-border-medium',
-                      'text-b2b-primary',
-                      'focus:ring-2 focus:ring-b2b-primary focus:ring-offset-0'
+                      'rounded border-neutral-300',
+                      'text-accent',
+                      'focus:ring-2 focus:ring-accent focus:ring-offset-0'
                     )}
                   />
                 </th>
@@ -228,14 +228,14 @@ function DataTable<T>({
                   key={column.key}
                   className={cn(
                     cellPadding,
-                    'text-b2b-label text-b2b-text-secondary font-semibold',
-                    'border-b border-b2b-border',
+                    'text-xs text-neutral-600 font-semibold',
+                    'border-b border-neutral-200',
                     'whitespace-nowrap',
                     column.align === 'center' && 'text-center',
                     column.align === 'right' && 'text-right',
-                    column.sortable && 'cursor-pointer hover:bg-b2b-bg-tertiary select-none',
-                    column.sticky === 'left' && 'sticky left-0 bg-b2b-bg-secondary z-20',
-                    column.sticky === 'right' && 'sticky right-0 bg-b2b-bg-secondary z-20',
+                    column.sortable && 'cursor-pointer hover:bg-neutral-100 select-none',
+                    column.sticky === 'left' && 'sticky left-0 bg-neutral-50 z-20',
+                    column.sticky === 'right' && 'sticky right-0 bg-neutral-50 z-20',
                     column.hideOnMobile && 'hidden md:table-cell'
                   )}
                   style={{
@@ -252,8 +252,8 @@ function DataTable<T>({
                           className={cn(
                             'w-3 h-3 -mb-1',
                             currentSort?.column === column.key && currentSort?.direction === 'asc'
-                              ? 'text-b2b-primary'
-                              : 'text-b2b-text-muted'
+                              ? 'text-accent'
+                              : 'text-neutral-500'
                           )}
                           fill="currentColor"
                           viewBox="0 0 20 20"
@@ -264,8 +264,8 @@ function DataTable<T>({
                           className={cn(
                             'w-3 h-3',
                             currentSort?.column === column.key && currentSort?.direction === 'desc'
-                              ? 'text-b2b-primary'
-                              : 'text-b2b-text-muted'
+                              ? 'text-accent'
+                              : 'text-neutral-500'
                           )}
                           fill="currentColor"
                           viewBox="0 0 20 20"
@@ -288,12 +288,12 @@ function DataTable<T>({
                 <tr key={`skeleton-${i}`}>
                   {selectable && (
                     <td className={cellPadding}>
-                      <div className="w-4 h-4 bg-b2b-bg-tertiary rounded animate-pulse" />
+                      <div className="w-4 h-4 bg-neutral-100 rounded animate-pulse" />
                     </td>
                   )}
                   {columns.map((column) => (
                     <td key={column.key} className={cellPadding}>
-                      <div className="h-4 bg-b2b-bg-tertiary rounded animate-pulse" />
+                      <div className="h-4 bg-neutral-100 rounded animate-pulse" />
                     </td>
                   ))}
                 </tr>
@@ -303,7 +303,7 @@ function DataTable<T>({
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0)}
-                  className="py-12 text-center text-b2b-body text-b2b-text-muted"
+                  className="py-12 text-center text-sm text-neutral-500"
                 >
                   {emptyMessage}
                 </td>
@@ -320,9 +320,9 @@ function DataTable<T>({
                     onClick={() => onRowClick?.(row, rowIndex)}
                     className={cn(
                       'transition-colors duration-150',
-                      striped && rowIndex % 2 === 1 && 'bg-b2b-bg-secondary/50',
-                      isSelected && 'bg-b2b-primary-50',
-                      hoverable && 'hover:bg-b2b-bg-tertiary',
+                      striped && rowIndex % 2 === 1 && 'bg-neutral-50/50',
+                      isSelected && 'bg-orange-50',
+                      hoverable && 'hover:bg-neutral-100',
                       onRowClick && 'cursor-pointer'
                     )}
                   >
@@ -331,7 +331,7 @@ function DataTable<T>({
                       <td
                         className={cn(
                           cellPadding,
-                          'border-b border-b2b-border-light'
+                          'border-b border-neutral-200'
                         )}
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -341,9 +341,9 @@ function DataTable<T>({
                           onChange={() => handleSelectRow(rowKey)}
                           className={cn(
                             'w-4 h-4',
-                            'rounded border-b2b-border-medium',
-                            'text-b2b-primary',
-                            'focus:ring-2 focus:ring-b2b-primary focus:ring-offset-0'
+                            'rounded border-neutral-300',
+                            'text-accent',
+                            'focus:ring-2 focus:ring-accent focus:ring-offset-0'
                           )}
                         />
                       </td>
@@ -355,8 +355,8 @@ function DataTable<T>({
                         key={column.key}
                         className={cn(
                           cellPadding,
-                          'text-b2b-body text-b2b-text-primary',
-                          'border-b border-b2b-border-light',
+                          'text-sm text-neutral-900',
+                          'border-b border-neutral-200',
                           column.align === 'center' && 'text-center',
                           column.align === 'right' && 'text-right',
                           column.sticky === 'left' && 'sticky left-0 bg-inherit z-10',

@@ -55,17 +55,17 @@ export default function OrderDetailError({ error, reset }: ErrorProps) {
       <div className="text-center max-w-md">
         <ErrorIcon />
 
-        <h1 className="mt-6 font-serif text-heading-3 text-text-primary">
+        <h1 className="mt-6 font-sans text-heading-3 text-content-primary">
           Une erreur est survenue
         </h1>
 
-        <p className="mt-4 font-sans text-body text-text-secondary">
+        <p className="mt-4 font-sans text-body text-content-secondary">
           Impossible de charger les details de la commande. Cela peut etre du a un probleme
           de connexion ou a une erreur temporaire.
         </p>
 
         {process.env.NODE_ENV === 'development' && (
-          <details className="mt-4 text-left bg-red-50 rounded-soft p-4 border border-red-200">
+          <details className="mt-4 text-left bg-red-50 rounded-lg p-4 border border-red-200">
             <summary className="cursor-pointer font-sans text-body-sm font-medium text-red-800">
               Details de l'erreur (developpement)
             </summary>
@@ -82,10 +82,10 @@ export default function OrderDetailError({ error, reset }: ErrorProps) {
             onClick={reset}
             className={cn(
               'inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3',
-              'bg-hermes-500 text-white rounded-soft',
+              'bg-primary text-white rounded-lg',
               'font-sans text-body font-medium',
-              'hover:bg-hermes-600 transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+              'hover:bg-primary-600 transition-colors duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
             )}
           >
             <RefreshIcon />
@@ -96,21 +96,21 @@ export default function OrderDetailError({ error, reset }: ErrorProps) {
             href="/commandes"
             className={cn(
               'inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3',
-              'bg-white border border-border-light text-text-secondary rounded-soft',
+              'bg-white border border-stroke-light text-content-secondary rounded-lg',
               'font-sans text-body font-medium',
-              'hover:bg-background-muted transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+              'hover:bg-surface-secondary transition-colors duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
             )}
           >
             Retour aux commandes
           </Link>
         </div>
 
-        <p className="mt-8 font-sans text-caption text-text-muted">
+        <p className="mt-8 font-sans text-caption text-content-muted">
           Si le probleme persiste, veuillez{' '}
           <Link
             href="/support"
-            className="text-hermes-500 hover:text-hermes-600 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft"
+            className="text-primary hover:text-primary-600 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
           >
             contacter le support
           </Link>

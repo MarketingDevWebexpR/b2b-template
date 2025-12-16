@@ -30,17 +30,17 @@ function FilterTag({ label, value, onRemove }: FilterTagProps) {
       className={cn(
         'inline-flex items-center gap-1.5',
         'px-3 py-1.5',
-        'bg-b2b-primary/10 text-b2b-primary',
+        'bg-accent/10 text-accent',
         'text-sm font-medium',
         'rounded-full',
-        'border border-b2b-primary/20',
+        'border border-accent/20',
         'transition-all duration-200',
-        'hover:bg-b2b-primary/20 hover:border-b2b-primary/30',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+        'hover:bg-accent/20 hover:border-accent/30',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
       )}
       aria-label={`Retirer le filtre ${label}: ${value}`}
     >
-      <span className="text-b2b-text-secondary text-xs">{label}:</span>
+      <span className="text-neutral-600 text-xs">{label}:</span>
       <span>{value}</span>
       <X className="w-3.5 h-3.5 ml-0.5" aria-hidden="true" />
     </button>
@@ -164,7 +164,7 @@ export function ActiveFilters({
       role="region"
       aria-label="Filtres actifs"
     >
-      <span className="text-sm text-b2b-text-secondary font-medium mr-1">
+      <span className="text-sm text-neutral-600 font-medium mr-1">
         Filtres actifs:
       </span>
 
@@ -231,9 +231,9 @@ export function ActiveFilters({
           className={cn(
             'ml-2 px-3 py-1.5',
             'text-sm font-medium',
-            'text-b2b-text-muted hover:text-b2b-danger',
+            'text-neutral-500 hover:text-red-600',
             'transition-colors duration-200',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-danger focus-visible:ring-offset-2',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2',
             'rounded'
           )}
         >

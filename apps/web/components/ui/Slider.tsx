@@ -45,12 +45,12 @@ const sliderSizes = {
   sm: {
     track: 'h-1',
     thumb: 'w-4 h-4',
-    label: 'text-b2b-body-sm',
+    label: 'text-sm',
   },
   md: {
     track: 'h-1.5',
     thumb: 'w-5 h-5',
-    label: 'text-b2b-body',
+    label: 'text-sm',
   },
   lg: {
     track: 'h-2',
@@ -129,18 +129,18 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
             <label
               htmlFor={id}
               className={cn(
-                'font-sans font-medium text-b2b-text-primary',
+                'font-sans font-medium text-neutral-900',
                 sizeConfig.label,
-                disabled && 'text-b2b-text-muted'
+                disabled && 'text-neutral-500'
               )}
             >
               {label}
             </label>
             <span
               className={cn(
-                'font-sans font-medium text-b2b-primary',
+                'font-sans font-medium text-accent',
                 sizeConfig.label,
-                disabled && 'text-b2b-text-muted'
+                disabled && 'text-neutral-500'
               )}
             >
               {formatValue(value)}
@@ -155,8 +155,8 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
             className={cn(
               'absolute inset-x-0 top-1/2 -translate-y-1/2',
               sizeConfig.track,
-              'bg-b2b-border-light rounded-full',
-              disabled && 'bg-b2b-bg-tertiary'
+              'bg-neutral-200 rounded-full',
+              disabled && 'bg-neutral-100'
             )}
           />
 
@@ -165,9 +165,9 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
             className={cn(
               'absolute left-0 top-1/2 -translate-y-1/2',
               sizeConfig.track,
-              'bg-b2b-primary rounded-full',
+              'bg-accent rounded-full',
               'transition-all duration-100',
-              disabled && 'bg-b2b-text-muted'
+              disabled && 'bg-neutral-500'
             )}
             style={{ width: `${percentage}%` }}
           />
@@ -198,7 +198,7 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
               '[&::-webkit-slider-thumb]:rounded-full',
               '[&::-webkit-slider-thumb]:bg-white',
               '[&::-webkit-slider-thumb]:border-2',
-              '[&::-webkit-slider-thumb]:border-b2b-primary',
+              '[&::-webkit-slider-thumb]:border-accent',
               '[&::-webkit-slider-thumb]:shadow-md',
               '[&::-webkit-slider-thumb]:cursor-pointer',
               '[&::-webkit-slider-thumb]:transition-all',
@@ -207,10 +207,10 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
               '[&::-webkit-slider-thumb]:hover:shadow-lg',
               // Focus state
               '[&:focus::-webkit-slider-thumb]:ring-2',
-              '[&:focus::-webkit-slider-thumb]:ring-b2b-primary/30',
+              '[&:focus::-webkit-slider-thumb]:ring-accent/30',
               // Disabled state
-              '[&:disabled::-webkit-slider-thumb]:bg-b2b-bg-tertiary',
-              '[&:disabled::-webkit-slider-thumb]:border-b2b-border-medium',
+              '[&:disabled::-webkit-slider-thumb]:bg-neutral-100',
+              '[&:disabled::-webkit-slider-thumb]:border-neutral-300',
               '[&:disabled::-webkit-slider-thumb]:cursor-not-allowed',
               '[&:disabled::-webkit-slider-thumb]:hover:scale-100',
               // Firefox
@@ -219,7 +219,7 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
               '[&::-moz-range-thumb]:rounded-full',
               '[&::-moz-range-thumb]:bg-white',
               '[&::-moz-range-thumb]:border-2',
-              '[&::-moz-range-thumb]:border-b2b-primary',
+              '[&::-moz-range-thumb]:border-accent',
               '[&::-moz-range-thumb]:shadow-md',
               '[&::-moz-range-thumb]:cursor-pointer',
               '[&::-moz-range-thumb]:transition-all',
@@ -235,8 +235,8 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
               className={cn(
                 'absolute -top-8',
                 'px-2 py-1',
-                'bg-b2b-text-primary text-white',
-                'text-b2b-caption font-medium',
+                'bg-neutral-900 text-white',
+                'text-xs font-medium',
                 'rounded',
                 'transform -translate-x-1/2',
                 'pointer-events-none',
@@ -250,7 +250,7 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
                 className={cn(
                   'absolute -bottom-1 left-1/2 -translate-x-1/2',
                   'w-2 h-2',
-                  'bg-b2b-text-primary',
+                  'bg-neutral-900',
                   'transform rotate-45'
                 )}
               />
@@ -260,7 +260,7 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
 
         {/* Markers */}
         {showMarkers && (
-          <div className="flex justify-between mt-1 text-b2b-caption text-b2b-text-muted">
+          <div className="flex justify-between mt-1 text-xs text-neutral-500">
             <span>{formatValue(min)}</span>
             <span>{formatValue(max)}</span>
           </div>
@@ -364,18 +364,18 @@ const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(
             <label
               htmlFor={`${id}-min`}
               className={cn(
-                'font-sans font-medium text-b2b-text-primary',
+                'font-sans font-medium text-neutral-900',
                 sizeConfig.label,
-                disabled && 'text-b2b-text-muted'
+                disabled && 'text-neutral-500'
               )}
             >
               {label}
             </label>
             <span
               className={cn(
-                'font-sans font-medium text-b2b-primary',
+                'font-sans font-medium text-accent',
                 sizeConfig.label,
-                disabled && 'text-b2b-text-muted'
+                disabled && 'text-neutral-500'
               )}
             >
               {formatValue(value[0])} - {formatValue(value[1])}
@@ -390,8 +390,8 @@ const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(
             className={cn(
               'absolute inset-x-0 top-1/2 -translate-y-1/2',
               sizeConfig.track,
-              'bg-b2b-border-light rounded-full',
-              disabled && 'bg-b2b-bg-tertiary'
+              'bg-neutral-200 rounded-full',
+              disabled && 'bg-neutral-100'
             )}
           />
 
@@ -400,8 +400,8 @@ const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(
             className={cn(
               'absolute top-1/2 -translate-y-1/2',
               sizeConfig.track,
-              'bg-b2b-primary rounded-full',
-              disabled && 'bg-b2b-text-muted'
+              'bg-accent rounded-full',
+              disabled && 'bg-neutral-500'
             )}
             style={{
               left: `${minPercentage}%`,
@@ -428,7 +428,7 @@ const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(
               '[&::-webkit-slider-thumb]:rounded-full',
               '[&::-webkit-slider-thumb]:bg-white',
               '[&::-webkit-slider-thumb]:border-2',
-              '[&::-webkit-slider-thumb]:border-b2b-primary',
+              '[&::-webkit-slider-thumb]:border-accent',
               '[&::-webkit-slider-thumb]:shadow-md',
               '[&::-webkit-slider-thumb]:cursor-pointer',
               '[&::-moz-range-thumb]:pointer-events-auto'
@@ -454,7 +454,7 @@ const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(
               '[&::-webkit-slider-thumb]:rounded-full',
               '[&::-webkit-slider-thumb]:bg-white',
               '[&::-webkit-slider-thumb]:border-2',
-              '[&::-webkit-slider-thumb]:border-b2b-primary',
+              '[&::-webkit-slider-thumb]:border-accent',
               '[&::-webkit-slider-thumb]:shadow-md',
               '[&::-webkit-slider-thumb]:cursor-pointer',
               '[&::-moz-range-thumb]:pointer-events-auto'
@@ -463,7 +463,7 @@ const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(
         </div>
 
         {/* Markers */}
-        <div className="flex justify-between mt-1 text-b2b-caption text-b2b-text-muted">
+        <div className="flex justify-between mt-1 text-xs text-neutral-500">
           <span>{formatValue(min)}</span>
           <span>{formatValue(max)}</span>
         </div>

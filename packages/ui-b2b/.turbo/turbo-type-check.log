@@ -1,0 +1,34 @@
+ WARN  Issue while reading "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/.npmrc". Failed to replace env in config: ${GITHUB_TOKEN}
+
+> @maison/ui-b2b@0.0.0 type-check /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/ui-b2b
+> tsc --noEmit
+
+src/primitives/ApprovalFlow/ApprovalFlow.stories.tsx(38,23): error TS2379: Argument of type '{ workflow: ApprovalWorkflow; currentUser: Approver | undefined; onApproved: ((wf: ApprovalWorkflow) => void) | undefined; onRejected: ((wf: ApprovalWorkflow) => void) | undefined; }' is not assignable to parameter of type 'UseApprovalFlowOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'currentUser' are incompatible.
+    Type 'Approver | undefined' is not assignable to type 'Approver'.
+      Type 'undefined' is not assignable to type 'Approver'.
+src/primitives/ApprovalFlow/ApprovalFlow.stories.tsx(482,17): error TS2375: Type '{ id: string; name: string; role: string | undefined; }' is not assignable to type 'Approver' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'role' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/primitives/ApprovalFlow/ApprovalFlow.stories.tsx(503,3): error TS2322: Type '{ id: string; name: string; description: string | undefined; order: number; status: ApprovalStepStatus; requiredApprovers: Approver[]; minApprovals: number; actions: ApprovalAction[]; optional: boolean | undefined; }[]' is not assignable to type 'ApprovalStep[]'.
+  Type '{ id: string; name: string; description: string | undefined; order: number; status: ApprovalStepStatus; requiredApprovers: Approver[]; minApprovals: number; actions: ApprovalAction[]; optional: boolean | undefined; }' is not assignable to type 'ApprovalStep' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Types of property 'description' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+src/primitives/ApprovalFlow/ApprovalFlow.stories.tsx(736,10): error TS2741: Property 'workflow' is missing in type '{ onApproved: (wf: ApprovalWorkflow) => void; onRejected: (wf: ApprovalWorkflow) => void; }' but required in type '{ workflow: ApprovalWorkflow; currentUser?: Approver; onApproved?: (wf: ApprovalWorkflow) => void; onRejected?: (wf: ApprovalWorkflow) => void; }'.
+src/primitives/BulkSelector/BulkSelector.stories.tsx(40,23): error TS2379: Argument of type '{ items: Employee[]; maxSelection: number | undefined; isItemSelectable: (item: Employee) => boolean; onSelectionChange: (ids: string[], selectedItems: Employee[]) => void; }' is not assignable to parameter of type 'UseBulkSelectorOptions<Employee>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'maxSelection' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/primitives/BulkSelector/BulkSelector.stories.tsx(404,8): error TS2741: Property 'items' is missing in type '{}' but required in type '{ items: Employee[]; maxSelection?: number; }'.
+src/primitives/DataTable/DataTable.stories.tsx(527,10): error TS2739: Type '{}' is missing the following properties from type '{ data: Product[]; columns: ColumnDef<Product, unknown>[]; pageSize?: number; selectionMode?: "single" | "multiple" | "none"; }': data, columns
+src/primitives/QuoteBuilder/QuoteBuilder.stories.tsx(698,8): error TS2741: Property 'customer' is missing in type '{}' but required in type '{ customer: QuoteCustomer; cartItems?: CartItem[]; }'.
+src/primitives/SpendingMeter/SpendingMeter.stories.tsx(21,22): error TS2379: Argument of type '{ limit: SpendingLimit; warningThreshold: number | undefined; dangerThreshold: number | undefined; onThresholdChange: ((level: ThresholdLevel) => void) | undefined; }' is not assignable to parameter of type 'UseSpendingMeterOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'warningThreshold' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/primitives/SpendingMeter/SpendingMeter.stories.tsx(58,18): error TS2339: Property 'periodLabel' does not exist on type 'SpendingLimit'.
+src/primitives/SpendingMeter/SpendingMeter.stories.tsx(259,3): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'SpendingLimit'.
+src/primitives/SpendingMeter/SpendingMeter.stories.tsx(341,10): error TS2741: Property 'limit' is missing in type '{ onThresholdChange: (level: ThresholdLevel) => void; }' but required in type '{ limit: SpendingLimit; warningThreshold?: number; dangerThreshold?: number; onThresholdChange?: (level: ThresholdLevel) => void; }'.
+ ELIFECYCLE  Command failed with exit code 2.

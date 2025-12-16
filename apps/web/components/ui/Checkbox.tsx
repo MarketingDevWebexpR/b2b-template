@@ -32,20 +32,20 @@ export interface CheckboxProps
 const checkboxSizes = {
   sm: {
     box: 'w-4 h-4',
-    label: 'text-b2b-body-sm',
-    description: 'text-b2b-caption',
+    label: 'text-sm',
+    description: 'text-xs',
     icon: 'w-2.5 h-2.5',
   },
   md: {
     box: 'w-5 h-5',
-    label: 'text-b2b-body',
-    description: 'text-b2b-body-sm',
+    label: 'text-sm',
+    description: 'text-sm',
     icon: 'w-3 h-3',
   },
   lg: {
     box: 'w-6 h-6',
     label: 'text-base',
-    description: 'text-b2b-body',
+    description: 'text-sm',
     icon: 'w-3.5 h-3.5',
   },
 };
@@ -93,19 +93,19 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             className={cn(
               'relative flex-shrink-0 mt-0.5',
               sizeConfig.box,
-              'border-2 border-b2b-border-medium',
-              'bg-b2b-bg-primary',
+              'border-2 border-neutral-300',
+              'bg-white',
               'transition-all duration-200',
               isRadio ? 'rounded-full' : 'rounded',
               // Hover state
-              !disabled && 'group-hover:border-b2b-primary',
+              !disabled && 'group-hover:border-accent',
               // Error state
               hasError && [
-                'border-b2b-danger',
-                'group-hover:border-b2b-danger-400',
+                'border-red-500',
+                'group-hover:border-red-400',
               ],
               // Disabled state
-              disabled && 'bg-b2b-bg-tertiary border-b2b-border-light'
+              disabled && 'bg-neutral-100 border-neutral-200'
             )}
           >
             {/* Hidden native input */}
@@ -176,12 +176,12 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               className={cn(
                 'absolute inset-0',
                 isRadio ? 'rounded-full' : 'rounded',
-                'bg-b2b-primary',
+                'bg-accent',
                 'opacity-0',
                 'transition-opacity duration-200',
                 'peer-checked:opacity-100',
-                hasError && 'peer-checked:bg-b2b-danger',
-                disabled && 'peer-checked:bg-b2b-text-muted'
+                hasError && 'peer-checked:bg-red-500',
+                disabled && 'peer-checked:bg-neutral-400'
               )}
             />
           </span>
@@ -192,10 +192,10 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               {label && (
                 <span
                   className={cn(
-                    'font-sans font-medium text-b2b-text-primary',
+                    'font-sans font-medium text-neutral-900',
                     sizeConfig.label,
-                    hasError && 'text-b2b-danger',
-                    disabled && 'text-b2b-text-muted'
+                    hasError && 'text-red-500',
+                    disabled && 'text-neutral-400'
                   )}
                 >
                   {label}
@@ -204,7 +204,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               {description && (
                 <span
                   className={cn(
-                    'font-sans text-b2b-text-muted mt-0.5',
+                    'font-sans text-neutral-500 mt-0.5',
                     sizeConfig.description
                   )}
                 >
@@ -222,8 +222,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             role="alert"
             className={cn(
               'mt-1.5 ml-8',
-              'font-sans text-b2b-caption',
-              'text-b2b-danger'
+              'font-sans text-xs',
+              'text-red-500'
             )}
           >
             {error}
@@ -282,9 +282,9 @@ const CheckboxGroup = ({
         <legend
           className={cn(
             'mb-3',
-            'font-sans text-b2b-label',
-            'text-b2b-text-secondary',
-            hasError && 'text-b2b-danger'
+            'font-sans text-sm font-medium',
+            'text-neutral-600',
+            hasError && 'text-red-500'
           )}
         >
           {label}
@@ -304,8 +304,8 @@ const CheckboxGroup = ({
           role="alert"
           className={cn(
             'mt-2',
-            'font-sans text-b2b-caption',
-            'text-b2b-danger'
+            'font-sans text-xs',
+            'text-red-500'
           )}
         >
           {error}

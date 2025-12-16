@@ -7,11 +7,11 @@ import { motion } from 'framer-motion';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/utils';
-import type { CartItem as CartItemType } from '@/types';
+import type { B2BCartItem } from '@/contexts/CartContext';
 
 interface CartItemProps {
   /** Cart item data */
-  item: CartItemType;
+  item: B2BCartItem;
   /** Handler to update item quantity */
   onUpdateQuantity: (productId: string, quantity: number) => void;
   /** Handler to remove item */
@@ -36,21 +36,21 @@ function CartItemComponent({
   onRemove,
   index = 0,
 }: CartItemProps) {
-  const { product, quantity } = item;
-  const itemTotal = product.price * quantity;
+  const { quantity } = item;
+  const itemTotal = item.pricing.unitPriceTTC * quantity;
 
   const handleIncrement = () => {
-    onUpdateQuantity(product.id, quantity + 1);
+    onUpdateQuantity(item.productId, quantity + 1);
   };
 
   const handleDecrement = () => {
     if (quantity > 1) {
-      onUpdateQuantity(product.id, quantity - 1);
+      onUpdateQuantity(item.productId, quantity - 1);
     }
   };
 
   const handleRemove = () => {
-    onRemove(product.id);
+    onRemove(item.productId);
   };
 
   return (
@@ -67,24 +67,24 @@ function CartItemComponent({
         'group relative',
         'grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr_auto_auto_auto] gap-4 md:gap-6',
         'py-6 md:py-8',
-        'border-b border-border-light',
+        'border-b border-stroke-light',
         'transition-colors duration-300'
       )}
     >
       {/* Product Image */}
       <Link
-        href={`/products/${product.slug}`}
+        href={`/products/${item.productSlug}`}
         className={cn(
           'relative block aspect-square overflow-hidden',
-          'bg-background-warm rounded-lg border border-border-light',
-          'transition-all duration-400 ease-luxe',
+          'bg-surface-secondary rounded-lg border border-stroke-light',
+          'transition-all duration-400 duration-200',
           'group-hover:shadow-soft-md'
         )}
-        aria-label={`Voir ${product.name}`}
+        aria-label={`Voir ${item.productName}`}
       >
         <Image
-          src={product.images?.[0] || '/images/placeholder-product.jpg'}
-          alt={product.name}
+          src={item.productImage || '/images/placeholder-product.jpg'}
+          alt={item.productName}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 768px) 100px, 140px"
@@ -96,28 +96,28 @@ function CartItemComponent({
         <div>
           {/* Product Name */}
           <Link
-            href={`/products/${product.slug}`}
+            href={`/products/${item.productSlug}`}
             className={cn(
-              'block font-serif text-heading-5 md:text-heading-4 text-text-primary',
-              'transition-colors duration-250 ease-luxe',
-              'hover:text-hermes-500',
+              'block font-sans text-heading-5 md:text-heading-4 text-content-primary',
+              'transition-colors duration-250 duration-200',
+              'hover:text-primary',
               'line-clamp-2'
             )}
           >
-            {product.name}
+            {item.productName}
           </Link>
 
-          {/* Category */}
-          {product.category && (
-            <p className="mt-1 font-sans text-caption uppercase tracking-luxe text-text-muted">
-              {product.category.name}
+          {/* Variant */}
+          {item.variant && (
+            <p className="mt-1 font-sans text-caption uppercase  text-content-muted">
+              {item.variant.name}
             </p>
           )}
 
           {/* Reference */}
-          {product.reference && (
-            <p className="mt-1 font-sans text-caption text-text-light">
-              Ref: {product.reference}
+          {item.productReference && (
+            <p className="mt-1 font-sans text-caption text-content-muted">
+              Ref: {item.productReference}
             </p>
           )}
         </div>
@@ -137,7 +137,7 @@ function CartItemComponent({
             <span
               className={cn(
                 'w-8 text-center',
-                'font-sans text-body font-medium text-text-primary'
+                'font-sans text-body font-medium text-content-primary'
               )}
               aria-label={`Quantité: ${quantity}`}
             >
@@ -154,7 +154,7 @@ function CartItemComponent({
 
           {/* Price and Remove (Mobile) */}
           <div className="flex items-center gap-3">
-            <span className="font-serif text-heading-5 text-text-primary">
+            <span className="font-sans text-heading-5 text-content-primary">
               {formatPrice(itemTotal)}
             </span>
             <button
@@ -162,12 +162,12 @@ function CartItemComponent({
               className={cn(
                 'flex items-center justify-center',
                 'w-8 h-8',
-                'text-text-light',
-                'transition-all duration-250 ease-luxe',
+                'text-content-muted',
+                'transition-all duration-250 duration-200',
                 'hover:text-red-500',
-                'focus:outline-none focus-visible:ring-1 focus-visible:ring-hermes-500'
+                'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary'
               )}
-              aria-label={`Supprimer ${product.name} du panier`}
+              aria-label={`Supprimer ${item.productName} du panier`}
             >
               <Trash2 className="w-4 h-4" strokeWidth={1.5} />
             </button>
@@ -188,7 +188,7 @@ function CartItemComponent({
         <span
           className={cn(
             'w-12 text-center',
-            'font-sans text-body-lg font-medium text-text-primary'
+            'font-sans text-body-lg font-medium text-content-primary'
           )}
           aria-label={`Quantite: ${quantity}`}
         >
@@ -206,16 +206,16 @@ function CartItemComponent({
       {/* Price (Desktop) */}
       <div className="hidden md:flex flex-col items-end justify-center min-w-[100px]">
         {/* Price */}
-        <span className="font-serif text-heading-4 text-text-primary whitespace-nowrap">
+        <span className="font-sans text-heading-4 text-content-primary whitespace-nowrap">
           {formatPrice(itemTotal)}
         </span>
 
         {/* Unit Price (if quantity > 1) */}
         <span className={cn(
-          "mt-1 font-sans text-caption text-text-muted whitespace-nowrap",
+          "mt-1 font-sans text-caption text-content-muted whitespace-nowrap",
           quantity <= 1 && "invisible"
         )}>
-          {formatPrice(product.price)} / pièce
+          {formatPrice(item.pricing.unitPriceTTC)} / piece
         </span>
       </div>
 
@@ -226,12 +226,12 @@ function CartItemComponent({
           className={cn(
             'flex items-center justify-center',
             'w-10 h-10',
-            'text-text-light',
-            'transition-all duration-250 ease-luxe',
+            'text-content-muted',
+            'transition-all duration-250 duration-200',
             'hover:text-red-500',
-            'focus:outline-none focus-visible:ring-1 focus-visible:ring-hermes-500'
+            'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary'
           )}
-          aria-label={`Supprimer ${product.name} du panier`}
+          aria-label={`Supprimer ${item.productName} du panier`}
         >
           <Trash2 className="w-4 h-4" strokeWidth={1.5} />
         </button>
@@ -264,12 +264,12 @@ function QuantityButton({
       className={cn(
         'flex items-center justify-center',
         'w-8 h-8 md:w-10 md:h-10',
-        'border border-border-medium rounded-soft',
-        'text-text-secondary',
-        'transition-all duration-250 ease-luxe',
-        'hover:border-hermes-500 hover:text-hermes-500',
-        'focus:outline-none focus-visible:ring-1 focus-visible:ring-hermes-500',
-        'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-border-medium disabled:hover:text-text-secondary'
+        'border border-stroke-medium rounded-lg',
+        'text-content-secondary',
+        'transition-all duration-250 duration-200',
+        'hover:border-primary hover:text-primary',
+        'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary',
+        'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-stroke-medium disabled:hover:text-content-secondary'
       )}
       aria-label={ariaLabel}
     >

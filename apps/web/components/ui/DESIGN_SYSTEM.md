@@ -1,8 +1,8 @@
-# Maison Bijoux Design System
+# B2B Professional Design System
 
 ## Overview
 
-A Hermes-inspired luxury design system for the Maison Bijoux e-commerce platform. This system prioritizes elegance, refinement, and visual harmony while maintaining excellent accessibility and user experience.
+A modern, ultra-minimalist B2B design system for the professional jewelry e-commerce platform. This system prioritizes clarity, efficiency, and professional aesthetics while maintaining excellent accessibility and user experience.
 
 ---
 
@@ -10,56 +10,37 @@ A Hermes-inspired luxury design system for the Maison Bijoux e-commerce platform
 
 ### Core Principles
 
-1. **Elegance Through Restraint**: Every element earns its place. Remove what doesn't add value.
-2. **Warmth and Approachability**: Luxury doesn't mean cold. Use warm tones to create an inviting atmosphere.
-3. **Visual Breathing Room**: Generous spacing allows content to shine.
-4. **Subtle Motion**: Animations enhance without distracting.
-5. **Accessibility First**: Beautiful design that everyone can use.
+1. **Professional Clarity**: Clean interfaces that communicate clearly and efficiently.
+2. **Neutral Foundation**: Gray-based palette that lets products be the focus.
+3. **Strategic Accent**: Orange accent (#f67828) for CTAs and important actions.
+4. **Generous Spacing**: Comfortable visual breathing room.
+5. **Accessibility First**: WCAG compliant design that everyone can use.
 
 ---
 
 ## Color Palette
 
-### Primary Accent: Hermes Orange
+### Accent Color (CTAs & Actions)
 
 ```
-hermes-500: #f67828  (Primary)
-hermes-400: #fb923c
-hermes-600: #ea580c
-hermes-50:  #fff7ed  (Soft backgrounds)
+accent: #f67828  (Primary action color)
 ```
 
-### Background Colors (Light Theme)
+Usage: Buttons, links, progress indicators, active states
+
+### Neutral Gray Scale
 
 ```
-background-cream: #fffcf7  (Primary background)
-background-beige: #fcf7f1  (Secondary sections)
-background-warm:  #f6f1eb  (Muted areas)
-background-muted: #f8f5f0  (Subtle emphasis)
-```
-
-### Text Colors
-
-```
-text-primary:   #2b333f  (Charcoal - main text)
-text-secondary: #444444  (Medium grey)
-text-muted:     #696969  (Secondary text)
-text-light:     #8b8b8b  (Subtle text)
-text-inverse:   #fffcf7  (On dark backgrounds)
-```
-
-### Luxe Neutrals
-
-```
-luxe-white:    #ffffff
-luxe-cream:    #fffcf7
-luxe-pearl:    #faf8f5
-luxe-sand:     #f0ebe3
-luxe-taupe:    #d4c9bd
-luxe-stone:    #b8a99a
-luxe-bronze:   #a08b76
-luxe-charcoal: #2b333f
-luxe-noir:     #1a1a1a
+neutral-50:  #fafafa  (Subtle backgrounds)
+neutral-100: #f5f5f5  (Muted sections)
+neutral-200: #e5e5e5  (Borders, dividers)
+neutral-300: #d4d4d4  (Medium borders)
+neutral-400: #a3a3a3  (Subtle text, icons)
+neutral-500: #737373  (Secondary text)
+neutral-600: #525252  (Body text)
+neutral-700: #404040  (Dark text)
+neutral-800: #262626  (Headings)
+neutral-900: #171717  (Primary text)
 ```
 
 ### Semantic Colors
@@ -77,34 +58,30 @@ Info:    blue-50 / blue-500 / blue-700
 
 ### Font Families
 
-- **Serif (Headings)**: Playfair Display, Cormorant Garamond
-- **Sans-Serif (Body)**: Inter, Helvetica Neue
-- **Display (Impact)**: Cormorant Garamond
+- **Sans-Serif (All text)**: Inter, system-ui, sans-serif
 
 ### Type Scale
 
 | Name          | Size   | Line Height | Letter Spacing | Weight |
 |---------------|--------|-------------|----------------|--------|
-| display-hero  | 5rem   | 1.05        | -0.03em        | 300    |
-| display-1     | 4rem   | 1.1         | -0.025em       | 300    |
-| display-2     | 3.25rem| 1.1         | -0.02em        | 400    |
-| heading-1     | 2.75rem| 1.15        | -0.015em       | 400    |
-| heading-2     | 2.25rem| 1.2         | -0.01em        | 400    |
-| heading-3     | 1.875rem| 1.25       | -0.005em       | 500    |
-| heading-4     | 1.5rem | 1.3         | 0              | 500    |
-| heading-5     | 1.25rem| 1.4         | 0.005em        | 500    |
-| body-lg       | 1.125rem| 1.7        | 0.01em         | -      |
-| body          | 1rem   | 1.7         | 0.01em         | -      |
-| body-sm       | 0.9375rem| 1.6       | 0.01em         | -      |
-| caption       | 0.8125rem| 1.5       | 0.02em         | -      |
-| overline      | 0.75rem| 1.4         | 0.15em         | 500    |
+| hero          | 4rem   | 1.1         | -0.02em        | 700    |
+| section       | 2.5rem | 1.2         | -0.01em        | 600    |
+| heading-1     | 2rem   | 1.25        | -0.01em        | 600    |
+| heading-2     | 1.75rem| 1.3         | 0              | 600    |
+| heading-3     | 1.5rem | 1.35        | 0              | 600    |
+| heading-4     | 1.25rem| 1.4         | 0              | 600    |
+| heading-5     | 1.125rem| 1.4        | 0              | 600    |
+| body-lg       | 1.125rem| 1.7        | 0              | 400    |
+| body          | 1rem   | 1.7         | 0              | 400    |
+| body-sm       | 0.875rem| 1.6        | 0              | 400    |
+| caption       | 0.75rem| 1.5         | 0.01em         | 400    |
 
 ### Letter Spacing Utilities
 
 ```
-tracking-luxe:    0.15em  (Labels, buttons)
-tracking-elegant: 0.1em   (Badges, captions)
-tracking-refined: 0.05em  (Subtle emphasis)
+tracking-wide:   0.025em  (Labels, buttons)
+tracking-wider:  0.05em   (Uppercase text)
+tracking-normal: 0        (Body text)
 ```
 
 ---
@@ -127,7 +104,7 @@ tracking-refined: 0.05em  (Subtle emphasis)
 
 ### Usage Guidelines
 
-- **Section padding**: Use 24-32 for vertical rhythm
+- **Section padding**: Use 16-24 for vertical rhythm
 - **Card padding**: Use sm (p-4), md (p-6), lg (p-8)
 - **Component gaps**: Use 4-6 for tight, 8-12 for comfortable
 
@@ -147,13 +124,14 @@ Sizes: `sm`, `md`, `lg`
 ```
 
 **Design Notes**:
-- Sharp edges (rounded-none) for luxury aesthetic
-- Uppercase text with letter-spacing
-- Subtle hover shadows
+- Rounded corners (rounded-lg)
+- Uppercase text with tracking-wide
+- Primary uses accent color
+- Subtle hover transitions (duration-150)
 
 ### Badge
 
-Variants: `hermes`, `hermes-outline`, `hermes-soft`, `dark`, `light`, `success`, `warning`, `error`, `info`, `pending`
+Variants: `primary`, `primary-outline`, `primary-soft`, `dark`, `light`, `success`, `warning`, `error`, `info`, `pending`
 Sizes: `xs`, `sm`, `md`, `lg`
 
 ```tsx
@@ -207,7 +185,7 @@ const steps = [
 
 ### Separator
 
-Variants: `default`, `light`, `medium`, `strong`, `hermes`, `fade`, `hermes-fade`
+Variants: `default`, `light`, `medium`, `strong`, `accent`, `fade`, `accent-fade`
 Orientations: `horizontal`, `vertical`
 Sizes: `xs`, `sm`, `md`, `lg`
 
@@ -215,7 +193,7 @@ Sizes: `xs`, `sm`, `md`, `lg`
 // Simple divider
 <Separator />
 
-// Hermes accent divider (centered)
+// Accent divider (centered)
 <DecorativeDivider lineWidth="w-24" />
 
 // Divider with text
@@ -227,7 +205,7 @@ Sizes: `xs`, `sm`, `md`, `lg`
 
 ### Alert
 
-Variants: `success`, `error`, `warning`, `info`, `hermes`, `neutral`
+Variants: `success`, `error`, `warning`, `info`, `accent`, `neutral`
 Sizes: `sm`, `md`, `lg`
 
 ```tsx
@@ -273,30 +251,24 @@ Sizes: `sm`, `md`, `lg`
 
 ### Timing Functions
 
-```
-ease-luxe:       cubic-bezier(0.25, 0.46, 0.45, 0.94)  (Elegant ease)
-ease-luxe-out:   cubic-bezier(0.22, 1, 0.36, 1)        (Snappy exit)
-ease-luxe-in-out: cubic-bezier(0.65, 0, 0.35, 1)      (Smooth both)
-```
+Standard CSS transitions with duration-150 for most interactions.
 
 ### Durations
 
 ```
-duration-250: 250ms  (Micro-interactions)
-duration-350: 350ms  (Standard transitions)
-duration-400: 400ms  (Emphasis transitions)
-duration-600: 600ms  (Entrance animations)
-duration-800: 800ms  (Dramatic reveals)
+duration-150: 150ms  (Standard transitions)
+duration-200: 200ms  (Micro-interactions)
+duration-300: 300ms  (Medium transitions)
+duration-500: 500ms  (Entrance animations)
 ```
 
 ### Animation Presets
 
 ```
-fade-in:      0.8s elegant fade
-fade-in-up:   0.8s fade with 24px slide up
-slide-in-right: 0.6s slide from right
-scale-in:     0.5s subtle scale entrance
-shimmer:      2.5s loading shimmer
+fade-in:      0.5s fade
+fade-in-up:   0.5s fade with 20px slide up
+scale-in:     0.3s subtle scale entrance
+shimmer:      2s loading shimmer
 ```
 
 ### Framer Motion Patterns
@@ -308,8 +280,8 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1,
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
     },
   },
 };
@@ -321,7 +293,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.8,
+      duration: 0.5,
       ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
@@ -333,15 +305,11 @@ const itemVariants = {
 ## Shadows
 
 ```
-shadow-soft:      Light, subtle shadow
-shadow-soft-md:   Medium soft shadow
-shadow-soft-lg:   Large soft shadow
-shadow-elegant:   Multi-layer refined shadow
-shadow-elegant-lg: Large elegant shadow
-shadow-card:      Default card shadow
-shadow-card-hover: Elevated card on hover
-shadow-button:    Button depth
-shadow-button-hover: Button hover state
+shadow-sm:   Subtle shadow
+shadow:      Default shadow
+shadow-md:   Medium shadow
+shadow-lg:   Large shadow
+shadow-xl:   Extra large shadow
 ```
 
 ---
@@ -349,10 +317,12 @@ shadow-button-hover: Button hover state
 ## Border Radius
 
 ```
-rounded-soft:    0.375rem  (Subtle rounding)
-rounded-elegant: 0.5rem    (Standard cards)
-rounded-luxe:    0.75rem   (Prominent elements)
-rounded-pill:    9999px    (Full pill shape)
+rounded:     0.25rem  (Subtle rounding)
+rounded-md:  0.375rem (Small elements)
+rounded-lg:  0.5rem   (Standard - default for most components)
+rounded-xl:  0.75rem  (Prominent elements)
+rounded-2xl: 1rem     (Large containers)
+rounded-full: 9999px  (Pills, avatars)
 ```
 
 ---
@@ -376,7 +346,7 @@ All interactive elements include:
 - `focus:outline-none` (remove default)
 - `focus-visible:ring-2` (keyboard focus)
 - `focus-visible:ring-offset-2` (spacing)
-- Color-appropriate ring color
+- `focus-visible:ring-accent` (accent color ring)
 
 ### Screen Readers
 
@@ -512,5 +482,5 @@ className={cn(
 
 ## Version
 
-Design System v1.0 - December 2024
-Built for Maison Bijoux luxury jewelry e-commerce.
+Design System v2.0 - December 2024
+B2B Professional Design for wholesale jewelry e-commerce.

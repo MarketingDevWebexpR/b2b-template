@@ -61,7 +61,7 @@ export function UserMenu() {
   // Loading state
   if (status === 'loading') {
     return (
-      <div className="w-10 h-10 rounded-full bg-luxury-charcoal animate-pulse" />
+      <div className="w-10 h-10 rounded-full bg-neutral-200 animate-pulse" />
     );
   }
 
@@ -85,9 +85,9 @@ export function UserMenu() {
           className={cn(
             'md:hidden flex items-center justify-center',
             'w-10 h-10 rounded-full',
-            'text-white/80 hover:text-gold-500',
-            'hover:bg-white/5',
-            'transition-all duration-300'
+            'text-neutral-600 hover:text-accent',
+            'hover:bg-neutral-100',
+            'transition-all duration-200'
           )}
           aria-label="Connexion"
         >
@@ -106,10 +106,10 @@ export function UserMenu() {
         className={cn(
           'flex items-center gap-2',
           'px-2 py-1 rounded-full',
-          'text-white/80 hover:text-gold-500',
-          'hover:bg-white/5',
-          'transition-all duration-300',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500'
+          'text-neutral-600 hover:text-accent',
+          'hover:bg-neutral-100',
+          'transition-all duration-200',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30'
         )}
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -120,13 +120,13 @@ export function UserMenu() {
           <img
             src={session.user.image}
             alt={session.user.name || 'Avatar'}
-            className="w-8 h-8 rounded-full object-cover border border-gold-500/30"
+            className="w-8 h-8 rounded-full object-cover border border-accent/30"
           />
         ) : (
           <div
             className={cn(
               'w-8 h-8 rounded-full',
-              'bg-gold-500 text-luxury-black',
+              'bg-accent text-white',
               'flex items-center justify-center',
               'text-sm font-medium'
             )}
@@ -158,19 +158,19 @@ export function UserMenu() {
             className={cn(
               'absolute right-0 top-full mt-2',
               'w-56 py-2',
-              'bg-luxury-black/95 backdrop-blur-md',
-              'border border-white/10 rounded-lg',
-              'shadow-luxury'
+              'bg-white backdrop-blur-md',
+              'border border-neutral-200 rounded-lg',
+              'shadow-lg'
             )}
             role="menu"
             aria-orientation="vertical"
           >
             {/* User info */}
-            <div className="px-4 py-3 border-b border-white/10">
-              <p className="text-sm font-medium text-white truncate">
+            <div className="px-4 py-3 border-b border-neutral-200">
+              <p className="text-sm font-medium text-neutral-900 truncate">
                 {session.user?.name}
               </p>
-              <p className="text-xs text-white/60 truncate">
+              <p className="text-xs text-neutral-500 truncate">
                 {session.user?.email}
               </p>
             </div>
@@ -182,8 +182,8 @@ export function UserMenu() {
                 onClick={() => setIsOpen(false)}
                 className={cn(
                   'flex items-center gap-3 px-4 py-2',
-                  'text-sm text-white/80',
-                  'hover:bg-white/5 hover:text-gold-500',
+                  'text-sm text-neutral-700',
+                  'hover:bg-neutral-100 hover:text-accent',
                   'transition-colors duration-200'
                 )}
                 role="menuitem"
@@ -197,8 +197,8 @@ export function UserMenu() {
                 onClick={() => setIsOpen(false)}
                 className={cn(
                   'flex items-center gap-3 px-4 py-2',
-                  'text-sm text-white/80',
-                  'hover:bg-white/5 hover:text-gold-500',
+                  'text-sm text-neutral-700',
+                  'hover:bg-neutral-100 hover:text-accent',
                   'transition-colors duration-200'
                 )}
                 role="menuitem"
@@ -209,13 +209,13 @@ export function UserMenu() {
             </div>
 
             {/* Sign out */}
-            <div className="border-t border-white/10 pt-1">
+            <div className="border-t border-neutral-200 pt-1">
               <button
                 onClick={handleSignOut}
                 className={cn(
                   'flex items-center gap-3 w-full px-4 py-2',
-                  'text-sm text-white/80',
-                  'hover:bg-white/5 hover:text-red-400',
+                  'text-sm text-neutral-700',
+                  'hover:bg-red-50 hover:text-red-600',
                   'transition-colors duration-200'
                 )}
                 role="menuitem"

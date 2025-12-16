@@ -52,7 +52,7 @@ export function FilterCollapsible({
   return (
     <div
       className={cn(
-        'border-b border-b2b-border-light',
+        'border-b border-neutral-200',
         className
       )}
     >
@@ -67,11 +67,11 @@ export function FilterCollapsible({
           'flex items-center justify-between w-full',
           'py-4 px-0',
           'text-left',
-          'text-b2b-label font-semibold uppercase tracking-wide',
-          'text-b2b-text-primary',
-          'hover:text-b2b-primary',
+          'text-xs font-semibold uppercase tracking-wide',
+          'text-neutral-900',
+          'hover:text-accent',
           'transition-colors duration-200',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
         )}
       >
         <span className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export function FilterCollapsible({
                 'inline-flex items-center justify-center',
                 'min-w-[20px] h-5 px-1.5',
                 'text-xs font-medium',
-                'bg-b2b-primary text-white',
+                'bg-accent text-white',
                 'rounded-full'
               )}
               aria-label={`${activeCount} filtre${activeCount > 1 ? 's' : ''} actif${activeCount > 1 ? 's' : ''}`}
@@ -95,7 +95,7 @@ export function FilterCollapsible({
         {/* Chevron icon */}
         <svg
           className={cn(
-            'w-5 h-5 text-b2b-text-muted',
+            'w-5 h-5 text-neutral-500',
             'transform transition-transform duration-200',
             isExpanded && 'rotate-180'
           )}

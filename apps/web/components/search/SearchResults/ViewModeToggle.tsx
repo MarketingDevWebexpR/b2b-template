@@ -36,10 +36,10 @@ function ViewModeButton({
         'relative p-2',
         'rounded-lg',
         'transition-all duration-200',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-1',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1',
         isActive
-          ? 'bg-b2b-primary text-white shadow-sm'
-          : 'bg-white text-b2b-text-muted hover:text-b2b-text-primary hover:bg-b2b-bg-tertiary border border-b2b-border'
+          ? 'bg-accent text-white shadow-sm'
+          : 'bg-white text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 border border-neutral-200'
       )}
       aria-label={label}
       aria-pressed={isActive}
@@ -145,8 +145,8 @@ export function ViewModeToggle({
     return (
       <div
         className={cn(
-          'inline-flex items-center rounded-lg bg-b2b-bg-secondary p-1',
-          'border border-b2b-border-light',
+          'inline-flex items-center rounded-lg bg-neutral-50 p-1',
+          'border border-neutral-200',
           className
         )}
         role="group"
@@ -165,10 +165,10 @@ export function ViewModeToggle({
                 'text-sm font-medium',
                 'rounded-md',
                 'transition-all duration-200',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-inset',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset',
                 isActive
-                  ? 'bg-white text-b2b-text-primary shadow-sm'
-                  : 'text-b2b-text-muted hover:text-b2b-text-primary'
+                  ? 'bg-white text-neutral-900 shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900'
               )}
               aria-pressed={isActive}
             >

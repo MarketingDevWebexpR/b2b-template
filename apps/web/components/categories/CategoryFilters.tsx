@@ -141,7 +141,7 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
           <select
             value={currentSort}
             onChange={(e) => handleSortChange(e.target.value)}
-            className="w-full bg-luxury-charcoal border border-luxury-gray/50 px-4 py-3 text-white appearance-none cursor-pointer focus:outline-none focus:border-gold-500 transition-colors"
+            className="w-full bg-luxury-charcoal border border-luxury-gray/50 px-4 py-3 text-white appearance-none cursor-pointer focus:outline-none focus:border-accent transition-colors"
             aria-label="Trier les produits"
           >
             {SORT_OPTIONS.map((option) => (
@@ -168,10 +168,10 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
               onClick={() => applyPricePreset(preset)}
               className={cn(
                 'w-full text-left px-3 py-2 text-sm transition-colors',
-                'hover:bg-luxury-gray/50 hover:text-gold-500',
+                'hover:bg-luxury-gray/50 hover:text-accent',
                 searchParams.get('minPrice') === (preset.min > 0 ? preset.min.toString() : '') &&
                   searchParams.get('maxPrice') === (preset.max < Infinity ? preset.max.toString() : '')
-                  ? 'bg-gold-500/10 text-gold-500 border-l-2 border-gold-500'
+                  ? 'bg-accent/10 text-accent border-l-2 border-accent'
                   : 'text-luxury-pearl'
               )}
             >
@@ -188,7 +188,7 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
               placeholder="Min"
-              className="w-full bg-luxury-charcoal border border-luxury-gray/50 px-3 py-2 text-white text-sm focus:outline-none focus:border-gold-500 transition-colors"
+              className="w-full bg-luxury-charcoal border border-luxury-gray/50 px-3 py-2 text-white text-sm focus:outline-none focus:border-accent transition-colors"
               aria-label="Prix minimum"
             />
           </div>
@@ -199,14 +199,14 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
               placeholder="Max"
-              className="w-full bg-luxury-charcoal border border-luxury-gray/50 px-3 py-2 text-white text-sm focus:outline-none focus:border-gold-500 transition-colors"
+              className="w-full bg-luxury-charcoal border border-luxury-gray/50 px-3 py-2 text-white text-sm focus:outline-none focus:border-accent transition-colors"
               aria-label="Prix maximum"
             />
           </div>
         </div>
         <button
           onClick={applyPriceFilter}
-          className="w-full py-2 text-sm uppercase tracking-wider text-gold-500 border border-gold-500/50 hover:bg-gold-500 hover:text-luxury-black transition-colors"
+          className="w-full py-2 text-sm uppercase tracking-wider text-accent border border-accent/50 hover:bg-accent hover:text-luxury-black transition-colors"
         >
           Appliquer
         </button>
@@ -227,8 +227,8 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
                 className={cn(
                   'w-5 h-5 border-2 flex items-center justify-center transition-all',
                   currentMaterials.includes(material.id)
-                    ? 'bg-gold-500 border-gold-500'
-                    : 'border-luxury-gray group-hover:border-gold-500/50'
+                    ? 'bg-accent border-accent'
+                    : 'border-luxury-gray group-hover:border-accent/50'
                 )}
               >
                 {currentMaterials.includes(material.id) && (
@@ -261,8 +261,8 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
                 className={cn(
                   'text-sm transition-colors',
                   currentMaterials.includes(material.id)
-                    ? 'text-gold-500'
-                    : 'text-luxury-pearl group-hover:text-gold-400'
+                    ? 'text-accent'
+                    : 'text-luxury-pearl group-hover:text-accent'
                 )}
               >
                 {material.label}
@@ -293,7 +293,7 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
       {/* Loading Indicator */}
       {isPending && (
         <div className="fixed inset-0 bg-luxury-black/50 flex items-center justify-center z-50 pointer-events-none">
-          <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
         </div>
       )}
     </>
@@ -310,7 +310,7 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
           <SlidersHorizontal className="w-4 h-4" />
           <span className="text-sm uppercase tracking-wider">Filtres</span>
           {hasActiveFilters && (
-            <span className="ml-2 w-5 h-5 bg-gold-500 text-luxury-black text-xs flex items-center justify-center rounded-full">
+            <span className="ml-2 w-5 h-5 bg-accent text-luxury-black text-xs flex items-center justify-center rounded-full">
               {currentMaterials.length +
                 (searchParams.has('minPrice') || searchParams.has('maxPrice') ? 1 : 0)}
             </span>
@@ -342,7 +342,7 @@ export function CategoryFilters({ className }: CategoryFiltersProps) {
               <div className="p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-serif text-xl text-white">Filtres</h2>
+                  <h2 className="font-sans text-xl text-white">Filtres</h2>
                   <button
                     onClick={() => setIsMobileOpen(false)}
                     className="w-10 h-10 flex items-center justify-center text-luxury-silver hover:text-white transition-colors"

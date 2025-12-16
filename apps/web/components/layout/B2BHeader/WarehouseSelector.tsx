@@ -136,8 +136,8 @@ export const WarehouseSelector = memo(function WarehouseSelector({
           className
         )}
       >
-        <div className="w-4 h-4 bg-b2b-bg-tertiary rounded" />
-        <div className="w-24 h-4 bg-b2b-bg-tertiary rounded" />
+        <div className="w-4 h-4 bg-neutral-100 rounded" />
+        <div className="w-24 h-4 bg-neutral-100 rounded" />
       </div>
     );
   }
@@ -162,18 +162,18 @@ export const WarehouseSelector = memo(function WarehouseSelector({
         className={cn(
           'flex items-center gap-2',
           compact ? 'px-2 py-1.5' : 'px-3 py-2',
-          'bg-b2b-bg-secondary border border-b2b-border rounded-lg',
-          'text-b2b-text-secondary hover:text-b2b-text-primary',
-          'hover:border-b2b-primary-300 hover:bg-white',
+          'bg-neutral-50 border border-neutral-200 rounded-lg',
+          'text-neutral-600 hover:text-neutral-900',
+          'hover:border-neutral-300 hover:bg-white',
           'transition-all duration-200',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20'
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20'
         )}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label={`Point de vente: ${selectedWarehouse.name}`}
       >
         <MapPin
-          className="w-4 h-4 text-b2b-primary-500 flex-shrink-0"
+          className="w-4 h-4 text-accent flex-shrink-0"
           strokeWidth={1.5}
           aria-hidden="true"
         />
@@ -181,7 +181,7 @@ export const WarehouseSelector = memo(function WarehouseSelector({
         {!compact && (
           <>
             <div className="flex flex-col items-start">
-              <span className="text-b2b-body-sm font-medium text-b2b-text-primary truncate max-w-[150px]">
+              <span className="text-sm font-medium text-neutral-900 truncate max-w-[150px]">
                 {selectedWarehouse.code}
               </span>
             </div>
@@ -189,10 +189,10 @@ export const WarehouseSelector = memo(function WarehouseSelector({
             {/* Open/Closed indicator */}
             <span
               className={cn(
-                'hidden lg:inline-flex items-center px-1.5 py-0.5 rounded text-b2b-badge',
+                'hidden lg:inline-flex items-center px-1.5 py-0.5 rounded text-xs',
                 isCurrentlyOpen
-                  ? 'bg-b2b-success-100 text-b2b-success-700'
-                  : 'bg-b2b-bg-tertiary text-b2b-text-muted'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-neutral-100 text-neutral-500'
               )}
             >
               {isCurrentlyOpen ? 'Ouvert' : 'Ferme'}
@@ -202,7 +202,7 @@ export const WarehouseSelector = memo(function WarehouseSelector({
 
         <ChevronDown
           className={cn(
-            'w-4 h-4 text-b2b-text-muted transition-transform duration-200',
+            'w-4 h-4 text-neutral-500 transition-transform duration-200',
             isOpen && 'rotate-180'
           )}
           strokeWidth={1.5}
@@ -216,14 +216,14 @@ export const WarehouseSelector = memo(function WarehouseSelector({
           className={cn(
             'absolute top-full right-0 mt-1 z-50',
             'w-72 max-h-80 overflow-y-auto',
-            'bg-white border border-b2b-border rounded-lg shadow-lg',
+            'bg-white border border-neutral-200 rounded-lg shadow-lg',
             'animate-fade-in-down'
           )}
           role="listbox"
           aria-label="Selectionner un point de vente"
         >
           <div className="p-2">
-            <p className="px-2 py-1.5 text-b2b-caption text-b2b-text-muted uppercase tracking-wide">
+            <p className="px-2 py-1.5 text-xs text-neutral-500 uppercase tracking-wide">
               Points de vente disponibles
             </p>
 
@@ -242,8 +242,8 @@ export const WarehouseSelector = memo(function WarehouseSelector({
                       'flex items-start gap-3 w-full p-2 rounded-md',
                       'text-left transition-colors duration-150',
                       isSelected
-                        ? 'bg-b2b-primary-50 text-b2b-primary-700'
-                        : 'hover:bg-b2b-bg-secondary text-b2b-text-primary'
+                        ? 'bg-orange-50 text-orange-700'
+                        : 'hover:bg-neutral-50 text-neutral-900'
                     )}
                     role="option"
                     aria-selected={isSelected}
@@ -253,16 +253,16 @@ export const WarehouseSelector = memo(function WarehouseSelector({
                       className={cn(
                         'flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0',
                         isSelected
-                          ? 'bg-b2b-primary-100'
-                          : 'bg-b2b-bg-tertiary'
+                          ? 'bg-orange-100'
+                          : 'bg-neutral-100'
                       )}
                     >
                       <Icon
                         className={cn(
                           'w-4 h-4',
                           isSelected
-                            ? 'text-b2b-primary-600'
-                            : 'text-b2b-text-muted'
+                            ? 'text-orange-600'
+                            : 'text-neutral-500'
                         )}
                         strokeWidth={1.5}
                         aria-hidden="true"
@@ -272,31 +272,31 @@ export const WarehouseSelector = memo(function WarehouseSelector({
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-b2b-body-sm truncate">
+                        <span className="font-medium text-sm truncate">
                           {warehouse.code}
                         </span>
                         {isSelected && (
                           <Check
-                            className="w-4 h-4 text-b2b-primary-500 flex-shrink-0"
+                            className="w-4 h-4 text-accent flex-shrink-0"
                             strokeWidth={2}
                             aria-hidden="true"
                           />
                         )}
                       </div>
-                      <p className="text-b2b-caption text-b2b-text-muted truncate">
+                      <p className="text-xs text-neutral-500 truncate">
                         {warehouse.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-b2b-caption text-b2b-text-muted">
+                        <span className="text-xs text-neutral-500">
                           {typeLabel}
                         </span>
-                        <span className="text-b2b-text-muted">-</span>
+                        <span className="text-neutral-500">-</span>
                         <span
                           className={cn(
-                            'text-b2b-badge',
+                            'text-xs',
                             isOpen
-                              ? 'text-b2b-success-600'
-                              : 'text-b2b-text-muted'
+                              ? 'text-green-600'
+                              : 'text-neutral-500'
                           )}
                         >
                           {isOpen ? 'Ouvert' : 'Ferme'}
@@ -310,10 +310,10 @@ export const WarehouseSelector = memo(function WarehouseSelector({
           </div>
 
           {/* Footer */}
-          <div className="border-t border-b2b-border p-2">
+          <div className="border-t border-neutral-200 p-2">
             <a
               href="/points-de-vente"
-              className="flex items-center justify-center gap-2 w-full px-3 py-2 text-b2b-body-sm text-b2b-primary-500 hover:text-b2b-primary-600 hover:bg-b2b-primary-50 rounded-md transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-3 py-2 text-sm text-accent hover:text-orange-600 hover:bg-orange-50 rounded-md transition-colors"
             >
               <MapPin className="w-4 h-4" strokeWidth={1.5} />
               <span>Voir tous les points de vente</span>

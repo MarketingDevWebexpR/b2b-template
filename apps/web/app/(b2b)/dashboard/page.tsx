@@ -6,6 +6,14 @@ import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import { useB2B, useB2BPermissions } from '@/contexts/B2BContext';
 import {
+  useDashboardFeatures,
+  useOrdersFeatures,
+  useQuotesFeatures,
+  useApprovalsFeatures,
+  useCompanyFeatures,
+  useQuickOrderFeatures,
+} from '@/contexts/FeatureContext';
+import {
   PageHeader,
   ActionButton,
   SectionCard,
@@ -123,15 +131,15 @@ function QuickActionCard({ href, icon, label }: QuickActionCardProps) {
       href={href}
       className={cn(
         'flex flex-col items-center gap-3 p-6',
-        'bg-white rounded-soft border border-border-light',
-        'hover:border-hermes-200 hover:shadow-sm transition-all duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+        'bg-white rounded-lg border border-stroke-light',
+        'hover:border-primary/20 hover:shadow-sm transition-all duration-200',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
       )}
     >
-      <div className="p-3 bg-hermes-50 rounded-full text-hermes-500" aria-hidden="true">
+      <div className="p-3 bg-primary-50 rounded-full text-primary" aria-hidden="true">
         {icon}
       </div>
-      <span className="font-sans text-body-sm text-text-primary text-center">
+      <span className="font-sans text-body-sm text-content-primary text-center">
         {label}
       </span>
     </Link>
@@ -146,18 +154,18 @@ function SpendingBar({ label, spent, limit, warningThreshold = 80 }: SpendingBar
   return (
     <div role="region" aria-labelledby={labelId}>
       <div className="flex items-center justify-between mb-2">
-        <span id={labelId} className="font-sans text-body-sm text-text-secondary">
+        <span id={labelId} className="font-sans text-body-sm text-content-secondary">
           {label}
         </span>
         <span className={cn(
           'font-sans text-body-sm font-medium',
-          isWarning ? 'text-amber-600' : 'text-text-primary'
+          isWarning ? 'text-amber-600' : 'text-content-primary'
         )}>
           {formatCurrency(spent)} / {formatCurrency(limit)}
         </span>
       </div>
       <div
-        className="h-2 bg-background-muted rounded-full overflow-hidden"
+        className="h-2 bg-surface-secondary rounded-full overflow-hidden"
         role="progressbar"
         aria-valuenow={Math.round(percentage)}
         aria-valuemin={0}
@@ -167,7 +175,7 @@ function SpendingBar({ label, spent, limit, warningThreshold = 80 }: SpendingBar
         <div
           className={cn(
             'h-full rounded-full transition-all duration-500',
-            isWarning ? 'bg-amber-500' : 'bg-hermes-500'
+            isWarning ? 'bg-amber-500' : 'bg-primary'
           )}
           style={{ width: `${Math.min(percentage, 100)}%` }}
         />
@@ -193,12 +201,22 @@ export default function DashboardPage() {
   const { employee, company, spendingSummary, isLoading } = useB2B();
   const { canApproveOrders, canViewSpending, canManageEmployees, canCreateQuote } = useB2BPermissions();
 
-  // Build stats from context data
+  // Feature flags
+  const { isEnabled: hasDashboard, hasAnalytics, hasQuickActions, hasRecentOrders, hasPendingQuotes } = useDashboardFeatures();
+  const { isEnabled: hasOrders } = useOrdersFeatures();
+  const { isEnabled: hasQuotes } = useQuotesFeatures();
+  const { isEnabled: hasApprovals } = useApprovalsFeatures();
+  const { hasEmployees: hasCompanyEmployees } = useCompanyFeatures();
+  const { hasCsvImport } = useQuickOrderFeatures();
+
+  // Build stats from context data - Feature Gated
   const stats = useMemo(() => {
     const monthlySpent = spendingSummary?.totalSpent ?? 8500;
+    const allStats = [];
 
-    return [
-      {
+    // Orders stat - gated by orders module
+    if (hasOrders) {
+      allStats.push({
         label: 'Commandes ce mois',
         value: '12',
         change: '+15%',
@@ -209,20 +227,28 @@ export default function DashboardPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
         ),
-      },
-      {
+      });
+    }
+
+    // Spending stat - gated by analytics subfeature
+    if (hasAnalytics && canViewSpending) {
+      allStats.push({
         label: 'Depenses ce mois',
         value: formatCurrency(monthlySpent),
         change: '+8%',
         changeType: 'positive' as const,
-        href: canViewSpending ? '/rapports' : undefined,
+        href: '/rapports',
         icon: (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
-      },
-      {
+      });
+    }
+
+    // Quotes stat - gated by quotes module
+    if (hasQuotes) {
+      allStats.push({
         label: 'Devis en attente',
         value: '3',
         href: '/devis',
@@ -231,24 +257,31 @@ export default function DashboardPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         ),
-      },
-      {
+      });
+    }
+
+    // Approvals stat - gated by approvals module AND permissions
+    if (hasApprovals && canApproveOrders) {
+      allStats.push({
         label: 'Approbations',
-        value: canApproveOrders ? '5' : '-',
-        href: canApproveOrders ? '/approbations' : undefined,
+        value: '5',
+        href: '/approbations',
         icon: (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
-      },
-    ];
-  }, [spendingSummary, canViewSpending, canApproveOrders]);
+      });
+    }
+
+    return allStats;
+  }, [spendingSummary, canViewSpending, canApproveOrders, hasOrders, hasAnalytics, hasQuotes, hasApprovals]);
 
   // Derive display values
   const employeeName = employee?.firstName ?? 'Utilisateur';
   const recentOrders = mockRecentOrders; // Will be replaced by API data
-  const pendingApprovals = canApproveOrders ? mockPendingApprovals : [];
+  // Approvals gated by module AND permissions
+  const pendingApprovals = (hasApprovals && canApproveOrders) ? mockPendingApprovals : [];
 
   // Loading state
   if (isLoading) {
@@ -261,10 +294,10 @@ export default function DashboardPage() {
       >
         <div className="text-center">
           <div
-            className="w-8 h-8 border-2 border-hermes-500 border-t-transparent rounded-full animate-spin mx-auto"
+            className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"
             aria-hidden="true"
           />
-          <p className="mt-4 font-sans text-body text-text-muted">Chargement...</p>
+          <p className="mt-4 font-sans text-body text-content-muted">Chargement...</p>
           <span className="sr-only">Chargement du tableau de bord en cours</span>
         </div>
       </div>
@@ -278,7 +311,8 @@ export default function DashboardPage() {
         title="Tableau de bord"
         description={`Bienvenue, ${employeeName}. Voici un apercu de votre activite.`}
         actions={
-          canCreateQuote && (
+          /* New Quote button - Gated by quotes module AND permissions */
+          hasQuotes && canCreateQuote && (
             <ActionButton
               variant="primary"
               href="/devis/nouveau"
@@ -295,19 +329,19 @@ export default function DashboardPage() {
         {stats.map((stat) => (
           <article
             key={stat.label}
-            className="bg-white rounded-soft border border-border-light p-6"
+            className="bg-white rounded-lg border border-stroke-light p-6"
             aria-labelledby={`stat-label-${stat.label.replace(/\s+/g, '-').toLowerCase()}`}
           >
             <div className="flex items-start justify-between">
-              <div className="p-2 bg-hermes-50 rounded-soft text-hermes-500" aria-hidden="true">
+              <div className="p-2 bg-primary-50 rounded-lg text-primary" aria-hidden="true">
                 {stat.icon}
               </div>
               {stat.href && (
                 <Link
                   href={stat.href}
                   className={cn(
-                    'font-sans text-caption text-hermes-500 hover:text-hermes-600',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft'
+                    'font-sans text-caption text-primary hover:text-primary-600',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg'
                   )}
                   aria-label={`Voir tout pour ${stat.label}`}
                 >
@@ -318,11 +352,11 @@ export default function DashboardPage() {
             <div className="mt-4">
               <p
                 id={`stat-label-${stat.label.replace(/\s+/g, '-').toLowerCase()}`}
-                className="font-sans text-caption text-text-muted"
+                className="font-sans text-caption text-content-muted"
               >
                 {stat.label}
               </p>
-              <p className="mt-1 font-serif text-heading-4 text-text-primary">
+              <p className="mt-1 font-sans text-heading-4 text-content-primary">
                 {stat.value}
               </p>
               {stat.change && (
@@ -341,22 +375,24 @@ export default function DashboardPage() {
         ))}
       </section>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pending Approvals */}
-        <section
-          className="bg-white rounded-soft border border-border-light"
-          aria-labelledby="approvals-heading"
-        >
-          <div className="flex items-center justify-between p-6 border-b border-border-light">
-            <h2 id="approvals-heading" className="font-serif text-heading-5 text-text-primary">
+      {/* Two Column Layout - Feature Gated */}
+      {(hasApprovals || hasRecentOrders) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pending Approvals - Feature Gated */}
+          {hasApprovals && (
+            <section
+              className="bg-white rounded-lg border border-stroke-light"
+              aria-labelledby="approvals-heading"
+            >
+          <div className="flex items-center justify-between p-6 border-b border-stroke-light">
+            <h2 id="approvals-heading" className="font-sans text-heading-5 text-content-primary">
               Approbations en attente
             </h2>
             <Link
               href="/approbations"
               className={cn(
-                'font-sans text-caption text-hermes-500 hover:text-hermes-600',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft'
+                'font-sans text-caption text-primary hover:text-primary-600',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg'
               )}
               aria-label="Voir toutes les approbations"
             >
@@ -366,7 +402,7 @@ export default function DashboardPage() {
           <div className="divide-y divide-border-light" role="list" aria-label="Liste des approbations en attente">
             {pendingApprovals.length === 0 ? (
               <div className="p-6 text-center" role="status">
-                <p className="font-sans text-body text-text-muted">
+                <p className="font-sans text-body text-content-muted">
                   Aucune approbation en attente
                 </p>
               </div>
@@ -374,7 +410,7 @@ export default function DashboardPage() {
               pendingApprovals.map((approval) => (
                 <article
                   key={approval.id}
-                  className="p-4 hover:bg-background-muted transition-colors"
+                  className="p-4 hover:bg-surface-secondary transition-colors"
                   role="listitem"
                   aria-labelledby={`approval-${approval.id}-title`}
                 >
@@ -382,11 +418,11 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p
                         id={`approval-${approval.id}-title`}
-                        className="font-sans text-body-sm font-medium text-text-primary"
+                        className="font-sans text-body-sm font-medium text-content-primary"
                       >
                         {approval.description}
                       </p>
-                      <p className="mt-0.5 font-sans text-caption text-text-muted">
+                      <p className="mt-0.5 font-sans text-caption text-content-muted">
                         {approval.requester} - {approval.date}
                       </p>
                       <p className="mt-1 font-sans text-caption text-amber-600" role="note">
@@ -394,13 +430,13 @@ export default function DashboardPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-sans text-body-sm font-medium text-text-primary">
+                      <p className="font-sans text-body-sm font-medium text-content-primary">
                         {formatCurrency(approval.amount)}
                       </p>
                       <div className="mt-2 flex items-center gap-2" role="group" aria-label="Actions">
                         <button
                           className={cn(
-                            'px-3 py-1 rounded-soft',
+                            'px-3 py-1 rounded-lg',
                             'font-sans text-caption font-medium',
                             'bg-green-100 text-green-700 hover:bg-green-200',
                             'transition-colors duration-200',
@@ -412,7 +448,7 @@ export default function DashboardPage() {
                         </button>
                         <button
                           className={cn(
-                            'px-3 py-1 rounded-soft',
+                            'px-3 py-1 rounded-lg',
                             'font-sans text-caption font-medium',
                             'bg-red-100 text-red-700 hover:bg-red-200',
                             'transition-colors duration-200',
@@ -428,23 +464,25 @@ export default function DashboardPage() {
                 </article>
               ))
             )}
-          </div>
-        </section>
+              </div>
+            </section>
+          )}
 
-        {/* Recent Orders */}
-        <section
-          className="bg-white rounded-soft border border-border-light"
-          aria-labelledby="orders-heading"
-        >
-          <div className="flex items-center justify-between p-6 border-b border-border-light">
-            <h2 id="orders-heading" className="font-serif text-heading-5 text-text-primary">
+          {/* Recent Orders - Feature Gated */}
+          {hasRecentOrders && (
+            <section
+              className="bg-white rounded-lg border border-stroke-light"
+              aria-labelledby="orders-heading"
+            >
+          <div className="flex items-center justify-between p-6 border-b border-stroke-light">
+            <h2 id="orders-heading" className="font-sans text-heading-5 text-content-primary">
               Commandes recentes
             </h2>
             <Link
               href="/commandes"
               className={cn(
-                'font-sans text-caption text-hermes-500 hover:text-hermes-600',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft'
+                'font-sans text-caption text-primary hover:text-primary-600',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg'
               )}
               aria-label="Voir toutes les commandes"
             >
@@ -454,39 +492,39 @@ export default function DashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full" aria-label="Commandes recentes">
               <thead>
-                <tr className="border-b border-border-light">
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                <tr className="border-b border-stroke-light">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Commande
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Date
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Statut
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-right font-sans text-caption font-medium text-content-muted">
                     Total
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-light">
                 {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-background-muted transition-colors">
+                  <tr key={order.id} className="hover:bg-surface-secondary transition-colors">
                     <td className="px-4 py-3">
                       <Link
                         href={`/commandes/${order.id}`}
                         className={cn(
-                          'font-sans text-body-sm font-medium text-hermes-500 hover:text-hermes-600',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft'
+                          'font-sans text-body-sm font-medium text-primary hover:text-primary-600',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg'
                         )}
                       >
                         {order.id}
                       </Link>
-                      <p className="font-sans text-caption text-text-muted">
+                      <p className="font-sans text-caption text-content-muted">
                         {order.items} articles
                       </p>
                     </td>
-                    <td className="px-4 py-3 font-sans text-body-sm text-text-secondary">
+                    <td className="px-4 py-3 font-sans text-body-sm text-content-secondary">
                       {order.date}
                     </td>
                     <td className="px-4 py-3">
@@ -501,32 +539,34 @@ export default function DashboardPage() {
                         {order.statusLabel}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right font-sans text-body-sm font-medium text-text-primary">
+                    <td className="px-4 py-3 text-right font-sans text-body-sm font-medium text-content-primary">
                       {formatCurrency(order.total)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        </section>
-      </div>
+              </div>
+            </section>
+          )}
+        </div>
+      )}
 
-      {/* Spending Overview - Only shown if user can view spending */}
-      {canViewSpending && (
+      {/* Spending Overview - Gated by analytics feature AND permissions */}
+      {hasAnalytics && canViewSpending && (
         <section
-          className="bg-white rounded-soft border border-border-light p-6"
+          className="bg-white rounded-lg border border-stroke-light p-6"
           aria-labelledby="spending-heading"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 id="spending-heading" className="font-serif text-heading-5 text-text-primary">
+            <h2 id="spending-heading" className="font-sans text-heading-5 text-content-primary">
               Apercu des depenses
             </h2>
             <Link
               href="/rapports"
               className={cn(
-                'font-sans text-caption text-hermes-500 hover:text-hermes-600',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft'
+                'font-sans text-caption text-primary hover:text-primary-600',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg'
               )}
               aria-label="Voir les rapports de depenses"
             >
@@ -557,51 +597,59 @@ export default function DashboardPage() {
         </section>
       )}
 
-      {/* Quick Actions */}
-      <nav aria-label="Actions rapides" className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <QuickActionCard
-          href="/commandes/bulk"
-          label="Commande groupee"
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          }
-        />
-        {canCreateQuote && (
-          <QuickActionCard
-            href="/devis/nouveau"
-            label="Demander un devis"
-            icon={
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            }
-          />
-        )}
-        {canManageEmployees && (
-          <QuickActionCard
-            href="/entreprise/employes"
-            label="Gerer les employes"
-            icon={
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            }
-          />
-        )}
-        {canViewSpending && (
-          <QuickActionCard
-            href="/rapports"
-            label="Voir les rapports"
+      {/* Quick Actions - Feature Gated */}
+      {hasQuickActions && (
+        <nav aria-label="Actions rapides" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Bulk Order - Gated by quickOrder.csvImport */}
+          {hasCsvImport && (
+            <QuickActionCard
+              href="/commandes/bulk"
+              label="Commande groupee"
+              icon={
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              }
+            />
+          )}
+          {/* Request Quote - Gated by quotes module AND permissions */}
+          {hasQuotes && canCreateQuote && (
+            <QuickActionCard
+              href="/devis/nouveau"
+              label="Demander un devis"
+              icon={
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              }
+            />
+          )}
+          {/* Manage Employees - Gated by company.employees AND permissions */}
+          {hasCompanyEmployees && canManageEmployees && (
+            <QuickActionCard
+              href="/entreprise/employes"
+              label="Gerer les employes"
+              icon={
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              }
+            />
+          )}
+          {/* View Reports - Gated by analytics AND permissions */}
+          {hasAnalytics && canViewSpending && (
+            <QuickActionCard
+              href="/rapports"
+              label="Voir les rapports"
             icon={
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            }
-          />
-        )}
-      </nav>
+                </svg>
+              }
+            />
+          )}
+        </nav>
+      )}
     </div>
   );
 }

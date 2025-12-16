@@ -7,10 +7,10 @@ import type { ReactNode } from 'react';
 type ColorVariant = 'default' | 'amber' | 'green' | 'red' | 'blue' | 'purple';
 
 const colorClasses: Record<ColorVariant, string> = {
-  default: 'text-text-primary',
-  amber: 'text-amber-600',
-  green: 'text-green-600',
-  red: 'text-red-600',
+  default: 'text-content-primary',
+  amber: 'text-warning',
+  green: 'text-success',
+  red: 'text-danger',
   blue: 'text-blue-600',
   purple: 'text-purple-600',
 };
@@ -63,18 +63,18 @@ export function StatCard({
   return (
     <article
       className={cn(
-        'bg-white rounded-soft border border-border-light p-4',
+        'bg-white rounded-lg border border-stroke-light p-4',
         className
       )}
       aria-labelledby={labelId}
     >
       <div className="flex items-start justify-between">
-        <p id={labelId} className="font-sans text-caption text-text-muted">{label}</p>
-        {icon && <div className="text-text-muted" aria-hidden="true">{icon}</div>}
+        <p id={labelId} className="text-caption text-content-muted">{label}</p>
+        {icon && <div className="text-content-muted" aria-hidden="true">{icon}</div>}
       </div>
       <p
         id={valueId}
-        className={cn('font-serif text-heading-4 mt-1', colorClasses[color])}
+        className={cn('text-section-sm font-bold mt-1', colorClasses[color])}
         aria-describedby={labelId}
       >
         {value}
@@ -87,7 +87,7 @@ export function StatCard({
           </span>
           {trend.value >= 0 ? (
             <svg
-              className="w-3 h-3 text-green-500"
+              className="w-3 h-3 text-success"
               fill="currentColor"
               viewBox="0 0 20 20"
               aria-hidden="true"
@@ -100,7 +100,7 @@ export function StatCard({
             </svg>
           ) : (
             <svg
-              className="w-3 h-3 text-red-500"
+              className="w-3 h-3 text-danger"
               fill="currentColor"
               viewBox="0 0 20 20"
               aria-hidden="true"
@@ -114,15 +114,15 @@ export function StatCard({
           )}
           <span
             className={cn(
-              'font-sans text-caption',
-              trend.value >= 0 ? 'text-green-600' : 'text-red-600'
+              'text-caption',
+              trend.value >= 0 ? 'text-success' : 'text-danger'
             )}
             aria-hidden="true"
           >
             {Math.abs(trend.value)}%
           </span>
           {trend.label && (
-            <span className="font-sans text-caption text-text-muted" aria-hidden="true">
+            <span className="text-caption text-content-muted" aria-hidden="true">
               {trend.label}
             </span>
           )}

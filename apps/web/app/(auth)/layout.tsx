@@ -41,7 +41,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         <div
           className={cn(
             'absolute inset-0',
-            'bg-gradient-to-t from-gold-500/10 via-transparent to-transparent'
+            'bg-gradient-to-t from-accent/10 via-transparent to-transparent'
           )}
         />
 
@@ -54,8 +54,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
           {/* Tagline */}
           <div className="space-y-6 max-w-md">
-            <div className="w-16 h-[2px] bg-hermes-500" />
-            <h2 className="text-3xl xl:text-4xl font-serif text-white leading-tight">
+            <div className="w-16 h-[2px] bg-primary" />
+            <h2 className="text-3xl xl:text-4xl font-sans text-white leading-tight">
               L'art de la joaillerie d'exception
             </h2>
             <p className="text-white/80 text-lg leading-relaxed">
@@ -64,17 +64,17 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             </p>
             <div className="flex items-center gap-8 pt-4">
               <div className="text-center">
-                <p className="text-2xl font-serif text-hermes-500">25+</p>
+                <p className="text-2xl font-sans text-primary">25+</p>
                 <p className="text-sm text-white/70 mt-1">Années d'excellence</p>
               </div>
               <div className="w-[1px] h-12 bg-white/30" />
               <div className="text-center">
-                <p className="text-2xl font-serif text-hermes-500">1000+</p>
+                <p className="text-2xl font-sans text-primary">1000+</p>
                 <p className="text-sm text-white/70 mt-1">Créations uniques</p>
               </div>
               <div className="w-[1px] h-12 bg-white/30" />
               <div className="text-center">
-                <p className="text-2xl font-serif text-hermes-500">100%</p>
+                <p className="text-2xl font-sans text-primary">100%</p>
                 <p className="text-sm text-white/70 mt-1">Fait main</p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
                   className={cn(
                     'w-10 h-10 rounded-full border-2 border-white/30',
                     'bg-black/50 backdrop-blur-sm flex items-center justify-center',
-                    'text-xs text-hermes-500 font-medium'
+                    'text-xs text-primary font-medium'
                   )}
                 >
                   {['M', 'B', 'J'][i - 1]}
@@ -117,7 +117,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             href="/"
             className={cn(
               'flex items-center gap-2',
-              'text-sm text-luxury-silver hover:text-gold-500',
+              'text-sm text-luxury-silver hover:text-accent',
               'transition-colors duration-200',
               'group'
             )}
@@ -138,15 +138,15 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         {/* Footer */}
         <footer className="p-6 lg:p-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-luxury-silver">
-            <p>&copy; {new Date().getFullYear()} Maison Bijoux</p>
+            <p>&copy; {new Date().getFullYear()} WebexpR Pro</p>
             <div className="flex items-center gap-6">
-              <Link href="#" className="hover:text-gold-500 transition-colors">
+              <Link href="#" className="hover:text-accent transition-colors">
                 Aide
               </Link>
-              <Link href="#" className="hover:text-gold-500 transition-colors">
+              <Link href="#" className="hover:text-accent transition-colors">
                 Confidentialité
               </Link>
-              <Link href="#" className="hover:text-gold-500 transition-colors">
+              <Link href="#" className="hover:text-accent transition-colors">
                 Mentions légales
               </Link>
             </div>

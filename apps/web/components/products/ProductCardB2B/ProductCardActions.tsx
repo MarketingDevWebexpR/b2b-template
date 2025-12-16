@@ -139,7 +139,7 @@ function QuantitySelector({
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-md border border-gray-300 bg-white',
+        'inline-flex items-center rounded-lg border border-stroke bg-white',
         disabled && 'opacity-50 cursor-not-allowed',
         styles.wrapper,
         className
@@ -150,11 +150,11 @@ function QuantitySelector({
         onClick={handleDecrement}
         disabled={disabled || value <= min}
         className={cn(
-          'flex items-center justify-center rounded-l-md',
-          'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+          'flex items-center justify-center rounded-l-soft',
+          'text-content-secondary hover:bg-surface-secondary hover:text-content-primary',
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent',
           'transition-colors duration-150',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50',
           styles.button
         )}
         aria-label="Diminuer la quantite"
@@ -171,9 +171,9 @@ function QuantitySelector({
         max={max}
         step={step}
         className={cn(
-          'border-x border-gray-300 text-center font-medium text-gray-900',
+          'border-x border-stroke text-center font-medium text-content-primary',
           'focus:outline-none focus:ring-0',
-          'disabled:bg-gray-50 disabled:cursor-not-allowed',
+          'disabled:bg-surface-secondary disabled:cursor-not-allowed',
           '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
           styles.input,
           styles.wrapper
@@ -186,11 +186,11 @@ function QuantitySelector({
         onClick={handleIncrement}
         disabled={disabled || (max !== undefined && value >= max)}
         className={cn(
-          'flex items-center justify-center rounded-r-md',
-          'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+          'flex items-center justify-center rounded-r-soft',
+          'text-content-secondary hover:bg-surface-secondary hover:text-content-primary',
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent',
           'transition-colors duration-150',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50',
           styles.button
         )}
         aria-label="Augmenter la quantite"
@@ -227,13 +227,13 @@ function IconButton({
       aria-label={ariaLabel}
       aria-pressed={active}
       className={cn(
-        'flex items-center justify-center w-9 h-9 rounded-md',
+        'flex items-center justify-center w-9 h-9 rounded-lg',
         'transition-all duration-150',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
         active
-          ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900',
-        disabled && 'opacity-50 cursor-not-allowed hover:bg-gray-100',
+          ? 'bg-primary-100 text-primary-700 hover:bg-primary-200'
+          : 'bg-surface-secondary text-content-secondary hover:bg-surface-tertiary hover:text-content-primary',
+        disabled && 'opacity-50 cursor-not-allowed hover:bg-surface-secondary',
         className
       )}
     >
@@ -293,12 +293,12 @@ export function ProductCardActions({
           onClick={handleAddToCart}
           disabled={isOutOfStock || isAdding}
           className={cn(
-            'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md',
+            'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg',
             'text-sm font-medium transition-all duration-150',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
             isOutOfStock
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-gray-900 text-white hover:bg-gray-800 active:bg-gray-950'
+              ? 'bg-surface-secondary text-content-muted cursor-not-allowed'
+              : 'bg-content-primary text-white hover:bg-content-secondary active:bg-black'
           )}
         >
           {isAdding ? (
@@ -357,12 +357,12 @@ export function ProductCardActions({
           onClick={handleAddToCart}
           disabled={isOutOfStock || isAdding}
           className={cn(
-            'flex items-center justify-center gap-2 px-4 py-2.5 rounded-md',
+            'flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg',
             'text-sm font-medium transition-all duration-150',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
             isOutOfStock
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-gray-900 text-white hover:bg-gray-800 active:bg-gray-950'
+              ? 'bg-surface-secondary text-content-muted cursor-not-allowed'
+              : 'bg-content-primary text-white hover:bg-content-secondary active:bg-black'
           )}
         >
           {isAdding ? (
@@ -396,12 +396,12 @@ export function ProductCardActions({
         onClick={handleAddToCart}
         disabled={isOutOfStock || isAdding}
         className={cn(
-          'flex items-center justify-center p-1.5 rounded',
+          'flex items-center justify-center p-1.5 rounded-lg',
           'transition-all duration-150',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-1',
           isOutOfStock
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-gray-900 text-white hover:bg-gray-800'
+            ? 'bg-surface-secondary text-content-muted cursor-not-allowed'
+            : 'bg-content-primary text-white hover:bg-content-secondary'
         )}
         aria-label={isOutOfStock ? 'Produit indisponible' : 'Ajouter au panier'}
       >
@@ -444,8 +444,8 @@ export function ProductCardFloatingActions({
             'bg-white/90 backdrop-blur-sm shadow-sm',
             'transition-all duration-200',
             'hover:bg-white hover:shadow-md hover:scale-110',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
-            isFavorite ? 'text-red-500' : 'text-gray-600'
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+            isFavorite ? 'text-danger' : 'text-content-secondary'
           )}
         >
           <Icons.Heart filled={isFavorite} className="w-4 h-4" />
@@ -463,8 +463,8 @@ export function ProductCardFloatingActions({
             'bg-white/90 backdrop-blur-sm shadow-sm',
             'transition-all duration-200',
             'hover:bg-white hover:shadow-md hover:scale-110',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
-            isComparing ? 'text-blue-600' : 'text-gray-600'
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+            isComparing ? 'text-primary' : 'text-content-secondary'
           )}
         >
           <Icons.Compare active={isComparing} className="w-4 h-4" />

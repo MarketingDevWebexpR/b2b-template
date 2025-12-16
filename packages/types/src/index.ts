@@ -366,7 +366,13 @@ export interface StockInfo {
   showExactStock: boolean; // True for logged-in users
 }
 
-export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
+export type StockStatus =
+  | 'in_stock'       // Available immediately
+  | 'low_stock'      // Limited quantity
+  | 'out_of_stock'   // Not available
+  | 'backorder'      // Can be ordered, waiting for supply
+  | 'preorder'       // Future availability
+  | 'discontinued';  // No longer available
 
 // ============================================
 // E-commerce API Types
@@ -438,3 +444,13 @@ export interface Wishlist {
  * Includes: Companies, Employees, Quotes, Approvals, Spending Limits.
  */
 export * from './b2b';
+
+// ============================================
+// Feature Flags Types - Re-exports
+// ============================================
+
+/**
+ * Feature flags system for modular white-label platform.
+ * Enables/disables features per client configuration.
+ */
+export * from './features';

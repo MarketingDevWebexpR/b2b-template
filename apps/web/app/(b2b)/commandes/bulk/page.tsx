@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { useB2B } from '@/contexts/B2BContext';
+import { useQuickOrderFeatures } from '@/contexts/FeatureContext';
 import { PageLoader, EmptyState, StatsGrid } from '@/components/b2b';
 import type { BulkOrderItem } from '@maison/types';
 
@@ -22,6 +23,9 @@ export default function BulkOrderPage() {
   const [manualQty, setManualQty] = useState(1);
   const [importError, setImportError] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+
+  // Feature flags
+  const { isEnabled: hasQuickOrder, hasCsvImport } = useQuickOrderFeatures();
 
   /**
    * Lookup a single product with quantity validation
@@ -229,6 +233,21 @@ export default function BulkOrderPage() {
     [summary]
   );
 
+  // Feature disabled - show message
+  if (!hasQuickOrder || !hasCsvImport) {
+    return (
+      <EmptyState
+        icon="cart"
+        message="Commande en lot desactivee"
+        description="La fonctionnalite d'import CSV n'est pas disponible pour votre compte."
+        action={{
+          label: 'Retour aux commandes',
+          href: '/commandes',
+        }}
+      />
+    );
+  }
+
   // Show loading state while B2B context initializes
   if (!isReady || isLoading) {
     return <PageLoader message="Chargement..." />;
@@ -239,10 +258,10 @@ export default function BulkOrderPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-heading-3 text-text-primary">
+          <h1 className="font-sans text-heading-3 text-content-primary">
             Commande en lot
           </h1>
-          <p className="mt-1 font-sans text-body text-text-muted">
+          <p className="mt-1 font-sans text-body text-content-muted">
             Importez une liste de produits par CSV ou ajoutez-les manuellement
           </p>
         </div>
@@ -250,9 +269,9 @@ export default function BulkOrderPage() {
           href="/commandes"
           className={cn(
             'inline-flex items-center gap-2 px-4 py-2',
-            'bg-white border border-border-light text-text-secondary rounded-soft',
+            'bg-white border border-stroke-light text-content-secondary rounded-lg',
             'font-sans text-body-sm font-medium',
-            'hover:bg-background-muted transition-colors duration-200'
+            'hover:bg-surface-secondary transition-colors duration-200'
           )}
         >
           <svg
@@ -277,12 +296,12 @@ export default function BulkOrderPage() {
         {/* Import Section */}
         <div className="lg:col-span-2 space-y-6">
           {/* CSV Import */}
-          <div className="bg-white rounded-soft border border-border-light">
-            <div className="p-6 border-b border-border-light">
-              <h2 className="font-serif text-heading-5 text-text-primary">
+          <div className="bg-white rounded-lg border border-stroke-light">
+            <div className="p-6 border-b border-stroke-light">
+              <h2 className="font-sans text-heading-5 text-content-primary">
                 Import CSV
               </h2>
-              <p className="mt-1 font-sans text-body-sm text-text-muted">
+              <p className="mt-1 font-sans text-body-sm text-content-muted">
                 Format: SKU,Quantite (une ligne par produit)
               </p>
             </div>
@@ -295,10 +314,10 @@ export default function BulkOrderPage() {
                 aria-label="Contenu CSV"
                 className={cn(
                   'w-full px-3 py-2',
-                  'bg-white border border-border-light rounded-soft',
-                  'font-mono text-body-sm text-text-primary',
-                  'placeholder:text-text-muted',
-                  'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:border-hermes-500',
+                  'bg-white border border-stroke-light rounded-lg',
+                  'font-mono text-body-sm text-content-primary',
+                  'placeholder:text-content-muted',
+                  'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary',
                   'resize-none'
                 )}
               />
@@ -312,16 +331,16 @@ export default function BulkOrderPage() {
                   onClick={handleCsvImport}
                   disabled={!csvContent.trim() || isImporting}
                   className={cn(
-                    'px-4 py-2 rounded-soft',
+                    'px-4 py-2 rounded-lg',
                     'font-sans text-body-sm font-medium',
-                    'bg-hermes-500 text-white hover:bg-hermes-600',
+                    'bg-primary text-white hover:bg-primary-600',
                     'disabled:opacity-50 disabled:cursor-not-allowed',
                     'transition-colors duration-200'
                   )}
                 >
                   {isImporting ? 'Import en cours...' : 'Importer'}
                 </button>
-                <span className="font-sans text-caption text-text-muted">
+                <span className="font-sans text-caption text-content-muted">
                   ou glissez-deposez un fichier CSV
                 </span>
               </div>
@@ -329,9 +348,9 @@ export default function BulkOrderPage() {
           </div>
 
           {/* Manual Add */}
-          <div className="bg-white rounded-soft border border-border-light">
-            <div className="p-6 border-b border-border-light">
-              <h2 className="font-serif text-heading-5 text-text-primary">
+          <div className="bg-white rounded-lg border border-stroke-light">
+            <div className="p-6 border-b border-stroke-light">
+              <h2 className="font-sans text-heading-5 text-content-primary">
                 Ajout manuel
               </h2>
             </div>
@@ -340,7 +359,7 @@ export default function BulkOrderPage() {
                 <div className="flex-1">
                   <label
                     htmlFor="manual-sku"
-                    className="block font-sans text-caption font-medium text-text-secondary mb-1"
+                    className="block font-sans text-caption font-medium text-content-secondary mb-1"
                   >
                     SKU
                   </label>
@@ -357,17 +376,17 @@ export default function BulkOrderPage() {
                     placeholder="Ex: BRA-001"
                     className={cn(
                       'w-full px-3 py-2',
-                      'bg-white border border-border-light rounded-soft',
-                      'font-sans text-body-sm text-text-primary',
-                      'placeholder:text-text-muted',
-                      'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:border-hermes-500'
+                      'bg-white border border-stroke-light rounded-lg',
+                      'font-sans text-body-sm text-content-primary',
+                      'placeholder:text-content-muted',
+                      'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
                     )}
                   />
                 </div>
                 <div className="w-24">
                   <label
                     htmlFor="manual-qty"
-                    className="block font-sans text-caption font-medium text-text-secondary mb-1"
+                    className="block font-sans text-caption font-medium text-content-secondary mb-1"
                   >
                     Quantite
                   </label>
@@ -386,9 +405,9 @@ export default function BulkOrderPage() {
                     }}
                     className={cn(
                       'w-full px-3 py-2',
-                      'bg-white border border-border-light rounded-soft',
-                      'font-sans text-body-sm text-text-primary',
-                      'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:border-hermes-500'
+                      'bg-white border border-stroke-light rounded-lg',
+                      'font-sans text-body-sm text-content-primary',
+                      'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
                     )}
                   />
                 </div>
@@ -396,9 +415,9 @@ export default function BulkOrderPage() {
                   onClick={handleManualAdd}
                   disabled={!manualSku.trim()}
                   className={cn(
-                    'px-4 py-2 rounded-soft',
+                    'px-4 py-2 rounded-lg',
                     'font-sans text-body-sm font-medium',
-                    'bg-hermes-500 text-white hover:bg-hermes-600',
+                    'bg-primary text-white hover:bg-primary-600',
                     'disabled:opacity-50 disabled:cursor-not-allowed',
                     'transition-colors duration-200'
                   )}
@@ -417,9 +436,9 @@ export default function BulkOrderPage() {
               description="Importez un fichier CSV ou ajoutez des produits manuellement"
             />
           ) : (
-            <div className="bg-white rounded-soft border border-border-light">
-              <div className="p-4 border-b border-border-light flex items-center justify-between">
-                <h2 className="font-serif text-heading-5 text-text-primary">
+            <div className="bg-white rounded-lg border border-stroke-light">
+              <div className="p-4 border-b border-stroke-light flex items-center justify-between">
+                <h2 className="font-sans text-heading-5 text-content-primary">
                   Produits ({formatNumber(items.length)})
                 </h2>
                 <button
@@ -440,7 +459,7 @@ export default function BulkOrderPage() {
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-body-sm font-medium text-hermes-500">
+                        <span className="font-mono text-body-sm font-medium text-primary">
                           {item.sku}
                         </span>
                         {!item.isValid && (
@@ -458,7 +477,7 @@ export default function BulkOrderPage() {
                           </svg>
                         )}
                       </div>
-                      <p className="font-sans text-body-sm text-text-secondary truncate">
+                      <p className="font-sans text-body-sm text-content-secondary truncate">
                         {item.product?.name ?? 'Produit non trouve'}
                       </p>
                       {item.errors && item.errors.length > 0 && (
@@ -472,8 +491,8 @@ export default function BulkOrderPage() {
                         onClick={() => updateQuantity(index, item.quantity - 1)}
                         aria-label="Diminuer la quantite"
                         className={cn(
-                          'w-8 h-8 flex items-center justify-center rounded-soft',
-                          'bg-background-muted text-text-secondary hover:bg-border-light',
+                          'w-8 h-8 flex items-center justify-center rounded-lg',
+                          'bg-surface-secondary text-content-secondary hover:bg-border-light',
                           'transition-colors duration-200'
                         )}
                       >
@@ -492,17 +511,17 @@ export default function BulkOrderPage() {
                         aria-label={`Quantite pour ${item.sku}`}
                         className={cn(
                           'w-16 px-2 py-1 text-center',
-                          'bg-white border border-border-light rounded-soft',
-                          'font-sans text-body-sm text-text-primary',
-                          'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:border-hermes-500'
+                          'bg-white border border-stroke-light rounded-lg',
+                          'font-sans text-body-sm text-content-primary',
+                          'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
                         )}
                       />
                       <button
                         onClick={() => updateQuantity(index, item.quantity + 1)}
                         aria-label="Augmenter la quantite"
                         className={cn(
-                          'w-8 h-8 flex items-center justify-center rounded-soft',
-                          'bg-background-muted text-text-secondary hover:bg-border-light',
+                          'w-8 h-8 flex items-center justify-center rounded-lg',
+                          'bg-surface-secondary text-content-secondary hover:bg-border-light',
                           'transition-colors duration-200'
                         )}
                       >
@@ -510,10 +529,10 @@ export default function BulkOrderPage() {
                       </button>
                     </div>
                     <div className="w-24 text-right">
-                      <p className="font-sans text-body-sm font-medium text-text-primary">
+                      <p className="font-sans text-body-sm font-medium text-content-primary">
                         {formatCurrency(item.quantity * (item.unitPrice ?? 0))}
                       </p>
-                      <p className="font-sans text-caption text-text-muted">
+                      <p className="font-sans text-caption text-content-muted">
                         {formatCurrency(item.unitPrice ?? 0)} /u
                       </p>
                     </div>
@@ -521,8 +540,8 @@ export default function BulkOrderPage() {
                       onClick={() => removeItem(index)}
                       aria-label={`Supprimer ${item.sku}`}
                       className={cn(
-                        'p-2 rounded-soft',
-                        'text-text-muted hover:text-red-600 hover:bg-red-50',
+                        'p-2 rounded-lg',
+                        'text-content-muted hover:text-red-600 hover:bg-red-50',
                         'transition-colors duration-200'
                       )}
                     >
@@ -550,9 +569,9 @@ export default function BulkOrderPage() {
 
         {/* Summary Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white rounded-soft border border-border-light sticky top-6">
-            <div className="p-6 border-b border-border-light">
-              <h2 className="font-serif text-heading-5 text-text-primary">
+          <div className="bg-white rounded-lg border border-stroke-light sticky top-6">
+            <div className="p-6 border-b border-stroke-light">
+              <h2 className="font-sans text-heading-5 text-content-primary">
                 Recapitulatif
               </h2>
             </div>
@@ -561,12 +580,12 @@ export default function BulkOrderPage() {
               <StatsGrid stats={summaryStats} columns={3} />
 
               {/* Total */}
-              <div className="pt-4 border-t border-border-light">
+              <div className="pt-4 border-t border-stroke-light">
                 <div className="flex justify-between">
-                  <span className="font-sans text-body font-medium text-text-primary">
+                  <span className="font-sans text-body font-medium text-content-primary">
                     Total HT
                   </span>
-                  <span className="font-serif text-heading-4 text-text-primary">
+                  <span className="font-sans text-heading-4 text-content-primary">
                     {formatCurrency(summary.totalAmount)}
                   </span>
                 </div>
@@ -576,9 +595,9 @@ export default function BulkOrderPage() {
               <button
                 disabled={items.length === 0 || summary.hasErrors}
                 className={cn(
-                  'w-full px-4 py-3 rounded-soft',
+                  'w-full px-4 py-3 rounded-lg',
                   'font-sans text-body-sm font-medium',
-                  'bg-hermes-500 text-white hover:bg-hermes-600',
+                  'bg-primary text-white hover:bg-primary-600',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
                   'transition-colors duration-200'
                 )}
@@ -590,10 +609,10 @@ export default function BulkOrderPage() {
                 <button
                   onClick={() => setItems(summary.availableItems)}
                   className={cn(
-                    'w-full px-4 py-2 rounded-soft',
+                    'w-full px-4 py-2 rounded-lg',
                     'font-sans text-caption font-medium',
-                    'bg-white border border-border-light text-text-secondary',
-                    'hover:bg-background-muted',
+                    'bg-white border border-stroke-light text-content-secondary',
+                    'hover:bg-surface-secondary',
                     'transition-colors duration-200'
                   )}
                 >
@@ -605,20 +624,20 @@ export default function BulkOrderPage() {
           </div>
 
           {/* Help */}
-          <div className="bg-background-muted rounded-soft p-4">
-            <h3 className="font-sans text-body-sm font-medium text-text-primary mb-2">
+          <div className="bg-surface-secondary rounded-lg p-4">
+            <h3 className="font-sans text-body-sm font-medium text-content-primary mb-2">
               Besoin d&apos;aide ?
             </h3>
-            <p className="font-sans text-caption text-text-muted mb-3">
+            <p className="font-sans text-caption text-content-muted mb-3">
               Telechargez notre modele CSV pour faciliter l&apos;import de vos
               produits.
             </p>
             <button
               className={cn(
-                'w-full px-3 py-2 rounded-soft',
+                'w-full px-3 py-2 rounded-lg',
                 'font-sans text-caption font-medium',
-                'bg-white border border-border-light text-text-secondary',
-                'hover:bg-white hover:border-hermes-300',
+                'bg-white border border-stroke-light text-content-secondary',
+                'hover:bg-white hover:border-primary/20',
                 'transition-colors duration-200'
               )}
             >

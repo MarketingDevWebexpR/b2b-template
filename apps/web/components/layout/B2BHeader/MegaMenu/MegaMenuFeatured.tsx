@@ -39,11 +39,11 @@ interface ProductCardProps {
 const getBadgeStyles = (badge: FeaturedProduct['badge']) => {
   switch (badge) {
     case 'new':
-      return 'bg-b2b-primary-500 text-white';
+      return 'bg-neutral-900 text-white';
     case 'promo':
-      return 'bg-b2b-danger-500 text-white';
+      return 'bg-red-500 text-white';
     case 'bestseller':
-      return 'bg-b2b-accent-500 text-white';
+      return 'bg-accent text-white';
     default:
       return '';
   }
@@ -75,19 +75,19 @@ const ProductCard = memo(function ProductCard({
     <Link
       href={`/produits/${product.sku.toLowerCase()}`}
       className={cn(
-        'group flex flex-col bg-white rounded-lg border border-b2b-border',
-        'hover:border-b2b-primary-300 hover:shadow-md',
+        'group flex flex-col bg-white rounded-lg border border-neutral-200',
+        'hover:border-neutral-300 hover:shadow-md',
         'transition-all duration-200',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20'
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20'
       )}
       onClick={onLinkClick}
     >
       {/* Image container */}
-      <div className="relative aspect-square bg-b2b-bg-secondary rounded-t-lg overflow-hidden">
+      <div className="relative aspect-square bg-neutral-50 rounded-t-lg overflow-hidden">
         {/* Placeholder for product image */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-16 h-16 bg-b2b-bg-tertiary rounded-lg flex items-center justify-center">
-            <ShoppingCart className="w-6 h-6 text-b2b-text-muted" strokeWidth={1.5} />
+          <div className="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center">
+            <ShoppingCart className="w-6 h-6 text-neutral-500" strokeWidth={1.5} />
           </div>
         </div>
 
@@ -96,7 +96,7 @@ const ProductCard = memo(function ProductCard({
           <span
             className={cn(
               'absolute top-2 left-2',
-              'px-2 py-0.5 rounded text-b2b-badge font-semibold',
+              'px-2 py-0.5 rounded text-xs font-semibold',
               getBadgeStyles(product.badge)
             )}
           >
@@ -106,7 +106,7 @@ const ProductCard = memo(function ProductCard({
 
         {/* Discount badge */}
         {hasDiscount && (
-          <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-b2b-danger-500 text-white text-b2b-badge font-semibold">
+          <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-red-500 text-white text-xs font-semibold">
             -{discountPercent}%
           </span>
         )}
@@ -115,25 +115,25 @@ const ProductCard = memo(function ProductCard({
       {/* Content */}
       <div className="flex flex-col flex-1 p-3">
         {/* SKU */}
-        <span className="text-b2b-sku text-b2b-text-muted mb-1">
+        <span className="text-xs font-mono text-neutral-500 mb-1">
           {product.sku}
         </span>
 
         {/* Name */}
-        <h4 className="text-b2b-body font-medium text-b2b-text-primary line-clamp-2 group-hover:text-b2b-primary-500 transition-colors">
+        <h4 className="text-sm font-medium text-neutral-900 line-clamp-2 group-hover:text-accent transition-colors">
           {product.name}
         </h4>
 
         {/* Price */}
         <div className="flex items-baseline gap-2 mt-2">
-          <span className="text-b2b-price font-semibold text-b2b-text-primary">
+          <span className="text-base font-semibold text-neutral-900">
             {product.price.toLocaleString('fr-FR', {
               style: 'currency',
               currency: 'EUR',
             })}
           </span>
           {hasDiscount && (
-            <span className="text-b2b-body-sm text-b2b-text-muted line-through">
+            <span className="text-sm text-neutral-500 line-through">
               {product.originalPrice?.toLocaleString('fr-FR', {
                 style: 'currency',
                 currency: 'EUR',
@@ -148,14 +148,14 @@ const ProductCard = memo(function ProductCard({
             className={cn(
               'w-2 h-2 rounded-full',
               product.stock > 10
-                ? 'bg-b2b-success-500'
+                ? 'bg-green-500'
                 : product.stock > 0
-                ? 'bg-b2b-warning-500'
-                : 'bg-b2b-danger-500'
+                ? 'bg-amber-500'
+                : 'bg-red-500'
             )}
             aria-hidden="true"
           />
-          <span className="text-b2b-caption text-b2b-text-muted">
+          <span className="text-xs text-neutral-500">
             {product.stock > 10
               ? 'En stock'
               : product.stock > 0
@@ -183,21 +183,21 @@ export const MegaMenuFeatured = memo(function MegaMenuFeatured({
   return (
     <div
       className={cn(
-        'flex flex-col bg-b2b-bg-secondary rounded-lg p-4',
+        'flex flex-col bg-neutral-50 rounded-lg p-4',
         className
       )}
     >
       {/* Section header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-b2b-section-title font-semibold text-b2b-text-primary">
+        <h3 className="text-base font-semibold text-neutral-900">
           {title}
         </h3>
         <Link
           href="/promotions"
           className={cn(
             'inline-flex items-center gap-1',
-            'text-b2b-body-sm font-medium text-b2b-primary-500',
-            'hover:text-b2b-primary-600 transition-colors duration-150',
+            'text-sm font-medium text-accent',
+            'hover:text-orange-600 transition-colors duration-150',
             'focus:outline-none focus-visible:underline'
           )}
           onClick={onLinkClick}
@@ -219,15 +219,15 @@ export const MegaMenuFeatured = memo(function MegaMenuFeatured({
       </div>
 
       {/* Promo banner */}
-      <div className="mt-4 p-3 bg-gradient-to-r from-b2b-accent-500 to-b2b-accent-600 rounded-lg">
-        <p className="text-white text-b2b-body font-medium">
+      <div className="mt-4 p-3 bg-gradient-to-r from-accent to-orange-600 rounded-lg">
+        <p className="text-white text-sm font-medium">
           Professionnels : -15% sur votre premiere commande
         </p>
         <Link
           href="/promotions/bienvenue"
           className={cn(
             'inline-flex items-center gap-1 mt-1',
-            'text-b2b-body-sm font-medium text-white/90',
+            'text-sm font-medium text-white/90',
             'hover:text-white transition-colors duration-150',
             'focus:outline-none focus-visible:underline'
           )}

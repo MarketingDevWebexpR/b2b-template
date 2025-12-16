@@ -30,22 +30,22 @@ const switchSizes = {
     track: 'w-8 h-4',
     thumb: 'w-3 h-3',
     translate: 'translate-x-4',
-    label: 'text-b2b-body-sm',
-    description: 'text-b2b-caption',
+    label: 'text-sm',
+    description: 'text-xs',
   },
   md: {
     track: 'w-10 h-5',
     thumb: 'w-4 h-4',
     translate: 'translate-x-5',
-    label: 'text-b2b-body',
-    description: 'text-b2b-body-sm',
+    label: 'text-sm',
+    description: 'text-sm',
   },
   lg: {
     track: 'w-12 h-6',
     thumb: 'w-5 h-5',
     translate: 'translate-x-6',
     label: 'text-base',
-    description: 'text-b2b-body',
+    description: 'text-sm',
   },
 };
 
@@ -79,10 +79,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           'relative inline-flex flex-shrink-0',
           sizeConfig.track,
           'rounded-full',
-          'bg-b2b-border-medium',
+          'bg-neutral-300',
           'transition-colors duration-200',
           'cursor-pointer',
-          disabled && 'opacity-50 cursor-not-allowed bg-b2b-border-light'
+          disabled && 'opacity-50 cursor-not-allowed bg-neutral-200'
         )}
       >
         {/* Hidden native input */}
@@ -104,11 +104,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         <span
           className={cn(
             'absolute inset-0 rounded-full',
-            'bg-b2b-primary',
+            'bg-accent',
             'opacity-0',
             'transition-opacity duration-200',
             'peer-checked:opacity-100',
-            disabled && 'peer-checked:bg-b2b-text-muted'
+            disabled && 'peer-checked:bg-neutral-500'
           )}
         />
 
@@ -125,7 +125,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             'transition-transform duration-200 ease-in-out',
             `peer-checked:${sizeConfig.translate}`,
             // Focus ring
-            'peer-focus-visible:ring-2 peer-focus-visible:ring-b2b-primary peer-focus-visible:ring-offset-2'
+            'peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2'
           )}
           style={{
             // Using inline style for dynamic translate since cn doesn't handle it well
@@ -160,9 +160,9 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             {label && (
               <span
                 className={cn(
-                  'font-sans font-medium text-b2b-text-primary',
+                  'font-sans font-medium text-neutral-900',
                   sizeConfig.label,
-                  disabled && 'text-b2b-text-muted'
+                  disabled && 'text-neutral-500'
                 )}
               >
                 {label}
@@ -171,7 +171,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             {description && (
               <span
                 className={cn(
-                  'font-sans text-b2b-text-muted mt-0.5',
+                  'font-sans text-neutral-500 mt-0.5',
                   sizeConfig.description
                 )}
               >

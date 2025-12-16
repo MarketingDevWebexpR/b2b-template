@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useCompanyFeatures } from '@/contexts/FeatureContext';
+import { EmptyState } from '@/components/b2b';
 
 /**
  * Mock employees data
@@ -82,7 +84,7 @@ const employees = [
 const roleColors = {
   owner: 'bg-purple-100 text-purple-800',
   admin: 'bg-blue-100 text-blue-800',
-  manager: 'bg-hermes-100 text-hermes-800',
+  manager: 'bg-primary-50 text-primary-800',
   purchaser: 'bg-green-100 text-green-800',
   viewer: 'bg-gray-100 text-gray-800',
 };
@@ -100,6 +102,21 @@ export default function EmployesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('all');
 
+  // Feature flags
+  const { isEnabled: hasCompany, hasEmployees } = useCompanyFeatures();
+
+  // Module disabled - show message
+  if (!hasCompany || !hasEmployees) {
+    return (
+      <EmptyState
+        icon="document"
+        message="Gestion des employes desactivee"
+        description="La fonctionnalite de gestion des employes n'est pas disponible pour votre compte."
+        action={{ label: 'Retour a l\'entreprise', href: '/entreprise' }}
+      />
+    );
+  }
+
   const filteredEmployees = employees.filter((employee) => {
     const matchesSearch =
       employee.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -114,19 +131,19 @@ export default function EmployesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-heading-3 text-text-primary">
+          <h1 className="font-sans text-heading-3 text-content-primary">
             Employes
           </h1>
-          <p className="mt-1 font-sans text-body text-text-muted">
+          <p className="mt-1 font-sans text-body text-content-muted">
             Gerez les acces et les limites de depenses de vos collaborateurs
           </p>
         </div>
         <button
           className={cn(
             'inline-flex items-center gap-2 px-4 py-2',
-            'bg-hermes-500 text-white rounded-soft',
+            'bg-primary text-white rounded-lg',
             'font-sans text-body-sm font-medium',
-            'hover:bg-hermes-600 transition-colors duration-200'
+            'hover:bg-primary-600 transition-colors duration-200'
           )}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,7 +158,7 @@ export default function EmployesPage() {
         <div className="flex-1">
           <div className="relative">
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -155,10 +172,10 @@ export default function EmployesPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className={cn(
                 'w-full pl-10 pr-4 py-2',
-                'bg-white border border-border-light rounded-soft',
-                'font-sans text-body-sm text-text-primary',
-                'placeholder:text-text-muted',
-                'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:border-hermes-500'
+                'bg-white border border-stroke-light rounded-lg',
+                'font-sans text-body-sm text-content-primary',
+                'placeholder:text-content-muted',
+                'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
               )}
             />
           </div>
@@ -168,9 +185,9 @@ export default function EmployesPage() {
           onChange={(e) => setSelectedRole(e.target.value)}
           className={cn(
             'px-4 py-2',
-            'bg-white border border-border-light rounded-soft',
-            'font-sans text-body-sm text-text-primary',
-            'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:border-hermes-500'
+            'bg-white border border-stroke-light rounded-lg',
+            'font-sans text-body-sm text-content-primary',
+            'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
           )}
         >
           <option value="all">Tous les roles</option>
@@ -181,49 +198,49 @@ export default function EmployesPage() {
       </div>
 
       {/* Employees Table */}
-      <div className="bg-white rounded-soft border border-border-light overflow-hidden">
+      <div className="bg-white rounded-lg border border-stroke-light overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border-light bg-background-muted">
-                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+              <tr className="border-b border-stroke-light bg-surface-secondary">
+                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                   Employe
                 </th>
-                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                   Role
                 </th>
-                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                   Limite mensuelle
                 </th>
-                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                   Derniere connexion
                 </th>
-                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                <th className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                   Statut
                 </th>
-                <th className="px-4 py-3 text-right font-sans text-caption font-medium text-text-muted">
+                <th className="px-4 py-3 text-right font-sans text-caption font-medium text-content-muted">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-light">
               {filteredEmployees.map((employee) => (
-                <tr key={employee.id} className="hover:bg-background-muted transition-colors">
+                <tr key={employee.id} className="hover:bg-surface-secondary transition-colors">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center flex-shrink-0">
-                        <span className="font-sans text-body-sm font-medium text-hermes-600">
+                      <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center flex-shrink-0">
+                        <span className="font-sans text-body-sm font-medium text-primary-600">
                           {employee.avatar}
                         </span>
                       </div>
                       <div>
-                        <p className="font-sans text-body-sm font-medium text-text-primary">
+                        <p className="font-sans text-body-sm font-medium text-content-primary">
                           {employee.firstName} {employee.lastName}
                         </p>
-                        <p className="font-sans text-caption text-text-muted">
+                        <p className="font-sans text-caption text-content-muted">
                           {employee.email}
                         </p>
-                        <p className="font-sans text-caption text-text-muted">
+                        <p className="font-sans text-caption text-content-muted">
                           {employee.jobTitle}
                         </p>
                       </div>
@@ -243,30 +260,30 @@ export default function EmployesPage() {
                   <td className="px-4 py-4">
                     {employee.spendingLimit > 0 ? (
                       <div>
-                        <p className="font-sans text-body-sm text-text-primary">
+                        <p className="font-sans text-body-sm text-content-primary">
                           {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(employee.currentSpending)}
                           {' / '}
                           {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(employee.spendingLimit)}
                         </p>
-                        <div className="mt-1 h-1.5 w-24 bg-background-muted rounded-full overflow-hidden">
+                        <div className="mt-1 h-1.5 w-24 bg-surface-secondary rounded-full overflow-hidden">
                           <div
                             className={cn(
                               'h-full rounded-full transition-all duration-500',
                               (employee.currentSpending / employee.spendingLimit) > 0.8
                                 ? 'bg-amber-500'
-                                : 'bg-hermes-500'
+                                : 'bg-primary'
                             )}
                             style={{ width: `${Math.min(100, (employee.currentSpending / employee.spendingLimit) * 100)}%` }}
                           />
                         </div>
                       </div>
                     ) : (
-                      <span className="font-sans text-caption text-text-muted">
+                      <span className="font-sans text-caption text-content-muted">
                         Pas de limite
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-4 font-sans text-body-sm text-text-secondary">
+                  <td className="px-4 py-4 font-sans text-body-sm text-content-secondary">
                     {employee.lastLogin}
                   </td>
                   <td className="px-4 py-4">
@@ -284,8 +301,8 @@ export default function EmployesPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         className={cn(
-                          'p-2 rounded-soft',
-                          'text-text-muted hover:text-text-primary hover:bg-background-muted',
+                          'p-2 rounded-lg',
+                          'text-content-muted hover:text-content-primary hover:bg-surface-secondary',
                           'transition-colors duration-200'
                         )}
                         title="Modifier"
@@ -296,8 +313,8 @@ export default function EmployesPage() {
                       </button>
                       <button
                         className={cn(
-                          'p-2 rounded-soft',
-                          'text-text-muted hover:text-red-600 hover:bg-red-50',
+                          'p-2 rounded-lg',
+                          'text-content-muted hover:text-red-600 hover:bg-red-50',
                           'transition-colors duration-200'
                         )}
                         title="Supprimer"
@@ -316,7 +333,7 @@ export default function EmployesPage() {
 
         {filteredEmployees.length === 0 && (
           <div className="p-8 text-center">
-            <p className="font-sans text-body text-text-muted">
+            <p className="font-sans text-body text-content-muted">
               Aucun employe trouve
             </p>
           </div>
@@ -325,25 +342,25 @@ export default function EmployesPage() {
 
       {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white rounded-soft border border-border-light p-4">
-          <p className="font-sans text-caption text-text-muted">Total employes</p>
-          <p className="mt-1 font-serif text-heading-4 text-text-primary">{employees.length}</p>
+        <div className="bg-white rounded-lg border border-stroke-light p-4">
+          <p className="font-sans text-caption text-content-muted">Total employes</p>
+          <p className="mt-1 font-sans text-heading-4 text-content-primary">{employees.length}</p>
         </div>
-        <div className="bg-white rounded-soft border border-border-light p-4">
-          <p className="font-sans text-caption text-text-muted">Actifs</p>
-          <p className="mt-1 font-serif text-heading-4 text-green-600">
+        <div className="bg-white rounded-lg border border-stroke-light p-4">
+          <p className="font-sans text-caption text-content-muted">Actifs</p>
+          <p className="mt-1 font-sans text-heading-4 text-green-600">
             {employees.filter((e) => e.status === 'active').length}
           </p>
         </div>
-        <div className="bg-white rounded-soft border border-border-light p-4">
-          <p className="font-sans text-caption text-text-muted">En attente</p>
-          <p className="mt-1 font-serif text-heading-4 text-amber-600">
+        <div className="bg-white rounded-lg border border-stroke-light p-4">
+          <p className="font-sans text-caption text-content-muted">En attente</p>
+          <p className="mt-1 font-sans text-heading-4 text-amber-600">
             {employees.filter((e) => e.status === 'pending').length}
           </p>
         </div>
-        <div className="bg-white rounded-soft border border-border-light p-4">
-          <p className="font-sans text-caption text-text-muted">Limite totale mensuelle</p>
-          <p className="mt-1 font-serif text-heading-4 text-text-primary">
+        <div className="bg-white rounded-lg border border-stroke-light p-4">
+          <p className="font-sans text-caption text-content-muted">Limite totale mensuelle</p>
+          <p className="mt-1 font-sans text-heading-4 text-content-primary">
             {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(
               employees.reduce((sum, e) => sum + e.spendingLimit, 0)
             )}

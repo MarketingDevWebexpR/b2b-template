@@ -34,12 +34,12 @@ export function EmptyCart() {
             'relative inline-flex items-center justify-center',
             'w-24 h-24 md:w-32 md:h-32',
             'rounded-full',
-            'bg-background-warm',
-            'border border-border-light'
+            'bg-surface-secondary',
+            'border border-stroke-light'
           )}
         >
           <ShoppingBag
-            className="w-10 h-10 md:w-12 md:h-12 text-text-light"
+            className="w-10 h-10 md:w-12 md:h-12 text-content-muted"
             strokeWidth={1}
           />
 
@@ -48,7 +48,7 @@ export function EmptyCart() {
             className={cn(
               'absolute inset-0',
               'rounded-full',
-              'border border-dashed border-border-medium',
+              'border border-dashed border-stroke-medium',
               'animate-[spin_20s_linear_infinite]'
             )}
           />
@@ -60,7 +60,7 @@ export function EmptyCart() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="font-serif text-heading-2 md:text-display-2 text-text-primary mb-4"
+        className="font-sans text-heading-2 md:text-display-2 text-content-primary mb-4"
       >
         Votre panier est vide
       </motion.h2>
@@ -70,10 +70,10 @@ export function EmptyCart() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="mx-auto max-w-md font-sans text-body-lg text-text-muted leading-elegant mb-10"
+        className="mx-auto max-w-md font-sans text-body-lg text-neutral-500 leading-relaxed mb-10"
       >
-        Découvrez nos collections de haute joaillerie et laissez-vous séduire
-        par des pièces d'exception, créées par nos maîtres artisans.
+        Decouvrez notre catalogue professionnel et trouvez les pieces
+        qui correspondent a vos besoins.
       </motion.p>
 
       {/* CTA */}
@@ -83,22 +83,22 @@ export function EmptyCart() {
         transition={{ duration: 0.5, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
         <Link
-          href="/collections"
+          href="/categories"
           className={cn(
             'group inline-flex items-center gap-3',
-            'px-8 py-4',
-            'bg-luxe-charcoal !text-white',
-            'font-sans text-body-sm uppercase tracking-luxe font-medium',
-            'transition-all duration-350 ease-luxe',
-            'hover:bg-hermes-500',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+            'px-8 py-3 rounded-sm',
+            'bg-neutral-900 text-white',
+            'font-sans text-body-sm uppercase tracking-wider font-medium',
+            'transition-all duration-200',
+            'hover:bg-accent',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
           )}
         >
-          <span>Découvrir nos collections</span>
+          <span>Decouvrir notre catalogue</span>
           <ArrowRight
             className={cn(
               'w-4 h-4',
-              'transition-transform duration-300 ease-luxe',
+              'transition-transform duration-300 duration-200',
               'group-hover:translate-x-1'
             )}
             strokeWidth={1.5}
@@ -114,7 +114,7 @@ export function EmptyCart() {
         className="mt-16 flex items-center justify-center gap-8"
       >
         <div className="h-px w-16 bg-gradient-to-r from-transparent to-border-light" />
-        <span className="font-serif text-caption text-text-light italic">
+        <span className="font-sans text-caption text-content-muted italic">
           L'excellence artisanale depuis 1987
         </span>
         <div className="h-px w-16 bg-gradient-to-l from-transparent to-border-light" />

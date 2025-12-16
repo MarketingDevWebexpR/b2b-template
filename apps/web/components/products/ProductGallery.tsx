@@ -123,7 +123,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className={cn(
-                'object-contain transition-transform duration-500 ease-luxe',
+                'object-contain transition-transform duration-500 ease-out',
                 isZoomed && 'scale-150'
               )}
               style={
@@ -140,7 +140,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
 
             {/* Loading State */}
             {!loadedImages.has(selectedIndex) && (
-              <div className="absolute inset-0 bg-background-cream animate-pulse" />
+              <div className="absolute inset-0 bg-neutral-100 animate-pulse" />
             )}
           </motion.div>
         </AnimatePresence>
@@ -154,7 +154,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
 
         {/* Zoom Indicator */}
         <motion.div
-          className="absolute bottom-6 right-6 px-3 py-1.5 bg-luxe-charcoal/80 text-white text-xs uppercase tracking-luxe z-30"
+          className="absolute bottom-6 right-6 px-3 py-1.5 bg-neutral-900/80 text-white text-xs uppercase tracking-wider rounded z-30"
           initial={{ opacity: 0 }}
           animate={{ opacity: isZoomed ? 1 : 0 }}
           transition={{ duration: 0.2 }}
@@ -180,11 +180,11 @@ export function ProductGallery({ images, productName, className }: ProductGaller
               aria-label={`Voir image ${index + 1}`}
               tabIndex={selectedIndex === index ? 0 : -1}
               className={cn(
-                'relative flex-shrink-0 w-20 h-20 overflow-hidden transition-all duration-300 bg-white',
-                'border-2 focus:outline-none focus:ring-2 focus:ring-hermes-500 focus:ring-offset-2',
+                'relative flex-shrink-0 w-20 h-20 overflow-hidden transition-all duration-200 bg-white rounded-lg',
+                'border-2 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2',
                 selectedIndex === index
-                  ? 'border-hermes-500'
-                  : 'border-border hover:border-hermes-500/50'
+                  ? 'border-accent'
+                  : 'border-neutral-200 hover:border-accent/50'
               )}
             >
               <div className="relative w-full h-full scale-110">
@@ -194,7 +194,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
                   fill
                   sizes="80px"
                   className={cn(
-                    'object-contain transition-opacity duration-300',
+                    'object-contain transition-opacity duration-200',
                     selectedIndex === index ? 'opacity-100' : 'opacity-70 hover:opacity-100'
                   )}
                   onLoad={() => handleImageLoad(index)}
@@ -204,7 +204,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
 
               {/* Loading State for Thumbnails */}
               {!loadedImages.has(index) && (
-                <div className="absolute inset-0 bg-background-cream animate-pulse" />
+                <div className="absolute inset-0 bg-neutral-100 animate-pulse" />
               )}
             </button>
           ))}
@@ -213,7 +213,7 @@ export function ProductGallery({ images, productName, className }: ProductGaller
 
       {/* Image Counter (Mobile) */}
       <div className="md:hidden text-center">
-        <span className="text-text-muted text-sm">
+        <span className="text-neutral-500 text-sm">
           {selectedIndex + 1} / {imageSources.length}
         </span>
       </div>

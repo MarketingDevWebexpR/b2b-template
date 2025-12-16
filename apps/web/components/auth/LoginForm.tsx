@@ -136,16 +136,16 @@ export function LoginForm() {
       {/* Demo credentials info */}
       <div
         className={cn(
-          'p-4 border border-gold-500/30 bg-gold-500/5',
+          'p-4 border border-accent/30 bg-accent/5 rounded-lg',
           'text-sm'
         )}
       >
-        <p className="text-gold-500 font-medium mb-2">Identifiants de demonstration</p>
-        <p className="text-luxury-silver">
-          Identifiant: <span className="text-luxury-pearl">user</span>
+        <p className="text-accent font-medium mb-2">Identifiants de demonstration</p>
+        <p className="text-neutral-500">
+          Identifiant: <span className="text-neutral-700 font-medium">user</span>
         </p>
-        <p className="text-luxury-silver">
-          Mot de passe: <span className="text-luxury-pearl">password</span>
+        <p className="text-neutral-500">
+          Mot de passe: <span className="text-neutral-700 font-medium">password</span>
         </p>
       </div>
 
@@ -180,7 +180,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-luxury-silver hover:text-gold-500 transition-colors focus:outline-none"
+              className="text-neutral-400 hover:text-accent transition-colors focus:outline-none"
               aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
               tabIndex={-1}
             >
@@ -207,16 +207,16 @@ export function LoginForm() {
             />
             <div
               className={cn(
-                'w-5 h-5 border border-luxury-gray bg-luxury-charcoal',
-                'peer-checked:bg-gold-500 peer-checked:border-gold-500',
-                'peer-focus-visible:ring-2 peer-focus-visible:ring-gold-500/30',
+                'w-5 h-5 border border-neutral-300 bg-white rounded',
+                'peer-checked:bg-accent peer-checked:border-accent',
+                'peer-focus-visible:ring-2 peer-focus-visible:ring-accent/30',
                 'transition-all duration-200',
                 'flex items-center justify-center'
               )}
             >
               {rememberMe && (
                 <svg
-                  className="w-3 h-3 text-luxury-black"
+                  className="w-3 h-3 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -227,7 +227,7 @@ export function LoginForm() {
               )}
             </div>
           </div>
-          <span className="text-sm text-luxury-silver group-hover:text-luxury-pearl transition-colors">
+          <span className="text-sm text-neutral-500 group-hover:text-neutral-700 transition-colors">
             Se souvenir de moi
           </span>
         </label>
@@ -235,9 +235,8 @@ export function LoginForm() {
         <Link
           href="#"
           className={cn(
-            'text-sm text-gold-500 hover:text-gold-400',
-            'transition-colors duration-200',
-            'link-hover'
+            'text-sm text-accent hover:text-accent/80',
+            'transition-colors duration-200'
           )}
         >
           Mot de passe oublie ?
@@ -256,11 +255,11 @@ export function LoginForm() {
       </Button>
 
       {/* Register link - mobile only, hidden on desktop where it's in the page */}
-      <p className="text-center text-sm text-luxury-silver md:hidden">
+      <p className="text-center text-sm text-neutral-500 md:hidden">
         Pas encore de compte ?{' '}
         <Link
           href="/register"
-          className="text-gold-500 hover:text-gold-400 transition-colors"
+          className="text-accent hover:text-accent/80 transition-colors"
         >
           Créer un compte
         </Link>

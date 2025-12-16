@@ -80,12 +80,12 @@ function Checkbox({
       />
       <div
         className={cn(
-          'w-4 h-4 border rounded transition-all duration-150',
+          'w-4 h-4 border rounded-lg transition-all duration-150',
           'flex items-center justify-center',
-          'peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2',
+          'peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50 peer-focus-visible:ring-offset-2',
           checked
-            ? 'bg-blue-600 border-blue-600'
-            : 'bg-white border-gray-300 hover:border-gray-400',
+            ? 'bg-primary border-primary'
+            : 'bg-white border-stroke hover:border-content-muted',
           disabled && 'opacity-50'
         )}
       >
@@ -197,10 +197,10 @@ export function ProductCardCompact({
   return (
     <div
       className={cn(
-        'flex items-center gap-3 px-3 py-2 bg-white border-b border-gray-100',
+        'flex items-center gap-3 px-3 py-2 bg-white border-b border-stroke-light',
         'transition-colors duration-150',
-        'hover:bg-gray-50',
-        isSelected && 'bg-blue-50 hover:bg-blue-50',
+        'hover:bg-surface-secondary',
+        isSelected && 'bg-primary-50 hover:bg-primary-50',
         className
       )}
       role="row"
@@ -217,23 +217,23 @@ export function ProductCardCompact({
       )}
 
       {/* Reference */}
-      <div className="w-24 flex-shrink-0 text-xs font-mono text-gray-600" role="cell">
-        <span className="text-gray-400">REF:</span>{' '}
-        <span className="font-medium text-gray-700">{product.reference}</span>
+      <div className="w-24 flex-shrink-0 text-caption font-mono text-content-secondary" role="cell">
+        <span className="text-content-muted">REF:</span>{' '}
+        <span className="font-medium text-content-primary">{product.reference}</span>
       </div>
 
       {/* Product Name */}
       <div className="flex-1 min-w-0" role="cell">
         <Link
-          href={`/products/${product.id}`}
-          className="text-sm text-gray-900 hover:text-blue-600 transition-colors truncate block"
+          href={`/produits/${product.slug || product.id}`}
+          className="text-body-sm text-content-primary hover:text-primary transition-colors truncate block"
         >
           {product.name}
         </Link>
       </div>
 
       {/* Brand */}
-      <div className="w-24 flex-shrink-0 text-xs text-gray-500 uppercase tracking-wide truncate" role="cell">
+      <div className="w-24 flex-shrink-0 text-caption text-content-muted uppercase tracking-wide truncate" role="cell">
         {product.brand || '-'}
       </div>
 
@@ -246,7 +246,7 @@ export function ProductCardCompact({
 
       {/* Price */}
       <div className="w-20 flex-shrink-0 text-right" role="cell">
-        <span className="text-sm font-semibold text-gray-900">
+        <span className="text-body-sm font-semibold text-content-primary">
           {formatCompactPrice(effectivePriceInfo.unitPriceHT, effectivePriceInfo.currency)}
         </span>
       </div>
@@ -290,8 +290,8 @@ export function ProductCardCompactHeader({
   return (
     <div
       className={cn(
-        'flex items-center gap-3 px-3 py-2 bg-gray-50 border-b border-gray-200',
-        'text-xs font-medium text-gray-500 uppercase tracking-wider',
+        'flex items-center gap-3 px-3 py-2 bg-surface-secondary border-b border-stroke',
+        'text-caption font-medium text-content-muted uppercase tracking-wider',
         className
       )}
       role="row"
@@ -331,7 +331,7 @@ export function ProductCardCompactList({
 }) {
   return (
     <div
-      className={cn('border border-gray-200 rounded-lg overflow-hidden', className)}
+      className={cn('border border-stroke rounded-lg overflow-hidden', className)}
       role="table"
       aria-label="Liste des produits"
     >

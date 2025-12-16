@@ -85,7 +85,7 @@ const Accordion = ({
   return (
     <AccordionContext.Provider value={{ expandedItems, toggleItem, type }}>
       <div
-        className={cn('w-full divide-y divide-b2b-border-light', className)}
+        className={cn('w-full divide-y divide-neutral-200', className)}
         {...props}
       >
         {children}
@@ -168,23 +168,23 @@ const AccordionTrigger = ({
       className={cn(
         'flex items-center justify-between w-full',
         'py-4',
-        'text-b2b-body font-medium text-left',
-        'text-b2b-text-primary',
-        'hover:text-b2b-primary',
+        'text-sm font-medium text-left',
+        'text-neutral-900',
+        'hover:text-accent',
         'transition-colors duration-200',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2',
-        'disabled:cursor-not-allowed disabled:hover:text-b2b-text-primary',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
+        'disabled:cursor-not-allowed disabled:hover:text-neutral-900',
         className
       )}
       {...props}
     >
       <span className="flex items-center gap-3">
-        {icon && <span className="w-5 h-5 text-b2b-text-muted">{icon}</span>}
+        {icon && <span className="w-5 h-5 text-neutral-500">{icon}</span>}
         {children}
       </span>
       <svg
         className={cn(
-          'w-5 h-5 text-b2b-text-muted',
+          'w-5 h-5 text-neutral-500',
           'transform transition-transform duration-200',
           isExpanded && 'rotate-180'
         )}
@@ -239,7 +239,7 @@ const AccordionContent = ({
       )}
       {...props}
     >
-      <div className="pb-4 text-b2b-body text-b2b-text-secondary">
+      <div className="pb-4 text-sm text-neutral-600">
         {children}
       </div>
     </div>

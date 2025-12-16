@@ -52,10 +52,10 @@ export const HeaderSearch = memo(function HeaderSearch({
       onKeyDown={handleKeyDown}
       className={cn(
         'relative flex items-center w-full max-w-xl',
-        'bg-white border border-b2b-border rounded-lg',
+        'bg-white border border-neutral-200 rounded-lg',
         'transition-all duration-200',
-        'hover:border-b2b-primary-300 hover:shadow-sm',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20 focus-visible:border-b2b-primary-500',
+        'hover:border-neutral-300 hover:shadow-sm',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 focus-visible:border-accent',
         'cursor-text',
         className
       )}
@@ -64,7 +64,7 @@ export const HeaderSearch = memo(function HeaderSearch({
       {/* Search icon */}
       <div className="flex items-center justify-center pl-3 pr-2">
         <Search
-          className="w-4 h-4 text-b2b-text-muted"
+          className="w-4 h-4 text-neutral-500"
           strokeWidth={1.5}
           aria-hidden="true"
         />
@@ -72,17 +72,17 @@ export const HeaderSearch = memo(function HeaderSearch({
 
       {/* Placeholder text */}
       <div className="flex-1 py-2.5 pr-3">
-        <span className="text-b2b-body text-b2b-text-muted">
+        <span className="text-sm text-neutral-500">
           {placeholder}
         </span>
       </div>
 
       {/* Keyboard shortcut hint */}
       <div className="hidden md:flex items-center gap-1 pr-3">
-        <kbd className="inline-flex items-center justify-center px-1.5 py-0.5 text-b2b-caption font-medium text-b2b-text-muted bg-b2b-bg-secondary border border-b2b-border rounded">
+        <kbd className="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-medium text-neutral-500 bg-neutral-50 border border-neutral-200 rounded">
           <span className="text-xs">Cmd</span>
         </kbd>
-        <kbd className="inline-flex items-center justify-center px-1.5 py-0.5 text-b2b-caption font-medium text-b2b-text-muted bg-b2b-bg-secondary border border-b2b-border rounded">
+        <kbd className="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-medium text-neutral-500 bg-neutral-50 border border-neutral-200 rounded">
           <span className="text-xs">K</span>
         </kbd>
       </div>

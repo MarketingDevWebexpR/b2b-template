@@ -218,8 +218,8 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         ref={popoverRef}
         className={cn(
           'fixed z-50',
-          'bg-b2b-bg-primary',
-          'border border-b2b-border',
+          'bg-white',
+          'border border-neutral-200',
           'rounded-lg shadow-lg',
           'animate-in fade-in zoom-in-95 duration-150',
           className
@@ -237,8 +237,8 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
           <div
             className={cn(
               'absolute w-3 h-3',
-              'bg-b2b-bg-primary',
-              'border border-b2b-border',
+              'bg-white',
+              'border border-neutral-200',
               'transform rotate-45',
               placement === 'top' && 'bottom-[-7px] border-t-0 border-l-0',
               placement === 'bottom' && 'top-[-7px] border-b-0 border-r-0',
@@ -317,7 +317,7 @@ const DropdownMenu = ({
           return (
             <div
               key={index}
-              className="my-1 border-t border-b2b-border-light"
+              className="my-1 border-t border-neutral-200"
             />
           );
         }
@@ -334,13 +334,13 @@ const DropdownMenu = ({
             className={cn(
               'w-full px-4 py-2',
               'flex items-center gap-3',
-              'text-b2b-body text-left',
+              'text-sm text-left',
               'transition-colors duration-150',
               item.danger
-                ? 'text-b2b-danger hover:bg-b2b-danger-50'
-                : 'text-b2b-text-primary hover:bg-b2b-bg-tertiary',
+                ? 'text-red-500 hover:bg-red-50'
+                : 'text-neutral-900 hover:bg-neutral-100',
               'disabled:opacity-50 disabled:cursor-not-allowed',
-              'focus:outline-none focus:bg-b2b-bg-tertiary'
+              'focus:outline-none focus:bg-neutral-100'
             )}
           >
             {item.icon && (

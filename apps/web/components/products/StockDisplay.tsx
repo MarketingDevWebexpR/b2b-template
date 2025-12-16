@@ -91,10 +91,10 @@ export function StockDisplay({ stock, className, showDetailedInfo = true }: Stoc
           <div className="flex items-start gap-3">
             <Package className={cn('w-5 h-5 mt-0.5', color)} />
             <div className="flex-1">
-              <p className="text-sm font-medium text-text-primary mb-1">
+              <p className="text-sm font-medium text-neutral-900 mb-1">
                 Information stock détaillée
               </p>
-              <div className="space-y-1 text-sm text-text-muted">
+              <div className="space-y-1 text-sm text-neutral-500">
                 <p>
                   <span className="font-medium">Quantité en stock:</span>{' '}
                   <span className={cn('font-semibold', color)}>{stock}</span> unité{stock > 1 ? 's' : ''}
@@ -138,7 +138,7 @@ export function StockDisplay({ stock, className, showDetailedInfo = true }: Stoc
 
       {/* Hint to log in for detailed info */}
       {!isLoggedIn && stockStatus !== 'out_of_stock' && (
-        <div className="flex items-center gap-2 text-xs text-text-muted">
+        <div className="flex items-center gap-2 text-xs text-neutral-500">
           <Lock className="w-3 h-3" />
           <span>Connectez-vous pour voir le stock exact</span>
         </div>

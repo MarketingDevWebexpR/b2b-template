@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 
 export const metadata: Metadata = {
-  title: 'Créer un compte | Maison Bijoux',
-  description: 'Créez votre compte Maison Bijoux pour découvrir nos collections exclusives et bénéficier d\'avantages uniques.',
+  title: 'Créer un compte | WebexpR Pro',
+  description: 'Créez votre compte WebexpR Pro pour découvrir nos collections exclusives et bénéficier d\'avantages uniques.',
 };
 
 /**
@@ -17,9 +17,9 @@ export default function RegisterPage() {
       {/* Header */}
       <div className="text-center mb-8">
         {/* Decorative line */}
-        <div className="w-12 h-[2px] bg-gold-500 mx-auto mb-6" />
+        <div className="w-12 h-[2px] bg-accent mx-auto mb-6" />
 
-        <h1 className="text-heading-3 md:text-heading-2 font-serif text-luxury-pearl mb-3">
+        <h1 className="text-heading-3 md:text-heading-2 font-sans text-luxury-pearl mb-3">
           Créer un compte
         </h1>
 
@@ -30,7 +30,7 @@ export default function RegisterPage() {
 
       {/* Benefits list */}
       <div className="mb-8 p-4 border border-luxury-gray/30 bg-luxury-charcoal/30">
-        <p className="text-sm text-gold-500 font-medium mb-3">Avantages membres</p>
+        <p className="text-sm text-accent font-medium mb-3">Avantages membres</p>
         <ul className="space-y-2">
           {[
             'Accès anticipé aux nouvelles collections',
@@ -40,7 +40,7 @@ export default function RegisterPage() {
           ].map((benefit, index) => (
             <li key={index} className="flex items-center gap-3 text-sm text-luxury-silver">
               <svg
-                className="w-4 h-4 text-gold-500 flex-shrink-0"
+                className="w-4 h-4 text-accent flex-shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -63,7 +63,7 @@ export default function RegisterPage() {
           Vous avez déjà un compte ?{' '}
           <Link
             href="/login"
-            className="text-gold-500 hover:text-gold-400 transition-colors font-medium"
+            className="text-accent hover:text-accent transition-colors font-medium"
           >
             Se connecter
           </Link>

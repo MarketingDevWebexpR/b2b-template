@@ -12,7 +12,7 @@ import { Container } from '@/components/ui/Container';
 import { ProductGallery } from '@/components/products/ProductGallery';
 import { ProductInfoWithCart } from '@/components/products/ProductInfoWithCart';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
-import { HeaderSpacer } from '@/components/layout/Header';
+import { B2BHeaderEcomSpacer } from '@/components/layout/B2BHeaderEcom';
 import { Product, Category } from '@/types';
 
 interface ProductPageProps {
@@ -171,8 +171,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <>
       <ProductJsonLd product={product} category={category} />
 
-      <main className="min-h-screen bg-background-cream">
-        <HeaderSpacer />
+      <main className="min-h-screen bg-white">
+        <B2BHeaderEcomSpacer />
 
         {/* Breadcrumbs */}
         <section className="pt-8 pb-4">
@@ -182,19 +182,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <li>
                   <Link
                     href="/"
-                    className="text-text-muted hover:text-hermes-500 transition-colors"
+                    className="text-content-muted hover:text-primary transition-colors"
                   >
                     Accueil
                   </Link>
                 </li>
                 <ChevronRight
-                  className="w-4 h-4 text-text-muted/50"
+                  className="w-4 h-4 text-content-muted/50"
                   aria-hidden="true"
                 />
                 <li>
                   <Link
                     href="/categories"
-                    className="text-text-muted hover:text-hermes-500 transition-colors"
+                    className="text-content-muted hover:text-primary transition-colors"
                   >
                     Collections
                   </Link>
@@ -202,13 +202,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {category && (
                   <>
                     <ChevronRight
-                      className="w-4 h-4 text-text-muted/50"
+                      className="w-4 h-4 text-content-muted/50"
                       aria-hidden="true"
                     />
                     <li>
                       <Link
                         href={`/categories/${category.slug}`}
-                        className="text-text-muted hover:text-hermes-500 transition-colors"
+                        className="text-content-muted hover:text-primary transition-colors"
                       >
                         {category.name}
                       </Link>
@@ -216,11 +216,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </>
                 )}
                 <ChevronRight
-                  className="w-4 h-4 text-text-muted/50"
+                  className="w-4 h-4 text-content-muted/50"
                   aria-hidden="true"
                 />
                 <li>
-                  <span className="text-text-primary font-medium" aria-current="page">
+                  <span className="text-content-primary font-medium" aria-current="page">
                     {product.name}
                   </span>
                 </li>
@@ -245,7 +245,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {category && (
                   <Link
                     href={`/categories/${category.slug}`}
-                    className="inline-block mb-4 text-xs uppercase tracking-luxe text-hermes-500 hover:text-hermes-600 transition-colors"
+                    className="inline-block mb-4 text-xs uppercase  text-primary hover:text-primary-600 transition-colors"
                   >
                     {category.name}
                   </Link>
@@ -254,93 +254,93 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <ProductInfoWithCart product={product} />
 
                 {/* Full Description */}
-                <div className="mt-8 pt-8 border-t border-border">
-                  <h2 className="text-sm uppercase tracking-luxe text-text-muted mb-4">
+                <div className="mt-8 pt-8 border-t border-stroke">
+                  <h2 className="text-sm uppercase  text-content-muted mb-4">
                     Description
                   </h2>
-                  <p className="text-text-secondary leading-relaxed">
+                  <p className="text-content-secondary leading-relaxed">
                     {product.description}
                   </p>
                 </div>
 
                 {/* Product Details */}
-                <div className="mt-8 pt-8 border-t border-border">
-                  <h2 className="text-sm uppercase tracking-luxe text-text-muted mb-4">
+                <div className="mt-8 pt-8 border-t border-stroke">
+                  <h2 className="text-sm uppercase  text-content-muted mb-4">
                     Détails
                   </h2>
                   <dl className="space-y-3">
                     <div className="flex justify-between">
-                      <dt className="text-text-muted">Référence</dt>
-                      <dd className="text-text-primary font-medium">
+                      <dt className="text-content-muted">Référence</dt>
+                      <dd className="text-content-primary font-medium">
                         {displayReference}
                       </dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-text-muted">Catégorie</dt>
-                      <dd className="text-text-primary font-medium">
+                      <dt className="text-content-muted">Catégorie</dt>
+                      <dd className="text-content-primary font-medium">
                         {category?.name || '-'}
                       </dd>
                     </div>
                     {product.brand && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Marque</dt>
-                        <dd className="text-text-primary font-medium">
+                        <dt className="text-content-muted">Marque</dt>
+                        <dd className="text-content-primary font-medium">
                           {product.brand}
                         </dd>
                       </div>
                     )}
                     {product.collection && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Collection</dt>
-                        <dd className="text-hermes-500 font-medium">
+                        <dt className="text-content-muted">Collection</dt>
+                        <dd className="text-primary font-medium">
                           {product.collection}
                         </dd>
                       </div>
                     )}
                     {product.style && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Style</dt>
-                        <dd className="text-text-primary font-medium">
+                        <dt className="text-content-muted">Style</dt>
+                        <dd className="text-content-primary font-medium">
                           {product.style}
                         </dd>
                       </div>
                     )}
                     {product.materials.length > 0 && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Matériaux</dt>
-                        <dd className="text-text-primary font-medium text-right">
+                        <dt className="text-content-muted">Matériaux</dt>
+                        <dd className="text-content-primary font-medium text-right">
                           {product.materials.join(', ')}
                         </dd>
                       </div>
                     )}
                     {product.weight && product.weight > 0 && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Poids</dt>
-                        <dd className="text-text-primary font-medium">
+                        <dt className="text-content-muted">Poids</dt>
+                        <dd className="text-content-primary font-medium">
                           {product.weight} {product.weightUnit}
                         </dd>
                       </div>
                     )}
                     {product.origin && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Origine</dt>
-                        <dd className="text-text-primary font-medium">
+                        <dt className="text-content-muted">Origine</dt>
+                        <dd className="text-content-primary font-medium">
                           {product.origin}
                         </dd>
                       </div>
                     )}
                     {product.warranty && product.warranty > 0 && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Garantie</dt>
-                        <dd className="text-text-primary font-medium">
+                        <dt className="text-content-muted">Garantie</dt>
+                        <dd className="text-content-primary font-medium">
                           {product.warranty} mois
                         </dd>
                       </div>
                     )}
                     {product.isNew && (
                       <div className="flex justify-between">
-                        <dt className="text-text-muted">Nouveauté</dt>
-                        <dd className="text-hermes-500 font-medium">
+                        <dt className="text-content-muted">Nouveauté</dt>
+                        <dd className="text-primary font-medium">
                           ✨ Nouveau
                         </dd>
                       </div>
@@ -349,10 +349,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
 
                 {/* Shipping & Returns */}
-                <div className="mt-8 pt-8 border-t border-border space-y-4">
+                <div className="mt-8 pt-8 border-t border-stroke space-y-4">
                   <div className="flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-hermes-500 flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -365,17 +365,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       />
                     </svg>
                     <div>
-                      <p className="text-text-primary font-medium">
+                      <p className="text-content-primary font-medium">
                         Livraison offerte
                       </p>
-                      <p className="text-sm text-text-muted">
+                      <p className="text-sm text-content-muted">
                         Livraison sécurisée sous 3-5 jours ouvrables
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-hermes-500 flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -388,17 +388,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       />
                     </svg>
                     <div>
-                      <p className="text-text-primary font-medium">
+                      <p className="text-content-primary font-medium">
                         Certificat d&apos;authenticité
                       </p>
-                      <p className="text-sm text-text-muted">
+                      <p className="text-sm text-content-muted">
                         Chaque pièce est accompagnée de son certificat
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-hermes-500 flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -411,10 +411,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       />
                     </svg>
                     <div>
-                      <p className="text-text-primary font-medium">
+                      <p className="text-content-primary font-medium">
                         Retours sous 30 jours
                       </p>
-                      <p className="text-sm text-text-muted">
+                      <p className="text-sm text-content-muted">
                         Retour gratuit et remboursement intégral
                       </p>
                     </div>
@@ -427,7 +427,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <section className="border-t border-border bg-background-beige">
+          <section className="border-t border-stroke bg-background-beige">
             <Container>
               <RelatedProducts
                 products={relatedProducts}
@@ -439,12 +439,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Back to Category CTA */}
         {category && (
-          <section className="py-12 border-t border-border">
+          <section className="py-12 border-t border-stroke">
             <Container>
               <div className="text-center">
                 <Link
                   href={`/categories/${category.slug}`}
-                  className="inline-flex items-center gap-2 text-hermes-500 hover:text-hermes-600 transition-colors text-sm uppercase tracking-luxe"
+                  className="inline-flex items-center gap-2 text-primary hover:text-primary-600 transition-colors text-sm uppercase "
                 >
                   <ChevronRight className="w-4 h-4 rotate-180" />
                   Retour à la collection {category.name}

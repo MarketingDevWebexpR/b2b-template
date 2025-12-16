@@ -165,7 +165,7 @@ function highlightText(text: string, query: string): JSX.Element {
         regex.test(part) ? (
           <mark
             key={index}
-            className="bg-b2b-accent-100 text-b2b-accent-700 rounded px-0.5"
+            className="bg-orange-100 text-orange-700 rounded px-0.5"
           >
             {part}
           </mark>
@@ -192,11 +192,11 @@ function SectionHeader({ title, icon }: SectionHeaderProps) {
       className={cn(
         'flex items-center gap-2',
         'px-4 py-2',
-        'text-b2b-label',
-        'text-b2b-text-muted',
+        'text-xs',
+        'text-neutral-500',
         'uppercase tracking-wide',
-        'bg-b2b-bg-secondary',
-        'border-b border-b2b-border-light'
+        'bg-neutral-50',
+        'border-b border-neutral-200'
       )}
     >
       {icon}
@@ -240,8 +240,8 @@ const ProductItem = memo(function ProductItem({
         'transition-colors duration-150',
         'focus:outline-none',
         isActive
-          ? 'bg-b2b-primary-50'
-          : 'hover:bg-b2b-bg-secondary'
+          ? 'bg-orange-50'
+          : 'hover:bg-neutral-50'
       )}
     >
       {/* Product Image */}
@@ -250,7 +250,7 @@ const ProductItem = memo(function ProductItem({
           'relative flex-shrink-0',
           'w-12 h-12',
           'bg-white',
-          'border border-b2b-border-light',
+          'border border-neutral-200',
           'rounded-md',
           'overflow-hidden'
         )}
@@ -270,15 +270,15 @@ const ProductItem = memo(function ProductItem({
           <div className="min-w-0">
             <p
               className={cn(
-                'text-b2b-body font-medium',
-                'text-b2b-text-primary',
+                'text-sm font-medium',
+                'text-neutral-900',
                 'truncate'
               )}
             >
               {highlightText(suggestion.text, query)}
             </p>
             {suggestion.category && (
-              <p className="text-b2b-caption text-b2b-text-muted truncate">
+              <p className="text-xs text-neutral-500 truncate">
                 {suggestion.category}
               </p>
             )}
@@ -289,8 +289,8 @@ const ProductItem = memo(function ProductItem({
             <span
               className={cn(
                 'flex-shrink-0',
-                'text-b2b-price-sm',
-                'text-b2b-primary-600',
+                'text-sm font-semibold',
+                'text-accent',
                 'whitespace-nowrap'
               )}
             >
@@ -338,24 +338,24 @@ const SimpleItem = memo(function SimpleItem({
         'transition-colors duration-150',
         'focus:outline-none',
         isActive
-          ? 'bg-b2b-primary-50'
-          : 'hover:bg-b2b-bg-secondary'
+          ? 'bg-orange-50'
+          : 'hover:bg-neutral-50'
       )}
     >
-      <ArrowRightIcon className="w-4 h-4 text-b2b-text-muted flex-shrink-0" />
+      <ArrowRightIcon className="w-4 h-4 text-neutral-500 flex-shrink-0" />
 
       <span
         className={cn(
           'flex-1',
-          'text-b2b-body',
-          'text-b2b-text-primary'
+          'text-sm',
+          'text-neutral-900'
         )}
       >
         {highlightText(suggestion.text, query)}
       </span>
 
       {count !== undefined && (
-        <span className="text-b2b-caption text-b2b-text-muted">
+        <span className="text-xs text-neutral-500">
           ({count})
         </span>
       )}
@@ -387,8 +387,8 @@ export function SearchSuggestions({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <LoaderIcon className="w-6 h-6 text-b2b-primary" />
-        <span className="ml-2 text-b2b-body text-b2b-text-muted">
+        <LoaderIcon className="w-6 h-6 text-accent" />
+        <span className="ml-2 text-sm text-neutral-500">
           Recherche en cours...
         </span>
       </div>
@@ -399,10 +399,10 @@ export function SearchSuggestions({
   if (!hasResults && query.trim().length >= 2) {
     return (
       <div className="py-8 text-center">
-        <p className="text-b2b-body text-b2b-text-secondary">
+        <p className="text-sm text-neutral-600">
           Aucun resultat pour "{query}"
         </p>
-        <p className="mt-1 text-b2b-caption text-b2b-text-muted">
+        <p className="mt-1 text-xs text-neutral-500">
           Essayez avec d'autres termes de recherche
         </p>
       </div>
@@ -418,7 +418,7 @@ export function SearchSuggestions({
             title="Produits"
             icon={<PackageIcon className="w-4 h-4" />}
           />
-          <div className="divide-y divide-b2b-border-light">
+          <div className="divide-y divide-neutral-200">
             {products.map((suggestion, index) => (
               <ProductItem
                 key={suggestion.id}

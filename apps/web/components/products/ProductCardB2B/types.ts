@@ -304,7 +304,7 @@ export function createMockProductB2B(overrides: Partial<MockProductB2B> = {}): M
     materials: ['Or 18K'],
     weight: 12.5,
     weightUnit: 'g',
-    brand: 'Maison Bijoux',
+    brand: 'WebexpR Pro',
     origin: 'France',
     warranty: 24,
     stock: 152,

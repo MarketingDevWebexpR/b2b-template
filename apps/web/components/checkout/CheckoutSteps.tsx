@@ -24,7 +24,7 @@ interface CheckoutStepsProps {
 
 /**
  * Checkout steps configuration
- * French labels with luxury aesthetic
+ * French labels with B2B professional aesthetic
  */
 const steps: Step[] = [
   {
@@ -46,8 +46,8 @@ const steps: Step[] = [
 
 /**
  * CheckoutSteps Component
- * Elegant step indicator for the checkout process
- * Hermes-inspired luxury aesthetic with gold accents
+ * Step indicator for the B2B checkout process
+ * Professional neutral aesthetic with accent highlights
  */
 export function CheckoutSteps({ currentStep, className }: CheckoutStepsProps) {
   return (
@@ -71,23 +71,23 @@ export function CheckoutSteps({ currentStep, className }: CheckoutStepsProps) {
                 {/* Step circle */}
                 <div
                   className={cn(
-                    'relative flex h-10 w-10 md:h-12 md:w-12 items-center justify-center',
-                    'border-2 transition-all duration-300',
+                    'relative flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full',
+                    'border-2 transition-all duration-200',
                     // Completed state
                     isCompleted && [
-                      'border-hermes-500 bg-hermes-500',
+                      'border-accent bg-accent',
                       'text-white',
                     ],
                     // Current state
                     isCurrent && [
-                      'border-hermes-500 bg-transparent',
-                      'text-hermes-500',
-                      'ring-4 ring-hermes-500/20',
+                      'border-accent bg-transparent',
+                      'text-accent',
+                      'ring-4 ring-accent/20',
                     ],
                     // Upcoming state
                     isUpcoming && [
-                      'border-border-light bg-transparent',
-                      'text-text-muted',
+                      'border-neutral-200 bg-transparent',
+                      'text-neutral-400',
                     ]
                   )}
                   aria-current={isCurrent ? 'step' : undefined}
@@ -99,7 +99,7 @@ export function CheckoutSteps({ currentStep, className }: CheckoutStepsProps) {
                       aria-hidden="true"
                     />
                   ) : (
-                    <span className="font-serif text-lg md:text-xl font-medium">
+                    <span className="font-sans text-lg md:text-xl font-semibold">
                       {step.number}
                     </span>
                   )}
@@ -109,11 +109,11 @@ export function CheckoutSteps({ currentStep, className }: CheckoutStepsProps) {
                 <div className="text-center">
                   <span
                     className={cn(
-                      'block text-xs md:text-sm font-medium uppercase tracking-luxe',
-                      'transition-colors duration-300',
-                      isCompleted && 'text-hermes-500',
-                      isCurrent && 'text-text-primary',
-                      isUpcoming && 'text-text-muted'
+                      'block text-xs md:text-sm font-medium uppercase tracking-wider',
+                      'transition-colors duration-200',
+                      isCompleted && 'text-accent',
+                      isCurrent && 'text-neutral-900',
+                      isUpcoming && 'text-neutral-400'
                     )}
                   >
                     {step.label}
@@ -121,10 +121,10 @@ export function CheckoutSteps({ currentStep, className }: CheckoutStepsProps) {
                   <span
                     className={cn(
                       'hidden md:block text-xs',
-                      'transition-colors duration-300',
+                      'transition-colors duration-200',
                       isCompleted || isCurrent
-                        ? 'text-text-secondary'
-                        : 'text-text-muted'
+                        ? 'text-neutral-600'
+                        : 'text-neutral-400'
                     )}
                   >
                     {step.description}
@@ -136,10 +136,10 @@ export function CheckoutSteps({ currentStep, className }: CheckoutStepsProps) {
               {index < steps.length - 1 && (
                 <div
                   className={cn(
-                    'hidden md:block h-px w-12 lg:w-24 transition-colors duration-300',
+                    'hidden md:block h-px w-12 lg:w-24 transition-colors duration-200',
                     currentStep > step.number
-                      ? 'bg-hermes-500'
-                      : 'bg-border-light'
+                      ? 'bg-accent'
+                      : 'bg-neutral-200'
                   )}
                   aria-hidden="true"
                 />

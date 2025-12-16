@@ -40,8 +40,8 @@ export interface SelectProps
  * Select size configurations
  */
 const selectSizes = {
-  sm: 'px-3 py-2 text-b2b-body-sm pr-10',
-  md: 'px-4 py-2.5 text-b2b-body pr-10',
+  sm: 'px-3 py-2 text-sm pr-10',
+  md: 'px-4 py-2.5 text-sm pr-10',
   lg: 'px-4 py-3 text-base pr-10',
 };
 
@@ -89,11 +89,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             htmlFor={id}
             className={cn(
               'block mb-1.5',
-              'font-sans text-b2b-label',
-              'text-b2b-text-secondary',
+              'font-sans text-sm font-medium',
+              'text-neutral-600',
               'transition-colors duration-200',
-              hasError && 'text-b2b-danger',
-              disabled && 'text-b2b-text-muted opacity-60'
+              hasError && 'text-red-500',
+              disabled && 'text-neutral-400 opacity-60'
             )}
           >
             {label}
@@ -107,9 +107,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             <span
               className={cn(
                 'absolute left-3 top-1/2 -translate-y-1/2',
-                'text-b2b-text-muted',
+                'text-neutral-500',
                 'pointer-events-none',
-                hasError && 'text-b2b-danger'
+                hasError && 'text-red-500'
               )}
             >
               {startIcon}
@@ -129,24 +129,24 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
               // Base styles
               'w-full appearance-none',
               'font-sans',
-              'bg-b2b-bg-primary text-b2b-text-primary',
-              'border border-b2b-border',
+              'bg-white text-neutral-900',
+              'border border-neutral-200',
               'rounded-md',
               'transition-all duration-200',
               // Focus styles
               'focus:outline-none',
-              'focus:border-b2b-primary',
-              'focus:ring-2 focus:ring-b2b-primary/20',
+              'focus:border-accent',
+              'focus:ring-2 focus:ring-accent/20',
               // Hover styles
-              'hover:border-b2b-border-medium',
+              'hover:border-neutral-300',
               // Disabled styles
-              'disabled:bg-b2b-bg-tertiary disabled:border-b2b-border-light',
-              'disabled:text-b2b-text-muted disabled:cursor-not-allowed',
+              'disabled:bg-neutral-100 disabled:border-neutral-200',
+              'disabled:text-neutral-400 disabled:cursor-not-allowed',
               // Error styles
               hasError && [
-                'border-b2b-danger',
-                'focus:border-b2b-danger focus:ring-b2b-danger/20',
-                'hover:border-b2b-danger-400',
+                'border-red-500',
+                'focus:border-red-500 focus:ring-red-500/20',
+                'hover:border-red-400',
               ],
               // Size styles
               selectSizes[size],
@@ -176,9 +176,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <span
             className={cn(
               'absolute right-3 top-1/2 -translate-y-1/2',
-              'text-b2b-text-muted',
+              'text-neutral-500',
               'pointer-events-none',
-              hasError && 'text-b2b-danger'
+              hasError && 'text-red-500'
             )}
           >
             <svg
@@ -205,8 +205,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             role="alert"
             className={cn(
               'mt-1.5',
-              'font-sans text-b2b-caption',
-              'text-b2b-danger'
+              'font-sans text-xs',
+              'text-red-500'
             )}
           >
             {error}
@@ -219,8 +219,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={helperId}
             className={cn(
               'mt-1.5',
-              'font-sans text-b2b-caption',
-              'text-b2b-text-muted'
+              'font-sans text-xs',
+              'text-neutral-500'
             )}
           >
             {helperText}

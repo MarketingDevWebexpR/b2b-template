@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Container } from '@/components/ui/Container';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { HeaderSpacer } from '@/components/layout/Header';
+import { B2BHeaderEcomSpacer } from '@/components/layout/B2BHeaderEcom';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { getOrderCountByUserId, getTotalSpentByUserId } from '@/data/orders';
 import { formatPrice } from '@/lib/utils';
@@ -84,27 +84,27 @@ export default async function AccountPage() {
   const totalSpent = getTotalSpentByUserId(user.id!);
 
   return (
-    <main className="min-h-screen bg-background-cream">
+    <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-warm">
-        <HeaderSpacer />
+        <B2BHeaderEcomSpacer />
         <div className="absolute inset-0 bg-vignette" />
-        <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-hermes-500/20 to-transparent" />
+        <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border-light to-transparent" />
 
         <Container className="py-12 lg:py-16">
           <div className="text-center">
-            <span className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500">
+            <span className="mb-4 inline-block font-sans text-overline uppercase  text-primary">
               Bienvenue
             </span>
 
-            <h1 className="font-serif text-heading-1 text-text-primary md:text-display-2">
+            <h1 className="font-sans text-heading-1 text-content-primary md:text-display-2">
               {user.name || 'Mon Compte'}
             </h1>
 
-            <div className="mx-auto my-6 h-px w-24 bg-hermes-500" />
+            <div className="mx-auto my-6 h-px w-24 bg-primary" />
 
-            <p className="mx-auto max-w-2xl font-sans text-body-lg leading-elegant text-text-muted">
+            <p className="mx-auto max-w-2xl font-sans text-body-lg leading-elegant text-content-muted">
               Gerez votre compte et retrouvez toutes vos informations
             </p>
           </div>
@@ -123,31 +123,31 @@ export default async function AccountPage() {
           {/* Quick Stats */}
           <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
             {/* Orders Count */}
-            <div className="border border-border-light bg-white p-6 text-center">
-              <span className="block font-serif text-display-2 text-hermes-500">
+            <div className="border border-stroke-light bg-white p-6 text-center">
+              <span className="block font-sans text-display-2 text-primary">
                 {orderCount}
               </span>
-              <span className="mt-2 block font-sans text-caption uppercase tracking-luxe text-text-muted">
+              <span className="mt-2 block font-sans text-caption uppercase  text-content-muted">
                 {orderCount === 1 ? 'Commande' : 'Commandes'}
               </span>
             </div>
 
             {/* Total Spent */}
-            <div className="border border-border-light bg-white p-6 text-center">
-              <span className="block font-serif text-display-2 text-hermes-500">
+            <div className="border border-stroke-light bg-white p-6 text-center">
+              <span className="block font-sans text-display-2 text-primary">
                 {formatPrice(totalSpent)}
               </span>
-              <span className="mt-2 block font-sans text-caption uppercase tracking-luxe text-text-muted">
+              <span className="mt-2 block font-sans text-caption uppercase  text-content-muted">
                 Total Achats
               </span>
             </div>
 
             {/* Member Since */}
-            <div className="border border-border-light bg-white p-6 text-center">
-              <span className="block font-serif text-display-2 text-hermes-500">
+            <div className="border border-stroke-light bg-white p-6 text-center">
+              <span className="block font-sans text-display-2 text-primary">
                 Or
               </span>
-              <span className="mt-2 block font-sans text-caption uppercase tracking-luxe text-text-muted">
+              <span className="mt-2 block font-sans text-caption uppercase  text-content-muted">
                 Statut Membre
               </span>
             </div>
@@ -161,24 +161,24 @@ export default async function AccountPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex h-full items-center gap-4 border border-border-light bg-white p-6 transition-all duration-300 ease-luxe hover:border-hermes-500/30 hover:shadow-elegant"
+                  className="group flex h-full items-center gap-4 border border-stroke-light bg-white p-6 transition-all duration-300 duration-200 hover:border-primary/30 hover:shadow-elegant"
                 >
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-border-light transition-all duration-300 group-hover:border-hermes-500/30 group-hover:bg-hermes-50">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-stroke-light transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary-50">
                     <Icon
-                      className="h-5 w-5 text-text-secondary transition-colors group-hover:text-hermes-500"
+                      className="h-5 w-5 text-content-secondary transition-colors group-hover:text-primary"
                       strokeWidth={1.5}
                     />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-serif text-body-lg text-text-primary transition-colors group-hover:text-hermes-600">
+                    <h3 className="font-sans text-body-lg text-content-primary transition-colors group-hover:text-primary-600">
                       {item.label}
                     </h3>
-                    <p className="mt-1 font-sans text-caption text-text-muted">
+                    <p className="mt-1 font-sans text-caption text-content-muted">
                       {item.description}
                     </p>
                   </div>
                   <ChevronRight
-                    className="h-5 w-5 text-border-dark transition-all duration-300 group-hover:translate-x-1 group-hover:text-hermes-500"
+                    className="h-5 w-5 text-border-dark transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary"
                     strokeWidth={1.5}
                   />
                 </Link>
@@ -192,32 +192,32 @@ export default async function AccountPage() {
           </div>
 
           {/* User Info Card */}
-          <div className="mt-12 border border-border-light bg-white p-8">
-            <h2 className="mb-6 font-serif text-heading-3 text-text-primary">
+          <div className="mt-12 border border-stroke-light bg-white p-8">
+            <h2 className="mb-6 font-sans text-heading-3 text-content-primary">
               Informations du Compte
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <span className="block font-sans text-caption uppercase tracking-luxe text-text-muted">
+                <span className="block font-sans text-caption uppercase  text-content-muted">
                   Nom
                 </span>
-                <span className="mt-1 block font-sans text-body text-text-primary">
+                <span className="mt-1 block font-sans text-body text-content-primary">
                   {user.name || '-'}
                 </span>
               </div>
               <div>
-                <span className="block font-sans text-caption uppercase tracking-luxe text-text-muted">
+                <span className="block font-sans text-caption uppercase  text-content-muted">
                   Email
                 </span>
-                <span className="mt-1 block font-sans text-body text-text-primary">
+                <span className="mt-1 block font-sans text-body text-content-primary">
                   {user.email || '-'}
                 </span>
               </div>
               <div>
-                <span className="block font-sans text-caption uppercase tracking-luxe text-text-muted">
+                <span className="block font-sans text-caption uppercase  text-content-muted">
                   Statut
                 </span>
-                <span className="mt-1 inline-block border border-hermes-500/30 bg-hermes-50 px-3 py-1 font-sans text-caption uppercase tracking-luxe text-hermes-600">
+                <span className="mt-1 inline-block border border-primary/30 bg-primary-50 px-3 py-1 font-sans text-caption uppercase  text-primary-600">
                   {user.role === 'admin' ? 'Administrateur' : 'Membre'}
                 </span>
               </div>

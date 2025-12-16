@@ -1,124 +1,281 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== CSS VARIABLES E-COMMERCE ===== */
+:root {
+  /* Colors */
+  --color-primary: #0059a1;
+  --color-primary-dark: #003d6d;
+  --color-accent: #f67828;
+  --color-accent-dark: #c2410c;
+  --color-gold: #d4a84b;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-promo: #dc2626;
+
+  /* Surfaces */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f8fafc;
+  --surface-tertiary: #f1f5f9;
+  --surface-header: #ffffff;
+  --surface-nav: #f8fafc;
+  --surface-promo: #1e293b;
+
+  /* Text */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* Borders */
+  --border-light: #f1f5f9;
+  --border-default: #e2e8f0;
+  --border-medium: #cbd5e1;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --header-height: 140px;
+  --header-height-mobile: 60px;
+  --nav-height: 48px;
+  --promo-height: 40px;
+  --container-max: 1400px;
+  --container-padding: 1rem;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+}
 
 @layer base {
   html {
     scroll-behavior: smooth;
   }
 
+  /* B2B E-commerce body style */
   body {
-    @apply bg-background-cream text-text-primary antialiased;
+    @apply bg-surface-primary text-content-primary antialiased;
     font-family: 'Inter', 'Helvetica Neue', Arial, system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  /* B2B Route specific styling */
+  body[data-route-group="b2b"] {
+    @apply bg-surface-secondary;
+  }
+
+  /* E-commerce headings with DM Serif Display */
+  h1, h2, h3 {
+    font-family: 'DM Serif Display', Georgia, serif;
+  }
+
+  h4, h5, h6 {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply font-semibold;
   }
 
   ::selection {
-    @apply bg-hermes-500 text-white;
+    @apply bg-accent text-white;
   }
 
-  /* Hide scrollbar - Clean luxury aesthetic */
-  html {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-
+  /* Custom scrollbar for e-commerce (subtle, not hidden) */
   ::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera */
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-stroke-medium rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-stroke-dark;
   }
 }
 
 @layer components {
-  /* Buttons - Hermes style */
-  .btn {
-    @apply inline-flex items-center justify-center px-8 py-4 font-medium
-           tracking-luxe uppercase text-overline transition-all duration-400
+  /* ===== E-COMMERCE BUTTONS ===== */
+  .btn-ecom {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
+           font-sans text-body font-medium rounded-soft
+           transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .btn-primary {
-    @apply btn bg-hermes-500 text-white
-           hover:bg-hermes-600 hover:shadow-button-hover active:scale-[0.98];
+  .btn-ecom-primary {
+    @apply btn-ecom bg-accent text-white
+           hover:bg-accent-600 active:scale-[0.98]
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50;
   }
 
-  .btn-secondary {
-    @apply btn bg-transparent text-text-primary border border-border
-           hover:border-hermes-500 hover:text-hermes-500;
+  .btn-ecom-secondary {
+    @apply btn-ecom bg-primary text-white
+           hover:bg-primary-600 active:scale-[0.98]
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
   }
 
-  .btn-outline {
-    @apply btn bg-transparent text-hermes-500 border border-hermes-500
-           hover:bg-hermes-500 hover:text-white;
+  .btn-ecom-outline {
+    @apply btn-ecom bg-transparent text-content-primary border border-stroke
+           hover:border-primary hover:text-primary
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
   }
 
-  .btn-ghost {
-    @apply btn bg-transparent text-text-primary
-           hover:text-hermes-500 hover:bg-background-beige;
+  .btn-ecom-ghost {
+    @apply btn-ecom bg-transparent text-content-secondary
+           hover:bg-surface-tertiary hover:text-content-primary;
   }
 
-  /* Inputs - Elegant light style */
-  .input {
-    @apply w-full bg-white border border-border rounded-soft
-           px-4 py-3 text-text-primary placeholder:text-text-light
-           focus:outline-none focus:border-hermes-500 transition-colors duration-350;
+  .btn-ecom-danger {
+    @apply btn-ecom bg-danger text-white
+           hover:bg-danger-600 active:scale-[0.98];
   }
 
-  .input-label {
-    @apply block text-caption text-text-muted mb-2 uppercase tracking-elegant;
+  .btn-ecom-cart {
+    @apply btn-ecom bg-accent text-white px-6 py-3 text-nav font-semibold
+           hover:bg-accent-600 active:scale-[0.98]
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50;
   }
 
-  /* Cards - Light elegant style */
-  .card-luxury {
-    @apply bg-white border border-border-light rounded-soft
-           transition-all duration-400 ease-luxe
-           hover:border-hermes-500/30 hover:shadow-card-hover;
+  /* ===== E-COMMERCE INPUTS ===== */
+  .input-ecom {
+    @apply w-full bg-white border border-stroke rounded-soft
+           px-3 py-2.5 text-body text-content-primary placeholder:text-content-muted
+           focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20
+           transition-all duration-150;
   }
 
-  /* Section styling */
+  .input-ecom-lg {
+    @apply input-ecom px-4 py-3 text-body-lg;
+  }
+
+  .input-ecom-search {
+    @apply input-ecom pl-10 pr-4 bg-surface-secondary border-transparent
+           focus:bg-white focus:border-primary;
+  }
+
+  .label-ecom {
+    @apply block text-label text-content-secondary mb-1.5;
+  }
+
+  /* ===== E-COMMERCE CARDS ===== */
+  .card-ecom {
+    @apply bg-white border border-stroke-light rounded-elegant
+           transition-all duration-200
+           hover:shadow-md hover:border-stroke;
+  }
+
+  .card-ecom-product {
+    @apply card-ecom overflow-hidden;
+    /* Note: 'group' class must be added directly in JSX, not via @apply */
+  }
+
+  .card-ecom-product:hover {
+    @apply shadow-lg;
+  }
+
+  /* ===== E-COMMERCE BADGES ===== */
+  .badge-ecom {
+    @apply inline-flex items-center px-2 py-0.5 text-badge font-semibold rounded;
+  }
+
+  .badge-promo {
+    @apply badge-ecom bg-promo text-white;
+  }
+
+  .badge-new {
+    @apply badge-ecom bg-success text-white;
+  }
+
+  .badge-stock {
+    @apply badge-ecom bg-success-50 text-success-700;
+  }
+
+  .badge-low-stock {
+    @apply badge-ecom bg-warning-50 text-warning-700;
+  }
+
+  .badge-out-stock {
+    @apply badge-ecom bg-danger-50 text-danger-700;
+  }
+
+  .badge-premium {
+    @apply badge-ecom bg-gold-100 text-gold-800;
+  }
+
+  .badge-pro {
+    @apply badge-ecom bg-primary-50 text-primary-700;
+  }
+
+  /* ===== E-COMMERCE PRICING ===== */
+  .price-current {
+    @apply text-price font-bold text-content-primary;
+  }
+
+  .price-promo {
+    @apply text-price font-bold text-promo;
+  }
+
+  .price-old {
+    @apply text-price-old text-content-muted line-through;
+  }
+
+  .price-unit {
+    @apply text-caption text-content-muted;
+  }
+
+  .price-ht {
+    @apply text-caption text-content-muted;
+  }
+
+  /* ===== E-COMMERCE LAYOUT ===== */
+  .container-ecom {
+    @apply max-w-[var(--container-max)] mx-auto px-4 lg:px-6;
+  }
+
+  .section-ecom {
+    @apply py-8 lg:py-12;
+  }
+
+  .section-title-ecom {
+    @apply text-section font-heading text-content-primary;
+  }
+
+  .section-subtitle-ecom {
+    @apply text-body text-content-secondary mt-2;
+  }
+
+  /* ===== LEGACY SECTION STYLING (still in use) ===== */
   .section-title {
-    @apply text-heading-1 md:text-display-2 font-serif text-center text-text-primary;
+    @apply text-section-xl font-sans font-semibold text-center text-neutral-900;
   }
 
   .section-subtitle {
-    @apply text-text-muted text-center max-w-prose mx-auto mt-4 text-body-lg;
+    @apply text-neutral-600 text-center max-w-prose mx-auto mt-3 text-base;
   }
 
-  /* Hermes orange decorative line */
-  .hermes-line {
-    @apply w-24 h-px bg-hermes-500 mx-auto;
-  }
-
-  /* Text utilities */
-  .text-gradient-hermes {
-    @apply bg-clip-text text-transparent bg-gradient-hermes;
-  }
-
-  /* Link with underline animation */
+  /* Link with underline animation (used in auth forms) */
   .link-hover {
     @apply relative;
   }
 
   .link-hover::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-px bg-hermes-500 transition-all duration-350;
+    @apply absolute bottom-0 left-0 w-0 h-px bg-accent transition-all duration-200;
   }
 
   .link-hover:hover::after {
     @apply w-full;
-  }
-
-  /* Elegant divider */
-  .divider {
-    @apply w-full h-px bg-border;
-  }
-
-  .divider-hermes {
-    @apply w-24 h-px bg-hermes-500;
   }
 }
 
@@ -135,15 +292,15 @@
     scrollbar-width: none;
   }
 
-  /* Image overlay for cards - Light version */
+  /* Image overlay for cards */
   .image-overlay {
     @apply relative overflow-hidden;
   }
 
   .image-overlay::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-t from-luxe-charcoal/50 via-transparent to-transparent
-           opacity-0 transition-opacity duration-400 z-10;
+    @apply absolute inset-0 bg-gradient-to-t from-neutral-900/50 via-transparent to-transparent
+           opacity-0 transition-opacity duration-300 z-10;
   }
 
   .image-overlay:hover::before {
@@ -155,12 +312,12 @@
     text-wrap: balance;
   }
 
-  /* Prose styling for elegant text blocks */
+  /* Prose styling for text blocks */
   .prose-elegant {
-    @apply text-body leading-elegant text-text-muted;
+    @apply text-base leading-relaxed text-neutral-600;
   }
 
   .prose-elegant p + p {
-    @apply mt-6;
+    @apply mt-5;
   }
 }

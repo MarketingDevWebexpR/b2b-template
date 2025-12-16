@@ -76,3 +76,9 @@ export {
   type CardProps,
   type SectionCardProps,
 } from './shared';
+
+// B2B Homepage
+export {
+  B2BHomepageClient,
+  type B2BHomepageClientProps,
+} from './B2BHomepageClient';

@@ -3324,6 +3324,571 @@ interface StockMovementFilters {
     createdBy?: string;
 }
 
+/**
+ * B2B Wishlist Types
+ *
+ * Types for managing multiple wishlists (product lists) with sharing
+ * capabilities between B2B collaborators.
+ *
+ * @packageDocumentation
+ */
+/**
+ * Visibility status for a wishlist
+ */
+type WishlistVisibility = 'private' | 'shared' | 'public';
+/**
+ * Permission level for shared wishlists
+ */
+type WishlistPermission = 'view' | 'edit';
+/**
+ * Template type for predefined list categories
+ */
+type WishlistTemplate = 'favorites' | 'seasonal_spring' | 'seasonal_summer' | 'seasonal_autumn' | 'seasonal_winter' | 'bestsellers' | 'new_arrivals' | 'reorder' | 'custom';
+/**
+ * A single item in a wishlist with suggested quantity and notes
+ */
+interface WishlistItemB2B {
+    /** Unique item ID */
+    id: string;
+    /** Reference to the product */
+    productId: string;
+    /** Product SKU/Reference */
+    productReference: string;
+    /** Product name (cached for offline display) */
+    productName: string;
+    /** Product image URL */
+    productImage: string;
+    /** Current product price (may have changed since added) */
+    currentPrice: number;
+    /** Price when item was added */
+    priceWhenAdded: number;
+    /** Currency code */
+    currency: string;
+    /** Suggested quantity for ordering */
+    suggestedQuantity: number;
+    /** Current stock availability */
+    stockAvailable: number;
+    /** Whether the product is currently available */
+    isAvailable: boolean;
+    /** Optional notes for this item */
+    notes?: string;
+    /** ISO timestamp when item was added */
+    addedAt: string;
+    /** ID of employee who added the item */
+    addedBy: string;
+    /** Name of employee who added the item */
+    addedByName: string;
+}
+/**
+ * A collaborator with access to a shared wishlist
+ */
+interface WishlistCollaborator {
+    /** Collaborator ID (can be employee ID or email for pending invites) */
+    id: string;
+    /** Employee ID if internal collaborator */
+    employeeId?: string;
+    /** Email address */
+    email: string;
+    /** Display name */
+    name: string;
+    /** Avatar URL */
+    avatar?: string;
+    /** Permission level */
+    permission: WishlistPermission;
+    /** Whether the invitation is pending */
+    isPending: boolean;
+    /** ISO timestamp when access was granted */
+    grantedAt: string;
+    /** ID of who granted access */
+    grantedBy: string;
+}
+/**
+ * A complete wishlist/product list with items and sharing info
+ */
+interface WishlistB2B {
+    /** Unique wishlist ID */
+    id: string;
+    /** Company ID this wishlist belongs to */
+    companyId: string;
+    /** Wishlist name */
+    name: string;
+    /** Optional description */
+    description?: string;
+    /** Visibility status */
+    visibility: WishlistVisibility;
+    /** Template type (for filtering/categorization) */
+    template: WishlistTemplate;
+    /** Whether this is the default favorites list */
+    isDefault: boolean;
+    /** Items in the wishlist */
+    items: WishlistItemB2B[];
+    /** Total number of items */
+    itemCount: number;
+    /** Estimated total value of items */
+    estimatedTotal: number;
+    /** Currency for estimated total */
+    currency: string;
+    /** Preview images (first 4 product images) */
+    previewImages: string[];
+    /** Collaborators with access */
+    collaborators: WishlistCollaborator[];
+    /** Public share link (if visibility is 'public') */
+    publicShareLink?: string;
+    /** ISO timestamp when created */
+    createdAt: string;
+    /** ID of employee who created the list */
+    createdBy: string;
+    /** Name of employee who created the list */
+    createdByName: string;
+    /** ISO timestamp of last update */
+    updatedAt: string;
+    /** ID of employee who last updated */
+    lastUpdatedBy: string;
+    /** Name of employee who last updated */
+    lastUpdatedByName: string;
+}
+/**
+ * Summary view of a wishlist for list displays
+ */
+interface WishlistSummary {
+    /** Unique wishlist ID */
+    id: string;
+    /** Wishlist name */
+    name: string;
+    /** Optional description */
+    description?: string;
+    /** Visibility status */
+    visibility: WishlistVisibility;
+    /** Template type */
+    template: WishlistTemplate;
+    /** Whether this is the default favorites list */
+    isDefault: boolean;
+    /** Total number of items */
+    itemCount: number;
+    /** Estimated total value */
+    estimatedTotal: number;
+    /** Currency */
+    currency: string;
+    /** Preview images (first 4 product images) */
+    previewImages: string[];
+    /** Number of collaborators */
+    collaboratorCount: number;
+    /** Whether current user owns this list */
+    isOwner: boolean;
+    /** Whether this list was shared with current user */
+    isSharedWithMe: boolean;
+    /** Permission level if shared */
+    myPermission?: WishlistPermission;
+    /** ISO timestamp of last update */
+    updatedAt: string;
+    /** Name of employee who last updated */
+    lastUpdatedByName: string;
+}
+/**
+ * Input for creating a new wishlist
+ */
+interface CreateWishlistInput {
+    /** Wishlist name */
+    name: string;
+    /** Optional description */
+    description?: string;
+    /** Visibility status (default: 'private') */
+    visibility?: WishlistVisibility;
+    /** Template type (default: 'custom') */
+    template?: WishlistTemplate;
+    /** Initial items to add */
+    initialItems?: AddWishlistItemInput[];
+}
+/**
+ * Input for updating a wishlist
+ */
+interface UpdateWishlistInput {
+    /** New name */
+    name?: string;
+    /** New description */
+    description?: string;
+    /** New visibility */
+    visibility?: WishlistVisibility;
+    /** New template */
+    template?: WishlistTemplate;
+}
+/**
+ * Input for adding an item to a wishlist
+ */
+interface AddWishlistItemInput {
+    /** Product ID to add */
+    productId: string;
+    /** Suggested quantity (default: 1) */
+    suggestedQuantity?: number;
+    /** Optional notes */
+    notes?: string;
+}
+/**
+ * Input for updating an item in a wishlist
+ */
+interface UpdateWishlistItemInput {
+    /** New suggested quantity */
+    suggestedQuantity?: number;
+    /** New notes */
+    notes?: string;
+}
+/**
+ * Input for sharing a wishlist
+ */
+interface ShareWishlistInput {
+    /** Email addresses to share with */
+    emails: string[];
+    /** Permission level to grant */
+    permission: WishlistPermission;
+    /** Optional message to include in invitation */
+    message?: string;
+}
+/**
+ * Input for updating collaborator permission
+ */
+interface UpdateCollaboratorInput {
+    /** New permission level */
+    permission: WishlistPermission;
+}
+/**
+ * Filters for querying wishlists
+ */
+interface WishlistFilters {
+    /** Filter by visibility */
+    visibility?: WishlistVisibility;
+    /** Filter by template */
+    template?: WishlistTemplate;
+    /** Filter by ownership */
+    ownership?: 'mine' | 'shared' | 'all';
+    /** Search by name */
+    search?: string;
+}
+/**
+ * Wishlist action types for activity tracking
+ */
+type WishlistActionType = 'created' | 'updated' | 'deleted' | 'item_added' | 'item_removed' | 'item_updated' | 'shared' | 'unshared' | 'permission_changed' | 'duplicated' | 'converted_to_order';
+/**
+ * Activity entry for wishlist history
+ */
+interface WishlistActivity {
+    /** Activity ID */
+    id: string;
+    /** Wishlist ID */
+    wishlistId: string;
+    /** Action type */
+    action: WishlistActionType;
+    /** Description of the action */
+    description: string;
+    /** ID of employee who performed action */
+    performedBy: string;
+    /** Name of employee who performed action */
+    performedByName: string;
+    /** Additional metadata */
+    metadata?: Record<string, unknown>;
+    /** ISO timestamp */
+    timestamp: string;
+}
+
+/**
+ * Configuration de base pour une sous-fonctionnalite.
+ * Chaque sous-feature peut etre activee/desactivee et avoir une config specifique.
+ */
+interface SubFeatureConfig {
+    enabled: boolean;
+    config?: Record<string, unknown>;
+}
+/**
+ * Configuration de base pour un module.
+ * Un module regroupe plusieurs sous-fonctionnalites liees.
+ */
+interface ModuleConfig<T = Record<string, SubFeatureConfig>> {
+    enabled: boolean;
+    subFeatures: T;
+}
+/**
+ * Catalog Module - Gestion du catalogue produits
+ */
+interface CatalogSubFeatures {
+    /** Barre de recherche produits */
+    search: SubFeatureConfig & {
+        config?: {
+            minChars?: number;
+            debounceMs?: number;
+            showSuggestions?: boolean;
+        };
+    };
+    /** Filtres de recherche */
+    filters: SubFeatureConfig & {
+        config?: {
+            showCounts?: boolean;
+            maxFilters?: number;
+            collapsible?: boolean;
+        };
+    };
+    /** Options de tri */
+    sorting: SubFeatureConfig & {
+        config?: {
+            defaultSort?: string;
+            options?: string[];
+        };
+    };
+    /** Apercu rapide produit */
+    quickView: SubFeatureConfig;
+    /** Comparaison de produits */
+    comparison: SubFeatureConfig & {
+        config?: {
+            maxItems?: number;
+        };
+    };
+    /** Actions groupees (selection multiple) */
+    bulkActions: SubFeatureConfig;
+}
+/**
+ * Cart Module - Gestion du panier
+ */
+interface CartSubFeatures {
+    /** Ajout rapide au panier */
+    quickAdd: SubFeatureConfig;
+    /** Ajout en masse (CSV, liste SKU) */
+    bulkAdd: SubFeatureConfig;
+    /** Paniers sauvegardes */
+    savedCarts: SubFeatureConfig & {
+        config?: {
+            maxSavedCarts?: number;
+        };
+    };
+    /** Notes sur les lignes panier */
+    notes: SubFeatureConfig;
+    /** Regles de quantite (min, step, multiples) */
+    quantityRules: SubFeatureConfig & {
+        config?: {
+            minQuantity?: number;
+            stepQuantity?: number;
+            enforceMultiples?: boolean;
+        };
+    };
+}
+/**
+ * Checkout Module - Tunnel de commande
+ */
+interface CheckoutSubFeatures {
+    /** Commande sans compte (invité) */
+    guestCheckout: SubFeatureConfig;
+    /** Plusieurs adresses de livraison */
+    multipleAddresses: SubFeatureConfig;
+    /** Livraison fractionnee */
+    splitShipment: SubFeatureConfig;
+    /** Notes de commande */
+    orderNotes: SubFeatureConfig;
+}
+/**
+ * Orders Module - Gestion des commandes
+ */
+interface OrdersSubFeatures {
+    /** Recommander une commande */
+    reorder: SubFeatureConfig;
+    /** Suivi de livraison */
+    tracking: SubFeatureConfig;
+    /** Export PDF */
+    exportPdf: SubFeatureConfig;
+    /** Historique des commandes */
+    orderHistory: SubFeatureConfig & {
+        config?: {
+            defaultPeriod?: '3months' | '6months' | '1year' | 'all';
+            maxResults?: number;
+        };
+    };
+}
+/**
+ * Quotes Module - Systeme de devis
+ */
+interface QuotesSubFeatures {
+    /** Demande de devis */
+    requestQuote: SubFeatureConfig;
+    /** Negociation (contre-propositions) */
+    negotiation: SubFeatureConfig;
+    /** Conversion devis en commande */
+    quoteToOrder: SubFeatureConfig;
+    /** Alertes d'expiration */
+    expirationAlerts: SubFeatureConfig & {
+        config?: {
+            alertDaysBefore?: number;
+        };
+    };
+}
+/**
+ * Approvals Module - Workflow d'approbation
+ */
+interface ApprovalsSubFeatures {
+    /** Approbation multi-niveaux */
+    multiLevel: SubFeatureConfig & {
+        config?: {
+            maxLevels?: number;
+        };
+    };
+    /** Limites budgetaires */
+    budgetLimits: SubFeatureConfig;
+    /** Notifications d'approbation */
+    notifications: SubFeatureConfig;
+    /** Delegation d'approbation */
+    delegation: SubFeatureConfig;
+}
+/**
+ * Company Module - Gestion de l'entreprise
+ */
+interface CompanySubFeatures {
+    /** Gestion des employes */
+    employees: SubFeatureConfig & {
+        config?: {
+            maxEmployees?: number;
+        };
+    };
+    /** Roles et permissions */
+    roles: SubFeatureConfig;
+    /** Adresses multiples */
+    addresses: SubFeatureConfig & {
+        config?: {
+            maxAddresses?: number;
+        };
+    };
+    /** Budgets par departement/employe */
+    budgets: SubFeatureConfig;
+    /** Departements/services */
+    departments: SubFeatureConfig;
+}
+/**
+ * Lists Module - Listes de produits
+ */
+interface ListsSubFeatures {
+    /** Liste de souhaits */
+    wishlist: SubFeatureConfig;
+    /** Favoris rapides */
+    favorites: SubFeatureConfig;
+    /** Listes partagees */
+    sharedLists: SubFeatureConfig;
+    /** Listes d'achat recurrentes */
+    purchaseLists: SubFeatureConfig & {
+        config?: {
+            maxLists?: number;
+        };
+    };
+}
+/**
+ * Comparison Module - Comparaison de produits
+ */
+interface ComparisonSubFeatures {
+    /** Tableau de comparaison */
+    compareTable: SubFeatureConfig;
+    /** Export de la comparaison */
+    export: SubFeatureConfig;
+    /** Limite du nombre de produits */
+    maxItems: SubFeatureConfig & {
+        config?: {
+            max?: number;
+        };
+    };
+}
+/**
+ * Dashboard Module - Tableau de bord
+ */
+interface DashboardSubFeatures {
+    /** Statistiques et analytics */
+    analytics: SubFeatureConfig;
+    /** Actions rapides */
+    quickActions: SubFeatureConfig;
+    /** Commandes recentes */
+    recentOrders: SubFeatureConfig & {
+        config?: {
+            count?: number;
+        };
+    };
+    /** Devis en attente */
+    pendingQuotes: SubFeatureConfig;
+}
+/**
+ * QuickOrder Module - Commande rapide
+ */
+interface QuickOrderSubFeatures {
+    /** Saisie par SKU */
+    skuEntry: SubFeatureConfig;
+    /** Import CSV */
+    csvImport: SubFeatureConfig;
+    /** Depuis commandes passees */
+    pastOrders: SubFeatureConfig;
+    /** Templates de commande */
+    templates: SubFeatureConfig & {
+        config?: {
+            maxTemplates?: number;
+        };
+    };
+}
+/**
+ * Warehouse Module - Multi-entrepot
+ */
+interface WarehouseSubFeatures {
+    /** Visibilite du stock par entrepot */
+    stockVisibility: SubFeatureConfig;
+    /** Selection de l'entrepot */
+    warehouseSelection: SubFeatureConfig;
+    /** Estimations de livraison */
+    deliveryEstimates: SubFeatureConfig;
+}
+/**
+ * Configuration complete de tous les modules et leurs sous-fonctionnalites.
+ * Cette interface est utilisee par le FeatureProvider pour gerer l'etat.
+ */
+interface FeaturesConfig {
+    /** Catalogue produits */
+    catalog: ModuleConfig<CatalogSubFeatures>;
+    /** Panier */
+    cart: ModuleConfig<CartSubFeatures>;
+    /** Tunnel de commande */
+    checkout: ModuleConfig<CheckoutSubFeatures>;
+    /** Gestion des commandes */
+    orders: ModuleConfig<OrdersSubFeatures>;
+    /** Systeme de devis */
+    quotes: ModuleConfig<QuotesSubFeatures>;
+    /** Workflow d'approbation */
+    approvals: ModuleConfig<ApprovalsSubFeatures>;
+    /** Gestion de l'entreprise */
+    company: ModuleConfig<CompanySubFeatures>;
+    /** Listes de produits */
+    lists: ModuleConfig<ListsSubFeatures>;
+    /** Comparaison de produits */
+    comparison: ModuleConfig<ComparisonSubFeatures>;
+    /** Tableau de bord */
+    dashboard: ModuleConfig<DashboardSubFeatures>;
+    /** Commande rapide */
+    quickOrder: ModuleConfig<QuickOrderSubFeatures>;
+    /** Multi-entrepot */
+    warehouse: ModuleConfig<WarehouseSubFeatures>;
+}
+/** Nom d'un module (cle de FeaturesConfig) */
+type ModuleName = keyof FeaturesConfig;
+/** Nom d'une sous-fonctionnalite pour un module donne */
+type SubFeatureName<M extends ModuleName> = keyof FeaturesConfig[M]['subFeatures'];
+/** Configuration d'une sous-fonctionnalite pour un module donne */
+type SubFeatureConfigOf<M extends ModuleName, S extends SubFeatureName<M>> = FeaturesConfig[M]['subFeatures'][S];
+/** Configuration partielle pour les overrides */
+type PartialFeaturesConfig = {
+    [K in ModuleName]?: Partial<ModuleConfig<Partial<FeaturesConfig[K]['subFeatures']>>>;
+};
+/** Source de la configuration */
+type FeaturesSource = 'local' | 'medusa' | 'env';
+/** Options du loader de configuration */
+interface FeaturesLoaderOptions {
+    source: FeaturesSource;
+    clientId?: string;
+    fallbackToDefault?: boolean;
+}
+/** Reponse du loader de configuration */
+interface FeaturesLoaderResponse {
+    config: FeaturesConfig;
+    source: FeaturesSource;
+    loadedAt: string;
+    clientId?: string;
+}
+
 interface SageStatistiqueArticle {
     Intitule: string;
     IdStatistique: number;
@@ -3568,7 +4133,7 @@ interface StockInfo {
     reserved: number;
     showExactStock: boolean;
 }
-type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
+type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock' | 'backorder' | 'preorder' | 'discontinued';
 interface CreateOrderRequest {
     items: CartItemWithDetails[];
     shippingAddress: ShippingAddress;
@@ -3613,4 +4178,4 @@ interface Wishlist {
     totalItems: number;
 }
 
-export type { ApiResponse, ApprovalAction, ApprovalActionInput, ApprovalAttachment, ApprovalDelegation, ApprovalEntityType, ApprovalFilters, ApprovalLevel, ApprovalRequest, ApprovalStatus, ApprovalStep, ApprovalSummary, ApprovalTrigger, ApprovalTriggerType, ApprovalWorkflow, ApproverDecision, AvailabilityCheckRequest, AvailabilityResult, Order$1 as B2BOrder, OrderItem$1 as B2BOrderItem, OrderStatus$1 as B2BOrderStatus, OrderTotals$1 as B2BOrderTotals, BasePrice, BillingAddress, BulkOrderCsvInput, BulkOrderCsvParseResult, BulkOrderErrorCode, BulkOrderItem, BulkOrderSummary, BulkOrderValidationError, BulkOrderValidationResult, BulkOrderValidationWarning, BulkOrderWarningCode, CalculatedPrice, CancelOrderInput, CardBrand, Cart, CartItem, CartItemWithDetails, CartState, Category, CategoryRestriction, CategorySpending, CheckoutState, CheckoutStep, Company, CompanyAddress, CompanyAddressType, CompanySettings, CompanyStatus, CompanySummary, CompanyTier, CompanyTierConfig, CreateApprovalWorkflowInput, CreateCompanyInput, CreateCustomerPriceInput, CreateOrderInput, CreateOrderRequest, CreateOrderResponse, CreatePriceListInput, CreateQuoteInput, CreateReservationInput, CreateSpendingLimitInput, CreateSpendingRuleInput, CreateStockMovementInput, CreateWarehouseInput, CurrencyCode, CustomerPriceOverride, DailySpending, DayOfWeek, DaySchedule, DeliveryOption, DeliveryOptionType, Department, Employee, EmployeeActivity, EmployeeActivityType, EmployeeInvitation, EmployeePermission, EmployeeRole, EmployeeSpending, EmployeeStatus, EmployeeSummary, ExtendedUser, FulfillmentOption, InviteEmployeeInput, LimitExceededAlert, LoginFormData, MockUser, MonthlyTrend, NavItem, NearLimitAlert, OpeningHours, Order, OrderAttachment, OrderFilters, OrderHistoryEntry, OrderHistoryEventType, OrderItem, OrderItemInput, OrderListResponse, OrderPayment, OrderShipping, OrderShippingAddress, OrderSortField, OrderSortOptions, OrderStatistics, OrderStatus, OrderSummary, OrderTotals, PartialFulfillmentOption, PaymentInfo, PaymentMethod, PaymentMethodType, PaymentStatus, PaymentTermType, PaymentTerms, PermissionGroup, PriceCalculationRequest, PriceList, PriceListFilters, PriceListStatus, PriceListSummary, PriceListType, PriceRoundingRule, Product, ProductCatalogEntry, ProductFilters, ProductPricing, ProductRestriction, ProductStock, Quote, QuoteAttachment, QuoteFilters, QuoteHistoryEntry, QuoteHistoryEventType, QuoteItem, QuoteItemInput, QuoteMessage, QuoteResponseInput, QuoteStatus, QuoteSummary, QuoteTerms, QuoteTotals, RegisterFormData, ReportData, ReportPeriod, ReportSummary, ReportType, ReservationStatus, ReservationSummary, ReturnOrderInput, RoleConfig, SageArticle, SageFamille, SageInfoLibre, SageStatistiqueArticle, SetProductPriceInput, ShippingAddress, ShippingAddressInput, SpecialSchedule, SpendingAdjustmentInput, SpendingByCategory, SpendingByDepartment, SpendingByEmployee, SpendingFilters, SpendingLimit, SpendingLimitEntityType, SpendingPeriod, SpendingReport, SpendingRule, SpendingRuleAction, SpendingTransaction, StockAdjustmentInput, StockAlert, StockAlertFilters, StockAlertType, StockFilters, StockInfo, StockMovement, StockMovementFilters, StockMovementType, StockReservation, StockStatus, StockTransferInput, TaxRate, TimeSlot, TopProduct, UnitConfig, UnitOfMeasure, UpdateApprovalWorkflowInput, UpdateCompanyInput, UpdateEmployeeInput, UpdateOrderInput, UpdatePriceListInput, UpdateQuoteInput, UpdateSpendingLimitInput, UpdateWarehouseInput, User, VolumeDiscount, VolumeDiscountConfig, Warehouse, WarehouseAddress, WarehouseCapabilities, WarehouseContact, WarehouseFilters, WarehouseStatus, WarehouseStock, WarehouseSummary, WarehouseType, Wishlist, WishlistItem };
+export type { AddWishlistItemInput, ApiResponse, ApprovalAction, ApprovalActionInput, ApprovalAttachment, ApprovalDelegation, ApprovalEntityType, ApprovalFilters, ApprovalLevel, ApprovalRequest, ApprovalStatus, ApprovalStep, ApprovalSummary, ApprovalTrigger, ApprovalTriggerType, ApprovalWorkflow, ApprovalsSubFeatures, ApproverDecision, AvailabilityCheckRequest, AvailabilityResult, Order$1 as B2BOrder, OrderItem$1 as B2BOrderItem, OrderStatus$1 as B2BOrderStatus, OrderTotals$1 as B2BOrderTotals, BasePrice, BillingAddress, BulkOrderCsvInput, BulkOrderCsvParseResult, BulkOrderErrorCode, BulkOrderItem, BulkOrderSummary, BulkOrderValidationError, BulkOrderValidationResult, BulkOrderValidationWarning, BulkOrderWarningCode, CalculatedPrice, CancelOrderInput, CardBrand, Cart, CartItem, CartItemWithDetails, CartState, CartSubFeatures, CatalogSubFeatures, Category, CategoryRestriction, CategorySpending, CheckoutState, CheckoutStep, CheckoutSubFeatures, Company, CompanyAddress, CompanyAddressType, CompanySettings, CompanyStatus, CompanySubFeatures, CompanySummary, CompanyTier, CompanyTierConfig, ComparisonSubFeatures, CreateApprovalWorkflowInput, CreateCompanyInput, CreateCustomerPriceInput, CreateOrderInput, CreateOrderRequest, CreateOrderResponse, CreatePriceListInput, CreateQuoteInput, CreateReservationInput, CreateSpendingLimitInput, CreateSpendingRuleInput, CreateStockMovementInput, CreateWarehouseInput, CreateWishlistInput, CurrencyCode, CustomerPriceOverride, DailySpending, DashboardSubFeatures, DayOfWeek, DaySchedule, DeliveryOption, DeliveryOptionType, Department, Employee, EmployeeActivity, EmployeeActivityType, EmployeeInvitation, EmployeePermission, EmployeeRole, EmployeeSpending, EmployeeStatus, EmployeeSummary, ExtendedUser, FeaturesConfig, FeaturesLoaderOptions, FeaturesLoaderResponse, FeaturesSource, FulfillmentOption, InviteEmployeeInput, LimitExceededAlert, ListsSubFeatures, LoginFormData, MockUser, ModuleConfig, ModuleName, MonthlyTrend, NavItem, NearLimitAlert, OpeningHours, Order, OrderAttachment, OrderFilters, OrderHistoryEntry, OrderHistoryEventType, OrderItem, OrderItemInput, OrderListResponse, OrderPayment, OrderShipping, OrderShippingAddress, OrderSortField, OrderSortOptions, OrderStatistics, OrderStatus, OrderSummary, OrderTotals, OrdersSubFeatures, PartialFeaturesConfig, PartialFulfillmentOption, PaymentInfo, PaymentMethod, PaymentMethodType, PaymentStatus, PaymentTermType, PaymentTerms, PermissionGroup, PriceCalculationRequest, PriceList, PriceListFilters, PriceListStatus, PriceListSummary, PriceListType, PriceRoundingRule, Product, ProductCatalogEntry, ProductFilters, ProductPricing, ProductRestriction, ProductStock, QuickOrderSubFeatures, Quote, QuoteAttachment, QuoteFilters, QuoteHistoryEntry, QuoteHistoryEventType, QuoteItem, QuoteItemInput, QuoteMessage, QuoteResponseInput, QuoteStatus, QuoteSummary, QuoteTerms, QuoteTotals, QuotesSubFeatures, RegisterFormData, ReportData, ReportPeriod, ReportSummary, ReportType, ReservationStatus, ReservationSummary, ReturnOrderInput, RoleConfig, SageArticle, SageFamille, SageInfoLibre, SageStatistiqueArticle, SetProductPriceInput, ShareWishlistInput, ShippingAddress, ShippingAddressInput, SpecialSchedule, SpendingAdjustmentInput, SpendingByCategory, SpendingByDepartment, SpendingByEmployee, SpendingFilters, SpendingLimit, SpendingLimitEntityType, SpendingPeriod, SpendingReport, SpendingRule, SpendingRuleAction, SpendingTransaction, StockAdjustmentInput, StockAlert, StockAlertFilters, StockAlertType, StockFilters, StockInfo, StockMovement, StockMovementFilters, StockMovementType, StockReservation, StockStatus, StockTransferInput, SubFeatureConfig, SubFeatureConfigOf, SubFeatureName, TaxRate, TimeSlot, TopProduct, UnitConfig, UnitOfMeasure, UpdateApprovalWorkflowInput, UpdateCollaboratorInput, UpdateCompanyInput, UpdateEmployeeInput, UpdateOrderInput, UpdatePriceListInput, UpdateQuoteInput, UpdateSpendingLimitInput, UpdateWarehouseInput, UpdateWishlistInput, UpdateWishlistItemInput, User, VolumeDiscount, VolumeDiscountConfig, Warehouse, WarehouseAddress, WarehouseCapabilities, WarehouseContact, WarehouseFilters, WarehouseStatus, WarehouseStock, WarehouseSubFeatures, WarehouseSummary, WarehouseType, Wishlist, WishlistActionType, WishlistActivity, WishlistB2B, WishlistCollaborator, WishlistFilters, WishlistItem, WishlistItemB2B, WishlistPermission, WishlistSummary, WishlistTemplate, WishlistVisibility };

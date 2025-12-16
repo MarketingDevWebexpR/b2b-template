@@ -224,22 +224,22 @@ export function FilterPrice({
                   max={maxPrice}
                   className={cn(
                     'w-full px-3 py-2 pr-12',
-                    'text-b2b-body-sm text-right',
-                    'bg-b2b-bg-secondary',
-                    'border border-b2b-border-light rounded-md',
-                    'placeholder:text-b2b-text-muted',
-                    'focus:outline-none focus:border-b2b-primary focus:ring-1 focus:ring-b2b-primary/30',
+                    'text-sm text-right',
+                    'bg-neutral-50',
+                    'border border-neutral-200 rounded-md',
+                    'placeholder:text-neutral-400',
+                    'focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30',
                     'transition-colors duration-200',
                     '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                   )}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-b2b-caption text-b2b-text-muted">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500">
                   {currency}
                 </span>
               </div>
             </div>
 
-            <span className="text-b2b-text-muted">-</span>
+            <span className="text-neutral-500">-</span>
 
             <div className="flex-1">
               <label htmlFor={maxInputId} className="sr-only">
@@ -256,16 +256,16 @@ export function FilterPrice({
                   max={maxPrice}
                   className={cn(
                     'w-full px-3 py-2 pr-12',
-                    'text-b2b-body-sm text-right',
-                    'bg-b2b-bg-secondary',
-                    'border border-b2b-border-light rounded-md',
-                    'placeholder:text-b2b-text-muted',
-                    'focus:outline-none focus:border-b2b-primary focus:ring-1 focus:ring-b2b-primary/30',
+                    'text-sm text-right',
+                    'bg-neutral-50',
+                    'border border-neutral-200 rounded-md',
+                    'placeholder:text-neutral-400',
+                    'focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30',
                     'transition-colors duration-200',
                     '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                   )}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-b2b-caption text-b2b-text-muted">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500">
                   {currency}
                 </span>
               </div>
@@ -275,7 +275,7 @@ export function FilterPrice({
 
         {/* Price Presets */}
         {showPresets && presets.length > 0 && (
-          <div className="space-y-1 pt-2 border-t border-b2b-border-light">
+          <div className="space-y-1 pt-2 border-t border-neutral-200">
             {presets.map((preset, index) => {
               const active = isPresetActive(preset);
               return (
@@ -285,11 +285,11 @@ export function FilterPrice({
                   onClick={() => handlePresetClick(preset)}
                   className={cn(
                     'flex items-center w-full py-1.5 px-2 -mx-2 rounded',
-                    'text-b2b-body-sm text-left',
+                    'text-sm text-left',
                     'transition-colors duration-150',
                     active
-                      ? 'bg-b2b-primary/10 text-b2b-primary font-medium'
-                      : 'text-b2b-text-primary hover:bg-b2b-bg-tertiary'
+                      ? 'bg-accent/10 text-accent font-medium'
+                      : 'text-neutral-900 hover:bg-neutral-100'
                   )}
                   aria-pressed={active}
                 >
@@ -298,8 +298,8 @@ export function FilterPrice({
                       'w-4 h-4 mr-2 rounded-sm border-2 flex items-center justify-center',
                       'transition-colors duration-150',
                       active
-                        ? 'border-b2b-primary bg-b2b-primary'
-                        : 'border-b2b-border-medium'
+                        ? 'border-accent bg-accent'
+                        : 'border-neutral-300'
                     )}
                   >
                     {active && (

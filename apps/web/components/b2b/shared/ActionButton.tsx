@@ -13,11 +13,11 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'dan
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-hermes-500 text-white hover:bg-hermes-600 border-transparent',
-  secondary: 'bg-white text-text-secondary border-border-light hover:bg-background-muted',
-  outline: 'bg-transparent text-hermes-500 border-hermes-300 hover:bg-hermes-50',
-  ghost: 'bg-transparent text-text-muted border-transparent hover:text-text-primary hover:bg-background-muted',
-  danger: 'bg-red-500 text-white hover:bg-red-600 border-transparent',
+  primary: 'bg-primary text-white hover:bg-primary-600 border-transparent',
+  secondary: 'bg-white text-content-secondary border-stroke-light hover:bg-surface-secondary',
+  outline: 'bg-transparent text-primary border-primary/30 hover:bg-primary-50',
+  ghost: 'bg-transparent text-content-muted border-transparent hover:text-content-primary hover:bg-surface-secondary',
+  danger: 'bg-danger text-white hover:bg-red-600 border-transparent',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -78,10 +78,10 @@ export function ActionButton({
 }: ActionButtonProps) {
   const baseClasses = cn(
     'inline-flex items-center justify-center gap-2',
-    'border rounded-soft',
+    'border rounded-lg',
     'font-sans font-medium',
     'transition-colors duration-200',
-    'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:ring-offset-2',
+    'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2',
     variantClasses[variant],
     sizeClasses[size],
     (disabled || loading) && 'opacity-50 cursor-not-allowed pointer-events-none',

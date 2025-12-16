@@ -91,3 +91,53 @@ export function formatDate(date: string | Date, locale = 'fr-FR'): string {
 export function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/**
+ * Check if value is a plain object (not null, array, or other types)
+ */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.prototype.toString.call(value) === '[object Object]'
+  );
+}
+
+/**
+ * Deep merge two objects recursively.
+ * Arrays are replaced, not merged.
+ * Only plain objects are deep merged.
+ *
+ * @param target - Base object
+ * @param source - Object to merge into target
+ * @returns Merged object (new reference)
+ */
+export function deepMerge<T extends Record<string, unknown>>(
+  target: T,
+  source: Partial<T>
+): T {
+  const output = { ...target } as T;
+
+  if (!isPlainObject(target) || !isPlainObject(source)) {
+    return output;
+  }
+
+  for (const key of Object.keys(source) as Array<keyof T>) {
+    const sourceValue = source[key];
+    const targetValue = target[key];
+
+    if (isPlainObject(sourceValue) && isPlainObject(targetValue)) {
+      // Recursively merge nested objects
+      output[key] = deepMerge(
+        targetValue as Record<string, unknown>,
+        sourceValue as Record<string, unknown>
+      ) as T[keyof T];
+    } else if (sourceValue !== undefined) {
+      // Replace with source value (including arrays)
+      output[key] = sourceValue as T[keyof T];
+    }
+  }
+
+  return output;
+}

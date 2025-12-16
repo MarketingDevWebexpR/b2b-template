@@ -37,7 +37,7 @@ const itemVariants = {
 };
 
 /**
- * Breadcrumbs - Elegant navigation breadcrumbs with Hermes-inspired styling
+ * Breadcrumbs - Professional navigation breadcrumbs with B2B styling
  *
  * Features:
  * - Animated appearance on mount
@@ -85,7 +85,7 @@ export function Breadcrumbs({
               {/* Separator */}
               {index > 0 && (
                 <ChevronRight
-                  className="mx-2 h-3.5 w-3.5 flex-shrink-0 text-border-dark"
+                  className="mx-2 h-3.5 w-3.5 flex-shrink-0 text-neutral-300"
                   aria-hidden="true"
                   strokeWidth={1.5}
                 />
@@ -95,10 +95,10 @@ export function Breadcrumbs({
               {isLast || !item.href ? (
                 <span
                   className={cn(
-                    'font-sans text-xs uppercase tracking-elegant',
+                    'font-sans text-xs uppercase tracking-wide',
                     variant === 'default'
-                      ? 'text-hermes-500'
-                      : 'text-text-primary'
+                      ? 'text-accent'
+                      : 'text-neutral-900'
                   )}
                   aria-current="page"
                 >
@@ -108,9 +108,9 @@ export function Breadcrumbs({
                 <Link
                   href={item.href}
                   className={cn(
-                    'group inline-flex items-center font-sans text-xs uppercase tracking-elegant',
-                    'text-text-muted transition-colors duration-250 ease-luxe',
-                    'hover:text-hermes-500'
+                    'group inline-flex items-center font-sans text-xs uppercase tracking-wide',
+                    'text-neutral-500 transition-colors duration-150',
+                    'hover:text-accent'
                   )}
                 >
                   {isHome && showHomeIcon ? (
@@ -121,8 +121,8 @@ export function Breadcrumbs({
                       {/* Underline animation */}
                       <span
                         className={cn(
-                          'absolute -bottom-0.5 left-0 h-px w-0 bg-hermes-500',
-                          'transition-all duration-350 ease-luxe-out',
+                          'absolute -bottom-0.5 left-0 h-px w-0 bg-accent',
+                          'transition-all duration-150',
                           'group-hover:w-full'
                         )}
                         aria-hidden="true"

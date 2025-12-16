@@ -130,7 +130,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
           className={cn(
             'relative w-full',
             modalSizes[size],
-            'bg-b2b-bg-primary',
+            'bg-white',
             'rounded-xl shadow-2xl',
             'animate-in fade-in zoom-in-95 duration-200',
             'max-h-[90vh] flex flex-col',
@@ -144,14 +144,14 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
               className={cn(
                 'flex items-start justify-between gap-4',
                 'px-6 py-4',
-                'border-b border-b2b-border-light'
+                'border-b border-neutral-200'
               )}
             >
               <div className="flex-1 min-w-0">
                 {title && (
                   <h2
                     id="modal-title"
-                    className="text-b2b-section-title text-b2b-text-primary truncate"
+                    className="text-lg font-semibold text-neutral-900 truncate"
                   >
                     {title}
                   </h2>
@@ -159,7 +159,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 {description && (
                   <p
                     id="modal-description"
-                    className="mt-1 text-b2b-body-sm text-b2b-text-secondary"
+                    className="mt-1 text-sm text-neutral-600"
                   >
                     {description}
                   </p>
@@ -172,11 +172,11 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                   className={cn(
                     'flex-shrink-0',
                     'p-2 -m-2',
-                    'text-b2b-text-muted hover:text-b2b-text-primary',
-                    'hover:bg-b2b-bg-tertiary',
+                    'text-neutral-500 hover:text-neutral-900',
+                    'hover:bg-neutral-100',
                     'rounded-lg',
                     'transition-colors duration-200',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary'
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20'
                   )}
                   aria-label="Fermer"
                 >
@@ -209,8 +209,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             <div
               className={cn(
                 'px-6 py-4',
-                'border-t border-b2b-border-light',
-                'bg-b2b-bg-secondary',
+                'border-t border-neutral-200',
+                'bg-neutral-50',
                 'rounded-b-xl'
               )}
             >
@@ -277,12 +277,12 @@ const ConfirmModal = forwardRef<HTMLDivElement, ConfirmModalProps>(
               disabled={isLoading}
               className={cn(
                 'px-4 py-2',
-                'text-b2b-body font-medium',
-                'text-b2b-text-secondary',
-                'bg-b2b-bg-primary',
-                'border border-b2b-border',
+                'text-sm font-medium',
+                'text-neutral-600',
+                'bg-white',
+                'border border-neutral-200',
                 'rounded-lg',
-                'hover:bg-b2b-bg-tertiary',
+                'hover:bg-neutral-100',
                 'transition-colors duration-200',
                 'disabled:opacity-50'
               )}
@@ -295,11 +295,11 @@ const ConfirmModal = forwardRef<HTMLDivElement, ConfirmModalProps>(
               disabled={isLoading}
               className={cn(
                 'px-4 py-2',
-                'text-b2b-body font-medium',
+                'text-sm font-medium',
                 'text-white',
                 confirmVariant === 'danger'
-                  ? 'bg-b2b-danger hover:bg-b2b-danger-600'
-                  : 'bg-b2b-primary hover:bg-b2b-primary-600',
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : 'bg-accent hover:bg-orange-600',
                 'rounded-lg',
                 'transition-colors duration-200',
                 'disabled:opacity-50',
@@ -333,7 +333,7 @@ const ConfirmModal = forwardRef<HTMLDivElement, ConfirmModalProps>(
         }
         {...props}
       >
-        <p className="text-b2b-body text-b2b-text-primary">{message}</p>
+        <p className="text-sm text-neutral-900">{message}</p>
       </Modal>
     );
   }

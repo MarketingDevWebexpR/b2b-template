@@ -113,7 +113,7 @@ export const B2BHeader = memo(function B2BHeader({
         {/* Top row: Logo, Search, Quick Access */}
         <div
           className={cn(
-            'border-b border-b2b-border',
+            'border-b border-neutral-200',
             'transition-all duration-300',
             isScrolled ? 'py-2' : 'py-3'
           )}
@@ -126,9 +126,9 @@ export const B2BHeader = memo(function B2BHeader({
                 className={cn(
                   'lg:hidden flex items-center justify-center',
                   'w-10 h-10 rounded-lg',
-                  'text-b2b-text-secondary hover:text-b2b-text-primary hover:bg-b2b-bg-secondary',
+                  'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50',
                   'transition-colors duration-200',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20'
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20'
                 )}
                 aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
                 aria-expanded={isMobileMenuOpen}
@@ -146,14 +146,14 @@ export const B2BHeader = memo(function B2BHeader({
                 href="/"
                 className={cn(
                   'flex items-center gap-2 flex-shrink-0',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20 rounded-lg'
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 rounded-lg'
                 )}
                 aria-label="Accueil"
               >
                 <div
                   className={cn(
                     'flex items-center justify-center',
-                    'bg-b2b-primary-500 rounded-lg',
+                    'bg-neutral-900 rounded-lg',
                     'transition-all duration-300',
                     isScrolled ? 'w-8 h-8' : 'w-10 h-10'
                   )}
@@ -165,10 +165,10 @@ export const B2BHeader = memo(function B2BHeader({
                   'transition-all duration-300',
                   isScrolled && 'scale-90 origin-left'
                 )}>
-                  <span className="text-b2b-text-primary font-semibold text-lg leading-tight">
+                  <span className="text-neutral-900 font-semibold text-lg leading-tight">
                     Maison
                   </span>
-                  <span className="text-b2b-text-muted text-xs leading-tight">
+                  <span className="text-neutral-500 text-xs leading-tight">
                     Pro Bijoux
                   </span>
                 </div>
@@ -202,7 +202,7 @@ export const B2BHeader = memo(function B2BHeader({
         <div
           className={cn(
             'hidden lg:block',
-            'bg-b2b-bg-secondary border-b border-b2b-border',
+            'bg-neutral-50 border-b border-neutral-200',
             'transition-all duration-300',
             isScrolled ? 'py-1.5' : 'py-2'
           )}
@@ -242,8 +242,8 @@ export const B2BHeader = memo(function B2BHeader({
             )}
           >
             {/* Mobile menu header */}
-            <div className="sticky top-0 flex items-center justify-between p-4 border-b border-b2b-border bg-white z-10">
-              <span className="text-b2b-section-title font-semibold text-b2b-text-primary">
+            <div className="sticky top-0 flex items-center justify-between p-4 border-b border-neutral-200 bg-white z-10">
+              <span className="text-base font-semibold text-neutral-900">
                 Menu
               </span>
               <button
@@ -251,9 +251,9 @@ export const B2BHeader = memo(function B2BHeader({
                 className={cn(
                   'flex items-center justify-center',
                   'w-10 h-10 rounded-lg',
-                  'text-b2b-text-secondary hover:text-b2b-text-primary hover:bg-b2b-bg-secondary',
+                  'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50',
                   'transition-colors duration-200',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20'
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20'
                 )}
                 aria-label="Fermer le menu"
               >
@@ -262,8 +262,8 @@ export const B2BHeader = memo(function B2BHeader({
             </div>
 
             {/* Warehouse selector (mobile) */}
-            <div className="p-4 border-b border-b2b-border">
-              <p className="text-b2b-caption text-b2b-text-muted uppercase tracking-wide mb-2">
+            <div className="p-4 border-b border-neutral-200">
+              <p className="text-xs text-neutral-500 uppercase tracking-wide mb-2">
                 Point de vente
               </p>
               <WarehouseSelector compact={false} />
@@ -278,8 +278,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-text-primary',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-neutral-900',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -292,8 +292,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-text-primary',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-neutral-900',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -306,8 +306,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-accent-500',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-accent',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -320,8 +320,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-text-primary',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-neutral-900',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -331,7 +331,7 @@ export const B2BHeader = memo(function B2BHeader({
               </ul>
 
               {/* Divider */}
-              <div className="my-4 border-t border-b2b-border" />
+              <div className="my-4 border-t border-neutral-200" />
 
               {/* Account links */}
               <ul className="space-y-1">
@@ -341,8 +341,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-text-primary',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-neutral-900',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -355,8 +355,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-text-primary',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-neutral-900',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -369,8 +369,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-text-primary',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-neutral-900',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -383,8 +383,8 @@ export const B2BHeader = memo(function B2BHeader({
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',
-                      'text-b2b-body font-medium text-b2b-text-primary',
-                      'hover:bg-b2b-bg-secondary',
+                      'text-sm font-medium text-neutral-900',
+                      'hover:bg-neutral-50',
                       'transition-colors duration-200'
                     )}
                   >
@@ -395,12 +395,12 @@ export const B2BHeader = memo(function B2BHeader({
             </nav>
 
             {/* Footer */}
-            <div className="p-4 mt-auto border-t border-b2b-border bg-b2b-bg-secondary">
-              <p className="text-b2b-caption text-b2b-text-muted text-center">
+            <div className="p-4 mt-auto border-t border-neutral-200 bg-neutral-50">
+              <p className="text-xs text-neutral-500 text-center">
                 Besoin d'aide ?{' '}
                 <a
                   href="tel:+33123456789"
-                  className="text-b2b-primary-500 hover:text-b2b-primary-600"
+                  className="text-accent hover:text-orange-600"
                 >
                   01 23 45 67 89
                 </a>

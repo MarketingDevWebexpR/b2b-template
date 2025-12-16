@@ -116,8 +116,8 @@ const filterSectionVariants = {
     opacity: 1,
     height: 'auto',
     transition: {
-      height: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] },
-      opacity: { duration: 0.2, delay: 0.1 },
+      height: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] },
+      opacity: { duration: 0.15, delay: 0.05 },
     },
   },
   exit: {
@@ -144,19 +144,19 @@ const drawerVariants = {
   exit: {
     x: '-100%',
     opacity: 0,
-    transition: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
 
 /**
- * CategoryFiltersLight - Elegant filters with light Hermes-inspired theme
+ * CategoryFiltersLight - Clean B2B filters with neutral styling
  *
  * Features:
  * - Collapsible filter sections with smooth animations
- * - Light cream/white background
- * - Hermes orange accent color
+ * - White/neutral background
+ * - Orange accent color for interactions
  * - Mobile drawer with backdrop
- * - Custom checkboxes with elegant styling
+ * - Custom checkboxes with clean styling
  * - Dynamic price presets from API
  * - Dynamic materials from API
  */
@@ -379,18 +379,18 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
   }) => (
     <button
       onClick={() => toggleSection(section)}
-      className="flex w-full items-center justify-between py-3 text-left"
+      className="flex w-full items-center justify-between py-2.5 text-left"
       aria-expanded={isExpanded}
       aria-controls={`filter-${section}`}
     >
-      <span className="font-sans text-xs font-medium uppercase tracking-luxe text-text-primary">
+      <span className="font-sans text-body-sm font-medium text-neutral-900">
         {title}
       </span>
       <motion.span
         animate={{ rotate: isExpanded ? 180 : 0 }}
-        transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{ duration: 0.2 }}
       >
-        <ChevronDown className="h-4 w-4 text-text-muted" />
+        <ChevronDown className="h-4 w-4 text-neutral-400" />
       </motion.span>
     </button>
   );
@@ -405,13 +405,13 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
     onChange: () => void;
     label: string;
   }) => (
-    <label className="group flex cursor-pointer items-center gap-3">
+    <label className="group flex cursor-pointer items-center gap-2.5">
       <div
         className={cn(
-          'flex h-5 w-5 items-center justify-center border transition-all duration-250 ease-luxe',
+          'flex h-4 w-4 items-center justify-center border rounded-sm transition-all duration-150',
           checked
-            ? 'border-hermes-500 bg-hermes-500'
-            : 'border-border-medium group-hover:border-hermes-400'
+            ? 'border-accent bg-accent'
+            : 'border-neutral-300 group-hover:border-neutral-400'
         )}
       >
         <AnimatePresence mode="wait">
@@ -420,7 +420,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              transition={{ duration: 0.15 }}
+              transition={{ duration: 0.1 }}
             >
               <Check className="h-3 w-3 text-white" strokeWidth={2.5} />
             </motion.div>
@@ -436,10 +436,10 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
       />
       <span
         className={cn(
-          'font-sans text-sm transition-colors duration-250',
+          'font-sans text-body-sm transition-colors duration-150',
           checked
-            ? 'text-hermes-500'
-            : 'text-text-secondary group-hover:text-text-primary'
+            ? 'text-accent'
+            : 'text-neutral-600 group-hover:text-neutral-900'
         )}
       >
         {label}
@@ -450,7 +450,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
   const filterContent = (
     <div className="space-y-1">
       {/* Sort Section */}
-      <div className="border-b border-border-light pb-1">
+      <div className="border-b border-neutral-200 pb-1">
         <FilterSectionHeader
           title="Trier par"
           section="sort"
@@ -466,17 +466,17 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
               exit="exit"
               className="overflow-hidden"
             >
-              <div className="pb-4">
+              <div className="pb-3">
                 <div className="relative">
                   <select
                     value={currentSort}
                     onChange={(e) => handleSortChange(e.target.value)}
                     className={cn(
-                      'w-full appearance-none bg-white px-4 py-3',
-                      'border border-border-light',
-                      'font-sans text-sm text-text-primary',
-                      'transition-all duration-250 ease-luxe',
-                      'hover:border-border-medium focus:border-hermes-500 focus:outline-none',
+                      'w-full appearance-none bg-white px-3 py-2',
+                      'border border-neutral-200 rounded-sm',
+                      'font-sans text-body-sm text-neutral-900',
+                      'transition-all duration-150',
+                      'hover:border-neutral-300 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20',
                       'cursor-pointer'
                     )}
                     aria-label="Trier les produits"
@@ -487,7 +487,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                 </div>
               </div>
             </motion.div>
@@ -496,7 +496,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
       </div>
 
       {/* Price Range Section */}
-      <div className="border-b border-border-light pb-1">
+      <div className="border-b border-neutral-200 pb-1">
         <FilterSectionHeader
           title="Fourchette de prix"
           section="price"
@@ -512,15 +512,15 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
               exit="exit"
               className="overflow-hidden"
             >
-              <div className="space-y-3 pb-4">
+              <div className="space-y-2.5 pb-3">
                 {/* Price Presets */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {isLoadingFilters ? (
                     <div className="space-y-2">
                       {[1, 2, 3, 4].map((i) => (
                         <div
                           key={i}
-                          className="h-9 animate-pulse rounded bg-background-muted"
+                          className="h-8 animate-pulse rounded-sm bg-neutral-100"
                         />
                       ))}
                     </div>
@@ -532,10 +532,10 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                           key={preset.label}
                           onClick={() => applyPricePreset(preset)}
                           className={cn(
-                            'w-full px-3 py-2 text-left font-sans text-sm transition-all duration-250 ease-luxe',
+                            'w-full px-2.5 py-1.5 text-left font-sans text-body-sm transition-all duration-150 rounded-sm',
                             isSelected
-                              ? 'border-l-2 border-hermes-500 bg-hermes-50 text-hermes-600'
-                              : 'border-l-2 border-transparent text-text-secondary hover:border-hermes-300 hover:bg-background-muted hover:text-text-primary'
+                              ? 'border-l-2 border-accent bg-accent/5 text-accent font-medium'
+                              : 'border-l-2 border-transparent text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
                           )}
                         >
                           {preset.label}
@@ -546,7 +546,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                 </div>
 
                 {/* Custom Price Inputs */}
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-2 pt-1">
                   <div className="flex-1">
                     <input
                       type="number"
@@ -554,16 +554,16 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                       onChange={(e) => setMinPrice(e.target.value)}
                       placeholder="Min"
                       className={cn(
-                        'w-full bg-white px-3 py-2',
-                        'border border-border-light',
-                        'font-sans text-sm text-text-primary placeholder:text-text-light',
-                        'transition-all duration-250 ease-luxe',
-                        'hover:border-border-medium focus:border-hermes-500 focus:outline-none'
+                        'w-full bg-white px-2.5 py-1.5',
+                        'border border-neutral-200 rounded-sm',
+                        'font-sans text-body-sm text-neutral-900 placeholder:text-neutral-400',
+                        'transition-all duration-150',
+                        'hover:border-neutral-300 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20'
                       )}
                       aria-label="Prix minimum"
                     />
                   </div>
-                  <span className="font-sans text-sm text-text-light">-</span>
+                  <span className="font-sans text-body-sm text-neutral-400">-</span>
                   <div className="flex-1">
                     <input
                       type="number"
@@ -571,11 +571,11 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                       onChange={(e) => setMaxPrice(e.target.value)}
                       placeholder="Max"
                       className={cn(
-                        'w-full bg-white px-3 py-2',
-                        'border border-border-light',
-                        'font-sans text-sm text-text-primary placeholder:text-text-light',
-                        'transition-all duration-250 ease-luxe',
-                        'hover:border-border-medium focus:border-hermes-500 focus:outline-none'
+                        'w-full bg-white px-2.5 py-1.5',
+                        'border border-neutral-200 rounded-sm',
+                        'font-sans text-body-sm text-neutral-900 placeholder:text-neutral-400',
+                        'transition-all duration-150',
+                        'hover:border-neutral-300 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20'
                       )}
                       aria-label="Prix maximum"
                     />
@@ -584,11 +584,11 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                 <button
                   onClick={applyPriceFilter}
                   className={cn(
-                    'w-full py-2.5',
-                    'border border-hermes-500',
-                    'font-sans text-xs font-medium uppercase tracking-luxe text-hermes-500',
-                    'transition-all duration-350 ease-luxe',
-                    'hover:bg-hermes-500 hover:text-white'
+                    'w-full py-2',
+                    'border border-accent rounded-sm',
+                    'font-sans text-body-sm font-medium text-accent',
+                    'transition-all duration-150',
+                    'hover:bg-accent hover:text-white'
                   )}
                 >
                   Appliquer
@@ -617,16 +617,16 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                 exit="exit"
                 className="overflow-hidden"
               >
-                <div className="space-y-3 pb-4">
+                <div className="space-y-2.5 pb-3">
                   {isLoadingFilters ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {[1, 2, 3].map((i) => (
                         <div
                           key={i}
-                          className="flex items-center gap-3"
+                          className="flex items-center gap-2.5"
                         >
-                          <div className="h-5 w-5 animate-pulse rounded bg-background-muted" />
-                          <div className="h-4 w-20 animate-pulse rounded bg-background-muted" />
+                          <div className="h-4 w-4 animate-pulse rounded-sm bg-neutral-100" />
+                          <div className="h-4 w-20 animate-pulse rounded-sm bg-neutral-100" />
                         </div>
                       ))}
                     </div>
@@ -651,20 +651,20 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
       <AnimatePresence>
         {hasActiveFilters && (
           <motion.div
-            className="pt-4"
-            initial={{ opacity: 0, y: 10 }}
+            className="pt-3"
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.25 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2 }}
           >
             <button
               onClick={resetFilters}
               className={cn(
-                'flex w-full items-center justify-center gap-2 py-3',
-                'border border-border-medium',
-                'font-sans text-xs font-medium uppercase tracking-luxe text-text-muted',
-                'transition-all duration-350 ease-luxe',
-                'hover:border-text-muted hover:text-text-primary'
+                'flex w-full items-center justify-center gap-2 py-2',
+                'border border-neutral-300 rounded-sm',
+                'font-sans text-body-sm font-medium text-neutral-500',
+                'transition-all duration-150',
+                'hover:border-neutral-400 hover:text-neutral-700'
               )}
             >
               <X className="h-4 w-4" />
@@ -683,7 +683,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-hermes-500 border-t-transparent" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -697,18 +697,18 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
         <button
           onClick={() => setIsMobileOpen(true)}
           className={cn(
-            'flex w-full items-center justify-center gap-2 py-3.5 px-4',
-            'bg-white border border-border-light',
-            'transition-all duration-250 ease-luxe',
-            'hover:border-hermes-500'
+            'flex w-full items-center justify-center gap-2 py-2.5 px-4',
+            'bg-white border border-neutral-200 rounded-sm',
+            'transition-all duration-150',
+            'hover:border-neutral-300'
           )}
         >
-          <SlidersHorizontal className="h-4 w-4 text-text-primary" />
-          <span className="font-sans text-xs font-medium uppercase tracking-luxe text-text-primary">
+          <SlidersHorizontal className="h-4 w-4 text-neutral-700" />
+          <span className="font-sans text-body-sm font-medium text-neutral-700">
             Filtres
           </span>
           {activeFilterCount > 0 && (
-            <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-hermes-500 text-xs text-white">
+            <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs text-white font-medium">
               {activeFilterCount}
             </span>
           )}
@@ -721,7 +721,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
           <>
             {/* Backdrop */}
             <motion.div
-              className="fixed inset-0 z-40 bg-luxe-charcoal/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-neutral-900/40 backdrop-blur-sm lg:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -731,7 +731,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
 
             {/* Drawer */}
             <motion.div
-              className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] overflow-y-auto bg-background-cream lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] overflow-y-auto bg-white lg:hidden"
               variants={drawerVariants}
               initial="hidden"
               animate="visible"
@@ -740,13 +740,13 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
               aria-modal="true"
               aria-label="Filtres de produits"
             >
-              <div className="p-6">
+              <div className="p-5">
                 {/* Header */}
-                <div className="mb-6 flex items-center justify-between border-b border-border-light pb-4">
-                  <h2 className="font-serif text-xl text-text-primary">Filtres</h2>
+                <div className="mb-5 flex items-center justify-between border-b border-neutral-200 pb-3">
+                  <h2 className="font-sans text-body-lg font-semibold text-neutral-900">Filtres</h2>
                   <button
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors hover:text-text-primary"
+                    className="flex h-8 w-8 items-center justify-center text-neutral-400 transition-colors hover:text-neutral-700"
                     aria-label="Fermer les filtres"
                   >
                     <X className="h-5 w-5" />
@@ -754,7 +754,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
                 </div>
 
                 {totalProducts !== undefined && (
-                  <p className="mb-6 font-sans text-sm text-text-muted">
+                  <p className="mb-5 font-sans text-body-sm text-neutral-500">
                     {totalProducts} {totalProducts > 1 ? 'produits' : 'produit'}
                   </p>
                 )}

@@ -75,8 +75,8 @@ function CategoryTreeNode({
         className={cn(
           'flex items-center gap-2 py-1.5 rounded-md cursor-pointer',
           'transition-colors duration-150',
-          'hover:bg-b2b-bg-tertiary',
-          isSelected && 'text-b2b-primary font-medium'
+          'hover:bg-neutral-100',
+          isSelected && 'text-accent font-medium'
         )}
         style={{ paddingLeft: `${level * 16 + 4}px` }}
         onClick={handleSelectClick}
@@ -98,9 +98,9 @@ function CategoryTreeNode({
             }}
             className={cn(
               'flex items-center justify-center w-5 h-5',
-              'text-b2b-text-muted hover:text-b2b-primary',
+              'text-neutral-500 hover:text-accent',
               'transition-colors duration-150',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary rounded'
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded'
             )}
             aria-label={isExpanded ? 'Replier' : 'Deplier'}
           >
@@ -127,7 +127,7 @@ function CategoryTreeNode({
             <span
               className={cn(
                 'w-1.5 h-1.5 rounded-full',
-                isSelected ? 'bg-b2b-primary' : 'bg-b2b-border-medium'
+                isSelected ? 'bg-accent' : 'bg-neutral-300'
               )}
             />
           </span>
@@ -136,8 +136,8 @@ function CategoryTreeNode({
         {/* Category name */}
         <span
           className={cn(
-            'flex-1 text-b2b-body-sm',
-            isSelected ? 'text-b2b-primary' : 'text-b2b-text-primary'
+            'flex-1 text-sm',
+            isSelected ? 'text-accent' : 'text-neutral-900'
           )}
         >
           {node.name}
@@ -147,7 +147,7 @@ function CategoryTreeNode({
         {showCounts && (
           <span
             className={cn(
-              'text-b2b-caption text-b2b-text-muted',
+              'text-xs text-neutral-500',
               'tabular-nums'
             )}
           >

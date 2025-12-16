@@ -10,17 +10,18 @@
  ✓ Compiled successfully
    Linting and checking validity of types ...
    Collecting page data ...
-   Generating static pages (0/27) ...
-   Generating static pages (6/27) 
-   Generating static pages (13/27) 
-   Generating static pages (20/27) 
- ✓ Generating static pages (27/27)
+   Generating static pages (0/37) ...
+   Generating static pages (9/37) 
+   Generating static pages (18/37) 
+   Generating static pages (27/37) 
+ ✓ Generating static pages (37/37)
    Finalizing page optimization ...
    Collecting build traces ...
 
 Route (app)                              Size     First Load JS
-┌ ƒ /                                    7.5 kB          153 kB
-├ ○ /_not-found                          146 B          87.4 kB
+┌ ƒ /                                    171 B           196 kB
+├ ○ /_not-found                          155 B          87.6 kB
+├ ○ /accueil                             171 B           196 kB
 ├ ƒ /api/auth/[...nextauth]              0 B                0 B
 ├ ƒ /api/categories                      0 B                0 B
 ├ ƒ /api/orders                          0 B                0 B
@@ -28,37 +29,48 @@ Route (app)                              Size     First Load JS
 ├ ƒ /api/search                          0 B                0 B
 ├ ƒ /api/stripe/create-payment-intent    0 B                0 B
 ├ ƒ /api/user/orders                     0 B                0 B
-├ ○ /approbations                        2.53 kB        96.5 kB
-├ ƒ /categories                          1.34 kB         167 kB
-├ ƒ /categories/[slug]                   1.91 kB         175 kB
-├ ○ /checkout                            13.3 kB         200 kB
-├ ○ /checkout/confirmation               4.54 kB         170 kB
-├ ƒ /collections                         1.85 kB         167 kB
-├ ƒ /collections/[slug]                  1.91 kB         175 kB
-├ ○ /commandes                           2.84 kB         106 kB
-├ ƒ /commandes/[id]                      3.44 kB         106 kB
-├ ○ /commandes/bulk                      3.54 kB         106 kB
-├ ƒ /compte                              1.55 kB         167 kB
-├ ƒ /compte/commandes                    1.15 kB         167 kB
-├ ƒ /compte/commandes/[id]               1.15 kB         167 kB
-├ ○ /contact                             5.37 kB         171 kB
-├ ○ /dashboard                           5.83 kB         109 kB
-├ ○ /devis                               2.22 kB         105 kB
-├ ƒ /devis/[id]                          2.95 kB         106 kB
-├ ○ /devis/nouveau                       3.45 kB         106 kB
-├ ○ /entreprise                          3 kB            106 kB
-├ ○ /entreprise/employes                 2.85 kB        96.9 kB
-├ ○ /entreprise/parametres               1.76 kB        95.8 kB
-├ ○ /favoris                             5.49 kB         151 kB
-├ ○ /login                               2.67 kB         176 kB
-├ ○ /notre-histoire                      6.13 kB         152 kB
-├ ○ /panier                              4.59 kB         170 kB
-├ ƒ /products/[id]                       6.63 kB         172 kB
-├ ○ /rapports                            3.24 kB        97.2 kB
-└ ○ /register                            5.63 kB         173 kB
-+ First Load JS shared by all            87.2 kB
-  ├ chunks/4004-63af5f26ed03229c.js      31.7 kB
-  ├ chunks/b6890e83-f63d4b68ac82bbfc.js  53.6 kB
+├ ○ /approbations                        2.53 kB         116 kB
+├ ƒ /categories                          1.38 kB         220 kB
+├ ƒ /categories/[slug]                   1.96 kB         230 kB
+├ ○ /checkout                            13 kB           245 kB
+├ ○ /checkout/confirmation               4.1 kB          223 kB
+├ ○ /checkout/livraison                  3.46 kB         226 kB
+├ ○ /checkout/paiement                   4.31 kB         227 kB
+├ ƒ /collections                         1.3 kB          220 kB
+├ ƒ /collections/[slug]                  1.96 kB         230 kB
+├ ○ /commande-rapide                     14.7 kB         128 kB
+├ ○ /commandes                           3.69 kB         122 kB
+├ ƒ /commandes/[id]                      5.73 kB         125 kB
+├ ○ /commandes/bulk                      4.02 kB         117 kB
+├ ○ /comparer                            4.04 kB         121 kB
+├ ƒ /compte                              845 B           220 kB
+├ ƒ /compte/commandes                    253 B           219 kB
+├ ƒ /compte/commandes/[id]               253 B           219 kB
+├ ○ /contact                             5.26 kB         224 kB
+├ ○ /dashboard                           4.26 kB         117 kB
+├ ○ /devis                               2.58 kB         116 kB
+├ ƒ /devis/[id]                          4.71 kB         118 kB
+├ ○ /devis/nouveau                       3.54 kB         106 kB
+├ ○ /entreprise                          4.19 kB         113 kB
+├ ○ /entreprise/adresses                 9.38 kB         116 kB
+├ ○ /entreprise/employes                 2.94 kB        97.2 kB
+├ ○ /entreprise/parametres               1.85 kB        96.1 kB
+├ ○ /favoris                             4.49 kB         157 kB
+├ ○ /listes                              3.45 kB         172 kB
+├ ƒ /listes/[id]                         4.02 kB         170 kB
+├ ○ /login                               2.64 kB         194 kB
+├ ○ /notre-histoire                      6.54 kB         152 kB
+├ ○ /panier                              3.9 kB          223 kB
+├ ○ /panier-b2b                          3.86 kB         168 kB
+├ ƒ /products/[id]                       5.71 kB         228 kB
+├ ƒ /produits/[slug]                     23.2 kB         177 kB
+├ ○ /rapports                            3.25 kB         116 kB
+├ ƒ /recherche                           1.3 kB          188 kB
+├ ○ /register                            3.32 kB         191 kB
+└ ○ /tableau-de-bord                     11.2 kB         124 kB
++ First Load JS shared by all            87.5 kB
+  ├ chunks/4004-625b16427b2e7af2.js      31.9 kB
+  ├ chunks/b6890e83-2f8776c9c0110a2c.js  53.6 kB
   └ other shared chunks (total)          1.9 kB
 
 

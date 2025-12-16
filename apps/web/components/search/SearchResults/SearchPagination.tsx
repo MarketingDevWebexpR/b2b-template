@@ -114,20 +114,20 @@ export function SearchPaginationCompact({
           'px-4 py-2',
           'text-sm font-medium',
           'rounded-lg',
-          'border border-b2b-border',
+          'border border-neutral-200',
           'transition-all duration-200',
           canGoPrev
-            ? 'text-b2b-text-primary hover:bg-b2b-bg-tertiary hover:border-b2b-border-medium'
-            : 'text-b2b-text-muted cursor-not-allowed opacity-50',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+            ? 'text-neutral-900 hover:bg-neutral-100 hover:border-neutral-300'
+            : 'text-neutral-500 cursor-not-allowed opacity-50',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
         )}
         aria-label="Page precedente"
       >
         Precedent
       </button>
 
-      <span className="text-sm text-b2b-text-secondary tabular-nums">
-        <span className="font-medium text-b2b-text-primary">{currentPage}</span>
+      <span className="text-sm text-neutral-600 tabular-nums">
+        <span className="font-medium text-neutral-900">{currentPage}</span>
         {' '}/ {totalPages}
       </span>
 
@@ -139,12 +139,12 @@ export function SearchPaginationCompact({
           'px-4 py-2',
           'text-sm font-medium',
           'rounded-lg',
-          'border border-b2b-border',
+          'border border-neutral-200',
           'transition-all duration-200',
           canGoNext
-            ? 'text-b2b-text-primary hover:bg-b2b-bg-tertiary hover:border-b2b-border-medium'
-            : 'text-b2b-text-muted cursor-not-allowed opacity-50',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+            ? 'text-neutral-900 hover:bg-neutral-100 hover:border-neutral-300'
+            : 'text-neutral-500 cursor-not-allowed opacity-50',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
         )}
         aria-label="Page suivante"
       >
@@ -176,7 +176,7 @@ export function SearchLoadMore({
 
   return (
     <div className={cn('flex flex-col items-center gap-3', className)}>
-      <p className="text-sm text-b2b-text-secondary">
+      <p className="text-sm text-neutral-600">
         {loadedItems} produits sur {totalResults.toLocaleString('fr-FR')}
       </p>
       <button
@@ -185,13 +185,13 @@ export function SearchLoadMore({
         className={cn(
           'px-6 py-3',
           'text-sm font-medium',
-          'text-b2b-primary',
+          'text-accent',
           'bg-white',
-          'border-2 border-b2b-primary',
+          'border-2 border-accent',
           'rounded-lg',
           'transition-all duration-200',
-          'hover:bg-b2b-primary hover:text-white',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+          'hover:bg-accent hover:text-white',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
         )}
       >
         {label}

@@ -8,28 +8,28 @@ import { cn } from '@/lib/utils';
  */
 const separatorVariants = {
   // Default subtle line
-  default: 'bg-border',
+  default: 'bg-neutral-200',
 
   // Light, barely visible separator
-  light: 'bg-border-light',
+  light: 'bg-neutral-100',
 
   // Medium emphasis separator
-  medium: 'bg-border-medium',
+  medium: 'bg-neutral-300',
 
   // Strong separator for clear divisions
-  strong: 'bg-border-dark',
+  strong: 'bg-neutral-400',
 
-  // Hermes orange accent line
-  hermes: 'bg-hermes-500',
+  // Accent orange line
+  accent: 'bg-accent',
 
   // Gradient fade effect
-  fade: 'bg-gradient-to-r from-transparent via-border to-transparent',
+  fade: 'bg-gradient-to-r from-transparent via-neutral-200 to-transparent',
 
-  // Hermes gradient fade
-  'hermes-fade': 'bg-gradient-to-r from-transparent via-hermes-500 to-transparent',
+  // Accent gradient fade
+  'accent-fade': 'bg-gradient-to-r from-transparent via-accent to-transparent',
 
   // Dashed style
-  dashed: 'bg-border border-none border-dashed',
+  dashed: 'bg-neutral-200 border-none border-dashed',
 };
 
 /**
@@ -93,17 +93,17 @@ export interface SeparatorProps extends HTMLAttributes<HTMLDivElement> {
 /**
  * Separator component for visual division of content.
  *
- * Design principles (Hermes-inspired):
+ * Design principles (B2B professional):
  * - Subtle, refined lines that don't overwhelm content
- * - Optional Hermes orange accent for decorative elements
+ * - Optional accent orange for decorative elements
  * - Proper accessibility with role="separator"
  *
  * @example
  * // Simple horizontal divider
  * <Separator />
  *
- * // Hermes accent divider
- * <Separator variant="hermes" size="sm" className="w-24 mx-auto" />
+ * // Accent divider
+ * <Separator variant="accent" size="sm" className="w-24 mx-auto" />
  *
  * // Vertical divider in flex container
  * <Separator orientation="vertical" className="h-6" />
@@ -153,7 +153,7 @@ const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
 Separator.displayName = 'Separator';
 
 /**
- * Decorative Hermes-style divider with optional centered content
+ * Decorative accent divider with optional centered content
  */
 export interface DecorativeDividerProps extends HTMLAttributes<HTMLDivElement> {
   /** Content to display in the center (e.g., icon, text) */
@@ -167,7 +167,7 @@ export interface DecorativeDividerProps extends HTMLAttributes<HTMLDivElement> {
 const DecorativeDivider = forwardRef<HTMLDivElement, DecorativeDividerProps>(
   ({ children, lineWidth = 'w-12', className, ...props }, ref) => {
     if (!children) {
-      // Simple centered Hermes line
+      // Simple centered accent line
       return (
         <div
           ref={ref}
@@ -175,7 +175,7 @@ const DecorativeDivider = forwardRef<HTMLDivElement, DecorativeDividerProps>(
           role="none"
           {...props}
         >
-          <div className={cn('h-px bg-hermes-500', lineWidth)} />
+          <div className={cn('h-px bg-accent', lineWidth)} />
         </div>
       );
     }
@@ -188,11 +188,11 @@ const DecorativeDivider = forwardRef<HTMLDivElement, DecorativeDividerProps>(
         role="none"
         {...props}
       >
-        <div className={cn('h-px flex-1 bg-border')} />
-        <span className="font-sans text-xs uppercase tracking-elegant text-text-muted">
+        <div className={cn('h-px flex-1 bg-neutral-200')} />
+        <span className="font-sans text-xs uppercase tracking-wide text-neutral-500">
           {children}
         </span>
-        <div className={cn('h-px flex-1 bg-border')} />
+        <div className={cn('h-px flex-1 bg-neutral-200')} />
       </div>
     );
   }
@@ -225,17 +225,17 @@ const SectionDivider = forwardRef<HTMLDivElement, SectionDividerProps>(
         )}
         {...props}
       >
-        <h3 className="font-serif text-heading-5 text-text-primary">
+        <h3 className="font-sans font-semibold text-heading-5 text-neutral-900">
           {title}
         </h3>
         {subtitle && (
-          <p className="mt-1 font-sans text-sm text-text-muted">
+          <p className="mt-1 font-sans text-sm text-neutral-500">
             {subtitle}
           </p>
         )}
         <div
           className={cn(
-            'mt-4 h-px bg-border',
+            'mt-4 h-px bg-neutral-200',
             align === 'center' && 'mx-auto max-w-xs',
             align === 'right' && 'ml-auto max-w-xs'
           )}

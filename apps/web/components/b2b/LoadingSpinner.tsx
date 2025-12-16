@@ -37,7 +37,7 @@ export function LoadingSpinner({
   const spinner = (
     <div
       className={cn(
-        'border-hermes-500 border-t-transparent rounded-full animate-spin',
+        'border-primary border-t-transparent rounded-full animate-spin',
         sizeClasses[size],
         !centered && className
       )}
@@ -56,13 +56,13 @@ export function LoadingSpinner({
       >
         <div
           className={cn(
-            'border-hermes-500 border-t-transparent rounded-full animate-spin',
+            'border-primary border-t-transparent rounded-full animate-spin',
             sizeClasses[size]
           )}
           aria-hidden="true"
         />
         {message && (
-          <p className="mt-4 font-sans text-body text-text-muted">{message}</p>
+          <p className="mt-4 font-sans text-body text-content-muted">{message}</p>
         )}
         <span className="sr-only">{message || 'Chargement en cours'}</span>
       </div>
@@ -93,7 +93,7 @@ export function PageLoader({ message = 'Chargement...' }: { message?: string }) 
 export function SectionLoader({ message = 'Chargement...' }: { message?: string }) {
   return (
     <div
-      className="bg-white rounded-soft border border-border-light p-8 text-center"
+      className="bg-white rounded-lg border border-stroke-light p-8 text-center"
       role="status"
       aria-live="polite"
     >

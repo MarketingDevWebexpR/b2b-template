@@ -130,7 +130,7 @@ const initialFormState: ShippingFormData = {
 /**
  * ShippingForm Component
  * Elegant shipping address form with French labels
- * Hermes-inspired luxury styling
+ * B2B professional neutral aesthetic
  */
 export function ShippingForm({
   initialData,
@@ -251,17 +251,17 @@ export function ShippingForm({
     >
       {/* Section title */}
       <div className="mb-8">
-        <h2 className="font-serif text-xl md:text-2xl text-text-primary mb-2">
+        <h2 className="font-sans font-semibold text-xl md:text-2xl text-neutral-900 mb-2">
           Adresse de livraison
         </h2>
-        <p className="text-sm text-text-muted">
-          Vos bijoux seront livrés à cette adresse de manière sécurisée.
+        <p className="text-sm text-neutral-500">
+          Vos produits seront livres a cette adresse de maniere securisee.
         </p>
       </div>
 
       {/* Saved addresses selection */}
       <div className="space-y-3">
-        <p className="text-sm font-medium text-text-primary">
+        <p className="text-sm font-medium text-neutral-900">
           Choisir une adresse
         </p>
         <div className="grid grid-cols-1 gap-3">
@@ -273,13 +273,13 @@ export function ShippingForm({
               onClick={() => handleAddressSelect(addr.id)}
               disabled={isLoading}
               className={cn(
-                'w-full p-4 text-left',
+                'w-full p-4 text-left rounded-lg',
                 'border transition-all duration-200',
                 'flex items-start gap-4',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 selectedAddressId === addr.id
-                  ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
-                  : 'border-border-light bg-white hover:border-hermes-500/50'
+                  ? 'border-accent bg-accent/5 ring-1 ring-accent/30'
+                  : 'border-neutral-200 bg-white hover:border-accent/50'
               )}
             >
               {/* Selection indicator */}
@@ -290,8 +290,8 @@ export function ShippingForm({
                   'flex items-center justify-center',
                   'transition-colors duration-200',
                   selectedAddressId === addr.id
-                    ? 'border-hermes-500 bg-hermes-500'
-                    : 'border-border-medium bg-white'
+                    ? 'border-accent bg-accent'
+                    : 'border-neutral-300 bg-white'
                 )}
               >
                 {selectedAddressId === addr.id && (
@@ -302,24 +302,24 @@ export function ShippingForm({
               {/* Address content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <Home className="w-4 h-4 text-hermes-500" />
-                  <span className="font-medium text-text-primary">
+                  <Home className="w-4 h-4 text-accent" />
+                  <span className="font-medium text-neutral-900">
                     {addr.label}
                   </span>
                   {addr.isDefault && (
-                    <span className="text-xs px-2 py-0.5 bg-hermes-500/10 text-hermes-600 rounded-full">
-                      Par défaut
+                    <span className="text-xs px-2 py-0.5 bg-accent/10 text-accent rounded-full">
+                      Par defaut
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-text-muted truncate">
+                <p className="text-sm text-neutral-500 truncate">
                   {addr.firstName} {addr.lastName}
                 </p>
-                <p className="text-sm text-text-muted truncate">
+                <p className="text-sm text-neutral-500 truncate">
                   {addr.address}
                   {addr.addressLine2 && `, ${addr.addressLine2}`}
                 </p>
-                <p className="text-sm text-text-muted">
+                <p className="text-sm text-neutral-500">
                   {addr.postalCode} {addr.city}, {addr.country}
                 </p>
               </div>
@@ -332,13 +332,13 @@ export function ShippingForm({
             onClick={() => handleAddressSelect('new')}
             disabled={isLoading}
             className={cn(
-              'w-full p-4 text-left',
+              'w-full p-4 text-left rounded-lg',
               'border transition-all duration-200',
               'flex items-center gap-4',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               selectedAddressId === 'new'
-                ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
-                : 'border-border-light bg-white hover:border-hermes-500/50'
+                ? 'border-accent bg-accent/5 ring-1 ring-accent/30'
+                : 'border-neutral-200 bg-white hover:border-accent/50'
             )}
           >
             {/* Selection indicator */}
@@ -349,8 +349,8 @@ export function ShippingForm({
                 'flex items-center justify-center',
                 'transition-colors duration-200',
                 selectedAddressId === 'new'
-                  ? 'border-hermes-500 bg-hermes-500'
-                  : 'border-border-medium bg-white'
+                  ? 'border-accent bg-accent'
+                  : 'border-neutral-300 bg-white'
               )}
             >
               {selectedAddressId === 'new' && (
@@ -360,8 +360,8 @@ export function ShippingForm({
 
             {/* New address content */}
             <div className="flex items-center gap-2">
-              <Plus className="w-4 h-4 text-hermes-500" />
-              <span className="font-medium text-text-primary">
+              <Plus className="w-4 h-4 text-accent" />
+              <span className="font-medium text-neutral-900">
                 Utiliser une nouvelle adresse
               </span>
             </div>
@@ -373,14 +373,14 @@ export function ShippingForm({
       {selectedAddressId === 'new' && (
         <>
           {/* Divider */}
-          <div className="border-t border-border-light" />
+          <div className="border-t border-neutral-200" />
 
           {/* General error message */}
           {errors.general && (
             <div
               role="alert"
               className={cn(
-                'p-4 border border-red-500/30 bg-red-500/10',
+                'p-4 border border-red-500/30 bg-red-500/10 rounded-lg',
                 'text-red-600 text-sm text-center'
               )}
             >
@@ -389,17 +389,17 @@ export function ShippingForm({
           )}
 
           {/* Form title */}
-          <p className="text-sm font-medium text-text-primary">
+          <p className="text-sm font-medium text-neutral-900">
             Nouvelle adresse
           </p>
 
           {/* Name fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Prénom"
+              label="Prenom"
               name="firstName"
               type="text"
-              placeholder="Votre prénom"
+              placeholder="Votre prenom"
               value={formData.firstName}
               onChange={handleChange}
               error={errors.firstName}
@@ -407,7 +407,7 @@ export function ShippingForm({
               autoComplete="given-name"
               startIcon={<User className="h-5 w-5" />}
               containerClassName="bg-white"
-              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+              className="bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400 focus:border-accent focus:ring-accent/30"
             />
 
             <Input
@@ -422,13 +422,13 @@ export function ShippingForm({
               autoComplete="family-name"
               startIcon={<User className="h-5 w-5" />}
               containerClassName="bg-white"
-              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+              className="bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400 focus:border-accent focus:ring-accent/30"
             />
           </div>
 
           {/* Contact field */}
           <Input
-            label="Téléphone"
+            label="Telephone"
             name="phone"
             type="tel"
             placeholder="+33 6 12 34 56 78"
@@ -439,7 +439,7 @@ export function ShippingForm({
             autoComplete="tel"
             startIcon={<Phone className="h-5 w-5" />}
             containerClassName="bg-white"
-            className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            className="bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400 focus:border-accent focus:ring-accent/30"
           />
 
           {/* Address field */}
@@ -447,7 +447,7 @@ export function ShippingForm({
             label="Adresse"
             name="address"
             type="text"
-            placeholder="Numéro et nom de rue"
+            placeholder="Numero et nom de rue"
             value={formData.address}
             onChange={handleChange}
             error={errors.address}
@@ -455,15 +455,15 @@ export function ShippingForm({
             autoComplete="address-line1"
             startIcon={<MapPin className="h-5 w-5" />}
             containerClassName="bg-white"
-            className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            className="bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400 focus:border-accent focus:ring-accent/30"
           />
 
           {/* Address line 2 (optional) */}
           <Input
-            label="Complément d'adresse"
+            label="Complement d'adresse"
             name="addressLine2"
             type="text"
-            placeholder="Appartement, bâtiment, étage... (optionnel)"
+            placeholder="Appartement, batiment, etage... (optionnel)"
             value={formData.addressLine2}
             onChange={handleChange}
             error={errors.addressLine2}
@@ -471,7 +471,7 @@ export function ShippingForm({
             autoComplete="address-line2"
             startIcon={<Building2 className="h-5 w-5" />}
             containerClassName="bg-white"
-            className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+            className="bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400 focus:border-accent focus:ring-accent/30"
           />
 
           {/* City and postal code */}
@@ -487,7 +487,7 @@ export function ShippingForm({
               disabled={isLoading}
               autoComplete="address-level2"
               containerClassName="bg-white"
-              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+              className="bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400 focus:border-accent focus:ring-accent/30"
             />
 
             <Input
@@ -501,7 +501,7 @@ export function ShippingForm({
               disabled={isLoading}
               autoComplete="postal-code"
               containerClassName="bg-white"
-              className="bg-white border-border-light text-text-primary placeholder:text-text-muted focus:border-hermes-500 focus:ring-hermes-500/30"
+              className="bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400 focus:border-accent focus:ring-accent/30"
             />
           </div>
 
@@ -512,7 +512,7 @@ export function ShippingForm({
               className={cn(
                 'block mb-2',
                 'font-sans text-sm font-medium tracking-wide',
-                'text-text-primary'
+                'text-neutral-900'
               )}
             >
               Pays
@@ -524,12 +524,12 @@ export function ShippingForm({
               onChange={handleChange}
               disabled={isLoading}
               className={cn(
-                'w-full px-4 py-3',
-                'bg-white text-text-primary',
-                'border border-border-light',
-                'focus:outline-none focus:border-hermes-500 focus:ring-1 focus:ring-hermes-500/30',
-                'transition-all duration-300',
-                'disabled:bg-background-beige disabled:cursor-not-allowed',
+                'w-full px-4 py-3 rounded-lg',
+                'bg-white text-neutral-900',
+                'border border-neutral-200',
+                'focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30',
+                'transition-all duration-200',
+                'disabled:bg-neutral-100 disabled:cursor-not-allowed',
                 errors.country && 'border-red-500'
               )}
             >
@@ -553,15 +553,15 @@ export function ShippingForm({
           variant="primary"
           size="lg"
           isLoading={isLoading}
-          className="w-full uppercase tracking-wider border border-luxe-charcoal hover:bg-luxe-charcoal hover:text-white transition-all duration-300"
+          className="w-full uppercase tracking-wider bg-accent text-white border border-accent hover:bg-accent/90 transition-all duration-200"
         >
           Continuer vers le paiement
         </Button>
       </div>
 
       {/* Security note */}
-      <p className="text-xs text-text-muted text-center pt-2">
-        Vos informations sont protégées et ne seront jamais partagées.
+      <p className="text-xs text-neutral-500 text-center pt-2">
+        Vos informations sont protegees et ne seront jamais partagees.
       </p>
     </form>
   );

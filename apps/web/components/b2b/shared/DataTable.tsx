@@ -72,19 +72,19 @@ export function DataTable<T>({
   return (
     <div
       className={cn(
-        'bg-white rounded-soft border border-border-light overflow-hidden',
+        'bg-white rounded-lg border border-stroke-light overflow-hidden',
         className
       )}
     >
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border-light bg-background-muted">
+            <tr className="border-b border-stroke-light bg-surface-secondary">
               {columns.map((column) => (
                 <th
                   key={column.key}
                   className={cn(
-                    'px-4 py-3 font-sans text-caption font-medium text-text-muted',
+                    'px-4 py-3 font-sans text-caption font-medium text-content-muted',
                     alignClasses[column.align ?? 'left'],
                     column.className
                   )}
@@ -99,7 +99,7 @@ export function DataTable<T>({
               <tr
                 key={getRowKey(item, rowIndex)}
                 className={cn(
-                  hoverable && 'hover:bg-background-muted transition-colors',
+                  hoverable && 'hover:bg-surface-secondary transition-colors',
                   onRowClick && 'cursor-pointer'
                 )}
                 onClick={() => onRowClick?.(item, rowIndex)}

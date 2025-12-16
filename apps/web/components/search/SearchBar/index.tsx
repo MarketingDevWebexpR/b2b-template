@@ -388,9 +388,9 @@ export function SearchBar({
             'absolute top-full left-0 right-0 z-50',
             'mt-2',
             'bg-white',
-            'border border-b2b-border',
+            'border border-neutral-200',
             'rounded-lg',
-            'shadow-soft-lg',
+            'shadow-lg',
             'overflow-hidden',
             'animate-fade-in-down'
           )}

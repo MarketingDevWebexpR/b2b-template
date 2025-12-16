@@ -18,6 +18,21 @@ const nextConfig = {
       },
     ],
   },
+  // Redirects: Collections merged into Categories
+  async redirects() {
+    return [
+      {
+        source: '/collections',
+        destination: '/categories',
+        permanent: true,
+      },
+      {
+        source: '/collections/:slug',
+        destination: '/categories/:slug',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -71,7 +71,7 @@ export function SearchSortSelect({
       {showLabel && (
         <label
           htmlFor={selectId}
-          className="text-sm font-medium text-b2b-text-secondary whitespace-nowrap"
+          className="text-sm font-medium text-neutral-600 whitespace-nowrap"
         >
           Trier par:
         </label>
@@ -101,17 +101,17 @@ export function SearchSortSelectInline({
 
   return (
     <div className={cn('relative inline-flex items-center', className)}>
-      <span className="text-sm text-b2b-text-secondary mr-2">Trier:</span>
+      <span className="text-sm text-neutral-600 mr-2">Trier:</span>
       <select
         value={sortBy}
         onChange={(e) => setSortBy(e.target.value as SearchSortOption)}
         className={cn(
           'appearance-none',
           'bg-transparent',
-          'text-sm font-medium text-b2b-primary',
+          'text-sm font-medium text-accent',
           'cursor-pointer',
           'pr-5',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
           'rounded'
         )}
         aria-label="Trier les resultats"
@@ -123,7 +123,7 @@ export function SearchSortSelectInline({
         ))}
       </select>
       <svg
-        className="absolute right-0 w-4 h-4 text-b2b-primary pointer-events-none"
+        className="absolute right-0 w-4 h-4 text-accent pointer-events-none"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

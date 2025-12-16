@@ -10,15 +10,15 @@ interface LogoProps {
 }
 
 const sizeClasses = {
-  sm: 'text-sm md:text-base tracking-[0.2em]',
-  md: 'text-base md:text-lg tracking-[0.25em]',
-  lg: 'text-lg md:text-xl tracking-[0.3em]',
+  sm: 'text-sm md:text-base tracking-wide',
+  md: 'text-base md:text-lg tracking-wide',
+  lg: 'text-lg md:text-xl tracking-wide',
 };
 
 const variantClasses = {
-  light: 'text-text-inverse',
-  dark: 'text-luxe-charcoal',
-  accent: 'text-hermes-500',
+  light: 'text-white',
+  dark: 'text-content-primary',
+  accent: 'text-primary',
 };
 
 export function Logo({ className, size = 'md', variant = 'dark' }: LogoProps) {
@@ -26,16 +26,16 @@ export function Logo({ className, size = 'md', variant = 'dark' }: LogoProps) {
     <Link
       href="/"
       className={cn(
-        'font-serif font-normal uppercase',
-        'transition-all duration-350 ease-luxe',
+        'font-sans font-bold uppercase',
+        'transition-opacity duration-150',
         'hover:opacity-75',
         sizeClasses[size],
         variantClasses[variant],
         className
       )}
-      aria-label="Maison Bijoux - Accueil"
+      aria-label="WebexpR Pro - Accueil"
     >
-      <span className="inline-block">Maison Bijoux</span>
+      <span className="inline-block">WebexpR Pro</span>
     </Link>
   );
 }
@@ -46,16 +46,16 @@ export function LogoText({ className, size = 'md', variant = 'dark' }: LogoProps
     <Link
       href="/"
       className={cn(
-        'font-serif font-normal uppercase',
-        'transition-all duration-350 ease-luxe',
+        'font-sans font-bold uppercase',
+        'transition-opacity duration-150',
         'hover:opacity-75',
         sizeClasses[size],
         variantClasses[variant],
         className
       )}
-      aria-label="Maison Bijoux - Accueil"
+      aria-label="WebexpR Pro - Accueil"
     >
-      Maison Bijoux
+      WebexpR Pro
     </Link>
   );
 }
@@ -66,15 +66,15 @@ export function LogoMinimal({ className, variant = 'dark' }: Omit<LogoProps, 'si
     <Link
       href="/"
       className={cn(
-        'font-serif font-normal text-xs tracking-[0.15em] uppercase',
-        'transition-all duration-350 ease-luxe',
+        'font-sans font-bold text-xs tracking-wide uppercase',
+        'transition-opacity duration-150',
         'hover:opacity-75',
         variantClasses[variant],
         className
       )}
-      aria-label="Maison Bijoux - Accueil"
+      aria-label="WebexpR Pro - Accueil"
     >
-      MB
+      WP
     </Link>
   );
 }

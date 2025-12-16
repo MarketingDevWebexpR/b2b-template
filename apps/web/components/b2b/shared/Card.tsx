@@ -53,9 +53,9 @@ export function Card({
   const cardContent = (
     <>
       {hasHeader && (
-        <div className="flex items-center justify-between p-6 border-b border-border-light">
+        <div className="flex items-center justify-between p-6 border-b border-stroke-light">
           {title && (
-            <h2 className="font-serif text-heading-5 text-text-primary">
+            <h2 className="font-sans text-section-sm font-semibold text-content-primary">
               {title}
             </h2>
           )}
@@ -73,8 +73,8 @@ export function Card({
   );
 
   const cardClasses = cn(
-    'bg-white rounded-soft border border-border-light',
-    href && 'hover:border-hermes-200 hover:shadow-sm transition-all duration-200',
+    'bg-white rounded-lg border border-stroke-light',
+    href && 'hover:border-primary/30 hover:shadow-sm transition-all duration-200',
     !hasHeader && paddingClasses[padding],
     className
   );
@@ -127,15 +127,15 @@ export function SectionCard({
   className,
 }: SectionCardProps) {
   return (
-    <div className={cn('bg-white rounded-soft border border-border-light', className)}>
-      <div className="flex items-center justify-between p-6 border-b border-border-light">
-        <h2 className="font-serif text-heading-5 text-text-primary">
+    <div className={cn('bg-white rounded-lg border border-stroke-light', className)}>
+      <div className="flex items-center justify-between p-6 border-b border-stroke-light">
+        <h2 className="font-sans text-heading-5 text-content-primary">
           {title}
         </h2>
         {viewAllHref && (
           <Link
             href={viewAllHref}
-            className="font-sans text-caption text-hermes-500 hover:text-hermes-600 transition-colors"
+            className="text-caption text-primary hover:text-primary-600 transition-colors"
           >
             {viewAllText}
           </Link>

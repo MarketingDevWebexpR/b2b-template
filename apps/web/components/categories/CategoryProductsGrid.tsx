@@ -84,10 +84,10 @@ export function CategoryProductsGrid({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <p className="font-serif text-xl text-text-muted">
+        <p className="font-sans text-xl text-content-muted">
           Aucun produit ne correspond a vos criteres.
         </p>
-        <p className="mt-2 font-sans text-sm text-text-light">
+        <p className="mt-2 font-sans text-sm text-content-muted">
           Essayez de modifier vos filtres ou de reinitialiser votre recherche.
         </p>
       </motion.div>

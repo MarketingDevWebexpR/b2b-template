@@ -47,7 +47,7 @@ export async function generateMetadata({
 
   if (query) {
     return {
-      title: `Recherche: "${query}" | Maison Bijoux B2B`,
+      title: `Recherche: "${query}" | WebexpR Pro B2B`,
       description: `Resultats de recherche pour "${query}". Decouvrez notre selection de bijoux professionnels pour les distributeurs B2B.`,
       robots: {
         index: false, // Don't index search results pages
@@ -57,7 +57,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: 'Recherche | Maison Bijoux B2B',
+    title: 'Recherche | WebexpR Pro B2B',
     description:
       'Recherchez parmi notre catalogue de bijoux professionnels. Filtrez par categorie, marque, prix et disponibilite.',
     robots: {
@@ -78,7 +78,7 @@ function SearchResultsLoading() {
       <div className="mb-6">
         <Skeleton className="h-8 w-64 mb-2" />
         <Skeleton className="h-4 w-32 mb-4" />
-        <div className="flex items-center justify-between py-3 px-4 bg-b2b-bg-secondary rounded-lg">
+        <div className="flex items-center justify-between py-3 px-4 bg-neutral-50 rounded-lg">
           <Skeleton className="h-9 w-40" />
           <Skeleton className="h-9 w-24" />
         </div>
@@ -108,7 +108,7 @@ function SearchResultsLoading() {
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-lg border border-b2b-border-light overflow-hidden"
+                className="bg-white rounded-lg border border-neutral-200 overflow-hidden"
               >
                 <Skeleton className="aspect-square" />
                 <div className="p-4 space-y-3">
@@ -163,7 +163,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
       {/* Header spacer for fixed header */}
       <div className="h-20" />
 
-      <section className="py-8 min-h-screen bg-b2b-bg-primary">
+      <section className="py-8 min-h-screen bg-white">
         <Container>
           <Suspense fallback={<SearchResultsLoading />}>
             <SearchResultsContent

@@ -79,7 +79,7 @@ export function RelatedProducts({
         <div className="flex items-center justify-between mb-8">
           <motion.h2
             id="related-products-title"
-            className="font-serif text-heading-3 md:text-heading-2 text-text-primary"
+            className="font-sans font-semibold text-heading-3 md:text-heading-2 text-neutral-900"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -95,11 +95,11 @@ export function RelatedProducts({
                 onClick={() => scroll('left')}
                 disabled={!canScrollLeft}
                 className={cn(
-                  'w-10 h-10 flex items-center justify-center border transition-all duration-300',
-                  'focus:outline-none focus:ring-2 focus:ring-hermes-500',
+                  'w-10 h-10 flex items-center justify-center border rounded-lg transition-all duration-200',
+                  'focus:outline-none focus:ring-2 focus:ring-accent',
                   canScrollLeft
-                    ? 'border-hermes-500 text-hermes-500 hover:bg-hermes-500 hover:text-white'
-                    : 'border-border text-text-muted cursor-not-allowed'
+                    ? 'border-accent text-accent hover:bg-accent hover:text-white'
+                    : 'border-neutral-200 text-neutral-500 cursor-not-allowed'
                 )}
                 aria-label="Produits precedents"
               >
@@ -109,11 +109,11 @@ export function RelatedProducts({
                 onClick={() => scroll('right')}
                 disabled={!canScrollRight}
                 className={cn(
-                  'w-10 h-10 flex items-center justify-center border transition-all duration-300',
-                  'focus:outline-none focus:ring-2 focus:ring-hermes-500',
+                  'w-10 h-10 flex items-center justify-center border rounded-lg transition-all duration-200',
+                  'focus:outline-none focus:ring-2 focus:ring-accent',
                   canScrollRight
-                    ? 'border-hermes-500 text-hermes-500 hover:bg-hermes-500 hover:text-white'
-                    : 'border-border text-text-muted cursor-not-allowed'
+                    ? 'border-accent text-accent hover:bg-accent hover:text-white'
+                    : 'border-neutral-200 text-neutral-500 cursor-not-allowed'
                 )}
                 aria-label="Produits suivants"
               >
@@ -181,7 +181,7 @@ export function RelatedProducts({
             {products.slice(0, Math.min(products.length, 8)).map((_, index) => (
               <div
                 key={index}
-                className="w-1.5 h-1.5 rounded-full bg-hermes-500/40"
+                className="w-1.5 h-1.5 rounded-full bg-accent/40"
                 aria-hidden="true"
               />
             ))}

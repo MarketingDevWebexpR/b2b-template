@@ -45,13 +45,13 @@ export function ErrorState({
   return (
     <div
       className={cn(
-        'bg-white rounded-soft border border-red-200 p-8 text-center',
+        'bg-white rounded-lg border border-danger/20 p-8 text-center',
         className
       )}
       role="alert"
     >
       {/* Error Icon */}
-      <div className="text-red-500 mx-auto mb-4">
+      <div className="text-danger mx-auto mb-4">
         <svg
           className="w-12 h-12 mx-auto"
           fill="none"
@@ -68,12 +68,12 @@ export function ErrorState({
       </div>
 
       {/* Error Title */}
-      <h3 className="font-sans text-body font-medium text-red-700">
+      <h3 className="text-body font-medium text-danger">
         {title}
       </h3>
 
       {/* Error Message */}
-      <p className="mt-2 font-sans text-body-sm text-text-muted">
+      <p className="mt-2 text-body-sm text-content-muted">
         {message}
       </p>
 
@@ -83,10 +83,10 @@ export function ErrorState({
           onClick={retry}
           className={cn(
             'inline-flex items-center gap-2 mt-4 px-4 py-2',
-            'bg-white border border-border-light text-text-primary rounded-soft',
-            'font-sans text-body-sm font-medium',
-            'hover:bg-background-muted transition-colors duration-200',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+            'bg-white border border-stroke-light text-content-primary rounded-lg',
+            'text-body-sm font-medium',
+            'hover:bg-surface-secondary transition-colors duration-200',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2'
           )}
         >
           <svg
@@ -113,10 +113,10 @@ export function ErrorState({
           href={action.href}
           className={cn(
             'inline-flex items-center gap-2 mt-4 px-4 py-2',
-            'bg-hermes-500 text-white rounded-soft',
-            'font-sans text-body-sm font-medium',
-            'hover:bg-hermes-600 transition-colors duration-200',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+            'bg-primary text-white rounded-lg',
+            'text-body-sm font-medium',
+            'hover:bg-primary-600 transition-colors duration-200',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2'
           )}
         >
           {action.label}

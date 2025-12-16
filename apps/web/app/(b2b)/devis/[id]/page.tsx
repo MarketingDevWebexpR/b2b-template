@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatDate, formatRelativeDate, getQuoteStatusLabel, getQuoteStatusColor } from '@/lib/formatters';
 import { useB2B, useB2BPermissions } from '@/contexts/B2BContext';
+import { useQuotesFeatures } from '@/contexts/FeatureContext';
 import type { QuoteStatus, QuoteHistoryEventType } from '@maison/types';
 import {
   StatusBadge,
@@ -14,6 +15,7 @@ import {
   PageHeader,
   ActionButton,
   ErrorState,
+  EmptyState,
   Card,
 } from '@/components/b2b';
 
@@ -239,7 +241,7 @@ const DownloadIcon = () => (
 );
 
 const ImagePlaceholder = () => (
-  <svg className="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+  <svg className="w-8 h-8 text-content-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
   </svg>
 );
@@ -283,6 +285,9 @@ export default function DevisDetailPage({ params }: PageProps) {
 
   const { api, isLoading: contextLoading, employee } = useB2B();
   const { canCreateQuote } = useB2BPermissions();
+
+  // Feature flags
+  const { isEnabled: hasQuotes, hasRequestQuote, hasNegotiation, hasQuoteToOrder } = useQuotesFeatures();
 
   // In production, this would come from the API via useEffect or server action
   // For now, we use mock data
@@ -344,6 +349,17 @@ export default function DevisDetailPage({ params }: PageProps) {
     });
   }, [quote, router]);
 
+  // Module disabled - show message
+  if (!hasQuotes) {
+    return (
+      <EmptyState
+        icon="document"
+        message="Module devis desactive"
+        description="Le module de gestion des devis n'est pas disponible pour votre compte."
+      />
+    );
+  }
+
   // Loading state
   if (isLoading) {
     return <PageLoader message="Chargement du devis..." />;
@@ -378,17 +394,17 @@ export default function DevisDetailPage({ params }: PageProps) {
           <div className="flex items-center gap-3 mb-2">
             <Link
               href="/devis"
-              className="text-text-muted hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft"
+              className="text-content-muted hover:text-content-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
               aria-label="Retour a la liste des devis"
             >
               <BackIcon />
             </Link>
-            <h1 className="font-serif text-heading-3 text-text-primary">
+            <h1 className="font-sans text-heading-3 text-content-primary">
               Devis {quote.quoteNumber}
             </h1>
             <StatusBadge status={quote.status} />
           </div>
-          <p className="font-sans text-body text-text-muted">
+          <p className="font-sans text-body text-content-muted">
             Cree le {formatDate(quote.createdAt)}
             {quote.validUntil && ` - Valide jusqu'au ${formatDate(quote.validUntil)}`}
           </p>
@@ -399,10 +415,10 @@ export default function DevisDetailPage({ params }: PageProps) {
             onClick={handleDownloadPDF}
             className={cn(
               'inline-flex items-center gap-2 px-4 py-2',
-              'bg-white border border-border-light text-text-secondary rounded-soft',
+              'bg-white border border-stroke-light text-content-secondary rounded-lg',
               'font-sans text-body-sm font-medium',
-              'hover:bg-background-muted transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+              'hover:bg-surface-secondary transition-colors duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
             )}
           >
             <DownloadIcon />
@@ -415,7 +431,7 @@ export default function DevisDetailPage({ params }: PageProps) {
               disabled={isPending}
               className={cn(
                 'inline-flex items-center gap-2 px-4 py-2',
-                'bg-red-50 border border-red-200 text-red-600 rounded-soft',
+                'bg-red-50 border border-red-200 text-red-600 rounded-lg',
                 'font-sans text-body-sm font-medium',
                 'hover:bg-red-100 transition-colors duration-200',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -430,7 +446,7 @@ export default function DevisDetailPage({ params }: PageProps) {
 
       {/* Error message */}
       {actionError && (
-        <div className="bg-red-50 border border-red-200 rounded-soft p-4" role="alert">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4" role="alert">
           <p className="font-sans text-body-sm text-red-800">{actionError}</p>
         </div>
       )}
@@ -440,55 +456,55 @@ export default function DevisDetailPage({ params }: PageProps) {
         <div className="lg:col-span-2 space-y-6">
           {/* Items */}
           <section
-            className="bg-white rounded-soft border border-border-light"
+            className="bg-white rounded-lg border border-stroke-light"
             aria-labelledby="items-heading"
           >
-            <div className="p-4 border-b border-border-light">
-              <h2 id="items-heading" className="font-serif text-heading-5 text-text-primary">
+            <div className="p-4 border-b border-stroke-light">
+              <h2 id="items-heading" className="font-sans text-heading-5 text-content-primary">
                 Articles demandes ({quote.items.length})
               </h2>
             </div>
             <div className="divide-y divide-border-light">
               {quote.items.map((item) => (
                 <div key={item.id} className="p-4 flex items-center gap-4">
-                  <div className="w-16 h-16 bg-background-muted rounded-soft flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 bg-surface-secondary rounded-lg flex items-center justify-center flex-shrink-0">
                     {item.productImage ? (
                       <img
                         src={item.productImage}
                         alt={item.productName}
-                        className="w-full h-full object-cover rounded-soft"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     ) : (
                       <ImagePlaceholder />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-sans text-body-sm font-medium text-text-primary">
+                    <p className="font-sans text-body-sm font-medium text-content-primary">
                       {item.productName}
                     </p>
-                    <p className="font-mono text-caption text-text-muted">
+                    <p className="font-mono text-caption text-content-muted">
                       {item.productSku}
                     </p>
                     <div className="mt-1 flex flex-wrap items-center gap-4">
-                      <span className="font-sans text-caption text-text-muted">
+                      <span className="font-sans text-caption text-content-muted">
                         Quantite: {item.quantity}
                       </span>
-                      <span className="font-sans text-caption text-text-muted">
+                      <span className="font-sans text-caption text-content-muted">
                         Prix unitaire: {formatCurrency(item.listPrice, quote.totals.currency)}
                       </span>
                       {item.discountPercent && item.discountPercent > 0 && (
-                        <span className="font-sans text-caption text-hermes-600">
+                        <span className="font-sans text-caption text-primary-600">
                           Remise demandee: -{item.discountPercent}%
                         </span>
                       )}
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-sans text-body-sm font-medium text-text-primary">
+                    <p className="font-sans text-body-sm font-medium text-content-primary">
                       {formatCurrency(item.listPrice * item.quantity, quote.totals.currency)}
                     </p>
                     {item.discountPercent && item.discountPercent > 0 && (
-                      <p className="font-sans text-caption text-hermes-600">
+                      <p className="font-sans text-caption text-primary-600">
                         -{formatCurrency((item.listPrice * item.quantity) - item.lineTotal, quote.totals.currency)}
                       </p>
                     )}
@@ -506,24 +522,24 @@ export default function DevisDetailPage({ params }: PageProps) {
           {/* Notes */}
           {(quote.notesForSeller || quote.sellerNotes) && (
             <section
-              className="bg-white rounded-soft border border-border-light p-6"
+              className="bg-white rounded-lg border border-stroke-light p-6"
               aria-labelledby="notes-heading"
             >
-              <h2 id="notes-heading" className="font-serif text-heading-5 text-text-primary mb-4">
+              <h2 id="notes-heading" className="font-sans text-heading-5 text-content-primary mb-4">
                 Notes
               </h2>
               {quote.notesForSeller && (
                 <div className="mb-4">
-                  <p className="font-sans text-caption text-text-muted mb-1">Vos notes:</p>
-                  <p className="font-sans text-body-sm text-text-secondary">
+                  <p className="font-sans text-caption text-content-muted mb-1">Vos notes:</p>
+                  <p className="font-sans text-body-sm text-content-secondary">
                     {quote.notesForSeller}
                   </p>
                 </div>
               )}
               {quote.sellerNotes && (
-                <div className="mt-4 pt-4 border-t border-border-light">
-                  <p className="font-sans text-caption text-text-muted mb-1">Reponse du fournisseur:</p>
-                  <p className="font-sans text-body-sm text-text-secondary">
+                <div className="mt-4 pt-4 border-t border-stroke-light">
+                  <p className="font-sans text-caption text-content-muted mb-1">Reponse du fournisseur:</p>
+                  <p className="font-sans text-body-sm text-content-secondary">
                     {quote.sellerNotes}
                   </p>
                 </div>
@@ -533,10 +549,10 @@ export default function DevisDetailPage({ params }: PageProps) {
 
           {/* Timeline */}
           <section
-            className="bg-white rounded-soft border border-border-light p-6"
+            className="bg-white rounded-lg border border-stroke-light p-6"
             aria-labelledby="history-heading"
           >
-            <h2 id="history-heading" className="font-serif text-heading-5 text-text-primary mb-4">
+            <h2 id="history-heading" className="font-sans text-heading-5 text-content-primary mb-4">
               Historique
             </h2>
             <div className="space-y-4" role="list" aria-label="Historique du devis">
@@ -556,14 +572,14 @@ export default function DevisDetailPage({ params }: PageProps) {
                   </div>
                   <div className="flex-1 pb-4">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-sans text-body-sm font-medium text-text-primary">
+                      <p className="font-sans text-body-sm font-medium text-content-primary">
                         {event.description}
                       </p>
-                      <span className="font-sans text-caption text-text-muted">
+                      <span className="font-sans text-caption text-content-muted">
                         par {event.actorName}
                       </span>
                     </div>
-                    <p className="font-sans text-caption text-text-muted mt-0.5">
+                    <p className="font-sans text-caption text-content-muted mt-0.5">
                       {formatDate(event.createdAt)} - {formatRelativeDate(event.createdAt)}
                     </p>
                   </div>
@@ -577,23 +593,23 @@ export default function DevisDetailPage({ params }: PageProps) {
         <div className="space-y-6">
           {/* Summary */}
           <section
-            className="bg-white rounded-soft border border-border-light"
+            className="bg-white rounded-lg border border-stroke-light"
             aria-labelledby="summary-heading"
           >
-            <div className="p-6 border-b border-border-light">
-              <h2 id="summary-heading" className="font-serif text-heading-5 text-text-primary">
+            <div className="p-6 border-b border-stroke-light">
+              <h2 id="summary-heading" className="font-sans text-heading-5 text-content-primary">
                 Recapitulatif
               </h2>
             </div>
             <div className="p-6 space-y-3">
               <div className="flex justify-between">
-                <span className="font-sans text-body-sm text-text-secondary">Sous-total</span>
-                <span className="font-sans text-body-sm text-text-primary">
+                <span className="font-sans text-body-sm text-content-secondary">Sous-total</span>
+                <span className="font-sans text-body-sm text-content-primary">
                   {formatCurrency(subtotal, quote.totals.currency)}
                 </span>
               </div>
               {totalDiscount > 0 && (
-                <div className="flex justify-between text-hermes-600">
+                <div className="flex justify-between text-primary-600">
                   <span className="font-sans text-body-sm">Remises demandees</span>
                   <span className="font-sans text-body-sm">
                     -{formatCurrency(totalDiscount, quote.totals.currency)}
@@ -602,25 +618,25 @@ export default function DevisDetailPage({ params }: PageProps) {
               )}
               {quote.totals.shipping > 0 && (
                 <div className="flex justify-between">
-                  <span className="font-sans text-body-sm text-text-secondary">Livraison</span>
-                  <span className="font-sans text-body-sm text-text-primary">
+                  <span className="font-sans text-body-sm text-content-secondary">Livraison</span>
+                  <span className="font-sans text-body-sm text-content-primary">
                     {formatCurrency(quote.totals.shipping, quote.totals.currency)}
                   </span>
                 </div>
               )}
               {quote.totals.tax > 0 && (
                 <div className="flex justify-between">
-                  <span className="font-sans text-body-sm text-text-secondary">TVA</span>
-                  <span className="font-sans text-body-sm text-text-primary">
+                  <span className="font-sans text-body-sm text-content-secondary">TVA</span>
+                  <span className="font-sans text-body-sm text-content-primary">
                     {formatCurrency(quote.totals.tax, quote.totals.currency)}
                   </span>
                 </div>
               )}
-              <div className="pt-3 border-t border-border-light flex justify-between">
-                <span className="font-sans text-body font-medium text-text-primary">
+              <div className="pt-3 border-t border-stroke-light flex justify-between">
+                <span className="font-sans text-body font-medium text-content-primary">
                   Total {quote.status === 'responded' ? 'propose' : 'demande'}
                 </span>
-                <span className="font-serif text-heading-4 text-text-primary">
+                <span className="font-sans text-heading-4 text-content-primary">
                   {formatCurrency(quote.totals.total, quote.totals.currency)}
                 </span>
               </div>
@@ -629,26 +645,26 @@ export default function DevisDetailPage({ params }: PageProps) {
 
           {/* Requester Info */}
           <section
-            className="bg-white rounded-soft border border-border-light p-6"
+            className="bg-white rounded-lg border border-stroke-light p-6"
             aria-labelledby="requester-heading"
           >
-            <h2 id="requester-heading" className="font-serif text-heading-5 text-text-primary mb-4">
+            <h2 id="requester-heading" className="font-sans text-heading-5 text-content-primary mb-4">
               Demande par
             </h2>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-hermes-100 flex items-center justify-center flex-shrink-0">
-                <span className="font-sans text-body font-medium text-hermes-600">
+              <div className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center flex-shrink-0">
+                <span className="font-sans text-body font-medium text-primary-600">
                   {quote.employeeName.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </span>
               </div>
               <div className="min-w-0">
-                <p className="font-sans text-body-sm font-medium text-text-primary truncate">
+                <p className="font-sans text-body-sm font-medium text-content-primary truncate">
                   {quote.employeeName}
                 </p>
-                <p className="font-sans text-caption text-text-muted truncate">
+                <p className="font-sans text-caption text-content-muted truncate">
                   {quote.contactEmail}
                 </p>
-                <p className="font-sans text-caption text-text-muted truncate">
+                <p className="font-sans text-caption text-content-muted truncate">
                   {quote.companyName}
                 </p>
               </div>
@@ -658,86 +674,92 @@ export default function DevisDetailPage({ params }: PageProps) {
           {/* Actions for responded quotes */}
           {quote.status === 'responded' && (
             <section
-              className="bg-white rounded-soft border border-border-light p-6"
+              className="bg-white rounded-lg border border-stroke-light p-6"
               aria-labelledby="response-heading"
             >
-              <h2 id="response-heading" className="font-serif text-heading-5 text-text-primary mb-4">
+              <h2 id="response-heading" className="font-sans text-heading-5 text-content-primary mb-4">
                 Reponse du fournisseur
               </h2>
               <div className="space-y-4">
-                <div className="p-4 bg-green-50 rounded-soft border border-green-200">
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                   <p className="font-sans text-body-sm text-green-800">
                     Offre valide jusqu'au {formatDate(quote.validUntil)}
                   </p>
-                  <p className="font-serif text-heading-4 text-green-700 mt-2">
+                  <p className="font-sans text-heading-4 text-green-700 mt-2">
                     {formatCurrency(quote.totals.total, quote.totals.currency)}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleAcceptQuote}
-                  disabled={isPending}
-                  className={cn(
-                    'w-full px-4 py-3 rounded-soft',
-                    'font-sans text-body-sm font-medium',
-                    'bg-green-500 text-white hover:bg-green-600',
-                    'transition-colors duration-200',
-                    'disabled:opacity-50 disabled:cursor-not-allowed',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
-                  )}
-                >
-                  {isPending ? 'Traitement...' : 'Accepter et commander'}
-                </button>
+                {/* Accept and order - Gated by quotes.quoteToOrder */}
+                {hasQuoteToOrder && (
+                  <button
+                    type="button"
+                    onClick={handleAcceptQuote}
+                    disabled={isPending}
+                    className={cn(
+                      'w-full px-4 py-3 rounded-lg',
+                      'font-sans text-body-sm font-medium',
+                      'bg-green-500 text-white hover:bg-green-600',
+                      'transition-colors duration-200',
+                      'disabled:opacity-50 disabled:cursor-not-allowed',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
+                    )}
+                  >
+                    {isPending ? 'Traitement...' : 'Accepter et commander'}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={handleRejectQuote}
                   disabled={isPending}
                   className={cn(
-                    'w-full px-4 py-2 rounded-soft',
+                    'w-full px-4 py-2 rounded-lg',
                     'font-sans text-body-sm font-medium',
-                    'bg-white border border-border-light text-text-secondary',
-                    'hover:bg-background-muted',
+                    'bg-white border border-stroke-light text-content-secondary',
+                    'hover:bg-surface-secondary',
                     'transition-colors duration-200',
                     'disabled:opacity-50 disabled:cursor-not-allowed',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                   )}
                 >
                   Refuser
                 </button>
-                <Link
-                  href={`/devis/${quote.id}/negocier`}
-                  className={cn(
-                    'block w-full px-4 py-2 rounded-soft text-center',
-                    'font-sans text-body-sm font-medium',
-                    'bg-white border border-border-light text-text-secondary',
-                    'hover:bg-background-muted',
-                    'transition-colors duration-200',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
-                  )}
-                >
-                  Negocier
-                </Link>
+                {/* Negotiate - Gated by quotes.negotiation */}
+                {hasNegotiation && (
+                  <Link
+                    href={`/devis/${quote.id}/negocier`}
+                    className={cn(
+                      'block w-full px-4 py-2 rounded-lg text-center',
+                      'font-sans text-body-sm font-medium',
+                      'bg-white border border-stroke-light text-content-secondary',
+                      'hover:bg-surface-secondary',
+                      'transition-colors duration-200',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                    )}
+                  >
+                    Negocier
+                  </Link>
+                )}
               </div>
             </section>
           )}
 
           {/* Help */}
-          <div className="bg-background-muted rounded-soft p-4">
-            <h3 className="font-sans text-body-sm font-medium text-text-primary mb-2">
+          <div className="bg-surface-secondary rounded-lg p-4">
+            <h3 className="font-sans text-body-sm font-medium text-content-primary mb-2">
               Besoin d'aide ?
             </h3>
-            <p className="font-sans text-caption text-text-muted mb-3">
+            <p className="font-sans text-caption text-content-muted mb-3">
               Notre equipe commerciale est disponible pour repondre a vos questions.
             </p>
             <Link
               href="/support"
               className={cn(
-                'block w-full px-3 py-2 rounded-soft text-center',
+                'block w-full px-3 py-2 rounded-lg text-center',
                 'font-sans text-caption font-medium',
-                'bg-white border border-border-light text-text-secondary',
-                'hover:bg-white hover:border-hermes-300',
+                'bg-white border border-stroke-light text-content-secondary',
+                'hover:bg-white hover:border-primary/20',
                 'transition-colors duration-200',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
               )}
             >
               Contacter le support

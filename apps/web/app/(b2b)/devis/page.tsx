@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatDate, formatRelativeDate } from '@/lib/formatters';
 import { useB2B, useB2BPermissions } from '@/contexts/B2BContext';
+import { useQuotesFeatures } from '@/contexts/FeatureContext';
 import type { QuoteStatus } from '@maison/types';
 import {
   StatusBadge,
@@ -47,6 +48,9 @@ export default function DevisPage() {
   const { quotes, quotesLoading, isLoading } = useB2B();
   const { canCreateQuote } = useB2BPermissions();
 
+  // Feature flags
+  const { isEnabled: hasQuotes, hasRequestQuote, hasNegotiation, hasQuoteToOrder } = useQuotesFeatures();
+
   // Filter quotes based on selected status
   const filteredQuotes = useMemo(() => {
     if (statusFilter === 'all') return quotes;
@@ -79,6 +83,17 @@ export default function DevisPage() {
     },
   ], [quotes, pendingCount]);
 
+  // Module disabled - show message
+  if (!hasQuotes) {
+    return (
+      <EmptyState
+        icon="document"
+        message="Module devis desactive"
+        description="Le module de gestion des devis n'est pas disponible pour votre compte."
+      />
+    );
+  }
+
   // Loading state
   if (isLoading) {
     return <PageLoader message="Chargement des devis..." />;
@@ -95,7 +110,8 @@ export default function DevisPage() {
             : 'Gerez vos demandes de devis'
         }
         actions={
-          canCreateQuote && (
+          /* Request Quote - Gated by quotes.requestQuote AND canCreateQuote permission */
+          hasRequestQuote && canCreateQuote && (
             <ActionButton
               variant="primary"
               href="/devis/nouveau"
@@ -116,7 +132,7 @@ export default function DevisPage() {
 
       {/* Quotes List */}
       <section
-        className="bg-white rounded-soft border border-border-light overflow-hidden"
+        className="bg-white rounded-lg border border-stroke-light overflow-hidden"
         aria-labelledby="quotes-list-heading"
       >
         <h2 id="quotes-list-heading" className="sr-only">Liste des devis</h2>
@@ -130,7 +146,7 @@ export default function DevisPage() {
                 ? 'Aucun devis pour le moment'
                 : `Aucun devis avec ce statut`
             }
-            action={canCreateQuote && statusFilter === 'all' ? {
+            action={hasRequestQuote && canCreateQuote && statusFilter === 'all' ? {
               label: 'Creer votre premier devis',
               href: '/devis/nouveau',
             } : undefined}
@@ -139,48 +155,48 @@ export default function DevisPage() {
           <div className="overflow-x-auto" role="region" aria-label="Tableau des devis" tabIndex={0}>
             <table className="w-full" aria-label="Liste des devis">
               <thead>
-                <tr className="border-b border-border-light bg-background-muted">
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                <tr className="border-b border-stroke-light bg-surface-secondary">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Devis
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Date
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Statut
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Articles
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-right font-sans text-caption font-medium text-content-muted">
                     Total
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-left font-sans text-caption font-medium text-content-muted">
                     Expire le
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right font-sans text-caption font-medium text-text-muted">
+                  <th scope="col" className="px-4 py-3 text-right font-sans text-caption font-medium text-content-muted">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-light">
                 {filteredQuotes.map((quote) => (
-                  <tr key={quote.id} className="hover:bg-background-muted transition-colors">
+                  <tr key={quote.id} className="hover:bg-surface-secondary transition-colors">
                     <td className="px-4 py-4">
                       <Link
                         href={`/devis/${quote.id}`}
                         className={cn(
-                          'font-sans text-body-sm font-medium text-hermes-500 hover:text-hermes-600',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft'
+                          'font-sans text-body-sm font-medium text-primary hover:text-primary-600',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg'
                         )}
                       >
                         {quote.quoteNumber}
                       </Link>
-                      <p className="font-sans text-caption text-text-muted">
+                      <p className="font-sans text-caption text-content-muted">
                         {formatRelativeDate(quote.updatedAt)}
                       </p>
                       {quote.hasUnreadMessages && (
-                        <span className="inline-flex items-center gap-1 mt-1 text-hermes-500" role="status">
+                        <span className="inline-flex items-center gap-1 mt-1 text-primary" role="status">
                           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                             <circle cx="10" cy="10" r="6" />
                           </svg>
@@ -188,19 +204,19 @@ export default function DevisPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-4 font-sans text-body-sm text-text-secondary">
+                    <td className="px-4 py-4 font-sans text-body-sm text-content-secondary">
                       {formatDate(quote.createdAt)}
                     </td>
                     <td className="px-4 py-4">
                       <StatusBadge status={quote.status} size="sm" />
                     </td>
-                    <td className="px-4 py-4 font-sans text-body-sm text-text-secondary">
+                    <td className="px-4 py-4 font-sans text-body-sm text-content-secondary">
                       {quote.itemCount} article{quote.itemCount > 1 ? 's' : ''}
                     </td>
-                    <td className="px-4 py-4 text-right font-sans text-body-sm font-medium text-text-primary">
+                    <td className="px-4 py-4 text-right font-sans text-body-sm font-medium text-content-primary">
                       {formatCurrency(quote.total, quote.currency)}
                     </td>
-                    <td className="px-4 py-4 font-sans text-body-sm text-text-secondary">
+                    <td className="px-4 py-4 font-sans text-body-sm text-content-secondary">
                       {quote.status === 'accepted' || quote.status === 'rejected' || quote.status === 'converted'
                         ? <span aria-label="Non applicable">-</span>
                         : formatDate(quote.validUntil)
@@ -212,11 +228,11 @@ export default function DevisPage() {
                           <Link
                             href={`/devis/${quote.id}`}
                             className={cn(
-                              'px-3 py-1 rounded-soft',
+                              'px-3 py-1 rounded-lg',
                               'font-sans text-caption font-medium',
-                              'bg-hermes-500 text-white hover:bg-hermes-600',
+                              'bg-primary text-white hover:bg-primary-600',
                               'transition-colors duration-200',
-                              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-300 focus-visible:ring-offset-2'
+                              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2'
                             )}
                           >
                             Voir la reponse
@@ -226,7 +242,7 @@ export default function DevisPage() {
                           <Link
                             href={`/commandes`}
                             className={cn(
-                              'px-3 py-1 rounded-soft',
+                              'px-3 py-1 rounded-lg',
                               'font-sans text-caption font-medium',
                               'bg-green-100 text-green-700 hover:bg-green-200',
                               'transition-colors duration-200',
@@ -239,10 +255,10 @@ export default function DevisPage() {
                         <Link
                           href={`/devis/${quote.id}`}
                           className={cn(
-                            'p-2 rounded-soft',
-                            'text-text-muted hover:text-text-primary hover:bg-background-muted',
+                            'p-2 rounded-lg',
+                            'text-content-muted hover:text-content-primary hover:bg-surface-secondary',
                             'transition-colors duration-200',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                           )}
                           aria-label={`Voir les details du devis ${quote.quoteNumber}`}
                         >

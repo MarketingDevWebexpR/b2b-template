@@ -1,9 +1,10 @@
 'use client';
 
 /**
- * ProductCardGrid Component
+ * ProductCardGrid Component - E-commerce Style
  *
  * Vertical grid card layout for B2B product display.
+ * Styled following Leroy Merlin / Shop Ragues design patterns.
  *
  * Layout:
  * - Product image with floating action buttons
@@ -32,7 +33,7 @@ import type {
   ProductStockStatus,
 } from './types';
 
-const PLACEHOLDER_IMAGE = '/images/placeholder-product.svg';
+const PLACEHOLDER_IMAGE = '/placeholder-product.jpg';
 
 /**
  * Determine stock status from quantity
@@ -160,20 +161,20 @@ export function ProductCardGrid({
   return (
     <article
       className={cn(
-        'group relative flex flex-col bg-white rounded-lg border border-gray-200',
-        'transition-all duration-300 ease-out',
-        'hover:shadow-lg hover:border-gray-300 hover:-translate-y-0.5',
+        'group relative flex flex-col bg-white rounded-lg border border-stroke-light',
+        'transition-all duration-200 ease-out',
+        'hover:shadow-lg hover:border-stroke hover:-translate-y-0.5',
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-50">
+      <div className="relative aspect-square overflow-hidden rounded-t-elegant bg-surface-secondary">
         {/* Loading skeleton */}
         <div
           className={cn(
-            'absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100',
+            'absolute inset-0 bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary',
             'bg-[length:200%_100%] animate-pulse',
             'transition-opacity duration-300',
             imageLoaded ? 'opacity-0' : 'opacity-100'
@@ -182,7 +183,7 @@ export function ProductCardGrid({
 
         {/* Product image */}
         <Link
-          href={`/products/${product.id}`}
+          href={`/produits/${product.slug || product.id}`}
           className="block w-full h-full"
           aria-label={`Voir ${product.name}`}
         >
@@ -227,44 +228,44 @@ export function ProductCardGrid({
 
         {/* New badge */}
         {product.isNew && (
-          <span className="absolute top-3 left-3 z-10 px-2 py-1 bg-gray-900 text-white text-xs font-medium uppercase tracking-wide rounded">
+          <span className="badge-new absolute top-3 left-3 z-10">
             Nouveau
           </span>
         )}
 
         {/* Promotional badge */}
         {effectivePriceInfo.isPromotional && (
-          <span className="absolute bottom-3 left-3 z-10 px-2 py-1 bg-red-600 text-white text-xs font-medium uppercase tracking-wide rounded">
-            Promo
+          <span className="badge-promo absolute bottom-3 left-3 z-10">
+            -{effectivePriceInfo.discountPercent}%
           </span>
         )}
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-4 gap-3">
+      <div className="flex flex-col flex-1 p-4 gap-2">
         {/* Brand */}
         {product.brand && (
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <span className="text-caption font-semibold uppercase tracking-wider text-content-muted">
             {product.brand}
           </span>
         )}
 
         {/* Product Name */}
         <Link
-          href={`/products/${product.id}`}
+          href={`/produits/${product.slug || product.id}`}
           className="group/link"
         >
-          <h3 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover/link:text-blue-600 transition-colors">
+          <h3 className="text-body font-medium text-content-primary line-clamp-2 group-hover/link:text-primary transition-colors">
             {product.name}
           </h3>
         </Link>
 
         {/* Reference and EAN */}
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-caption text-content-muted">
           <span>REF: {product.reference}</span>
           {product.ean && (
             <>
-              <span className="text-gray-300">|</span>
+              <span className="text-stroke">|</span>
               <span>EAN: {product.ean}</span>
             </>
           )}
@@ -301,7 +302,7 @@ export function ProductCardGrid({
             maxQuantity={effectiveStockInfo.quantity > 0 ? effectiveStockInfo.quantity : undefined}
             isOutOfStock={isOutOfStock}
             layout="horizontal"
-            className="pt-2 border-t border-gray-100"
+            className="pt-3 border-t border-stroke-light"
           />
         )}
       </div>

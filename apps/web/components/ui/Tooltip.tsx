@@ -172,8 +172,8 @@ const Tooltip = ({
       className={cn(
         'fixed z-50',
         'px-3 py-2',
-        'bg-b2b-text-primary text-white',
-        'text-b2b-body-sm',
+        'bg-neutral-900 text-white',
+        'text-sm',
         'rounded-md shadow-lg',
         'animate-in fade-in zoom-in-95 duration-150',
         'pointer-events-none',
@@ -191,7 +191,7 @@ const Tooltip = ({
       <div
         className={cn(
           'absolute w-2 h-2',
-          'bg-b2b-text-primary',
+          'bg-neutral-900',
           'transform rotate-45',
           arrowClasses[actualPlacement || 'top']
         )}
@@ -244,9 +244,9 @@ const InfoTooltip = ({
         type="button"
         className={cn(
           'inline-flex items-center justify-center',
-          'text-b2b-text-muted hover:text-b2b-primary',
+          'text-neutral-500 hover:text-accent',
           'transition-colors duration-200',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 focus-visible:ring-offset-2',
           'rounded-full'
         )}
         aria-label="Plus d'informations"

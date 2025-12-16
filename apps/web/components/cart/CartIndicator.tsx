@@ -22,7 +22,7 @@ interface CartIndicatorProps {
  *
  * A compact cart icon with animated item count badge.
  * Designed for use in the site header.
- * Follows the luxury Hermes-inspired design language.
+ * B2B professional neutral styling.
  */
 export function CartIndicator({
   className,
@@ -47,10 +47,10 @@ export function CartIndicator({
   const sharedClassName = cn(
     'relative flex items-center justify-center',
     'w-10 h-10 rounded-full',
-    'text-text-secondary hover:text-text-primary',
-    'hover:bg-background-warm',
-    'transition-all duration-300 ease-luxe',
-    'focus:outline-none focus-visible:ring-1 focus-visible:ring-luxe-charcoal/20',
+    'text-neutral-600 hover:text-neutral-900',
+    'hover:bg-neutral-100',
+    'transition-all duration-200',
+    'focus:outline-none focus-visible:ring-1 focus-visible:ring-neutral-900/20',
     'group',
     className
   );
@@ -85,7 +85,7 @@ export function CartIndicator({
             className={cn(
               'absolute -top-0.5 -right-0.5',
               'min-w-4 h-4 px-1 rounded-full',
-              'bg-luxe-charcoal text-white',
+              'bg-accent text-white',
               'text-[9px] font-medium',
               'flex items-center justify-center',
               'pointer-events-none'
@@ -107,7 +107,7 @@ export function CartIndicator({
             className={cn(
               'absolute inset-0',
               'rounded-full',
-              'bg-hermes-500/20',
+              'bg-accent/20',
               'pointer-events-none'
             )}
           />
@@ -146,8 +146,8 @@ export function CartIndicatorCompact({ className, asLink = false }: { className?
 
   const sharedClassName = cn(
     'relative inline-flex items-center gap-2',
-    'text-text-secondary hover:text-text-primary',
-    'transition-colors duration-300 ease-luxe',
+    'text-neutral-600 hover:text-neutral-900',
+    'transition-colors duration-200',
     className
   );
 
@@ -155,7 +155,7 @@ export function CartIndicatorCompact({ className, asLink = false }: { className?
     <>
       <ShoppingBag className="w-4 h-4" strokeWidth={1.25} />
       {itemCount > 0 && (
-        <span className="text-caption font-medium">
+        <span className="text-xs font-medium">
           {itemCount}
         </span>
       )}

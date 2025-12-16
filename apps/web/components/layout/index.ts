@@ -1,11 +1,8 @@
 // Layout Components
-export { Logo, LogoText } from './Logo';
-export { Navigation } from './Navigation';
-export { MobileMenu } from './MobileMenu';
-export { Header, HeaderSpacer } from './Header';
-export { Footer } from './Footer';
+export { Logo, LogoText, LogoMinimal } from './Logo';
+export { FooterEcom, type FooterEcomProps } from './FooterEcom';
 
-// B2B Header Components
+// B2B Header Components (legacy dashboard style)
 export {
   B2BHeader,
   B2BHeaderSpacer,
@@ -29,3 +26,16 @@ export type {
   FeaturedProduct,
   NavLink,
 } from './B2BHeader';
+
+// B2B E-commerce Header (main header for shop)
+export {
+  B2BHeaderEcom,
+  B2BHeaderEcomSpacer,
+  PromoBanner,
+  HeaderTop,
+  HeaderNav,
+  MegaMenuEcom,
+  MobileMenuEcom,
+} from './B2BHeaderEcom';
+
+export type { B2BHeaderEcomProps } from './B2BHeaderEcom';

@@ -63,13 +63,13 @@ export function Newsletter() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-background-beige py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-neutral-100 py-16 lg:py-20">
       {/* Subtle Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.03]">
+      <div className="absolute inset-0 opacity-[0.02]">
         <div
           className="h-full w-full"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232b333f' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23525252' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
         />
       </div>
@@ -85,29 +85,29 @@ export function Newsletter() {
         >
           {/* Decorative Element */}
           <motion.div
-            className="mx-auto mb-8 flex items-center justify-center gap-4"
+            className="mx-auto mb-6 flex items-center justify-center gap-4"
             variants={itemVariants}
           >
-            <span className="h-px w-12 bg-hermes-500" />
-            <span className="h-2 w-2 rotate-45 bg-hermes-500" />
-            <span className="h-px w-12 bg-hermes-500" />
+            <span className="h-px w-12 bg-accent" />
+            <span className="h-2 w-2 rotate-45 bg-accent" />
+            <span className="h-px w-12 bg-accent" />
           </motion.div>
 
           {/* Headline */}
           <motion.h2
-            className="font-serif text-heading-1 text-text-primary md:text-display-2"
+            className="font-sans text-2xl font-semibold text-neutral-900 md:text-3xl"
             variants={itemVariants}
           >
-            Restez Informes
+            Restez informe
           </motion.h2>
 
           {/* Subheadline */}
           <motion.p
-            className="mx-auto mt-4 max-w-prose font-sans text-body-lg text-text-muted"
+            className="mx-auto mt-3 max-w-prose font-sans text-base text-neutral-600"
             variants={itemVariants}
           >
             Inscrivez-vous a notre newsletter pour recevoir nos dernieres
-            creations, evenements exclusifs et offres privilegiees.
+            nouveautes, offres exclusives et actualites du marche.
           </motion.p>
 
           {/* Form */}
@@ -129,8 +129,8 @@ export function Newsletter() {
                   placeholder="Votre adresse email"
                   disabled={status === 'loading' || status === 'success'}
                   className={cn(
-                    'w-full bg-white px-6 py-4 font-sans text-text-primary placeholder-text-light outline-none transition-all duration-350',
-                    'border border-border focus:border-hermes-500 rounded-soft sm:rounded-r-none',
+                    'w-full bg-white px-5 py-3.5 font-sans text-neutral-900 placeholder-neutral-400 outline-none transition-all duration-200',
+                    'border border-neutral-300 focus:border-accent rounded-sm sm:rounded-r-none',
                     'disabled:opacity-50',
                     status === 'error' && 'border-red-500'
                   )}
@@ -156,9 +156,9 @@ export function Newsletter() {
                 type="submit"
                 disabled={status === 'loading' || status === 'success'}
                 className={cn(
-                  'group relative flex items-center justify-center gap-2 bg-hermes-500 px-8 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-350',
-                  'hover:bg-hermes-600 hover:shadow-button-hover disabled:opacity-70',
-                  'sm:min-w-[140px] rounded-soft sm:rounded-l-none'
+                  'group relative flex items-center justify-center gap-2 bg-accent px-6 py-3.5 font-sans text-sm font-medium uppercase tracking-wider text-white transition-all duration-200',
+                  'hover:bg-accent/90 disabled:opacity-70',
+                  'sm:min-w-[140px] rounded-sm sm:rounded-l-none'
                 )}
                 aria-label="Subscribe to newsletter"
               >
@@ -172,7 +172,7 @@ export function Newsletter() {
                 ) : (
                   <>
                     <span className="hidden sm:inline">S&apos;inscrire</span>
-                    <Send className="h-5 w-5 transition-transform duration-350 group-hover:translate-x-1" />
+                    <Send className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </>
                 )}
               </button>
@@ -206,13 +206,13 @@ export function Newsletter() {
 
           {/* Privacy Text */}
           <motion.p
-            className="mt-6 font-sans text-caption text-text-light"
+            className="mt-4 font-sans text-xs text-neutral-500"
             variants={itemVariants}
           >
             En vous inscrivant, vous acceptez notre{' '}
             <a
               href="/privacy"
-              className="text-hermes-500 underline-offset-2 transition-colors duration-350 hover:text-hermes-600 hover:underline"
+              className="text-accent underline-offset-2 transition-colors duration-200 hover:text-accent/80 hover:underline"
             >
               politique de confidentialite
             </a>
@@ -221,12 +221,12 @@ export function Newsletter() {
 
           {/* Decorative Element */}
           <motion.div
-            className="mx-auto mt-12 flex items-center justify-center gap-4"
+            className="mx-auto mt-10 flex items-center justify-center gap-4"
             variants={itemVariants}
           >
-            <span className="h-px w-12 bg-hermes-500" />
-            <span className="h-2 w-2 rotate-45 bg-hermes-500" />
-            <span className="h-px w-12 bg-hermes-500" />
+            <span className="h-px w-12 bg-accent" />
+            <span className="h-2 w-2 rotate-45 bg-accent" />
+            <span className="h-px w-12 bg-accent" />
           </motion.div>
         </motion.div>
       </div>

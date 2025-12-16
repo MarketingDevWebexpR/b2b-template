@@ -130,7 +130,7 @@ const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
             'fixed inset-y-0',
             side === 'left' ? 'left-0' : 'right-0',
             drawerSizes[size],
-            'bg-b2b-bg-primary',
+            'bg-white',
             'shadow-2xl',
             'flex flex-col',
             'transition-transform duration-300 ease-out',
@@ -149,7 +149,7 @@ const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
               className={cn(
                 'flex items-start justify-between gap-4',
                 'px-6 py-4',
-                'border-b border-b2b-border-light',
+                'border-b border-neutral-200',
                 'flex-shrink-0'
               )}
             >
@@ -157,7 +157,7 @@ const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
                 {title && (
                   <h2
                     id="drawer-title"
-                    className="text-b2b-section-title text-b2b-text-primary truncate"
+                    className="text-lg font-semibold text-neutral-900 truncate"
                   >
                     {title}
                   </h2>
@@ -165,7 +165,7 @@ const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
                 {description && (
                   <p
                     id="drawer-description"
-                    className="mt-1 text-b2b-body-sm text-b2b-text-secondary"
+                    className="mt-1 text-sm text-neutral-600"
                   >
                     {description}
                   </p>
@@ -178,11 +178,11 @@ const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
                   className={cn(
                     'flex-shrink-0',
                     'p-2 -m-2',
-                    'text-b2b-text-muted hover:text-b2b-text-primary',
-                    'hover:bg-b2b-bg-tertiary',
+                    'text-neutral-500 hover:text-neutral-900',
+                    'hover:bg-neutral-100',
                     'rounded-lg',
                     'transition-colors duration-200',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary'
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20'
                   )}
                   aria-label="Fermer"
                 >
@@ -215,8 +215,8 @@ const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
             <div
               className={cn(
                 'px-6 py-4',
-                'border-t border-b2b-border-light',
-                'bg-b2b-bg-secondary',
+                'border-t border-neutral-200',
+                'bg-neutral-50',
                 'flex-shrink-0'
               )}
             >

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { HeaderSpacer } from '@/components/layout/Header';
+import { B2BHeaderEcomSpacer } from '@/components/layout/B2BHeaderEcom';
 import {
   CheckoutSteps,
   ShippingForm,
@@ -130,17 +130,17 @@ export default function CheckoutPage() {
         createdAt: new Date().toISOString(),
         status: 'confirmed',
         items: cart.items.map((item) => ({
-          productId: item.product.id,
-          productReference: item.product.reference,
-          productName: item.product.name,
-          productSlug: item.product.slug,
-          productImage: item.product.images[0] || '',
-          unitPrice: item.product.price,
+          productId: item.productId,
+          productReference: item.productReference,
+          productName: item.productName,
+          productSlug: item.productSlug,
+          productImage: item.productImage || '',
+          unitPrice: item.pricing.unitPriceTTC,
           quantity: item.quantity,
-          totalPrice: item.product.price * item.quantity,
+          totalPrice: item.pricing.unitPriceTTC * item.quantity,
         })),
-        totalPrice: cart.totalPrice,
-        shippingCost: cart.totalPrice >= 500 ? 0 : 15,
+        totalPrice: cart.totalTTC,
+        shippingCost: cart.totalTTC >= 500 ? 0 : 15,
         shipping: {
           firstName: shippingData.firstName,
           lastName: shippingData.lastName,
@@ -176,13 +176,13 @@ export default function CheckoutPage() {
   // Loading states
   if (status === 'loading' || cartLoading) {
     return (
-      <main className="min-h-screen bg-background-cream">
-        <HeaderSpacer />
+      <main className="min-h-screen bg-white">
+        <B2BHeaderEcomSpacer />
         <Container className="py-12">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <div className="w-12 h-12 border-2 border-hermes-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-text-muted">Chargement...</p>
+              <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-content-muted">Chargement...</p>
             </div>
           </div>
         </Container>
@@ -193,13 +193,13 @@ export default function CheckoutPage() {
   // Not authenticated - show loading while redirecting
   if (!session) {
     return (
-      <main className="min-h-screen bg-background-cream">
-        <HeaderSpacer />
+      <main className="min-h-screen bg-white">
+        <B2BHeaderEcomSpacer />
         <Container className="py-12">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <div className="w-12 h-12 border-2 border-hermes-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-text-muted">Redirection vers la connexion...</p>
+              <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-content-muted">Redirection vers la connexion...</p>
             </div>
           </div>
         </Container>
@@ -210,21 +210,21 @@ export default function CheckoutPage() {
   // Empty cart
   if (cart.items.length === 0 && currentStep === 1) {
     return (
-      <main className="min-h-screen bg-background-cream">
-        <HeaderSpacer />
+      <main className="min-h-screen bg-white">
+        <B2BHeaderEcomSpacer />
         <Container className="py-12">
           <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-            <ShoppingBag className="h-16 w-16 text-text-muted mb-6" />
-            <h1 className="font-serif text-2xl md:text-3xl text-text-primary mb-4">
+            <ShoppingBag className="h-16 w-16 text-content-muted mb-6" />
+            <h1 className="font-sans text-2xl md:text-3xl text-content-primary mb-4">
               Votre panier est vide
             </h1>
-            <p className="text-text-muted mb-8 max-w-md">
-              Decouvrez nos collections de haute joaillerie et laissez-vous seduire
-              par nos creations d'exception.
+            <p className="text-content-muted mb-8 max-w-md">
+              Decouvrez notre catalogue professionnel et trouvez les pieces
+              qui correspondent a vos besoins.
             </p>
-            <Link href="/collections">
+            <Link href="/categories">
               <Button variant="primary" size="lg">
-                Decouvrir nos collections
+                Decouvrir notre catalogue
               </Button>
             </Link>
           </div>
@@ -234,18 +234,18 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background-cream">
-      <HeaderSpacer />
+    <main className="min-h-screen bg-white">
+      <B2BHeaderEcomSpacer />
 
       {/* Page header */}
-      <section className="py-8 md:py-12 border-b border-border-light">
+      <section className="py-8 md:py-12 border-b border-stroke-light">
         <Container>
           {/* Back link */}
           <Link
             href="/panier"
             className={cn(
-              'inline-flex items-center gap-2 text-sm text-text-muted',
-              'hover:text-hermes-500 transition-colors mb-6'
+              'inline-flex items-center gap-2 text-sm text-content-muted',
+              'hover:text-primary transition-colors mb-6'
             )}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -254,10 +254,10 @@ export default function CheckoutPage() {
 
           {/* Title */}
           <div className="text-center">
-            <span className="block text-xs uppercase tracking-luxe text-hermes-500 mb-2">
+            <span className="block text-xs uppercase  text-primary mb-2">
               Maison Joaillerie
             </span>
-            <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl text-text-primary">
+            <h1 className="font-sans text-2xl md:text-3xl lg:text-4xl text-content-primary">
               Finaliser votre commande
             </h1>
           </div>
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
       </section>
 
       {/* Step indicator */}
-      <section className="py-8 border-b border-border-light bg-white">
+      <section className="py-8 border-b border-stroke-light bg-white">
         <Container>
           <CheckoutSteps currentStep={currentStep} />
         </Container>
@@ -290,7 +290,7 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             {/* Form section */}
             <div className="lg:col-span-7 xl:col-span-8">
-              <div className="bg-white p-6 md:p-8 border border-border-light">
+              <div className="bg-white p-6 md:p-8 border border-stroke-light">
                 {/* Step 1: Shipping */}
                 {currentStep === 1 && (
                   <ShippingForm
@@ -306,7 +306,7 @@ export default function CheckoutPage() {
                     onSubmit={handlePaymentSubmit}
                     onBack={handleBackToShipping}
                     isLoading={isSubmitting}
-                    totalAmount={cart.totalPrice + (cart.totalPrice >= 500 ? 0 : 15)}
+                    totalAmount={cart.totalTTC + (cart.totalTTC >= 500 ? 0 : 15)}
                   />
                 )}
               </div>
@@ -323,38 +323,38 @@ export default function CheckoutPage() {
       </section>
 
       {/* Trust section */}
-      <section className="py-8 bg-background-beige border-t border-border-light">
+      <section className="py-8 bg-background-beige border-t border-stroke-light">
         <Container>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <span className="block font-serif text-2xl text-hermes-500 mb-1">
+              <span className="block font-sans text-2xl text-primary mb-1">
                 100%
               </span>
-              <span className="text-xs uppercase tracking-luxe text-text-muted">
+              <span className="text-xs uppercase  text-content-muted">
                 Securise
               </span>
             </div>
             <div>
-              <span className="block font-serif text-2xl text-hermes-500 mb-1">
+              <span className="block font-sans text-2xl text-primary mb-1">
                 3-5j
               </span>
-              <span className="text-xs uppercase tracking-luxe text-text-muted">
+              <span className="text-xs uppercase  text-content-muted">
                 Livraison
               </span>
             </div>
             <div>
-              <span className="block font-serif text-2xl text-hermes-500 mb-1">
+              <span className="block font-sans text-2xl text-primary mb-1">
                 30j
               </span>
-              <span className="text-xs uppercase tracking-luxe text-text-muted">
+              <span className="text-xs uppercase  text-content-muted">
                 Retours
               </span>
             </div>
             <div>
-              <span className="block font-serif text-2xl text-hermes-500 mb-1">
+              <span className="block font-sans text-2xl text-primary mb-1">
                 24/7
               </span>
-              <span className="text-xs uppercase tracking-luxe text-text-muted">
+              <span className="text-xs uppercase  text-content-muted">
                 Support
               </span>
             </div>

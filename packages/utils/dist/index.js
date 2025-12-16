@@ -45,7 +45,29 @@ function formatDate(date, locale = "fr-FR") {
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+function isPlainObject(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && Object.prototype.toString.call(value) === "[object Object]";
+}
+function deepMerge(target, source) {
+  const output = { ...target };
+  if (!isPlainObject(target) || !isPlainObject(source)) {
+    return output;
+  }
+  for (const key of Object.keys(source)) {
+    const sourceValue = source[key];
+    const targetValue = target[key];
+    if (isPlainObject(sourceValue) && isPlainObject(targetValue)) {
+      output[key] = deepMerge(
+        targetValue,
+        sourceValue
+      );
+    } else if (sourceValue !== void 0) {
+      output[key] = sourceValue;
+    }
+  }
+  return output;
+}
 
-export { calculateDiscount, cn, debounce, delay, formatDate, formatPrice, generateId, isClient, slugify, truncate };
+export { calculateDiscount, cn, debounce, deepMerge, delay, formatDate, formatPrice, generateId, isClient, slugify, truncate };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

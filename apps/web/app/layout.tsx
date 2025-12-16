@@ -22,35 +22,29 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Maison Bijoux | Haute Joaillerie',
-    template: '%s | Maison Bijoux',
+    default: 'WebexpR Pro | Plateforme B2B',
+    template: '%s | WebexpR Pro',
   },
   description:
-    'Decouvrez notre collection exclusive de haute joaillerie. Pieces uniques creees par nos maitres artisans depuis 1987. Bagues, colliers, bracelets et boucles d\'oreilles d\'exception.',
+    'Plateforme B2B professionnelle pour la gestion de vos commandes, devis et catalogues produits.',
   keywords: [
-    'bijoux',
-    'joaillerie',
-    'haute joaillerie',
-    'bijoux de luxe',
-    'bagues',
-    'colliers',
-    'bracelets',
-    'boucles d\'oreilles',
-    'or',
-    'diamants',
-    'pierres precieuses',
-    'Paris',
-    'France',
+    'B2B',
+    'plateforme professionnelle',
+    'gestion commandes',
+    'devis',
+    'catalogue produits',
+    'grossiste',
+    'professionnel',
   ],
-  authors: [{ name: 'Maison Bijoux' }],
-  creator: 'Maison Bijoux',
-  publisher: 'Maison Bijoux',
+  authors: [{ name: 'WebexpR Pro' }],
+  creator: 'WebexpR Pro',
+  publisher: 'WebexpR Pro',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://maisonbijoux.fr'),
+  metadataBase: new URL('https://webexpr.pro'),
   alternates: {
     canonical: '/',
     languages: {
@@ -60,27 +54,27 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://maisonbijoux.fr',
-    siteName: 'Maison Bijoux',
-    title: 'Maison Bijoux | Haute Joaillerie',
+    url: 'https://webexpr.pro',
+    siteName: 'WebexpR Pro',
+    title: 'WebexpR Pro | Plateforme B2B',
     description:
-      'Decouvrez notre collection exclusive de haute joaillerie. Pieces uniques creees par nos maitres artisans depuis 1987.',
+      'Plateforme B2B professionnelle pour la gestion de vos commandes, devis et catalogues produits.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Maison Bijoux - Haute Joaillerie',
+        alt: 'WebexpR Pro - Plateforme B2B',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Maison Bijoux | Haute Joaillerie',
+    title: 'WebexpR Pro | Plateforme B2B',
     description:
-      'Decouvrez notre collection exclusive de haute joaillerie. Pieces uniques creees par nos maitres artisans depuis 1987.',
+      'Plateforme B2B professionnelle pour la gestion de vos commandes, devis et catalogues produits.',
     images: ['/og-image.jpg'],
-    creator: '@maisonbijoux',
+    creator: '@webexprpro',
   },
   robots: {
     index: true,

@@ -38,8 +38,8 @@ const inputSizes = {
 };
 
 /**
- * Elegant form input component with label and error state.
- * Designed with luxury styling - gold accents on focus, clean typography.
+ * Form input component with label and error state.
+ * Designed with B2B professional styling.
  */
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
@@ -82,10 +82,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               'block mb-2',
               'font-sans text-sm font-medium tracking-wide',
-              'text-luxury-pearl',
+              'text-neutral-700',
               'transition-colors duration-200',
-              hasError && 'text-red-400',
-              disabled && 'text-luxury-silver opacity-60'
+              hasError && 'text-red-500',
+              disabled && 'text-neutral-400 opacity-60'
             )}
           >
             {label}
@@ -99,9 +99,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <span
               className={cn(
                 'absolute left-4 top-1/2 -translate-y-1/2',
-                'text-luxury-silver',
+                'text-neutral-400',
                 'pointer-events-none',
-                hasError && 'text-red-400'
+                hasError && 'text-red-500'
               )}
             >
               {startIcon}
@@ -122,20 +122,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               // Base styles
               'w-full',
               'font-sans',
-              'bg-luxury-charcoal text-luxury-pearl',
-              'border border-luxury-gray',
-              'rounded-soft', // Soft rounded corners aligned with mobile
-              'placeholder:text-luxury-silver',
-              'transition-all duration-300 ease-luxury',
+              'bg-white text-neutral-900',
+              'border border-neutral-300',
+              'rounded-lg',
+              'placeholder:text-neutral-400',
+              'transition-all duration-150',
               // Focus styles
               'focus:outline-none',
-              'focus:border-gold-500',
-              'focus:ring-1 focus:ring-gold-500/30',
+              'focus:border-accent',
+              'focus:ring-1 focus:ring-accent/30',
               // Hover styles
-              'hover:border-luxury-silver',
+              'hover:border-neutral-400',
               // Disabled styles
-              'disabled:bg-luxury-black disabled:border-luxury-gray',
-              'disabled:text-luxury-silver disabled:cursor-not-allowed',
+              'disabled:bg-neutral-50 disabled:border-neutral-200',
+              'disabled:text-neutral-400 disabled:cursor-not-allowed',
               // Error styles
               hasError && [
                 'border-red-500',
@@ -157,8 +157,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <span
               className={cn(
                 'absolute right-4 top-1/2 -translate-y-1/2',
-                'text-luxury-silver',
-                hasError && 'text-red-400'
+                'text-neutral-400',
+                hasError && 'text-red-500'
               )}
             >
               {endIcon}
@@ -174,7 +174,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               'mt-2',
               'font-sans text-sm',
-              'text-red-400',
+              'text-red-500',
               'animate-fade-in'
             )}
           >
@@ -189,7 +189,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               'mt-2',
               'font-sans text-sm',
-              'text-luxury-silver'
+              'text-neutral-500'
             )}
           >
             {helperText}

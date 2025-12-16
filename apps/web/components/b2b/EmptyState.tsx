@@ -117,16 +117,16 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'bg-white rounded-soft border border-border-light p-8 text-center',
+        'bg-white rounded-lg border border-stroke-light p-8 text-center',
         className
       )}
       role="status"
       aria-label={message}
     >
-      <div className="text-text-muted mx-auto mb-4" aria-hidden="true">{iconElement}</div>
-      <p className="font-sans text-body text-text-muted">{message}</p>
+      <div className="text-content-muted mx-auto mb-4" aria-hidden="true">{iconElement}</div>
+      <p className="font-sans text-body text-content-muted">{message}</p>
       {description && (
-        <p className="mt-2 font-sans text-body-sm text-text-muted">{description}</p>
+        <p className="mt-2 font-sans text-body-sm text-content-muted">{description}</p>
       )}
       {action && (
         action.href ? (
@@ -134,10 +134,10 @@ export function EmptyState({
             href={action.href}
             className={cn(
               'inline-flex items-center gap-2 mt-4 px-4 py-2',
-              'bg-hermes-500 text-white rounded-soft',
+              'bg-primary text-white rounded-lg',
               'font-sans text-body-sm font-medium',
-              'hover:bg-hermes-600 transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-300 focus-visible:ring-offset-2'
+              'hover:bg-primary-600 transition-colors duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2'
             )}
           >
             {action.label}
@@ -147,10 +147,10 @@ export function EmptyState({
             onClick={action.onClick}
             className={cn(
               'inline-flex items-center gap-2 mt-4 px-4 py-2',
-              'bg-hermes-500 text-white rounded-soft',
+              'bg-primary text-white rounded-lg',
               'font-sans text-body-sm font-medium',
-              'hover:bg-hermes-600 transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-300 focus-visible:ring-offset-2'
+              'hover:bg-primary-600 transition-colors duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2'
             )}
           >
             {action.label}

@@ -91,7 +91,7 @@ const TabsList = ({ children, className, ...props }: TabsListProps) => {
       className={cn(
         'inline-flex items-center',
         'p-1',
-        'bg-b2b-bg-tertiary',
+        'bg-neutral-100',
         'rounded-lg',
         'gap-1',
         className
@@ -138,20 +138,20 @@ const TabsTrigger = ({
       className={cn(
         'inline-flex items-center justify-center gap-2',
         'px-4 py-2',
-        'text-b2b-body font-medium',
+        'text-sm font-medium',
         'rounded-md',
         'transition-all duration-200',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 focus-visible:ring-offset-2',
         isActive
           ? [
-              'bg-b2b-bg-primary',
-              'text-b2b-text-primary',
+              'bg-white',
+              'text-neutral-900',
               'shadow-sm',
             ]
           : [
-              'text-b2b-text-secondary',
-              'hover:text-b2b-text-primary',
-              'hover:bg-b2b-bg-secondary',
+              'text-neutral-600',
+              'hover:text-neutral-900',
+              'hover:bg-neutral-50',
             ],
         disabled && 'opacity-50 cursor-not-allowed',
         className
@@ -252,22 +252,22 @@ const PillTabs = ({ tabs, value, onChange, className }: PillTabsProps) => {
           className={cn(
             'inline-flex items-center gap-2',
             'px-4 py-2',
-            'text-b2b-body font-medium',
+            'text-sm font-medium',
             'rounded-full',
             'border',
             'transition-all duration-200',
             value === tab.value
               ? [
-                  'bg-b2b-primary',
+                  'bg-accent',
                   'text-white',
-                  'border-b2b-primary',
+                  'border-accent',
                 ]
               : [
-                  'bg-b2b-bg-primary',
-                  'text-b2b-text-secondary',
-                  'border-b2b-border',
-                  'hover:border-b2b-primary',
-                  'hover:text-b2b-primary',
+                  'bg-white',
+                  'text-neutral-600',
+                  'border-neutral-200',
+                  'hover:border-accent',
+                  'hover:text-accent',
                 ],
             tab.disabled && 'opacity-50 cursor-not-allowed'
           )}
@@ -278,11 +278,11 @@ const PillTabs = ({ tabs, value, onChange, className }: PillTabsProps) => {
             <span
               className={cn(
                 'ml-1 px-2 py-0.5',
-                'text-b2b-caption font-medium',
+                'text-xs font-medium',
                 'rounded-full',
                 value === tab.value
                   ? 'bg-white/20'
-                  : 'bg-b2b-bg-tertiary'
+                  : 'bg-neutral-100'
               )}
             >
               {tab.count}

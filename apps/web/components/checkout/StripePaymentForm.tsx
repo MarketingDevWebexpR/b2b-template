@@ -128,14 +128,14 @@ export function StripePaymentForm({
         size="lg"
         disabled={isLoading || !stripe || !elements || isSubmitting}
         isLoading={isLoading}
-        className="w-full uppercase tracking-wider bg-luxe-charcoal !text-white border border-luxe-charcoal hover:bg-hermes-500 hover:border-hermes-500 transition-all duration-300"
+        className="w-full uppercase tracking-wider bg-accent text-white border border-accent hover:bg-accent/90 transition-all duration-200"
       >
         {isLoading ? 'Traitement...' : 'Payer maintenant'}
       </Button>
 
-      <div className="flex items-center justify-center gap-2 text-xs text-text-muted pt-2">
+      <div className="flex items-center justify-center gap-2 text-xs text-neutral-500 pt-2">
         <Lock className="h-4 w-4" />
-        <span>Paiement sécurisé par Stripe</span>
+        <span>Paiement securise par Stripe</span>
       </div>
     </form>
   );

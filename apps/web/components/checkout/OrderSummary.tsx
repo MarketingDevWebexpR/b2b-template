@@ -25,25 +25,25 @@ const FREE_SHIPPING_THRESHOLD = 0;
 /**
  * OrderSummary Component
  * Displays cart items and totals in the checkout sidebar
- * Hermes-inspired luxury styling
+ * B2B professional neutral aesthetic
  */
 export function OrderSummary({ compact = false, className }: OrderSummaryProps) {
   const { cart, isLoading } = useCart();
 
   // Calculate shipping
-  const shippingCost = cart.totalPrice >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-  const orderTotal = cart.totalPrice + shippingCost;
+  const shippingCost = cart.totalTTC >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  const orderTotal = cart.totalTTC + shippingCost;
 
   // Loading state
   if (isLoading) {
     return (
-      <div className={cn('bg-background-beige p-6', className)}>
+      <div className={cn('bg-neutral-50 p-6 rounded-lg', className)}>
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-border-light w-1/2" />
-          <div className="h-20 bg-border-light" />
-          <div className="h-20 bg-border-light" />
-          <div className="h-px bg-border-light" />
-          <div className="h-6 bg-border-light" />
+          <div className="h-6 bg-neutral-200 rounded w-1/2" />
+          <div className="h-20 bg-neutral-200 rounded" />
+          <div className="h-20 bg-neutral-200 rounded" />
+          <div className="h-px bg-neutral-200" />
+          <div className="h-6 bg-neutral-200 rounded" />
         </div>
       </div>
     );
@@ -52,15 +52,15 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
   // Empty cart state
   if (cart.items.length === 0) {
     return (
-      <div className={cn('bg-background-beige p-6', className)}>
+      <div className={cn('bg-neutral-50 p-6 rounded-lg', className)}>
         <div className="text-center py-8">
-          <ShoppingBag className="h-12 w-12 text-text-muted mx-auto mb-4" />
-          <p className="text-text-muted mb-4">Votre panier est vide</p>
+          <ShoppingBag className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
+          <p className="text-neutral-500 mb-4">Votre panier est vide</p>
           <Link
-            href="/collections"
-            className="text-hermes-500 hover:text-hermes-600 text-sm uppercase tracking-luxe"
+            href="/categories"
+            className="text-accent hover:text-accent/80 text-sm font-medium uppercase tracking-wider"
           >
-            Découvrir nos collections
+            Decouvrir nos categories
           </Link>
         </div>
       </div>
@@ -68,59 +68,59 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
   }
 
   return (
-    <div className={cn('bg-background-beige', className)}>
+    <div className={cn('bg-neutral-50 rounded-lg', className)}>
       {/* Header */}
-      <div className="p-6 border-b border-border-light">
-        <h2 className="font-serif text-lg md:text-xl text-text-primary flex items-center gap-2">
-          <ShoppingBag className="h-5 w-5 text-hermes-500" />
+      <div className="p-6 border-b border-neutral-200">
+        <h2 className="font-sans font-semibold text-lg md:text-xl text-neutral-900 flex items-center gap-2">
+          <ShoppingBag className="h-5 w-5 text-accent" />
           Votre commande
         </h2>
-        <p className="text-sm text-text-muted mt-1">
-          {cart.totalItems} {cart.totalItems > 1 ? 'articles' : 'article'}
+        <p className="text-sm text-neutral-500 mt-1">
+          {cart.itemCount} {cart.itemCount > 1 ? 'articles' : 'article'}
         </p>
       </div>
 
       {/* Cart items */}
-      <div className={cn('divide-y divide-border-light', compact ? 'max-h-60 overflow-y-auto' : '')}>
+      <div className={cn('divide-y divide-neutral-200', compact ? 'max-h-60 overflow-y-auto' : '')}>
         {cart.items.map((item) => (
           <div
-            key={item.product.id}
+            key={item.productId}
             className="p-4 flex gap-4"
           >
             {/* Product image */}
-            <div className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-white border border-border-light">
-              {item.product.images[0] ? (
+            <div className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-white rounded border border-neutral-200">
+              {item.productImage ? (
                 <Image
-                  src={item.product.images[0]}
-                  alt={item.product.name}
+                  src={item.productImage}
+                  alt={item.productName}
                   fill
-                  className="object-cover"
+                  className="object-cover rounded"
                   sizes="80px"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Package className="h-6 w-6 text-text-muted" />
+                  <Package className="h-6 w-6 text-neutral-400" />
                 </div>
               )}
 
               {/* Quantity badge */}
-              <span className="absolute -top-2 -right-2 w-6 h-6 bg-hermes-500 text-white text-xs font-medium flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 w-6 h-6 bg-accent text-white text-xs font-medium flex items-center justify-center rounded-full">
                 {item.quantity}
               </span>
             </div>
 
             {/* Product details */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-text-primary text-sm truncate">
-                {item.product.name}
+              <h3 className="font-medium text-neutral-900 text-sm truncate">
+                {item.productName}
               </h3>
-              {item.product.reference && (
-                <p className="text-xs text-text-muted mt-0.5">
-                  Ref: {item.product.reference}
+              {item.productReference && (
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Ref: {item.productReference}
                 </p>
               )}
-              <p className="text-sm text-hermes-600 mt-1 font-medium">
-                {formatPrice(item.product.price * item.quantity)}
+              <p className="text-sm text-accent mt-1 font-semibold">
+                {formatPrice(item.pricing.unitPriceTTC * item.quantity)}
               </p>
             </div>
           </div>
@@ -128,19 +128,19 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
       </div>
 
       {/* Totals section */}
-      <div className="p-6 border-t border-border-light space-y-3">
+      <div className="p-6 border-t border-neutral-200 space-y-3">
         {/* Subtotal */}
         <div className="flex justify-between text-sm">
-          <span className="text-text-muted">Sous-total</span>
-          <span className="text-text-primary">{formatPrice(cart.totalPrice)}</span>
+          <span className="text-neutral-500">Sous-total</span>
+          <span className="text-neutral-900">{formatPrice(cart.totalTTC)}</span>
         </div>
 
         {/* Shipping */}
         <div className="flex justify-between text-sm">
-          <span className="text-text-muted">Livraison</span>
-          <span className="text-text-primary">
+          <span className="text-neutral-500">Livraison</span>
+          <span className="text-neutral-900">
             {shippingCost === 0 ? (
-              <span className="text-green-600">Offerte</span>
+              <span className="text-green-600 font-medium">Offerte</span>
             ) : (
               formatPrice(shippingCost)
             )}
@@ -148,18 +148,18 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-border-light my-4" />
+        <div className="h-px bg-neutral-200 my-4" />
 
         {/* Total */}
         <div className="flex justify-between items-center">
-          <span className="font-medium text-text-primary">Total</span>
-          <span className="font-serif text-xl md:text-2xl text-hermes-600">
+          <span className="font-medium text-neutral-900">Total</span>
+          <span className="font-sans font-bold text-xl md:text-2xl text-accent">
             {formatPrice(orderTotal)}
           </span>
         </div>
 
         {/* Tax note */}
-        <p className="text-xs text-text-muted text-right">
+        <p className="text-xs text-neutral-500 text-right">
           TVA incluse
         </p>
       </div>
@@ -167,17 +167,17 @@ export function OrderSummary({ compact = false, className }: OrderSummaryProps) 
       {/* Trust badges */}
       {!compact && (
         <div className="px-6 pb-6 space-y-3">
-          <div className="flex items-center gap-3 text-sm text-text-muted">
-            <Truck className="h-4 w-4 text-hermes-500 flex-shrink-0" />
-            <span>Livraison sécurisée sous 3-5 jours</span>
+          <div className="flex items-center gap-3 text-sm text-neutral-600">
+            <Truck className="h-4 w-4 text-accent flex-shrink-0" />
+            <span>Livraison securisee sous 3-5 jours</span>
           </div>
-          <div className="flex items-center gap-3 text-sm text-text-muted">
-            <Shield className="h-4 w-4 text-hermes-500 flex-shrink-0" />
+          <div className="flex items-center gap-3 text-sm text-neutral-600">
+            <Shield className="h-4 w-4 text-accent flex-shrink-0" />
             <span>Retours gratuits sous 30 jours</span>
           </div>
-          <div className="flex items-center gap-3 text-sm text-text-muted">
-            <Package className="h-4 w-4 text-hermes-500 flex-shrink-0" />
-            <span>Écrin et certificat inclus</span>
+          <div className="flex items-center gap-3 text-sm text-neutral-600">
+            <Package className="h-4 w-4 text-accent flex-shrink-0" />
+            <span>Emballage professionnel inclus</span>
           </div>
         </div>
       )}

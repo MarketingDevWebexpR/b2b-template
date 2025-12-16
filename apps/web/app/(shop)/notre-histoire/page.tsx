@@ -65,7 +65,7 @@ const timelineEvents = [
     year: '1987',
     title: 'La Fondation',
     description:
-      'Maison Bijoux voit le jour dans le quartier historique du Marais, fondée par Pierre-Alexandre Beaumont, maître joaillier formé auprès des plus grandes maisons parisiennes.',
+      'WebexpR Pro voit le jour dans le quartier historique du Marais, fondée par Pierre-Alexandre Beaumont, maître joaillier formé auprès des plus grandes maisons parisiennes.',
   },
   {
     year: '1995',
@@ -189,8 +189,8 @@ function HeroSection() {
       </div>
 
       {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-luxe-charcoal/40 via-luxe-charcoal/20 to-luxe-charcoal/60" />
-      <div className="absolute inset-0 bg-gradient-to-r from-luxe-charcoal/30 via-transparent to-luxe-charcoal/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/40 via-neutral-900/20 to-neutral-900/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/30 via-transparent to-neutral-900/30" />
 
       {/* Content */}
       <motion.div
@@ -201,13 +201,13 @@ function HeroSection() {
       >
         {/* Decorative Line */}
         <motion.div
-          className="mx-auto mb-8 h-px w-24 bg-hermes-500"
+          className="mx-auto mb-8 h-px w-24 bg-primary"
           variants={fadeIn}
         />
 
         {/* Overline */}
         <motion.span
-          className="mb-6 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-400"
+          className="mb-6 inline-block font-sans text-overline uppercase  text-primary-400"
           variants={fadeInUp}
         >
           Depuis 1987
@@ -215,7 +215,7 @@ function HeroSection() {
 
         {/* Main Title */}
         <motion.h1
-          className="font-serif text-display-hero text-white drop-shadow-lg md:text-[5.5rem] lg:text-[6.5rem]"
+          className="font-sans text-display-hero text-white drop-shadow-lg md:text-[5.5rem] lg:text-[6.5rem]"
           variants={fadeInUp}
         >
           Notre Histoire
@@ -223,7 +223,7 @@ function HeroSection() {
 
         {/* Subtitle */}
         <motion.p
-          className="mx-auto mt-6 max-w-2xl font-sans text-body-lg font-light tracking-elegant text-white/90 md:text-xl"
+          className="mx-auto mt-6 max-w-2xl font-sans text-body-lg font-light  text-white/90 md:text-xl"
           variants={fadeInUp}
         >
           Trois générations d'excellence artisanale au service de la beauté.
@@ -233,7 +233,7 @@ function HeroSection() {
 
         {/* Decorative Line */}
         <motion.div
-          className="mx-auto mt-12 h-px w-24 bg-hermes-500"
+          className="mx-auto mt-12 h-px w-24 bg-primary"
           variants={fadeIn}
         />
       </motion.div>
@@ -250,7 +250,7 @@ function HeroSection() {
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <span className="font-sans text-overline uppercase tracking-luxe">
+          <span className="font-sans text-overline uppercase ">
             Découvrir
           </span>
           <svg
@@ -278,7 +278,7 @@ function HeroSection() {
  */
 function TimelineSection() {
   return (
-    <section className="bg-background-cream py-24 lg:py-32">
+    <section className="bg-white py-24 lg:py-32">
       <Container size="lg">
         {/* Section Header */}
         <motion.div
@@ -289,19 +289,19 @@ function TimelineSection() {
           viewport={{ once: true, margin: '-100px' }}
         >
           <motion.span
-            className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
+            className="mb-4 inline-block font-sans text-overline uppercase  text-primary"
             variants={fadeInUp}
           >
             Une Saga Familiale
           </motion.span>
           <motion.h2
-            className="font-serif text-heading-1 text-text-primary md:text-display-2"
+            className="font-sans text-heading-1 text-content-primary md:text-display-2"
             variants={fadeInUp}
           >
             Les Grandes Étapes
           </motion.h2>
           <motion.div
-            className="mx-auto mt-6 h-px w-24 bg-hermes-500"
+            className="mx-auto mt-6 h-px w-24 bg-primary"
             variants={fadeIn}
           />
         </motion.div>
@@ -330,21 +330,21 @@ function TimelineSection() {
                     index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12 md:text-left'
                   }`}
                 >
-                  <div className="rounded-elegant border border-border-light bg-white p-8 shadow-soft transition-shadow duration-400 hover:shadow-elegant">
-                    <span className="font-serif text-heading-2 text-hermes-500">
+                  <div className="rounded-lg border border-stroke-light bg-white p-8 shadow-soft transition-shadow duration-400 hover:shadow-elegant">
+                    <span className="font-sans text-heading-2 text-primary">
                       {event.year}
                     </span>
-                    <h3 className="mt-2 font-serif text-heading-4 text-text-primary">
+                    <h3 className="mt-2 font-sans text-heading-4 text-content-primary">
                       {event.title}
                     </h3>
-                    <p className="mt-4 font-sans text-body leading-elegant text-text-muted">
+                    <p className="mt-4 font-sans text-body leading-elegant text-content-muted">
                       {event.description}
                     </p>
                   </div>
                 </div>
 
                 {/* Timeline Dot */}
-                <div className="absolute left-4 top-8 hidden h-4 w-4 -translate-x-1/2 rounded-full border-4 border-hermes-500 bg-white md:left-1/2 md:block" />
+                <div className="absolute left-4 top-8 hidden h-4 w-4 -translate-x-1/2 rounded-full border-4 border-primary bg-white md:left-1/2 md:block" />
 
                 {/* Spacer */}
                 <div className="hidden md:block md:w-5/12" />
@@ -373,7 +373,7 @@ function CraftsmanshipSection() {
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
           >
-            <div className="relative aspect-[4/5] overflow-hidden rounded-soft">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
               <Image
                 src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&q=80"
                 alt="Artisan joaillier au travail"
@@ -381,21 +381,21 @@ function CraftsmanshipSection() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-luxe-charcoal/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/20 to-transparent" />
             </div>
 
             {/* Decorative Frame */}
-            <div className="absolute -bottom-4 -right-4 -z-10 h-full w-full rounded-soft border border-hermes-500/20 lg:-bottom-6 lg:-right-6" />
+            <div className="absolute -bottom-4 -right-4 -z-10 h-full w-full rounded-lg border border-primary/20 lg:-bottom-6 lg:-right-6" />
 
             {/* Floating Accent */}
             <motion.div
-              className="absolute -top-8 right-8 rounded-soft border-4 border-white bg-hermes-500 px-6 py-4 shadow-elegant-lg"
+              className="absolute -top-8 right-8 rounded-lg border-4 border-white bg-primary px-6 py-4 shadow-elegant-lg"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              <span className="font-serif text-heading-3 text-white">37</span>
+              <span className="font-sans text-heading-3 text-white">37</span>
               <p className="font-sans text-caption text-white/90">
                 années d'excellence
               </p>
@@ -411,26 +411,26 @@ function CraftsmanshipSection() {
             viewport={{ once: true, margin: '-100px' }}
           >
             <motion.span
-              className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
+              className="mb-4 inline-block font-sans text-overline uppercase  text-primary"
               variants={fadeInUp}
             >
               L'Art du Geste
             </motion.span>
 
             <motion.h2
-              className="font-serif text-heading-1 text-text-primary md:text-display-2"
+              className="font-sans text-heading-1 text-content-primary md:text-display-2"
               variants={fadeInUp}
             >
               Le Savoir-Faire
             </motion.h2>
 
             <motion.div
-              className="my-8 h-px w-24 bg-hermes-500"
+              className="my-8 h-px w-24 bg-primary"
               variants={fadeIn}
             />
 
             <motion.p
-              className="mb-12 font-sans text-body-lg leading-elegant text-text-muted"
+              className="mb-12 font-sans text-body-lg leading-elegant text-content-muted"
               variants={fadeInUp}
             >
               Dans nos ateliers, chaque bijou naît de la rencontre entre
@@ -448,16 +448,16 @@ function CraftsmanshipSection() {
                   variants={fadeInUp}
                   custom={index}
                 >
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-hermes-50 transition-colors duration-350 group-hover:bg-hermes-100">
+                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 transition-colors duration-300 group-hover:bg-primary-50">
                     <value.icon
-                      className="h-6 w-6 text-hermes-500"
+                      className="h-6 w-6 text-primary"
                       strokeWidth={1.5}
                     />
                   </div>
-                  <h3 className="font-serif text-heading-5 text-text-primary">
+                  <h3 className="font-sans text-heading-5 text-content-primary">
                     {value.title}
                   </h3>
-                  <p className="mt-2 font-sans text-body-sm leading-relaxed text-text-muted">
+                  <p className="mt-2 font-sans text-body-sm leading-relaxed text-content-muted">
                     {value.description}
                   </p>
                 </motion.div>
@@ -486,26 +486,26 @@ function MaterialsSection() {
           viewport={{ once: true, margin: '-100px' }}
         >
           <motion.span
-            className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
+            className="mb-4 inline-block font-sans text-overline uppercase  text-primary"
             variants={fadeInUp}
           >
             La Quête de l'Excellence
           </motion.span>
           <motion.h2
-            className="font-serif text-heading-1 text-text-primary md:text-display-2"
+            className="font-sans text-heading-1 text-content-primary md:text-display-2"
             variants={fadeInUp}
           >
             Matières Nobles
           </motion.h2>
           <motion.p
-            className="mx-auto mt-6 max-w-2xl font-sans text-body-lg leading-elegant text-text-muted"
+            className="mx-auto mt-6 max-w-2xl font-sans text-body-lg leading-elegant text-content-muted"
             variants={fadeInUp}
           >
             Nous sélectionnons avec une exigence absolue les matériaux les plus
             précieux, issus des sources les plus éthiques au monde.
           </motion.p>
           <motion.div
-            className="mx-auto mt-8 h-px w-24 bg-hermes-500"
+            className="mx-auto mt-8 h-px w-24 bg-primary"
             variants={fadeIn}
           />
         </motion.div>
@@ -524,20 +524,20 @@ function MaterialsSection() {
               className="group cursor-pointer"
               variants={fadeInUp}
             >
-              <div className="relative mb-6 aspect-square overflow-hidden rounded-soft">
+              <div className="relative mb-6 aspect-square overflow-hidden rounded-lg">
                 <Image
                   src={material.image}
                   alt={material.name}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-600 ease-luxe group-hover:scale-105"
+                  className="object-cover transition-transform duration-600 duration-200 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-luxe-charcoal/40 via-transparent to-transparent opacity-0 transition-opacity duration-400 group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/40 via-transparent to-transparent opacity-0 transition-opacity duration-400 group-hover:opacity-100" />
               </div>
-              <h3 className="font-serif text-heading-5 text-text-primary transition-colors duration-350 group-hover:text-hermes-500">
+              <h3 className="font-sans text-heading-5 text-content-primary transition-colors duration-300 group-hover:text-primary">
                 {material.name}
               </h3>
-              <p className="mt-2 font-sans text-body-sm leading-relaxed text-text-muted">
+              <p className="mt-2 font-sans text-body-sm leading-relaxed text-content-muted">
                 {material.description}
               </p>
             </motion.div>
@@ -564,26 +564,26 @@ function TeamSection() {
           viewport={{ once: true, margin: '-100px' }}
         >
           <motion.span
-            className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
+            className="mb-4 inline-block font-sans text-overline uppercase  text-primary"
             variants={fadeInUp}
           >
             Les Visages de la Maison
           </motion.span>
           <motion.h2
-            className="font-serif text-heading-1 text-text-primary md:text-display-2"
+            className="font-sans text-heading-1 text-content-primary md:text-display-2"
             variants={fadeInUp}
           >
             Notre Équipe
           </motion.h2>
           <motion.p
-            className="mx-auto mt-6 max-w-2xl font-sans text-body-lg leading-elegant text-text-muted"
+            className="mx-auto mt-6 max-w-2xl font-sans text-body-lg leading-elegant text-content-muted"
             variants={fadeInUp}
           >
             Derrière chaque création, des artisans passionnés qui consacrent leur
             vie à l'excellence. Rencontrez les gardiens de notre savoir-faire.
           </motion.p>
           <motion.div
-            className="mx-auto mt-8 h-px w-24 bg-hermes-500"
+            className="mx-auto mt-8 h-px w-24 bg-primary"
             variants={fadeIn}
           />
         </motion.div>
@@ -608,14 +608,14 @@ function TeamSection() {
                   alt={member.name}
                   fill
                   sizes="256px"
-                  className="object-cover transition-transform duration-600 ease-luxe group-hover:scale-105"
+                  className="object-cover transition-transform duration-600 duration-200 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 rounded-full border-4 border-transparent transition-colors duration-400 group-hover:border-hermes-500/30" />
+                <div className="absolute inset-0 rounded-full border-4 border-transparent transition-colors duration-400 group-hover:border-primary/30" />
               </div>
-              <h3 className="font-serif text-heading-5 text-text-primary">
+              <h3 className="font-sans text-heading-5 text-content-primary">
                 {member.name}
               </h3>
-              <p className="mt-1 font-sans text-overline uppercase tracking-luxe text-hermes-500">
+              <p className="mt-1 font-sans text-overline uppercase  text-primary">
                 {member.role}
               </p>
             </motion.div>
@@ -630,7 +630,7 @@ function TeamSection() {
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
         >
-          <div className="relative aspect-[21/9] overflow-hidden rounded-elegant">
+          <div className="relative aspect-[21/9] overflow-hidden rounded-lg">
             <Image
               src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=1600&q=80"
               alt="Notre atelier Place Vendome"
@@ -638,12 +638,12 @@ function TeamSection() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-luxe-charcoal/50 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/50 via-transparent to-transparent" />
             <div className="absolute bottom-8 left-8 text-white md:bottom-12 md:left-12">
-              <p className="font-sans text-overline uppercase tracking-luxe text-hermes-400">
+              <p className="font-sans text-overline uppercase  text-primary-400">
                 Notre Atelier
               </p>
-              <h3 className="mt-2 font-serif text-heading-3 md:text-heading-2">
+              <h3 className="mt-2 font-sans text-heading-3 md:text-heading-2">
                 Place Vendome, Paris
               </h3>
             </div>
@@ -659,7 +659,7 @@ function TeamSection() {
  */
 function CTASection() {
   return (
-    <section className="relative overflow-hidden bg-luxe-charcoal py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-neutral-900 py-24 lg:py-32">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2Mmgxem0tMTIgMTB2Mmg0di0yaC00em0yMC0xMHYyaDR2LTJoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')]" />
@@ -675,24 +675,24 @@ function CTASection() {
         >
           {/* Decorative Icon */}
           <motion.div
-            className="mx-auto mb-8 inline-flex h-20 w-20 items-center justify-center rounded-full border border-hermes-500/30 bg-hermes-500/10"
+            className="mx-auto mb-8 inline-flex h-20 w-20 items-center justify-center rounded-full border border-primary/30 bg-primary/10"
             variants={scaleIn}
           >
-            <Sparkles className="h-10 w-10 text-hermes-500" strokeWidth={1} />
+            <Sparkles className="h-10 w-10 text-primary" strokeWidth={1} />
           </motion.div>
 
           <motion.span
-            className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-400"
+            className="mb-4 inline-block font-sans text-overline uppercase  text-primary-400"
             variants={fadeInUp}
           >
             Explorez Notre Univers
           </motion.span>
 
           <motion.h2
-            className="font-serif text-heading-1 text-white md:text-display-2"
+            className="font-sans text-heading-1 text-white md:text-display-2"
             variants={fadeInUp}
           >
-            Découvrez Nos Collections
+            Découvrez Notre Catalogue
           </motion.h2>
 
           <motion.p
@@ -705,7 +705,7 @@ function CTASection() {
           </motion.p>
 
           <motion.div
-            className="mx-auto mt-8 h-px w-24 bg-hermes-500"
+            className="mx-auto mt-8 h-px w-24 bg-primary"
             variants={fadeIn}
           />
 
@@ -715,12 +715,12 @@ function CTASection() {
           >
             {/* Primary CTA */}
             <Link
-              href="/products"
-              className="group inline-flex min-w-[220px] items-center justify-center gap-3 rounded-soft bg-hermes-500 px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:bg-hermes-600 hover:shadow-button-hover"
+              href="/categories"
+              className="group inline-flex min-w-[220px] items-center justify-center gap-3 rounded-sm bg-accent px-10 py-4 font-sans text-body-sm font-medium uppercase tracking-wider text-white transition-all duration-200 hover:bg-accent/90"
             >
-              <span>Voir les Collections</span>
+              <span>Voir les Categories</span>
               <ArrowRight
-                className="h-4 w-4 transition-transform duration-350 group-hover:translate-x-1"
+                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
                 strokeWidth={1.5}
               />
             </Link>
@@ -728,7 +728,7 @@ function CTASection() {
             {/* Secondary CTA */}
             <Link
               href="/contact"
-              className="group inline-flex min-w-[220px] items-center justify-center gap-3 rounded-soft border border-white/40 bg-transparent px-10 py-4 font-sans text-overline font-medium uppercase tracking-luxe text-white transition-all duration-400 hover:border-white hover:bg-white/10"
+              className="group inline-flex min-w-[220px] items-center justify-center gap-3 rounded-lg border border-white/40 bg-transparent px-10 py-4 font-sans text-overline font-medium uppercase  text-white transition-all duration-400 hover:border-white hover:bg-white/10"
             >
               <span>Nous Contacter</span>
             </Link>
@@ -757,7 +757,7 @@ function CTASection() {
  * Design inspired by Hermes aesthetic with:
  * - Generous white space
  * - Serif typography for headings
- * - Orange accent color (hermes-500)
+ * - Orange accent color (primary)
  * - Subtle framer-motion animations
  */
 export default function NotreHistoirePage() {

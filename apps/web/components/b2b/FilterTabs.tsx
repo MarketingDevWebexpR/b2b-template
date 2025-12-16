@@ -69,13 +69,13 @@ export function FilterTabs<T extends string>({
             aria-controls={`tabpanel-${option.value}`}
             tabIndex={isSelected ? 0 : -1}
             className={cn(
-              'px-4 py-2 rounded-soft',
-              'font-sans text-body-sm font-medium',
+              'px-4 py-2 rounded-lg',
+              'text-body-sm font-medium',
               'transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2',
               isSelected
-                ? 'bg-hermes-500 text-white'
-                : 'bg-white border border-border-light text-text-secondary hover:bg-background-muted'
+                ? 'bg-primary text-white'
+                : 'bg-white border border-stroke-light text-content-secondary hover:bg-surface-secondary'
             )}
           >
             {option.label}
@@ -83,7 +83,7 @@ export function FilterTabs<T extends string>({
               <span
                 className={cn(
                   'ml-2 px-1.5 py-0.5 rounded text-xs',
-                  isSelected ? 'bg-white/20' : 'bg-background-muted'
+                  isSelected ? 'bg-white/20' : 'bg-surface-secondary'
                 )}
                 aria-label={`${option.count} elements`}
               >

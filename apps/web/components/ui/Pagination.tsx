@@ -120,23 +120,23 @@ const Pagination = ({
     'rounded-lg',
     'font-medium',
     'transition-all duration-200',
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 focus-visible:ring-offset-2'
   );
 
   const activeButtonClasses = cn(
-    'bg-b2b-primary text-white',
-    'hover:bg-b2b-primary-600'
+    'bg-accent text-white',
+    'hover:bg-orange-600'
   );
 
   const inactiveButtonClasses = cn(
-    'bg-b2b-bg-primary text-b2b-text-primary',
-    'border border-b2b-border',
-    'hover:bg-b2b-bg-tertiary hover:border-b2b-border-medium'
+    'bg-white text-neutral-900',
+    'border border-neutral-200',
+    'hover:bg-neutral-100 hover:border-neutral-300'
   );
 
   const disabledButtonClasses = cn(
     'opacity-50 cursor-not-allowed',
-    'hover:bg-b2b-bg-primary hover:border-b2b-border'
+    'hover:bg-white hover:border-neutral-200'
   );
 
   return (
@@ -193,7 +193,7 @@ const Pagination = ({
               className={cn(
                 'inline-flex items-center justify-center',
                 sizeConfig.button,
-                'text-b2b-text-muted'
+                'text-neutral-500'
               )}
             >
               ...
@@ -301,7 +301,7 @@ const PaginationWithInfo = ({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
       {/* Info section */}
-      <div className="flex items-center gap-4 text-b2b-body-sm text-b2b-text-secondary">
+      <div className="flex items-center gap-4 text-sm text-neutral-600">
         {showTotal && (
           <span>
             {startItem}-{endItem} sur {totalItems.toLocaleString('fr-FR')} résultats
@@ -316,10 +316,10 @@ const PaginationWithInfo = ({
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
               className={cn(
                 'px-2 py-1',
-                'bg-b2b-bg-primary',
-                'border border-b2b-border rounded-md',
-                'text-b2b-body-sm',
-                'focus:outline-none focus:ring-2 focus:ring-b2b-primary focus:border-b2b-primary'
+                'bg-white',
+                'border border-neutral-200 rounded-md',
+                'text-sm',
+                'focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent'
               )}
             >
               {pageSizeOptions.map((option) => (

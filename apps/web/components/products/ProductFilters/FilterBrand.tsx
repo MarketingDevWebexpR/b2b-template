@@ -110,7 +110,7 @@ export function FilterBrand({
           <div className="relative">
             {/* Search icon */}
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-b2b-text-muted"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -132,11 +132,11 @@ export function FilterBrand({
               placeholder="Rechercher..."
               className={cn(
                 'w-full pl-9 pr-8 py-2',
-                'text-b2b-body-sm',
-                'bg-b2b-bg-secondary',
-                'border border-b2b-border-light rounded-md',
-                'placeholder:text-b2b-text-muted',
-                'focus:outline-none focus:border-b2b-primary focus:ring-1 focus:ring-b2b-primary/30',
+                'text-sm',
+                'bg-neutral-50',
+                'border border-neutral-200 rounded-md',
+                'placeholder:text-neutral-400',
+                'focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30',
                 'transition-colors duration-200'
               )}
             />
@@ -149,8 +149,8 @@ export function FilterBrand({
                 className={cn(
                   'absolute right-2 top-1/2 -translate-y-1/2',
                   'p-1 rounded',
-                  'text-b2b-text-muted hover:text-b2b-text-primary',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary'
+                  'text-neutral-500 hover:text-neutral-900',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
                 )}
                 aria-label="Effacer la recherche"
               >
@@ -180,7 +180,7 @@ export function FilterBrand({
           className="space-y-1"
         >
           {visibleBrands.length === 0 ? (
-            <p className="text-b2b-body-sm text-b2b-text-muted py-2">
+            <p className="text-sm text-neutral-500 py-2">
               Aucune marque trouvee
             </p>
           ) : (
@@ -191,7 +191,7 @@ export function FilterBrand({
                   key={brand.value}
                   className={cn(
                     'flex items-center justify-between py-1 px-1 -mx-1 rounded',
-                    'hover:bg-b2b-bg-tertiary',
+                    'hover:bg-neutral-100',
                     'transition-colors duration-150'
                   )}
                 >
@@ -203,7 +203,7 @@ export function FilterBrand({
                     containerClassName="flex-1"
                   />
                   {showCounts && (
-                    <span className="text-b2b-caption text-b2b-text-muted tabular-nums ml-2">
+                    <span className="text-xs text-neutral-500 tabular-nums ml-2">
                       ({brand.count.toLocaleString('fr-FR')})
                     </span>
                   )}
@@ -220,8 +220,8 @@ export function FilterBrand({
             onClick={handleShowMore}
             className={cn(
               'flex items-center gap-1.5 w-full',
-              'text-b2b-body-sm text-b2b-primary',
-              'hover:text-b2b-primary-600',
+              'text-sm text-accent',
+              'hover:text-accent/80',
               'focus:outline-none focus-visible:underline',
               'transition-colors duration-200'
             )}

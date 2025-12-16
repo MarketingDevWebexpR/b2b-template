@@ -6,12 +6,19 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatDate, formatRelativeDate, getOrderStatusLabel, getOrderStatusColor } from '@/lib/formatters';
 import { useB2B } from '@/contexts/B2BContext';
+import { useOrdersFeatures } from '@/contexts/FeatureContext';
 import type { B2BOrderStatus as OrderStatus, OrderHistoryEventType, PaymentStatus } from '@maison/types';
 import {
   StatusBadge,
   PageLoader,
   ErrorState,
+  EmptyState,
 } from '@/components/b2b';
+import {
+  OrderStatusBadge,
+  OrderStatusTimeline,
+  TrackingLink,
+} from '@/components/orders';
 
 /**
  * Order detail data structure
@@ -400,7 +407,7 @@ const ReorderIcon = () => (
 );
 
 const ImagePlaceholder = () => (
-  <svg className="w-10 h-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+  <svg className="w-10 h-10 text-content-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
   </svg>
 );
@@ -482,6 +489,9 @@ export default function CommandeDetailPage({ params }: PageProps) {
 
   const { api, isLoading: contextLoading } = useB2B();
 
+  // Feature flags
+  const { isEnabled: hasOrders, hasReorder, hasExportPdf, hasTracking } = useOrdersFeatures();
+
   // In production, this would come from the API via useEffect or server action
   const order = getMockOrderDetail(id);
   const isLoading = contextLoading;
@@ -525,13 +535,24 @@ export default function CommandeDetailPage({ params }: PageProps) {
     });
   }, [order, router]);
 
+  // Module disabled - show message
+  if (!hasOrders) {
+    return (
+      <EmptyState
+        icon="cart"
+        message="Module commandes desactive"
+        description="Le module de gestion des commandes n'est pas disponible pour votre compte."
+      />
+    );
+  }
+
   // Loading state
   if (isLoading) {
     return (
       <div className="p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center">
-          <div className="w-8 h-8 border-2 border-hermes-500 border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4 font-sans text-body text-text-muted">Chargement de la commande...</p>
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="mt-4 font-sans text-body text-content-muted">Chargement de la commande...</p>
         </div>
       </div>
     );
@@ -552,7 +573,8 @@ export default function CommandeDetailPage({ params }: PageProps) {
   }
 
   const canCancel = order.status === 'pending_approval' || order.status === 'processing';
-  const canReorder = order.status === 'delivered' || order.status === 'cancelled';
+  // Reorder is gated by both feature flag AND order status
+  const canReorder = hasReorder && (order.status === 'delivered' || order.status === 'cancelled');
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
@@ -562,36 +584,39 @@ export default function CommandeDetailPage({ params }: PageProps) {
           <div className="flex items-center gap-3 mb-2">
             <Link
               href="/commandes"
-              className="text-text-muted hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft"
+              className="text-content-muted hover:text-content-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
               aria-label="Retour a la liste des commandes"
             >
               <BackIcon />
             </Link>
-            <h1 className="font-serif text-heading-3 text-text-primary">
+            <h1 className="font-sans text-heading-3 text-content-primary">
               Commande {order.orderNumber}
             </h1>
-            <StatusBadge status={order.status} />
+            <OrderStatusBadge status={order.status} />
           </div>
-          <p className="font-sans text-body text-text-muted">
+          <p className="font-sans text-body text-content-muted">
             Passee le {formatDate(order.createdAt)}
             {order.reference && ` - Ref: ${order.reference}`}
           </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          <button
-            type="button"
-            onClick={handleDownloadInvoice}
-            className={cn(
-              'inline-flex items-center gap-2 px-4 py-2',
-              'bg-white border border-border-light text-text-secondary rounded-soft',
-              'font-sans text-body-sm font-medium',
-              'hover:bg-background-muted transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
-            )}
-          >
-            <DownloadIcon />
-            Telecharger facture
-          </button>
+          {/* Invoice download - Gated by orders.exportPdf */}
+          {hasExportPdf && (
+            <button
+              type="button"
+              onClick={handleDownloadInvoice}
+              className={cn(
+                'inline-flex items-center gap-2 px-4 py-2',
+                'bg-white border border-stroke-light text-content-secondary rounded-lg',
+                'font-sans text-body-sm font-medium',
+                'hover:bg-surface-secondary transition-colors duration-200',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+              )}
+            >
+              <DownloadIcon />
+              Telecharger facture
+            </button>
+          )}
           {canReorder && (
             <button
               type="button"
@@ -599,11 +624,11 @@ export default function CommandeDetailPage({ params }: PageProps) {
               disabled={isPending}
               className={cn(
                 'inline-flex items-center gap-2 px-4 py-2',
-                'bg-hermes-500 text-white rounded-soft',
+                'bg-primary text-white rounded-lg',
                 'font-sans text-body-sm font-medium',
-                'hover:bg-hermes-600 transition-colors duration-200',
+                'hover:bg-primary-600 transition-colors duration-200',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
               )}
             >
               <ReorderIcon />
@@ -615,7 +640,7 @@ export default function CommandeDetailPage({ params }: PageProps) {
 
       {/* Error message */}
       {actionError && (
-        <div className="bg-red-50 border border-red-200 rounded-soft p-4" role="alert">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4" role="alert">
           <p className="font-sans text-body-sm text-red-800">{actionError}</p>
         </div>
       )}
@@ -623,23 +648,27 @@ export default function CommandeDetailPage({ params }: PageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Tracking */}
-          {order.shipping.trackingNumber && (order.status === 'shipped' || order.status === 'delivered') && (
+          {/* Tracking - Gated by orders.tracking */}
+          {hasTracking && order.shipping.trackingNumber && (order.status === 'shipped' || order.status === 'delivered') && (
             <section
-              className="bg-purple-50 rounded-soft border border-purple-200 p-6"
+              className="bg-purple-50 rounded-lg border border-purple-200 p-6"
               aria-labelledby="tracking-heading"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 id="tracking-heading" className="font-serif text-heading-5 text-purple-900">
+                  <h2 id="tracking-heading" className="font-sans text-heading-5 text-purple-900">
                     Suivi de livraison
                   </h2>
                   <p className="mt-1 font-sans text-body-sm text-purple-700">
                     {order.shipping.carrier} - {order.shipping.methodName}
                   </p>
-                  <p className="mt-2 font-mono text-body-sm text-purple-800">
-                    {order.shipping.trackingNumber}
-                  </p>
+                  <div className="mt-2">
+                    <TrackingLink
+                      trackingNumber={order.shipping.trackingNumber}
+                      trackingUrl={order.shipping.trackingUrl}
+                      carrier={order.shipping.carrier}
+                    />
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="font-sans text-caption text-purple-600">
@@ -659,7 +688,7 @@ export default function CommandeDetailPage({ params }: PageProps) {
                   type="button"
                   onClick={handleTrackPackage}
                   className={cn(
-                    'mt-4 w-full px-4 py-2 rounded-soft',
+                    'mt-4 w-full px-4 py-2 rounded-lg',
                     'font-sans text-body-sm font-medium',
                     'bg-purple-600 text-white hover:bg-purple-700',
                     'transition-colors duration-200',
@@ -676,23 +705,23 @@ export default function CommandeDetailPage({ params }: PageProps) {
 
           {/* Items */}
           <section
-            className="bg-white rounded-soft border border-border-light"
+            className="bg-white rounded-lg border border-stroke-light"
             aria-labelledby="items-heading"
           >
-            <div className="p-4 border-b border-border-light">
-              <h2 id="items-heading" className="font-serif text-heading-5 text-text-primary">
+            <div className="p-4 border-b border-stroke-light">
+              <h2 id="items-heading" className="font-sans text-heading-5 text-content-primary">
                 Articles ({order.items.length})
               </h2>
             </div>
             <div className="divide-y divide-border-light">
               {order.items.map((item) => (
                 <div key={item.id} className="p-4 flex items-center gap-4">
-                  <div className="w-20 h-20 bg-background-muted rounded-soft flex items-center justify-center flex-shrink-0">
+                  <div className="w-20 h-20 bg-surface-secondary rounded-lg flex items-center justify-center flex-shrink-0">
                     {item.productImage ? (
                       <img
                         src={item.productImage}
                         alt={item.productName}
-                        className="w-full h-full object-cover rounded-soft"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     ) : (
                       <ImagePlaceholder />
@@ -701,18 +730,18 @@ export default function CommandeDetailPage({ params }: PageProps) {
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/catalogue/${item.productSku}`}
-                      className="font-sans text-body-sm font-medium text-text-primary hover:text-hermes-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft"
+                      className="font-sans text-body-sm font-medium text-content-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
                     >
                       {item.productName}
                     </Link>
-                    <p className="font-mono text-caption text-text-muted">
+                    <p className="font-mono text-caption text-content-muted">
                       {item.productSku}
                     </p>
                     <div className="mt-1 flex flex-wrap items-center gap-4">
-                      <span className="font-sans text-caption text-text-muted">
+                      <span className="font-sans text-caption text-content-muted">
                         Quantite: {item.quantity}
                       </span>
-                      <span className="font-sans text-caption text-text-muted">
+                      <span className="font-sans text-caption text-content-muted">
                         {formatCurrency(item.unitPrice, order.totals.currency)} /unite
                       </span>
                       {item.fulfillmentStatus && (
@@ -740,11 +769,11 @@ export default function CommandeDetailPage({ params }: PageProps) {
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-sans text-body-sm font-medium text-text-primary">
+                    <p className="font-sans text-body-sm font-medium text-content-primary">
                       {formatCurrency(item.lineTotal, order.totals.currency)}
                     </p>
                     {item.discountPercent && item.discountPercent > 0 && (
-                      <p className="font-sans text-caption text-hermes-600">
+                      <p className="font-sans text-caption text-primary-600">
                         -{item.discountPercent}%
                       </p>
                     )}
@@ -753,15 +782,15 @@ export default function CommandeDetailPage({ params }: PageProps) {
               ))}
             </div>
             {/* Totals */}
-            <div className="p-4 border-t border-border-light bg-background-muted space-y-2">
+            <div className="p-4 border-t border-stroke-light bg-surface-secondary space-y-2">
               <div className="flex justify-between">
-                <span className="font-sans text-body-sm text-text-secondary">Sous-total HT</span>
-                <span className="font-sans text-body-sm text-text-primary">
+                <span className="font-sans text-body-sm text-content-secondary">Sous-total HT</span>
+                <span className="font-sans text-body-sm text-content-primary">
                   {formatCurrency(order.totals.subtotal, order.totals.currency)}
                 </span>
               </div>
               {order.totals.discount > 0 && (
-                <div className="flex justify-between text-hermes-600">
+                <div className="flex justify-between text-primary-600">
                   <span className="font-sans text-body-sm">Remises</span>
                   <span className="font-sans text-body-sm">
                     -{formatCurrency(order.totals.discount, order.totals.currency)}
@@ -769,22 +798,22 @@ export default function CommandeDetailPage({ params }: PageProps) {
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="font-sans text-body-sm text-text-secondary">Livraison</span>
-                <span className="font-sans text-body-sm text-text-primary">
+                <span className="font-sans text-body-sm text-content-secondary">Livraison</span>
+                <span className="font-sans text-body-sm text-content-primary">
                   {order.shipping.isFreeShipping
                     ? 'Gratuite'
                     : formatCurrency(order.totals.shipping, order.totals.currency)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="font-sans text-body-sm text-text-secondary">TVA (20%)</span>
-                <span className="font-sans text-body-sm text-text-primary">
+                <span className="font-sans text-body-sm text-content-secondary">TVA (20%)</span>
+                <span className="font-sans text-body-sm text-content-primary">
                   {formatCurrency(order.totals.tax, order.totals.currency)}
                 </span>
               </div>
-              <div className="pt-2 border-t border-border-light flex justify-between">
-                <span className="font-sans text-body font-medium text-text-primary">Total TTC</span>
-                <span className="font-serif text-heading-4 text-text-primary">
+              <div className="pt-2 border-t border-stroke-light flex justify-between">
+                <span className="font-sans text-body font-medium text-content-primary">Total TTC</span>
+                <span className="font-sans text-heading-4 text-content-primary">
                   {formatCurrency(order.totals.total, order.totals.currency)}
                 </span>
               </div>
@@ -793,10 +822,10 @@ export default function CommandeDetailPage({ params }: PageProps) {
 
           {/* Timeline */}
           <section
-            className="bg-white rounded-soft border border-border-light p-6"
+            className="bg-white rounded-lg border border-stroke-light p-6"
             aria-labelledby="history-heading"
           >
-            <h2 id="history-heading" className="font-serif text-heading-5 text-text-primary mb-6">
+            <h2 id="history-heading" className="font-sans text-heading-5 text-content-primary mb-6">
               Historique de la commande
             </h2>
             <div className="space-y-0" role="list" aria-label="Historique de la commande">
@@ -816,14 +845,14 @@ export default function CommandeDetailPage({ params }: PageProps) {
                   </div>
                   <div className="flex-1 pb-6">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="font-sans text-body-sm font-medium text-text-primary">
+                      <p className="font-sans text-body-sm font-medium text-content-primary">
                         {event.description}
                       </p>
-                      <span className="font-sans text-caption text-text-muted">
+                      <span className="font-sans text-caption text-content-muted">
                         {formatDate(event.createdAt)}
                       </span>
                     </div>
-                    <p className="mt-1 font-sans text-body-sm text-text-secondary">
+                    <p className="mt-1 font-sans text-body-sm text-content-secondary">
                       Par {event.actorName}
                     </p>
                   </div>
@@ -837,36 +866,36 @@ export default function CommandeDetailPage({ params }: PageProps) {
         <div className="space-y-6">
           {/* Order Summary */}
           <section
-            className="bg-white rounded-soft border border-border-light"
+            className="bg-white rounded-lg border border-stroke-light"
             aria-labelledby="summary-heading"
           >
-            <div className="p-6 border-b border-border-light">
-              <h2 id="summary-heading" className="font-serif text-heading-5 text-text-primary">
+            <div className="p-6 border-b border-stroke-light">
+              <h2 id="summary-heading" className="font-sans text-heading-5 text-content-primary">
                 Resume
               </h2>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <p className="font-sans text-caption text-text-muted">Commandee par</p>
+                <p className="font-sans text-caption text-content-muted">Commandee par</p>
                 <div className="mt-2 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center flex-shrink-0">
-                    <span className="font-sans text-body-sm font-medium text-hermes-600">
+                  <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center flex-shrink-0">
+                    <span className="font-sans text-body-sm font-medium text-primary-600">
                       {order.employeeName.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <p className="font-sans text-body-sm font-medium text-text-primary truncate">
+                    <p className="font-sans text-body-sm font-medium text-content-primary truncate">
                       {order.employeeName}
                     </p>
-                    <p className="font-sans text-caption text-text-muted truncate">
+                    <p className="font-sans text-caption text-content-muted truncate">
                       {order.companyName}
                     </p>
                   </div>
                 </div>
               </div>
               <div>
-                <p className="font-sans text-caption text-text-muted">Paiement</p>
-                <p className="mt-1 font-sans text-body-sm text-text-primary">
+                <p className="font-sans text-caption text-content-muted">Paiement</p>
+                <p className="mt-1 font-sans text-body-sm text-content-primary">
                   {order.payment.methodName}
                 </p>
                 <span
@@ -879,17 +908,17 @@ export default function CommandeDetailPage({ params }: PageProps) {
                   {paymentStatusLabels[order.payment.status] || order.payment.statusLabel || order.payment.status}
                 </span>
                 {order.payment.dueDate && order.payment.status === 'pending' && (
-                  <p className="mt-2 font-sans text-caption text-text-muted">
+                  <p className="mt-2 font-sans text-caption text-content-muted">
                     Echeance: {formatDate(order.payment.dueDate)}
                   </p>
                 )}
               </div>
               {order.sourceQuoteNumber && (
                 <div>
-                  <p className="font-sans text-caption text-text-muted">Devis d'origine</p>
+                  <p className="font-sans text-caption text-content-muted">Devis d'origine</p>
                   <Link
                     href={`/devis/${order.sourceQuoteId}`}
-                    className="mt-1 font-sans text-body-sm text-hermes-500 hover:text-hermes-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2 rounded-soft"
+                    className="mt-1 font-sans text-body-sm text-primary hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
                   >
                     {order.sourceQuoteNumber}
                   </Link>
@@ -900,14 +929,14 @@ export default function CommandeDetailPage({ params }: PageProps) {
 
           {/* Shipping Address */}
           <section
-            className="bg-white rounded-soft border border-border-light p-6"
+            className="bg-white rounded-lg border border-stroke-light p-6"
             aria-labelledby="shipping-address-heading"
           >
-            <h2 id="shipping-address-heading" className="font-serif text-heading-5 text-text-primary mb-4">
+            <h2 id="shipping-address-heading" className="font-sans text-heading-5 text-content-primary mb-4">
               Adresse de livraison
             </h2>
-            <address className="font-sans text-body-sm text-text-secondary space-y-1 not-italic">
-              <p className="font-medium text-text-primary">{order.shipping.address.recipientName}</p>
+            <address className="font-sans text-body-sm text-content-secondary space-y-1 not-italic">
+              <p className="font-medium text-content-primary">{order.shipping.address.recipientName}</p>
               {order.shipping.address.companyName && (
                 <p>{order.shipping.address.companyName}</p>
               )}
@@ -918,10 +947,10 @@ export default function CommandeDetailPage({ params }: PageProps) {
               <p>{order.shipping.address.postalCode} {order.shipping.address.city}</p>
               <p>{order.shipping.address.country}</p>
               {order.shipping.address.phone && (
-                <p className="pt-2 text-text-muted">{order.shipping.address.phone}</p>
+                <p className="pt-2 text-content-muted">{order.shipping.address.phone}</p>
               )}
               {order.shipping.address.deliveryInstructions && (
-                <p className="pt-2 text-text-muted italic">
+                <p className="pt-2 text-content-muted italic">
                   {order.shipping.address.deliveryInstructions}
                 </p>
               )}
@@ -931,14 +960,14 @@ export default function CommandeDetailPage({ params }: PageProps) {
           {/* Billing Address */}
           {order.shipping.billingAddress && (
             <section
-              className="bg-white rounded-soft border border-border-light p-6"
+              className="bg-white rounded-lg border border-stroke-light p-6"
               aria-labelledby="billing-address-heading"
             >
-              <h2 id="billing-address-heading" className="font-serif text-heading-5 text-text-primary mb-4">
+              <h2 id="billing-address-heading" className="font-sans text-heading-5 text-content-primary mb-4">
                 Adresse de facturation
               </h2>
-              <address className="font-sans text-body-sm text-text-secondary space-y-1 not-italic">
-                <p className="font-medium text-text-primary">{order.shipping.billingAddress.recipientName}</p>
+              <address className="font-sans text-body-sm text-content-secondary space-y-1 not-italic">
+                <p className="font-medium text-content-primary">{order.shipping.billingAddress.recipientName}</p>
                 {order.shipping.billingAddress.companyName && (
                   <p>{order.shipping.billingAddress.companyName}</p>
                 )}
@@ -949,7 +978,7 @@ export default function CommandeDetailPage({ params }: PageProps) {
                 <p>{order.shipping.billingAddress.postalCode} {order.shipping.billingAddress.city}</p>
                 <p>{order.shipping.billingAddress.country}</p>
                 {order.shipping.billingAddress.vatNumber && (
-                  <p className="pt-2 text-text-muted">TVA: {order.shipping.billingAddress.vatNumber}</p>
+                  <p className="pt-2 text-content-muted">TVA: {order.shipping.billingAddress.vatNumber}</p>
                 )}
               </address>
             </section>
@@ -962,7 +991,7 @@ export default function CommandeDetailPage({ params }: PageProps) {
               onClick={handleCancelOrder}
               disabled={isPending}
               className={cn(
-                'w-full px-4 py-2 rounded-soft',
+                'w-full px-4 py-2 rounded-lg',
                 'font-sans text-body-sm font-medium',
                 'bg-red-50 border border-red-200 text-red-600',
                 'hover:bg-red-100 transition-colors duration-200',
@@ -975,22 +1004,22 @@ export default function CommandeDetailPage({ params }: PageProps) {
           )}
 
           {/* Help */}
-          <div className="bg-background-muted rounded-soft p-4">
-            <h3 className="font-sans text-body-sm font-medium text-text-primary mb-2">
+          <div className="bg-surface-secondary rounded-lg p-4">
+            <h3 className="font-sans text-body-sm font-medium text-content-primary mb-2">
               Un probleme ?
             </h3>
-            <p className="font-sans text-caption text-text-muted mb-3">
+            <p className="font-sans text-caption text-content-muted mb-3">
               Notre equipe est disponible pour vous aider avec votre commande.
             </p>
             <Link
               href="/support"
               className={cn(
-                'block w-full px-3 py-2 rounded-soft text-center',
+                'block w-full px-3 py-2 rounded-lg text-center',
                 'font-sans text-caption font-medium',
-                'bg-white border border-border-light text-text-secondary',
-                'hover:bg-white hover:border-hermes-300',
+                'bg-white border border-stroke-light text-content-secondary',
+                'hover:bg-white hover:border-primary/20',
                 'transition-colors duration-200',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
               )}
             >
               Contacter le support

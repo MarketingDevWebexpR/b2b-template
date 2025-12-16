@@ -16,19 +16,19 @@ export function LogoutButton() {
     <button
       type="button"
       onClick={handleLogout}
-      className="group flex h-full w-full items-center gap-4 border border-border-light bg-white p-6 transition-all duration-300 ease-luxe hover:border-red-200 hover:bg-red-50/30"
+      className="group flex h-full w-full items-center gap-4 border border-neutral-200 bg-white p-6 rounded-lg transition-all duration-200 hover:border-red-200 hover:bg-red-50/30"
     >
-      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-border-light transition-all duration-300 group-hover:border-red-200 group-hover:bg-red-50">
+      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-neutral-200 rounded-lg transition-all duration-200 group-hover:border-red-200 group-hover:bg-red-50">
         <LogOut
-          className="h-5 w-5 text-text-secondary transition-colors group-hover:text-red-600"
+          className="h-5 w-5 text-neutral-500 transition-colors group-hover:text-red-600"
           strokeWidth={1.5}
         />
       </div>
       <div className="flex-1 text-left">
-        <h3 className="font-serif text-body-lg text-text-primary transition-colors group-hover:text-red-600">
+        <h3 className="font-sans text-base font-medium text-neutral-900 transition-colors group-hover:text-red-600">
           Deconnexion
         </h3>
-        <p className="mt-1 font-sans text-caption text-text-muted">
+        <p className="mt-1 font-sans text-sm text-neutral-500">
           Se deconnecter de votre compte
         </p>
       </div>

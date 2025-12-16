@@ -180,17 +180,17 @@ export function ProductFilters({
     >
       {/* Active Filters */}
       {showActiveFilters && hasActiveFilters && (
-        <div className="mb-6 pb-4 border-b border-b2b-border-light">
+        <div className="mb-6 pb-4 border-b border-neutral-200">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-b2b-label font-semibold uppercase tracking-wide text-b2b-text-primary">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-900">
               Filtres actifs
             </h3>
             <button
               type="button"
               onClick={handleClearAll}
               className={cn(
-                'text-b2b-body-sm text-b2b-text-muted',
-                'hover:text-b2b-danger',
+                'text-sm text-neutral-500',
+                'hover:text-red-600',
                 'focus:outline-none focus-visible:underline',
                 'transition-colors duration-200'
               )}
@@ -208,10 +208,10 @@ export function ProductFilters({
                 className={cn(
                   'inline-flex items-center gap-1.5',
                   'px-2.5 py-1.5 rounded-md',
-                  'text-b2b-caption',
-                  'bg-b2b-bg-tertiary text-b2b-text-primary',
-                  'hover:bg-b2b-danger/10 hover:text-b2b-danger',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary',
+                  'text-xs',
+                  'bg-neutral-100 text-neutral-900',
+                  'hover:bg-red-50 hover:text-red-600',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
                   'transition-colors duration-200',
                   'group'
                 )}
@@ -221,7 +221,7 @@ export function ProductFilters({
                 <svg
                   className={cn(
                     'w-3.5 h-3.5 flex-shrink-0',
-                    'text-b2b-text-muted group-hover:text-b2b-danger',
+                    'text-neutral-500 group-hover:text-red-600',
                     'transition-colors duration-200'
                   )}
                   fill="none"

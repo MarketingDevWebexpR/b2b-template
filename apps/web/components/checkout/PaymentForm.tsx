@@ -40,7 +40,7 @@ interface PaymentFormProps {
 /**
  * PaymentForm Component
  * Payment method selection with Stripe integration
- * Hermes-inspired luxury styling
+ * B2B professional neutral aesthetic
  */
 export function PaymentForm({
   onSubmit,
@@ -114,10 +114,10 @@ export function PaymentForm({
     <div className={cn('space-y-6', className)}>
       {/* Section title */}
       <div className="mb-8">
-        <h2 className="font-serif text-xl md:text-2xl text-text-primary mb-2">
+        <h2 className="font-sans font-semibold text-xl md:text-2xl text-neutral-900 mb-2">
           Mode de paiement
         </h2>
-        <p className="text-sm text-text-muted">
+        <p className="text-sm text-neutral-500">
           Choisissez votre methode de paiement preferee.
         </p>
       </div>
@@ -130,13 +130,13 @@ export function PaymentForm({
           onClick={() => setPaymentMethod('deferred')}
           disabled={isLoading}
           className={cn(
-            'w-full p-5 text-left',
+            'w-full p-5 text-left rounded-lg',
             'border transition-all duration-200',
             'flex items-start gap-4',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             paymentMethod === 'deferred'
-              ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
-              : 'border-border-light bg-white hover:border-hermes-500/50'
+              ? 'border-accent bg-accent/5 ring-1 ring-accent/30'
+              : 'border-neutral-200 bg-white hover:border-accent/50'
           )}
         >
           {/* Selection indicator */}
@@ -147,8 +147,8 @@ export function PaymentForm({
               'flex items-center justify-center',
               'transition-colors duration-200',
               paymentMethod === 'deferred'
-                ? 'border-hermes-500 bg-hermes-500'
-                : 'border-border-medium bg-white'
+                ? 'border-accent bg-accent'
+                : 'border-neutral-300 bg-white'
             )}
           >
             {paymentMethod === 'deferred' && (
@@ -159,12 +159,12 @@ export function PaymentForm({
           {/* Option content */}
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <Clock className="w-5 h-5 text-hermes-500" />
-              <span className="font-medium text-text-primary text-lg">
+              <Clock className="w-5 h-5 text-accent" />
+              <span className="font-medium text-neutral-900 text-lg">
                 Paiement a 30 jours
               </span>
             </div>
-            <p className="text-sm text-text-muted">
+            <p className="text-sm text-neutral-500">
               Recevez votre commande maintenant et payez dans 30 jours.
               Aucun frais supplementaire.
             </p>
@@ -177,13 +177,13 @@ export function PaymentForm({
           onClick={() => setPaymentMethod('immediate')}
           disabled={isLoading}
           className={cn(
-            'w-full p-5 text-left',
+            'w-full p-5 text-left rounded-lg',
             'border transition-all duration-200',
             'flex items-start gap-4',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             paymentMethod === 'immediate'
-              ? 'border-hermes-500 bg-hermes-500/5 ring-1 ring-hermes-500/30'
-              : 'border-border-light bg-white hover:border-hermes-500/50'
+              ? 'border-accent bg-accent/5 ring-1 ring-accent/30'
+              : 'border-neutral-200 bg-white hover:border-accent/50'
           )}
         >
           {/* Selection indicator */}
@@ -194,8 +194,8 @@ export function PaymentForm({
               'flex items-center justify-center',
               'transition-colors duration-200',
               paymentMethod === 'immediate'
-                ? 'border-hermes-500 bg-hermes-500'
-                : 'border-border-medium bg-white'
+                ? 'border-accent bg-accent'
+                : 'border-neutral-300 bg-white'
             )}
           >
             {paymentMethod === 'immediate' && (
@@ -206,12 +206,12 @@ export function PaymentForm({
           {/* Option content */}
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <CreditCard className="w-5 h-5 text-hermes-500" />
-              <span className="font-medium text-text-primary text-lg">
+              <CreditCard className="w-5 h-5 text-accent" />
+              <span className="font-medium text-neutral-900 text-lg">
                 Paiement comptant
               </span>
             </div>
-            <p className="text-sm text-text-muted">
+            <p className="text-sm text-neutral-500">
               Payez immediatement par carte bancaire via notre plateforme securisee Stripe.
             </p>
           </div>
@@ -219,22 +219,22 @@ export function PaymentForm({
       </div>
 
       {/* Divider */}
-      <div className="border-t border-border-light" />
+      <div className="border-t border-neutral-200" />
 
       {/* Payment form based on selection */}
       {paymentMethod === 'deferred' ? (
         /* Deferred payment confirmation */
         <form onSubmit={handleDeferredSubmit} className="space-y-6">
-          <div className="p-6 bg-background-beige border border-border-light">
+          <div className="p-6 bg-neutral-50 border border-neutral-200 rounded-lg">
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-hermes-500/10 flex items-center justify-center">
-                <Clock className="w-6 h-6 text-hermes-500" />
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                <Clock className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <h3 className="font-medium text-text-primary mb-2">
+                <h3 className="font-medium text-neutral-900 mb-2">
                   Paiement differe a 30 jours
                 </h3>
-                <ul className="space-y-2 text-sm text-text-muted">
+                <ul className="space-y-2 text-sm text-neutral-600">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-green-600" />
                     Votre commande est expediee immediatement
@@ -270,14 +270,14 @@ export function PaymentForm({
               variant="primary"
               size="lg"
               isLoading={isLoading}
-              className="flex-1 uppercase tracking-wider bg-luxe-charcoal !text-white border border-luxe-charcoal hover:bg-hermes-500 hover:border-hermes-500 transition-all duration-300"
+              className="flex-1 uppercase tracking-wider bg-accent text-white border border-accent hover:bg-accent/90 transition-all duration-200"
             >
               Confirmer la commande
             </Button>
           </div>
 
           {/* Security note */}
-          <div className="flex items-center justify-center gap-2 text-xs text-text-muted pt-2">
+          <div className="flex items-center justify-center gap-2 text-xs text-neutral-500 pt-2">
             <Lock className="h-4 w-4" />
             <span>Commande securisee</span>
           </div>
@@ -286,7 +286,7 @@ export function PaymentForm({
         /* Immediate payment with Stripe */
         <div className="space-y-6">
           {stripeError && (
-            <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 text-red-700 text-sm">
+            <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
               <AlertCircle className="h-5 w-5 flex-shrink-0" />
               {stripeError}
             </div>
@@ -295,8 +295,8 @@ export function PaymentForm({
           {isLoadingStripe ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="w-10 h-10 border-2 border-hermes-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-sm text-text-muted">
+                <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-sm text-neutral-500">
                   Chargement du formulaire de paiement...
                 </p>
               </div>
@@ -309,12 +309,12 @@ export function PaymentForm({
                 appearance: {
                   theme: 'stripe',
                   variables: {
-                    colorPrimary: '#c9a050',
+                    colorPrimary: '#f67828',
                     colorBackground: '#ffffff',
-                    colorText: '#1a1a1a',
+                    colorText: '#171717',
                     colorDanger: '#dc2626',
-                    fontFamily: 'system-ui, sans-serif',
-                    borderRadius: '0px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    borderRadius: '8px',
                   },
                 },
               }}
@@ -326,12 +326,12 @@ export function PaymentForm({
               />
             </Elements>
           ) : (
-            <div className="text-center py-8 text-text-muted">
+            <div className="text-center py-8 text-neutral-500">
               <p>Impossible de charger le formulaire de paiement.</p>
               <button
                 type="button"
                 onClick={() => setPaymentMethod('immediate')}
-                className="mt-2 text-hermes-500 underline"
+                className="mt-2 text-accent underline hover:text-accent/80"
               >
                 Reessayer
               </button>

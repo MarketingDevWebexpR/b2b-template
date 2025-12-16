@@ -304,7 +304,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             exit="exit"
             className={cn(
               'fixed inset-0 z-[100]',
-              'bg-luxe-charcoal/60 backdrop-blur-sm'
+              'bg-neutral-900/60 backdrop-blur-sm'
             )}
             onClick={onClose}
             aria-hidden="true"
@@ -318,8 +318,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             exit="exit"
             className={cn(
               'fixed top-0 left-0 right-0 z-[101]',
-              'bg-luxe-cream',
-              'shadow-elegant-lg'
+              'bg-white',
+              'shadow-2xl'
             )}
             role="dialog"
             aria-modal="true"
@@ -333,12 +333,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   <div className="flex-shrink-0">
                     {isLoading ? (
                       <Loader2
-                        className="w-5 h-5 text-hermes-500 animate-spin"
+                        className="w-5 h-5 text-accent animate-spin"
                         strokeWidth={1.5}
                       />
                     ) : (
                       <Search
-                        className="w-5 h-5 text-text-muted"
+                        className="w-5 h-5 text-neutral-500"
                         strokeWidth={1.5}
                       />
                     )}
@@ -351,14 +351,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     value={query}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    placeholder="Rechercher un bijou, une collection..."
+                    placeholder="Rechercher un produit, une reference..."
                     className={cn(
                       'flex-1',
                       'bg-transparent',
-                      'font-serif text-xl md:text-2xl lg:text-3xl',
-                      'text-text-primary placeholder:text-text-light',
+                      'font-sans text-xl md:text-2xl lg:text-3xl',
+                      'text-neutral-900 placeholder:text-neutral-400',
                       'border-none outline-none',
-                      'transition-colors duration-300'
+                      'transition-colors duration-200'
                     )}
                     autoComplete="off"
                     autoCorrect="off"
@@ -378,10 +378,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       'flex-shrink-0',
                       'w-10 h-10 flex items-center justify-center',
                       'rounded-full',
-                      'text-text-muted hover:text-text-primary',
-                      'hover:bg-background-warm',
-                      'transition-all duration-300 ease-luxe',
-                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-luxe-charcoal/20'
+                      'text-neutral-500 hover:text-neutral-900',
+                      'hover:bg-neutral-100',
+                      'transition-all duration-200',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/20'
                     )}
                     aria-label={query ? 'Effacer la recherche' : 'Fermer'}
                   >
@@ -390,7 +390,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 </div>
 
                 {/* Elegant underline */}
-                <div className="mt-4 h-px bg-gradient-to-r from-transparent via-border-medium to-transparent" />
+                <div className="mt-4 h-px bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
               </form>
             </div>
 
@@ -411,8 +411,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               {isLoading && (
                 <div className="flex items-center justify-center py-12">
                   <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-8 h-8 text-hermes-500 animate-spin" />
-                    <span className="text-sm text-text-muted">Recherche en cours...</span>
+                    <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                    <span className="text-sm text-neutral-500">Recherche en cours...</span>
                   </div>
                 </div>
               )}
@@ -429,15 +429,15 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   {recentSearches.length > 0 && (
                     <motion.div variants={itemVariants}>
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-luxe text-text-muted">
+                        <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-neutral-500">
                           <Clock className="w-4 h-4" strokeWidth={1.5} />
                           Recherches récentes
                         </h3>
                         <button
                           onClick={clearRecentSearches}
                           className={cn(
-                            'text-xs text-text-light hover:text-hermes-500',
-                            'transition-colors duration-300'
+                            'text-xs text-neutral-400 hover:text-accent',
+                            'transition-colors duration-200'
                           )}
                         >
                           Effacer
@@ -451,12 +451,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                               className={cn(
                                 'w-full text-left',
                                 'py-2.5 px-3 -mx-3',
-                                'font-sans text-sm text-text-secondary',
-                                'hover:text-text-primary hover:bg-background-warm',
-                                'rounded-soft',
-                                'transition-all duration-300 ease-luxe',
-                                'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500/30',
-                                selectedIndex === index && 'bg-background-warm text-text-primary'
+                                'font-sans text-sm text-neutral-600',
+                                'hover:text-neutral-900 hover:bg-neutral-100',
+                                'rounded-lg',
+                                'transition-all duration-200',
+                                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30',
+                                selectedIndex === index && 'bg-neutral-100 text-neutral-900'
                               )}
                               role="option"
                               aria-selected={selectedIndex === index}
@@ -471,7 +471,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
                   {/* Popular Searches */}
                   <motion.div variants={itemVariants}>
-                    <h3 className="flex items-center gap-2 mb-4 text-xs font-medium uppercase tracking-luxe text-text-muted">
+                    <h3 className="flex items-center gap-2 mb-4 text-xs font-medium uppercase tracking-wider text-neutral-500">
                       <TrendingUp className="w-4 h-4" strokeWidth={1.5} />
                       Recherches populaires
                     </h3>
@@ -483,13 +483,13 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             className={cn(
                               'w-full text-left',
                               'py-2.5 px-3 -mx-3',
-                              'font-sans text-sm text-text-secondary',
-                              'hover:text-text-primary hover:bg-background-warm',
-                              'rounded-soft',
-                              'transition-all duration-300 ease-luxe',
-                              'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500/30',
+                              'font-sans text-sm text-neutral-600',
+                              'hover:text-neutral-900 hover:bg-neutral-100',
+                              'rounded-lg',
+                              'transition-all duration-200',
+                              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30',
                               selectedIndex === recentSearches.length + index &&
-                                'bg-background-warm text-text-primary'
+                                'bg-neutral-100 text-neutral-900'
                             )}
                             role="option"
                             aria-selected={selectedIndex === recentSearches.length + index}
@@ -510,10 +510,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center py-12"
                 >
-                  <p className="font-serif text-lg text-text-primary mb-2">
+                  <p className="font-sans font-semibold text-lg text-neutral-900 mb-2">
                     Aucun résultat pour "{query}"
                   </p>
-                  <p className="text-sm text-text-muted mb-6">
+                  <p className="text-sm text-neutral-500 mb-6">
                     Essayez avec d'autres termes ou explorez nos suggestions
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
@@ -523,12 +523,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         onClick={() => handleSuggestionClick(suggestion)}
                         className={cn(
                           'px-4 py-2',
-                          'text-xs font-medium uppercase tracking-elegant',
-                          'text-text-secondary',
-                          'border border-border-light',
+                          'text-xs font-medium uppercase tracking-wider',
+                          'text-neutral-600',
+                          'border border-neutral-200',
                           'rounded-full',
-                          'hover:border-hermes-500 hover:text-hermes-500',
-                          'transition-all duration-300 ease-luxe'
+                          'hover:border-accent hover:text-accent',
+                          'transition-all duration-200'
                         )}
                       >
                         {suggestion}
@@ -547,23 +547,23 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 >
                   {/* Results Header */}
                   <div className="flex items-center justify-between mb-6">
-                    <span className="text-xs font-medium uppercase tracking-luxe text-text-muted">
+                    <span className="text-xs font-medium uppercase tracking-wider text-neutral-500">
                       {results.totalProducts} résultat{results.totalProducts > 1 ? 's' : ''}
                     </span>
                     <Link
                       href={`/recherche?q=${encodeURIComponent(query)}`}
                       className={cn(
                         'flex items-center gap-1.5',
-                        'text-xs font-medium uppercase tracking-luxe',
-                        'text-hermes-500 hover:text-hermes-600',
-                        'transition-colors duration-300',
+                        'text-xs font-medium uppercase tracking-wider',
+                        'text-accent hover:text-accent/80',
+                        'transition-colors duration-200',
                         'group'
                       )}
                       onClick={() => saveRecentSearch(query)}
                     >
                       Voir tout
                       <ArrowRight
-                        className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+                        className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
                         strokeWidth={1.5}
                       />
                     </Link>
@@ -587,7 +587,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
             {/* Bottom Gradient Fade */}
             <div
-              className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-luxe-cream to-transparent pointer-events-none"
+              className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"
               aria-hidden="true"
             />
           </motion.div>
@@ -617,9 +617,9 @@ function SearchProductCard({ product, isSelected, onClick }: SearchProductCardPr
       onClick={onClick}
       className={cn(
         'group block',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500/30 focus-visible:ring-offset-2',
-        'rounded-soft',
-        isSelected && 'ring-2 ring-hermes-500/30 ring-offset-2'
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',
+        'rounded-lg',
+        isSelected && 'ring-2 ring-accent/30 ring-offset-2'
       )}
       role="option"
       aria-selected={isSelected}
@@ -627,10 +627,10 @@ function SearchProductCard({ product, isSelected, onClick }: SearchProductCardPr
       {/* Image */}
       <div className={cn(
         'relative aspect-square overflow-hidden',
-        'bg-white rounded-soft',
-        'shadow-card',
-        'transition-all duration-300 ease-luxe',
-        'group-hover:shadow-card-hover'
+        'bg-white rounded-lg border border-neutral-100',
+        'shadow-sm',
+        'transition-all duration-200',
+        'group-hover:shadow-md group-hover:border-neutral-200'
       )}>
         <Image
           src={imageSrc}
@@ -639,7 +639,7 @@ function SearchProductCard({ product, isSelected, onClick }: SearchProductCardPr
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
           className={cn(
             'object-contain p-2',
-            'transition-transform duration-500 ease-luxe-out',
+            'transition-transform duration-300 ease-out',
             'group-hover:scale-105'
           )}
           onError={() => setImageError(true)}
@@ -649,14 +649,14 @@ function SearchProductCard({ product, isSelected, onClick }: SearchProductCardPr
       {/* Product Info */}
       <div className="mt-3">
         <h4 className={cn(
-          'font-serif text-sm text-text-primary',
+          'font-sans text-sm font-medium text-neutral-900',
           'line-clamp-2 leading-snug',
-          'transition-colors duration-300',
-          'group-hover:text-hermes-500'
+          'transition-colors duration-200',
+          'group-hover:text-accent'
         )}>
           {product.name}
         </h4>
-        <p className="mt-1 font-sans text-xs text-text-muted">
+        <p className="mt-1 font-sans text-xs text-neutral-500">
           {formatPrice(product.price)}
         </p>
       </div>

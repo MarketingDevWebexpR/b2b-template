@@ -18,19 +18,19 @@ const sectionVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
+      duration: 0.4,
       ease: [0.16, 1, 0.3, 1],
     },
   },
@@ -42,62 +42,61 @@ interface CategoryCardProps {
 }
 
 /**
- * CategoryCard - Text-only category card matching CategoriesShowcase style
+ * CategoryCard - Clean B2B category card
  */
 function CategoryCard({ category, index }: CategoryCardProps) {
   return (
     <motion.div variants={itemVariants} className="h-full">
       <Link
         href={`/categories/${category.slug}`}
-        className="group relative flex h-full flex-col border border-border bg-white p-6 transition-all duration-400 hover:border-hermes-500 hover:shadow-elegant lg:p-8"
-        aria-label={`Decouvrir la collection ${category.name}`}
+        className="group relative flex h-full flex-col border border-neutral-200 bg-white p-5 transition-all duration-200 hover:border-neutral-300 hover:shadow-md lg:p-6"
+        aria-label={`Decouvrir la categorie ${category.name}`}
       >
         {/* Index number */}
-        <span className="absolute right-4 top-4 font-serif text-3xl text-hermes-500/20 transition-colors duration-400 group-hover:text-hermes-500/40 lg:right-6 lg:top-6 lg:text-4xl">
+        <span className="absolute right-3 top-3 font-sans text-2xl font-light text-neutral-200 transition-colors duration-200 group-hover:text-accent/30 lg:right-4 lg:top-4 lg:text-3xl">
           {String(index + 1).padStart(2, '0')}
         </span>
 
         {/* Category Name */}
-        <h3 className="pr-12 font-serif text-heading-4 text-text-primary transition-colors duration-350 group-hover:text-hermes-600 lg:pr-14 lg:text-heading-3">
+        <h3 className="pr-10 font-sans text-body-lg font-semibold text-neutral-900 transition-colors duration-200 group-hover:text-accent lg:pr-12">
           {category.name}
         </h3>
 
         {/* Description */}
-        <p className="mt-2 line-clamp-2 font-sans text-body-sm text-text-muted lg:mt-3 lg:text-body">
+        <p className="mt-2 line-clamp-2 font-sans text-body-sm text-neutral-500 lg:mt-2">
           {category.description}
         </p>
 
         {/* Bottom row: product count + arrow - pushed to bottom */}
-        <div className="mt-auto flex items-center justify-between pt-4 lg:pt-6">
-          <span className="font-sans text-caption uppercase tracking-luxe text-text-muted">
-            {category.productCount} pieces
+        <div className="mt-auto flex items-center justify-between pt-4">
+          <span className="font-sans text-caption uppercase tracking-wider text-neutral-400">
+            {category.productCount} produits
           </span>
 
-          <div className="flex items-center gap-2">
-            <span className="h-px w-0 bg-hermes-500 transition-all duration-400 group-hover:w-6 lg:group-hover:w-8" />
+          <div className="flex items-center gap-1.5">
+            <span className="h-px w-0 bg-accent transition-all duration-200 group-hover:w-5" />
             <ArrowUpRight
-              className="h-4 w-4 text-hermes-500 transition-transform duration-400 group-hover:translate-x-1 group-hover:-translate-y-1 lg:h-5 lg:w-5"
+              className="h-4 w-4 text-accent transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               strokeWidth={1.5}
             />
           </div>
         </div>
 
         {/* Hover accent line */}
-        <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-hermes-500 transition-all duration-400 group-hover:w-full" />
+        <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-accent transition-all duration-200 group-hover:w-full" />
       </Link>
     </motion.div>
   );
 }
 
 /**
- * OtherCategories - Elegant navigation to other category pages
+ * OtherCategories - Clean B2B navigation to other category pages
  *
  * Features:
  * - Text-only card-based category navigation (no images)
  * - Subtle hover effects
- * - Hermes-inspired minimalist design
+ * - Professional neutral styling
  * - Responsive grid layout
- * - Same style as CategoriesShowcase on homepage
  */
 export function OtherCategories({ categories, currentSlug }: OtherCategoriesProps) {
   // Filter out current category
@@ -108,23 +107,23 @@ export function OtherCategories({ categories, currentSlug }: OtherCategoriesProp
   }
 
   return (
-    <section className="border-t border-border-light bg-background-beige py-16 lg:py-24">
+    <section className="border-t border-neutral-200 bg-neutral-50 py-12 lg:py-16">
       <Container>
         {/* Section Header */}
         <motion.div
-          className="mb-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
+          className="mb-8 text-center"
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          <span className="mb-3 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500">
+          <span className="mb-2 inline-block font-sans text-caption uppercase tracking-wider text-accent font-medium">
             Explorer
           </span>
-          <h2 className="font-serif text-heading-2 text-text-primary md:text-heading-1">
-            Autres Collections
+          <h2 className="font-sans text-section-title font-semibold text-neutral-900">
+            Autres Categories
           </h2>
-          <div className="mx-auto mt-5 h-px w-16 bg-hermes-500" />
+          <div className="mx-auto mt-3 h-[2px] w-10 bg-accent" />
         </motion.div>
 
         {/* Categories Grid */}
@@ -133,7 +132,7 @@ export function OtherCategories({ categories, currentSlug }: OtherCategoriesProp
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
+          viewport={{ once: true, margin: '-30px' }}
         >
           {otherCategories.slice(0, 6).map((category, index) => (
             <CategoryCard key={category.id} category={category} index={index} />
@@ -142,22 +141,22 @@ export function OtherCategories({ categories, currentSlug }: OtherCategoriesProp
 
         {/* View All Link */}
         <motion.div
-          className="mt-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
+          className="mt-10 text-center"
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <Link
             href="/categories"
-            className="group inline-flex items-center gap-3 font-sans text-xs font-medium uppercase tracking-luxe text-text-primary transition-colors duration-350 hover:text-hermes-500"
+            className="group inline-flex items-center gap-2 font-sans text-body-sm font-medium text-neutral-700 transition-colors duration-200 hover:text-accent"
           >
-            <span>Toutes les collections</span>
+            <span>Toutes les categories</span>
             <ArrowRight
-              className="h-4 w-4 transition-transform duration-350 group-hover:translate-x-1"
+              className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
               strokeWidth={1.5}
             />
-            <span className="h-px w-10 bg-hermes-500 transition-all duration-350 group-hover:w-14" />
+            <span className="h-px w-8 bg-accent transition-all duration-200 group-hover:w-10" />
           </Link>
         </motion.div>
       </Container>

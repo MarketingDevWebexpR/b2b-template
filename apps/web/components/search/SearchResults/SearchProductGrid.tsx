@@ -155,15 +155,15 @@ function GridProductCard({
       className={cn(
         'group relative',
         'bg-white rounded-lg',
-        'border border-b2b-border-light',
+        'border border-neutral-200',
         'overflow-hidden',
         'transition-all duration-300',
-        'hover:shadow-lg hover:border-b2b-border-medium'
+        'hover:shadow-lg hover:border-neutral-300'
       )}
     >
       <Link href={`/products/${product.id}`} className="block">
         {/* Image */}
-        <div className="relative aspect-square bg-b2b-bg-secondary overflow-hidden">
+        <div className="relative aspect-square bg-neutral-50 overflow-hidden">
           <Image
             src={product.images[0] || '/images/placeholder-product.svg'}
             alt={product.name}
@@ -175,12 +175,12 @@ function GridProductCard({
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1">
             {product.isNew && (
-              <Badge variant="hermes" size="sm">
+              <Badge variant="primary" size="sm">
                 Nouveau
               </Badge>
             )}
             {hasDiscount && (
-              <Badge variant="hermes-soft" size="sm">
+              <Badge variant="primary-soft" size="sm">
                 -{discountPercent}%
               </Badge>
             )}
@@ -199,17 +199,17 @@ function GridProductCard({
                 'w-8 h-8 rounded-full',
                 'flex items-center justify-center',
                 'bg-white/90 backdrop-blur-sm',
-                'border border-b2b-border-light',
+                'border border-neutral-200',
                 'transition-all duration-200',
                 'hover:bg-white hover:scale-110',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary'
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
               )}
               aria-label={isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris'}
             >
               <Heart
                 className={cn(
                   'w-4 h-4',
-                  isInWishlist ? 'fill-red-500 text-red-500' : 'text-b2b-text-muted'
+                  isInWishlist ? 'fill-red-500 text-red-500' : 'text-neutral-400'
                 )}
               />
             </button>
@@ -220,18 +220,18 @@ function GridProductCard({
         <div className="p-4">
           {/* Brand */}
           {product.brand && (
-            <p className="text-xs font-medium text-b2b-text-muted uppercase tracking-wide mb-1">
+            <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide mb-1">
               {product.brand}
             </p>
           )}
 
           {/* Name */}
-          <h3 className="text-sm font-medium text-b2b-text-primary line-clamp-2 min-h-[2.5rem] mb-2 group-hover:text-b2b-primary transition-colors">
+          <h3 className="text-sm font-medium text-neutral-900 line-clamp-2 min-h-[2.5rem] mb-2 group-hover:text-accent transition-colors">
             {product.name}
           </h3>
 
           {/* Reference */}
-          <p className="text-xs text-b2b-text-muted mb-2">
+          <p className="text-xs text-neutral-500 mb-2">
             Ref: {product.reference}
           </p>
 
@@ -242,15 +242,15 @@ function GridProductCard({
 
           {/* Price */}
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-semibold text-b2b-primary">
+            <span className="text-lg font-semibold text-accent">
               {formatPrice(product.price)}
             </span>
             {hasDiscount && (
-              <span className="text-sm text-b2b-text-muted line-through">
+              <span className="text-sm text-neutral-500 line-through">
                 {formatPrice(product.compareAtPrice!)}
               </span>
             )}
-            <span className="text-xs text-b2b-text-muted">HT</span>
+            <span className="text-xs text-neutral-500">HT</span>
           </div>
         </div>
       </Link>
@@ -265,11 +265,11 @@ function GridProductCard({
               'w-full py-2.5',
               'flex items-center justify-center gap-2',
               'text-sm font-medium',
-              'bg-b2b-primary text-white',
+              'bg-accent text-white',
               'rounded-lg',
               'transition-all duration-200',
-              'hover:bg-b2b-primary-600',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+              'hover:bg-orange-600',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
             )}
           >
             <ShoppingCart className="w-4 h-4" />
@@ -297,15 +297,15 @@ function ListProductCard({
       className={cn(
         'group',
         'bg-white rounded-lg',
-        'border border-b2b-border-light',
+        'border border-neutral-200',
         'overflow-hidden',
         'transition-all duration-300',
-        'hover:shadow-lg hover:border-b2b-border-medium'
+        'hover:shadow-lg hover:border-neutral-300'
       )}
     >
       <Link href={`/products/${product.id}`} className="flex">
         {/* Image */}
-        <div className="relative w-48 h-48 flex-shrink-0 bg-b2b-bg-secondary">
+        <div className="relative w-48 h-48 flex-shrink-0 bg-neutral-50">
           <Image
             src={product.images[0] || '/images/placeholder-product.svg'}
             alt={product.name}
@@ -316,7 +316,7 @@ function ListProductCard({
 
           {/* New badge */}
           {product.isNew && (
-            <Badge variant="hermes" size="sm" className="absolute top-2 left-2">
+            <Badge variant="primary" size="sm" className="absolute top-2 left-2">
               Nouveau
             </Badge>
           )}
@@ -328,22 +328,22 @@ function ListProductCard({
             {/* Brand & Reference */}
             <div className="flex items-center gap-4 mb-1">
               {product.brand && (
-                <p className="text-xs font-medium text-b2b-text-muted uppercase tracking-wide">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
                   {product.brand}
                 </p>
               )}
-              <p className="text-xs text-b2b-text-muted">
+              <p className="text-xs text-neutral-500">
                 Ref: {product.reference}
               </p>
             </div>
 
             {/* Name */}
-            <h3 className="text-base font-medium text-b2b-text-primary mb-2 group-hover:text-b2b-primary transition-colors">
+            <h3 className="text-base font-medium text-neutral-900 mb-2 group-hover:text-accent transition-colors">
               {product.name}
             </h3>
 
             {/* Description */}
-            <p className="text-sm text-b2b-text-secondary line-clamp-2 mb-3">
+            <p className="text-sm text-neutral-600 line-clamp-2 mb-3">
               {product.shortDescription || product.description}
             </p>
 
@@ -366,18 +366,18 @@ function ListProductCard({
           </div>
 
           {/* Footer: Price & Actions */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-b2b-border-light">
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-neutral-200">
             {/* Price */}
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-semibold text-b2b-primary">
+              <span className="text-xl font-semibold text-accent">
                 {formatPrice(product.price)}
               </span>
               {hasDiscount && (
-                <span className="text-sm text-b2b-text-muted line-through">
+                <span className="text-sm text-neutral-500 line-through">
                   {formatPrice(product.compareAtPrice!)}
                 </span>
               )}
-              <span className="text-xs text-b2b-text-muted">HT</span>
+              <span className="text-xs text-neutral-500">HT</span>
             </div>
 
             {/* Actions */}
@@ -391,17 +391,17 @@ function ListProductCard({
                   }}
                   className={cn(
                     'p-2 rounded-lg',
-                    'border border-b2b-border',
+                    'border border-neutral-200',
                     'transition-all duration-200',
-                    'hover:bg-b2b-bg-tertiary',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary'
+                    'hover:bg-neutral-100',
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
                   )}
                   aria-label={isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris'}
                 >
                   <Heart
                     className={cn(
                       'w-5 h-5',
-                      isInWishlist ? 'fill-red-500 text-red-500' : 'text-b2b-text-muted'
+                      isInWishlist ? 'fill-red-500 text-red-500' : 'text-neutral-400'
                     )}
                   />
                 </button>
@@ -418,11 +418,11 @@ function ListProductCard({
                     'px-4 py-2',
                     'flex items-center gap-2',
                     'text-sm font-medium',
-                    'bg-b2b-primary text-white',
+                    'bg-accent text-white',
                     'rounded-lg',
                     'transition-all duration-200',
-                    'hover:bg-b2b-primary-600',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary'
+                    'hover:bg-orange-600',
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
                   )}
                 >
                   <ShoppingCart className="w-4 h-4" />
@@ -449,9 +449,9 @@ function CompactProductRow({
       className={cn(
         'group',
         'bg-white',
-        'border-b border-b2b-border-light last:border-b-0',
+        'border-b border-neutral-200 last:border-b-0',
         'transition-colors duration-200',
-        'hover:bg-b2b-bg-secondary'
+        'hover:bg-neutral-50'
       )}
     >
       <Link
@@ -459,7 +459,7 @@ function CompactProductRow({
         className="flex items-center gap-4 py-3 px-4"
       >
         {/* Image */}
-        <div className="relative w-12 h-12 flex-shrink-0 bg-b2b-bg-secondary rounded">
+        <div className="relative w-12 h-12 flex-shrink-0 bg-neutral-50 rounded">
           <Image
             src={product.images[0] || '/images/placeholder-product.svg'}
             alt={product.name}
@@ -471,18 +471,18 @@ function CompactProductRow({
 
         {/* Reference */}
         <div className="w-28 flex-shrink-0">
-          <p className="text-xs font-mono text-b2b-text-muted">
+          <p className="text-xs font-mono text-neutral-500">
             {product.reference}
           </p>
         </div>
 
         {/* Name */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-b2b-text-primary truncate group-hover:text-b2b-primary transition-colors">
+          <h3 className="text-sm font-medium text-neutral-900 truncate group-hover:text-accent transition-colors">
             {product.name}
           </h3>
           {product.brand && (
-            <p className="text-xs text-b2b-text-muted">{product.brand}</p>
+            <p className="text-xs text-neutral-500">{product.brand}</p>
           )}
         </div>
 
@@ -505,10 +505,10 @@ function CompactProductRow({
 
         {/* Price */}
         <div className="w-28 flex-shrink-0 text-right">
-          <span className="text-sm font-semibold text-b2b-primary">
+          <span className="text-sm font-semibold text-accent">
             {formatPrice(product.price)}
           </span>
-          <span className="text-xs text-b2b-text-muted ml-1">HT</span>
+          <span className="text-xs text-neutral-500 ml-1">HT</span>
         </div>
 
         {/* Add button */}
@@ -522,11 +522,11 @@ function CompactProductRow({
             className={cn(
               'flex-shrink-0',
               'p-2 rounded-lg',
-              'bg-b2b-primary text-white',
+              'bg-accent text-white',
               'opacity-0 group-hover:opacity-100',
               'transition-all duration-200',
-              'hover:bg-b2b-primary-600',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary'
+              'hover:bg-orange-600',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
             )}
             aria-label={`Ajouter ${product.name} au panier`}
           >
@@ -544,7 +544,7 @@ function CompactProductRow({
 
 function GridSkeleton() {
   return (
-    <div className="bg-white rounded-lg border border-b2b-border-light overflow-hidden">
+    <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
       <Skeleton className="aspect-square" />
       <div className="p-4 space-y-3">
         <Skeleton className="h-3 w-16" />
@@ -559,7 +559,7 @@ function GridSkeleton() {
 
 function ListSkeleton() {
   return (
-    <div className="bg-white rounded-lg border border-b2b-border-light overflow-hidden flex">
+    <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden flex">
       <Skeleton className="w-48 h-48 flex-shrink-0" />
       <div className="flex-1 p-4 space-y-3">
         <Skeleton className="h-3 w-24" />
@@ -577,7 +577,7 @@ function ListSkeleton() {
 
 function CompactSkeleton() {
   return (
-    <div className="flex items-center gap-4 py-3 px-4 border-b border-b2b-border-light">
+    <div className="flex items-center gap-4 py-3 px-4 border-b border-neutral-200">
       <Skeleton className="w-12 h-12 rounded" />
       <Skeleton className="h-4 w-24" />
       <Skeleton className="h-4 flex-1 max-w-xs" />
@@ -626,7 +626,7 @@ export function SearchProductGrid({
   if (isLoading) {
     if (viewMode === 'compact') {
       return (
-        <div className={cn('bg-white rounded-lg border border-b2b-border-light', className)}>
+        <div className={cn('bg-white rounded-lg border border-neutral-200', className)}>
           {Array.from({ length: skeletonCount }).map((_, i) => (
             <CompactSkeleton key={i} />
           ))}
@@ -666,15 +666,15 @@ export function SearchProductGrid({
         className={cn(
           'flex flex-col items-center justify-center',
           'py-16 px-4',
-          'bg-white rounded-lg border border-b2b-border-light',
+          'bg-white rounded-lg border border-neutral-200',
           className
         )}
       >
-        <Package className="w-16 h-16 text-b2b-text-muted mb-4" />
-        <h3 className="text-lg font-semibold text-b2b-text-primary mb-2">
+        <Package className="w-16 h-16 text-neutral-400 mb-4" />
+        <h3 className="text-lg font-semibold text-neutral-900 mb-2">
           Aucun produit trouve
         </h3>
-        <p className="text-sm text-b2b-text-secondary text-center max-w-md">
+        <p className="text-sm text-neutral-600 text-center max-w-md">
           Essayez de modifier vos filtres ou d'effectuer une nouvelle recherche
           avec des termes differents.
         </p>
@@ -687,12 +687,12 @@ export function SearchProductGrid({
     return (
       <div
         className={cn(
-          'bg-white rounded-lg border border-b2b-border-light overflow-hidden',
+          'bg-white rounded-lg border border-neutral-200 overflow-hidden',
           className
         )}
       >
         {/* Header */}
-        <div className="flex items-center gap-4 py-2 px-4 bg-b2b-bg-secondary border-b border-b2b-border-light text-xs font-medium text-b2b-text-muted uppercase tracking-wide">
+        <div className="flex items-center gap-4 py-2 px-4 bg-neutral-50 border-b border-neutral-200 text-xs font-medium text-neutral-500 uppercase tracking-wide">
           <div className="w-12" />
           <div className="w-28">Reference</div>
           <div className="flex-1">Produit</div>

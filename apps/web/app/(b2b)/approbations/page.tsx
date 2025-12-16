@@ -86,10 +86,10 @@ export default function ApprobationsPage() {
     <div className="p-6 lg:p-8 space-y-6">
       {/* Header */}
       <header>
-        <h1 className="font-serif text-heading-3 text-text-primary">
+        <h1 className="font-sans text-heading-3 text-content-primary">
           Approbations
         </h1>
-        <p className="mt-1 font-sans text-body text-text-muted" aria-live="polite">
+        <p className="mt-1 font-sans text-body text-content-muted" aria-live="polite">
           {pendingCount > 0
             ? `${pendingCount} demande${pendingCount > 1 ? 's' : ''} en attente de votre decision`
             : 'Toutes les demandes ont ete traitees'
@@ -131,7 +131,7 @@ export default function ApprobationsPage() {
             {filteredApprovals.map((approval) => (
               <li key={approval.id}>
                 <article
-                  className="bg-white rounded-soft border border-border-light overflow-hidden"
+                  className="bg-white rounded-lg border border-stroke-light overflow-hidden"
                   aria-labelledby={`approval-${approval.id}-title`}
                 >
                   <div className="p-6">
@@ -153,10 +153,10 @@ export default function ApprobationsPage() {
 
                         {/* Avatar */}
                         <div
-                          className="w-12 h-12 rounded-full bg-hermes-100 flex items-center justify-center flex-shrink-0"
+                          className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center flex-shrink-0"
                           aria-hidden="true"
                         >
-                          <span className="font-sans text-body font-medium text-hermes-600">
+                          <span className="font-sans text-body font-medium text-primary-600">
                             {getInitials(approval.requesterName)}
                           </span>
                         </div>
@@ -167,16 +167,16 @@ export default function ApprobationsPage() {
                             <EntityTypeBadge entityType={approval.entityType} />
                             <span
                               id={`approval-${approval.id}-title`}
-                              className="font-sans text-body-sm font-medium text-hermes-500"
+                              className="font-sans text-body-sm font-medium text-primary"
                             >
                               {approval.entityReference}
                             </span>
                             <StatusBadge status={approval.status} size="sm" />
                           </div>
-                          <p className="mt-1 font-sans text-body-sm text-text-primary">
+                          <p className="mt-1 font-sans text-body-sm text-content-primary">
                             {approval.entitySummary}
                           </p>
-                          <div className="mt-2 flex items-center gap-4 text-text-muted">
+                          <div className="mt-2 flex items-center gap-4 text-content-muted">
                             <span className="font-sans text-caption">
                               Par {approval.requesterName}
                             </span>
@@ -197,7 +197,7 @@ export default function ApprobationsPage() {
                             </p>
                           )}
                           {approval.dueAt && !approval.isOverdue && approval.status === 'pending' && (
-                            <p className="mt-2 font-sans text-caption text-text-muted">
+                            <p className="mt-2 font-sans text-caption text-content-muted">
                               Echance: <time dateTime={approval.dueAt}>{formatDate(approval.dueAt)}</time>
                             </p>
                           )}
@@ -207,7 +207,7 @@ export default function ApprobationsPage() {
                       {/* Right section - Amount and Actions */}
                       <div className="text-right flex-shrink-0">
                         {approval.entityAmount && (
-                          <p className="font-serif text-heading-4 text-text-primary">
+                          <p className="font-sans text-heading-4 text-content-primary">
                             {formatCurrency(approval.entityAmount, approval.entityCurrency)}
                           </p>
                         )}
@@ -216,7 +216,7 @@ export default function ApprobationsPage() {
                           <div className="mt-4 flex items-center gap-2" role="group" aria-label="Actions">
                             <button
                               className={cn(
-                                'px-4 py-2 rounded-soft',
+                                'px-4 py-2 rounded-lg',
                                 'font-sans text-body-sm font-medium',
                                 'bg-green-500 text-white hover:bg-green-600',
                                 'transition-colors duration-200',
@@ -228,7 +228,7 @@ export default function ApprobationsPage() {
                             </button>
                             <button
                               className={cn(
-                                'px-4 py-2 rounded-soft',
+                                'px-4 py-2 rounded-lg',
                                 'font-sans text-body-sm font-medium',
                                 'bg-white border border-red-300 text-red-600 hover:bg-red-50',
                                 'transition-colors duration-200',

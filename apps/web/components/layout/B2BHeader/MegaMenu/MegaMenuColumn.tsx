@@ -52,15 +52,15 @@ const SubCategorySection = memo(function SubCategorySection({
         href={`/categories/${categorySlug}/${subcategory.slug}`}
         className={cn(
           'flex items-center justify-between py-1',
-          'text-b2b-body font-medium text-b2b-text-primary',
-          'hover:text-b2b-primary-500 transition-colors duration-150',
-          'focus:outline-none focus-visible:text-b2b-primary-500'
+          'text-sm font-medium text-neutral-900',
+          'hover:text-accent transition-colors duration-150',
+          'focus:outline-none focus-visible:text-accent'
         )}
         onClick={onLinkClick}
       >
         <span>{subcategory.name}</span>
         <ChevronRight
-          className="w-3.5 h-3.5 text-b2b-text-muted"
+          className="w-3.5 h-3.5 text-neutral-500"
           strokeWidth={1.5}
           aria-hidden="true"
         />
@@ -75,16 +75,16 @@ const SubCategorySection = memo(function SubCategorySection({
                 href={`/categories/${categorySlug}/${subcategory.slug}/${item.slug}`}
                 className={cn(
                   'flex items-center justify-between py-1',
-                  'text-b2b-body-sm text-b2b-text-secondary',
-                  'hover:text-b2b-primary-500 transition-colors duration-150',
-                  'focus:outline-none focus-visible:text-b2b-primary-500',
+                  'text-sm text-neutral-600',
+                  'hover:text-accent transition-colors duration-150',
+                  'focus:outline-none focus-visible:text-accent',
                   'group'
                 )}
                 onClick={onLinkClick}
               >
                 <span>{item.name}</span>
                 {item.productCount && (
-                  <span className="text-b2b-caption text-b2b-text-muted group-hover:text-b2b-primary-400">
+                  <span className="text-xs text-neutral-500 group-hover:text-orange-400">
                     ({item.productCount})
                   </span>
                 )}
@@ -99,8 +99,8 @@ const SubCategorySection = memo(function SubCategorySection({
                 href={`/categories/${categorySlug}/${subcategory.slug}`}
                 className={cn(
                   'inline-flex items-center gap-1 py-1',
-                  'text-b2b-body-sm text-b2b-primary-500 font-medium',
-                  'hover:text-b2b-primary-600 transition-colors duration-150',
+                  'text-sm text-accent font-medium',
+                  'hover:text-orange-600 transition-colors duration-150',
                   'focus:outline-none focus-visible:underline'
                 )}
                 onClick={onLinkClick}
@@ -135,10 +135,10 @@ export const MegaMenuColumn = memo(function MegaMenuColumn({
         href={`/categories/${category.slug}`}
         className={cn(
           'flex items-center gap-2 pb-3 mb-3',
-          'text-b2b-section-title font-semibold text-b2b-text-primary',
-          'border-b-2 border-b2b-primary-500',
-          'hover:text-b2b-primary-500 transition-colors duration-150',
-          'focus:outline-none focus-visible:text-b2b-primary-500'
+          'text-base font-semibold text-neutral-900',
+          'border-b-2 border-accent',
+          'hover:text-accent transition-colors duration-150',
+          'focus:outline-none focus-visible:text-accent'
         )}
         onClick={onLinkClick}
       >
@@ -161,9 +161,9 @@ export const MegaMenuColumn = memo(function MegaMenuColumn({
       <Link
         href={`/categories/${category.slug}`}
         className={cn(
-          'inline-flex items-center gap-1 mt-4 pt-3 border-t border-b2b-border',
-          'text-b2b-body font-medium text-b2b-primary-500',
-          'hover:text-b2b-primary-600 transition-colors duration-150',
+          'inline-flex items-center gap-1 mt-4 pt-3 border-t border-neutral-200',
+          'text-sm font-medium text-accent',
+          'hover:text-orange-600 transition-colors duration-150',
           'focus:outline-none focus-visible:underline'
         )}
         onClick={onLinkClick}

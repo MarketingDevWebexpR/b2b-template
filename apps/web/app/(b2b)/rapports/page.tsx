@@ -73,14 +73,14 @@ export default function RapportsPage() {
           <span>{formatCurrency(reports.summary.totalSpending)}</span>
           <div className="mt-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="font-sans text-caption text-text-muted">Budget</span>
-              <span className="font-sans text-caption font-medium text-text-primary">{budgetUsage}%</span>
+              <span className="font-sans text-caption text-content-muted">Budget</span>
+              <span className="font-sans text-caption font-medium text-content-primary">{budgetUsage}%</span>
             </div>
-            <div className="h-2 bg-background-muted rounded-full overflow-hidden">
+            <div className="h-2 bg-surface-secondary rounded-full overflow-hidden">
               <div
                 className={cn(
                   'h-full rounded-full transition-all duration-500',
-                  budgetUsage > 80 ? 'bg-amber-500' : 'bg-hermes-500'
+                  budgetUsage > 80 ? 'bg-amber-500' : 'bg-primary'
                 )}
                 style={{ width: `${budgetUsage}%` }}
               />
@@ -116,10 +116,10 @@ export default function RapportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-heading-3 text-text-primary">
+          <h1 className="font-sans text-heading-3 text-content-primary">
             Rapports
           </h1>
-          <p className="mt-1 font-sans text-body text-text-muted">
+          <p className="mt-1 font-sans text-body text-content-muted">
             Analysez vos depenses et activites d'achats
           </p>
         </div>
@@ -129,9 +129,9 @@ export default function RapportsPage() {
             onChange={(e) => handlePeriodChange(e.target.value)}
             className={cn(
               'px-4 py-2',
-              'bg-white border border-border-light rounded-soft',
-              'font-sans text-body-sm text-text-primary',
-              'focus:outline-none focus:ring-2 focus:ring-hermes-200 focus:border-hermes-500'
+              'bg-white border border-stroke-light rounded-lg',
+              'font-sans text-body-sm text-content-primary',
+              'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
             )}
           >
             {periodOptions.map((opt) => (
@@ -143,9 +143,9 @@ export default function RapportsPage() {
           <button
             className={cn(
               'inline-flex items-center gap-2 px-4 py-2',
-              'bg-hermes-500 text-white rounded-soft',
+              'bg-primary text-white rounded-lg',
               'font-sans text-body-sm font-medium',
-              'hover:bg-hermes-600 transition-colors duration-200'
+              'hover:bg-primary-600 transition-colors duration-200'
             )}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,11 +164,11 @@ export default function RapportsPage() {
         options={reportTypeOptions}
         value={reportType}
         onChange={(value) => setReportType(value as ReportType)}
-        className="border-b border-border-light pb-4"
+        className="border-b border-stroke-light pb-4"
       />
 
       {/* Report Content */}
-      <div className="bg-white rounded-soft border border-border-light">
+      <div className="bg-white rounded-lg border border-stroke-light">
         {reportsLoading ? (
           <SectionLoader message="Chargement des donnees..." />
         ) : (
@@ -208,7 +208,7 @@ export default function RapportsPage() {
 function SpendingByEmployeeReport({ data }: { data: EmployeeSpending[] }) {
   return (
     <div className="p-6">
-      <h2 className="font-serif text-heading-5 text-text-primary mb-6">
+      <h2 className="font-sans text-heading-5 text-content-primary mb-6">
         Depenses par employe
       </h2>
       <div className="space-y-6">
@@ -220,16 +220,16 @@ function SpendingByEmployeeReport({ data }: { data: EmployeeSpending[] }) {
             <div key={employee.employeeId}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-hermes-100 flex items-center justify-center">
-                    <span className="font-sans text-body-sm font-medium text-hermes-600">
+                  <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center">
+                    <span className="font-sans text-body-sm font-medium text-primary-600">
                       {employeeName.split(' ').map((n: string) => n[0]).join('')}
                     </span>
                   </div>
                   <div>
-                    <p className="font-sans text-body-sm font-medium text-text-primary">
+                    <p className="font-sans text-body-sm font-medium text-content-primary">
                       {employeeName}
                     </p>
-                    <p className="font-sans text-caption text-text-muted">
+                    <p className="font-sans text-caption text-content-muted">
                       {formatCurrency(totalSpending)}
                       {' - '}
                       {employee.ordersCount} commandes
@@ -239,17 +239,17 @@ function SpendingByEmployeeReport({ data }: { data: EmployeeSpending[] }) {
                 <span
                   className={cn(
                     'font-sans text-body-sm font-medium',
-                    percentOfTotal > 40 ? 'text-amber-600' : 'text-text-primary'
+                    percentOfTotal > 40 ? 'text-amber-600' : 'text-content-primary'
                   )}
                 >
                   {percentOfTotal}%
                 </span>
               </div>
-              <div className="h-3 bg-background-muted rounded-full overflow-hidden">
+              <div className="h-3 bg-surface-secondary rounded-full overflow-hidden">
                 <div
                   className={cn(
                     'h-full rounded-full transition-all duration-500',
-                    percentOfTotal > 40 ? 'bg-amber-500' : 'bg-hermes-500'
+                    percentOfTotal > 40 ? 'bg-amber-500' : 'bg-primary'
                   )}
                   style={{ width: `${Math.min(percentOfTotal, 100)}%` }}
                 />
@@ -272,17 +272,17 @@ function SpendingByCategoryReport({ data }: { data: CategorySpending[] }) {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-border-light bg-background-muted">
-            <th className="px-6 py-3 text-left font-sans text-caption font-medium text-text-muted">
+          <tr className="border-b border-stroke-light bg-surface-secondary">
+            <th className="px-6 py-3 text-left font-sans text-caption font-medium text-content-muted">
               Categorie
             </th>
-            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-text-muted">
+            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-content-muted">
               Montant
             </th>
-            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-text-muted">
+            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-content-muted">
               Articles
             </th>
-            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-text-muted">
+            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-content-muted">
               Part
             </th>
           </tr>
@@ -293,27 +293,27 @@ function SpendingByCategoryReport({ data }: { data: CategorySpending[] }) {
             const catItemsCount = cat.itemsCount || 0;
             const percentage = total > 0 ? Math.round((catTotalSpending / total) * 100) : 0;
             return (
-              <tr key={cat.categoryId} className="hover:bg-background-muted transition-colors">
+              <tr key={cat.categoryId} className="hover:bg-surface-secondary transition-colors">
                 <td className="px-6 py-4">
-                  <p className="font-sans text-body-sm font-medium text-text-primary">
+                  <p className="font-sans text-body-sm font-medium text-content-primary">
                     {cat.categoryName}
                   </p>
                 </td>
-                <td className="px-6 py-4 text-right font-sans text-body-sm text-text-primary">
+                <td className="px-6 py-4 text-right font-sans text-body-sm text-content-primary">
                   {formatCurrency(catTotalSpending)}
                 </td>
-                <td className="px-6 py-4 text-right font-sans text-body-sm text-text-secondary">
+                <td className="px-6 py-4 text-right font-sans text-body-sm text-content-secondary">
                   {catItemsCount}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <div className="w-16 h-2 bg-background-muted rounded-full overflow-hidden">
+                    <div className="w-16 h-2 bg-surface-secondary rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-hermes-500 rounded-full"
+                        className="h-full bg-primary rounded-full"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span className="font-sans text-body-sm text-text-secondary w-8">
+                    <span className="font-sans text-body-sm text-content-secondary w-8">
                       {percentage}%
                     </span>
                   </div>
@@ -336,7 +336,7 @@ function MonthlyTrendReport({ data }: { data: MonthlyTrend[] }) {
 
   return (
     <div className="p-6">
-      <h2 className="font-serif text-heading-5 text-text-primary mb-6">
+      <h2 className="font-sans text-heading-5 text-content-primary mb-6">
         Evolution des depenses
       </h2>
       <div className="space-y-4">
@@ -347,12 +347,12 @@ function MonthlyTrendReport({ data }: { data: MonthlyTrend[] }) {
           const change = prevAmount > 0 ? Math.round(((monthSpending - prevAmount) / prevAmount) * 100) : 0;
           return (
             <div key={month.month} className="flex items-center gap-4">
-              <span className="w-24 font-sans text-body-sm text-text-secondary">
+              <span className="w-24 font-sans text-body-sm text-content-secondary">
                 {month.month}
               </span>
-              <div className="flex-1 h-8 bg-background-muted rounded-soft overflow-hidden">
+              <div className="flex-1 h-8 bg-surface-secondary rounded-lg overflow-hidden">
                 <div
-                  className="h-full bg-hermes-500 rounded-soft flex items-center justify-end pr-2 transition-all duration-500"
+                  className="h-full bg-primary rounded-lg flex items-center justify-end pr-2 transition-all duration-500"
                   style={{ width: `${percentage}%` }}
                 >
                   <span className="font-sans text-caption font-medium text-white">
@@ -386,24 +386,24 @@ function TopProductsReport({ data }: { data: TopProduct[] }) {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-border-light bg-background-muted">
-            <th className="px-6 py-3 text-left font-sans text-caption font-medium text-text-muted">
+          <tr className="border-b border-stroke-light bg-surface-secondary">
+            <th className="px-6 py-3 text-left font-sans text-caption font-medium text-content-muted">
               #
             </th>
-            <th className="px-6 py-3 text-left font-sans text-caption font-medium text-text-muted">
+            <th className="px-6 py-3 text-left font-sans text-caption font-medium text-content-muted">
               Produit
             </th>
-            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-text-muted">
+            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-content-muted">
               Quantite
             </th>
-            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-text-muted">
+            <th className="px-6 py-3 text-right font-sans text-caption font-medium text-content-muted">
               Chiffre d'affaires
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border-light">
           {data.map((product, index) => (
-            <tr key={product.productId} className="hover:bg-background-muted transition-colors">
+            <tr key={product.productId} className="hover:bg-surface-secondary transition-colors">
               <td className="px-6 py-4">
                 <div
                   className={cn(
@@ -411,24 +411,24 @@ function TopProductsReport({ data }: { data: TopProduct[] }) {
                     index === 0 && 'bg-amber-100 text-amber-700',
                     index === 1 && 'bg-gray-200 text-gray-700',
                     index === 2 && 'bg-orange-100 text-orange-700',
-                    index > 2 && 'bg-background-muted text-text-muted'
+                    index > 2 && 'bg-surface-secondary text-content-muted'
                   )}
                 >
                   <span className="font-sans text-caption font-medium">{index + 1}</span>
                 </div>
               </td>
               <td className="px-6 py-4">
-                <p className="font-sans text-body-sm font-medium text-text-primary">
+                <p className="font-sans text-body-sm font-medium text-content-primary">
                   {product.productName}
                 </p>
-                <p className="font-mono text-caption text-text-muted">
+                <p className="font-mono text-caption text-content-muted">
                   {product.sku}
                 </p>
               </td>
-              <td className="px-6 py-4 text-right font-sans text-body-sm text-text-secondary">
+              <td className="px-6 py-4 text-right font-sans text-body-sm text-content-secondary">
                 {product.quantity} unites
               </td>
-              <td className="px-6 py-4 text-right font-sans text-body-sm font-medium text-text-primary">
+              <td className="px-6 py-4 text-right font-sans text-body-sm font-medium text-content-primary">
                 {formatCurrency(product.totalSpending)}
               </td>
             </tr>
@@ -444,17 +444,17 @@ function TopProductsReport({ data }: { data: TopProduct[] }) {
  */
 function ExportOptionsSection() {
   return (
-    <div className="bg-background-muted rounded-soft p-6">
-      <h3 className="font-serif text-heading-5 text-text-primary mb-4">
+    <div className="bg-surface-secondary rounded-lg p-6">
+      <h3 className="font-sans text-heading-5 text-content-primary mb-4">
         Exporter les donnees
       </h3>
       <div className="flex flex-wrap gap-3">
         <button
           className={cn(
             'inline-flex items-center gap-2 px-4 py-2',
-            'bg-white border border-border-light text-text-secondary rounded-soft',
+            'bg-white border border-stroke-light text-content-secondary rounded-lg',
             'font-sans text-body-sm font-medium',
-            'hover:bg-white hover:border-hermes-300',
+            'hover:bg-white hover:border-primary/20',
             'transition-colors duration-200'
           )}
         >
@@ -466,9 +466,9 @@ function ExportOptionsSection() {
         <button
           className={cn(
             'inline-flex items-center gap-2 px-4 py-2',
-            'bg-white border border-border-light text-text-secondary rounded-soft',
+            'bg-white border border-stroke-light text-content-secondary rounded-lg',
             'font-sans text-body-sm font-medium',
-            'hover:bg-white hover:border-hermes-300',
+            'hover:bg-white hover:border-primary/20',
             'transition-colors duration-200'
           )}
         >
@@ -480,9 +480,9 @@ function ExportOptionsSection() {
         <button
           className={cn(
             'inline-flex items-center gap-2 px-4 py-2',
-            'bg-white border border-border-light text-text-secondary rounded-soft',
+            'bg-white border border-stroke-light text-content-secondary rounded-lg',
             'font-sans text-body-sm font-medium',
-            'hover:bg-white hover:border-hermes-300',
+            'hover:bg-white hover:border-primary/20',
             'transition-colors duration-200'
           )}
         >

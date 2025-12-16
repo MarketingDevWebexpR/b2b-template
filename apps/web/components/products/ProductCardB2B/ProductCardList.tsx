@@ -157,18 +157,18 @@ export function ProductCardList({
   return (
     <article
       className={cn(
-        'group flex items-stretch bg-white rounded-lg border border-gray-200',
+        'group flex items-stretch bg-white rounded-lg border border-stroke-light',
         'transition-all duration-200',
-        'hover:shadow-md hover:border-gray-300',
+        'hover:shadow-md hover:border-stroke',
         className
       )}
     >
       {/* Image */}
-      <div className="relative w-28 md:w-36 flex-shrink-0 bg-gray-50 rounded-l-lg overflow-hidden">
+      <div className="relative w-28 md:w-36 flex-shrink-0 bg-surface-secondary rounded-l-elegant overflow-hidden">
         {/* Loading skeleton */}
         <div
           className={cn(
-            'absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100',
+            'absolute inset-0 bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary',
             'bg-[length:200%_100%] animate-pulse',
             'transition-opacity duration-300',
             imageLoaded ? 'opacity-0' : 'opacity-100'
@@ -198,7 +198,7 @@ export function ProductCardList({
 
         {/* Badges */}
         {product.isNew && (
-          <span className="absolute top-2 left-2 z-10 px-1.5 py-0.5 bg-gray-900 text-white text-[10px] font-medium uppercase tracking-wide rounded">
+          <span className="badge-new absolute top-2 left-2 z-10">
             Nouveau
           </span>
         )}
@@ -210,24 +210,24 @@ export function ProductCardList({
         <div className="flex flex-col justify-center min-w-0">
           {/* Brand */}
           {product.brand && (
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-0.5">
+            <span className="text-caption font-semibold uppercase tracking-wider text-content-muted mb-0.5">
               {product.brand}
             </span>
           )}
 
           {/* Name */}
-          <Link href={`/products/${product.id}`} className="group/link">
-            <h3 className="text-sm font-medium text-gray-900 line-clamp-1 group-hover/link:text-blue-600 transition-colors">
+          <Link href={`/produits/${product.slug || product.id}`} className="group/link">
+            <h3 className="text-body-sm font-medium text-content-primary line-clamp-1 group-hover/link:text-primary transition-colors">
               {product.name}
             </h3>
           </Link>
 
           {/* Reference and Description */}
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500">
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-caption text-content-muted">
             <span>REF: {product.reference}</span>
             {showDescription && product.shortDescription && (
               <>
-                <span className="text-gray-300">|</span>
+                <span className="text-stroke">|</span>
                 <span className="truncate">{product.shortDescription}</span>
               </>
             )}

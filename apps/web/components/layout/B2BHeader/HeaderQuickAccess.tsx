@@ -58,9 +58,9 @@ const QuickAccessButton = memo(function QuickAccessButton({
       href={href}
       className={cn(
         'relative flex items-center gap-1.5 px-2.5 py-2',
-        'text-b2b-text-secondary hover:text-b2b-primary-500',
+        'text-neutral-600 hover:text-accent',
         'transition-colors duration-200',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20 rounded-lg',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 rounded-lg',
         'group'
       )}
       aria-label={ariaLabel}
@@ -75,7 +75,7 @@ const QuickAccessButton = memo(function QuickAccessButton({
               'flex items-center justify-center',
               'min-w-[18px] h-[18px] px-1',
               'text-[10px] font-semibold text-white',
-              'bg-b2b-accent-500 rounded-full',
+              'bg-accent rounded-full',
               'transition-transform duration-200',
               'group-hover:scale-110'
             )}
@@ -88,7 +88,7 @@ const QuickAccessButton = memo(function QuickAccessButton({
 
       {/* Label - hidden on smaller screens */}
       {showLabel && (
-        <span className="hidden lg:inline text-b2b-body-sm font-medium">
+        <span className="hidden lg:inline text-sm font-medium">
           {label}
         </span>
       )}
@@ -149,7 +149,7 @@ export const HeaderQuickAccess = memo(function HeaderQuickAccess({
       />
 
       {/* Divider */}
-      <div className="hidden md:block w-px h-6 bg-b2b-border mx-1" aria-hidden="true" />
+      <div className="hidden md:block w-px h-6 bg-neutral-200 mx-1" aria-hidden="true" />
 
       {/* Cart */}
       <QuickAccessButton
@@ -168,24 +168,24 @@ export const HeaderQuickAccess = memo(function HeaderQuickAccess({
       />
 
       {/* Divider */}
-      <div className="hidden md:block w-px h-6 bg-b2b-border mx-1" aria-hidden="true" />
+      <div className="hidden md:block w-px h-6 bg-neutral-200 mx-1" aria-hidden="true" />
 
       {/* User Account */}
       <Link
         href="/compte"
         className={cn(
           'flex items-center gap-2 px-2.5 py-2',
-          'text-b2b-text-secondary hover:text-b2b-primary-500',
+          'text-neutral-600 hover:text-accent',
           'transition-colors duration-200',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20 rounded-lg',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 rounded-lg',
           'group'
         )}
         aria-label="Mon compte"
       >
         {/* User icon or avatar */}
-        <div className="relative flex items-center justify-center w-8 h-8 bg-b2b-bg-secondary rounded-full border border-b2b-border group-hover:border-b2b-primary-300 transition-colors">
+        <div className="relative flex items-center justify-center w-8 h-8 bg-neutral-50 rounded-full border border-neutral-200 group-hover:border-neutral-300 transition-colors">
           <User
-            className="w-4 h-4 text-b2b-text-muted group-hover:text-b2b-primary-500"
+            className="w-4 h-4 text-neutral-500 group-hover:text-accent"
             strokeWidth={1.5}
             aria-hidden="true"
           />
@@ -193,17 +193,17 @@ export const HeaderQuickAccess = memo(function HeaderQuickAccess({
 
         {/* User info - hidden on mobile */}
         <div className="hidden lg:flex flex-col items-start">
-          <span className="text-b2b-body-sm font-medium text-b2b-text-primary">
+          <span className="text-sm font-medium text-neutral-900">
             {employee?.firstName || 'Mon compte'}
           </span>
-          <span className="text-b2b-caption text-b2b-text-muted truncate max-w-[120px]">
+          <span className="text-xs text-neutral-500 truncate max-w-[120px]">
             {company?.tradeName || company?.name || 'Se connecter'}
           </span>
         </div>
 
         {/* Dropdown chevron */}
         <ChevronDown
-          className="hidden lg:block w-4 h-4 text-b2b-text-muted"
+          className="hidden lg:block w-4 h-4 text-neutral-500"
           strokeWidth={1.5}
           aria-hidden="true"
         />

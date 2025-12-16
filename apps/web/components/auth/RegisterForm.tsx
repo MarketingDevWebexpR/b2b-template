@@ -144,21 +144,21 @@ export function RegisterForm() {
       <div className="w-full animate-fade-in">
         <div
           className={cn(
-            'p-8 border border-gold-500/30 bg-gold-500/5',
+            'p-8 border border-accent/30 bg-accent/5 rounded-lg',
             'text-center space-y-4'
           )}
         >
-          <div className="w-16 h-16 mx-auto bg-gold-500 flex items-center justify-center">
-            <Check className="w-8 h-8 text-luxury-black" />
+          <div className="w-16 h-16 mx-auto bg-accent rounded-full flex items-center justify-center">
+            <Check className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-xl font-serif text-luxury-pearl">
+          <h3 className="text-xl font-sans font-semibold text-neutral-900">
             Compte créé avec succès !
           </h3>
-          <p className="text-luxury-silver">
+          <p className="text-neutral-500">
             Vous allez être redirigé vers la page de connexion...
           </p>
           <div className="flex justify-center pt-4">
-            <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           </div>
         </div>
       </div>
@@ -226,7 +226,7 @@ export function RegisterForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-luxury-silver hover:text-gold-500 transition-colors focus:outline-none"
+              className="text-neutral-400 hover:text-accent transition-colors focus:outline-none"
               aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
               tabIndex={-1}
             >
@@ -275,7 +275,7 @@ export function RegisterForm() {
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="text-luxury-silver hover:text-gold-500 transition-colors focus:outline-none"
+            className="text-neutral-400 hover:text-accent transition-colors focus:outline-none"
             aria-label={
               showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
             }
@@ -304,17 +304,17 @@ export function RegisterForm() {
             />
             <div
               className={cn(
-                'w-5 h-5 border bg-luxury-charcoal',
-                'peer-checked:bg-gold-500 peer-checked:border-gold-500',
-                'peer-focus-visible:ring-2 peer-focus-visible:ring-gold-500/30',
+                'w-5 h-5 border bg-white rounded',
+                'peer-checked:bg-accent peer-checked:border-accent',
+                'peer-focus-visible:ring-2 peer-focus-visible:ring-accent/30',
                 'transition-all duration-200',
                 'flex items-center justify-center',
-                errors.terms ? 'border-red-500' : 'border-luxury-gray'
+                errors.terms ? 'border-red-500' : 'border-neutral-300'
               )}
             >
               {formData.terms && (
                 <svg
-                  className="w-3 h-3 text-luxury-black"
+                  className="w-3 h-3 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -325,13 +325,13 @@ export function RegisterForm() {
               )}
             </div>
           </div>
-          <span className="text-sm text-luxury-silver group-hover:text-luxury-pearl transition-colors leading-relaxed">
+          <span className="text-sm text-neutral-500 group-hover:text-neutral-700 transition-colors leading-relaxed">
             J'accepte les{' '}
-            <Link href="#" className="text-gold-500 hover:text-gold-400 transition-colors">
+            <Link href="#" className="text-accent hover:text-accent/80 transition-colors">
               conditions d'utilisation
             </Link>{' '}
             et la{' '}
-            <Link href="#" className="text-gold-500 hover:text-gold-400 transition-colors">
+            <Link href="#" className="text-accent hover:text-accent/80 transition-colors">
               politique de confidentialité
             </Link>
           </span>
@@ -353,11 +353,11 @@ export function RegisterForm() {
       </Button>
 
       {/* Login link - mobile only */}
-      <p className="text-center text-sm text-luxury-silver md:hidden">
+      <p className="text-center text-sm text-neutral-500 md:hidden">
         Déjà un compte ?{' '}
         <Link
           href="/login"
-          className="text-gold-500 hover:text-gold-400 transition-colors"
+          className="text-accent hover:text-accent/80 transition-colors"
         >
           Se connecter
         </Link>
@@ -375,7 +375,7 @@ function PasswordRequirement({ met, text }: { met: boolean; text: string }) {
       <div
         className={cn(
           'w-3 h-3 rounded-full flex items-center justify-center transition-colors',
-          met ? 'bg-green-500' : 'bg-luxury-gray'
+          met ? 'bg-green-500' : 'bg-neutral-300'
         )}
       >
         {met && (
@@ -390,7 +390,7 @@ function PasswordRequirement({ met, text }: { met: boolean; text: string }) {
           </svg>
         )}
       </div>
-      <span className={cn(met ? 'text-green-400' : 'text-luxury-silver')}>{text}</span>
+      <span className={cn(met ? 'text-green-500' : 'text-neutral-400')}>{text}</span>
     </div>
   );
 }

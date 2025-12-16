@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 import type { ProductCardStockProps, ProductStockStatus } from './types';
 
 /**
- * Stock status configuration
+ * Stock status configuration using design system tokens
  */
 const stockStatusConfig: Record<
   ProductStockStatus,
@@ -37,30 +37,30 @@ const stockStatusConfig: Record<
 > = {
   in_stock: {
     label: 'En stock',
-    dotClass: 'bg-emerald-500',
-    textClass: 'text-emerald-700',
-    bgClass: 'bg-emerald-50',
+    dotClass: 'bg-success',
+    textClass: 'text-success-700',
+    bgClass: 'bg-success-50',
     icon: 'full',
   },
   low_stock: {
     label: 'Stock faible',
-    dotClass: 'bg-amber-500',
-    textClass: 'text-amber-700',
-    bgClass: 'bg-amber-50',
+    dotClass: 'bg-warning',
+    textClass: 'text-warning-700',
+    bgClass: 'bg-warning-50',
     icon: 'half',
   },
   out_of_stock: {
     label: 'Rupture',
-    dotClass: 'bg-red-500',
-    textClass: 'text-red-700',
-    bgClass: 'bg-red-50',
+    dotClass: 'bg-danger',
+    textClass: 'text-danger-700',
+    bgClass: 'bg-danger-50',
     icon: 'empty',
   },
   backorder: {
     label: 'Sur commande',
-    dotClass: 'bg-gray-400',
-    textClass: 'text-gray-600',
-    bgClass: 'bg-gray-50',
+    dotClass: 'bg-content-muted',
+    textClass: 'text-content-secondary',
+    bgClass: 'bg-surface-secondary',
     icon: 'half',
   },
 };
@@ -177,7 +177,7 @@ export function ProductCardStock({
 
         {/* Warehouse */}
         {showWarehouse && stock.warehouseName && stock.status !== 'out_of_stock' && (
-          <div className="flex items-center gap-1 text-gray-500">
+          <div className="flex items-center gap-1 text-content-muted">
             <LocationIcon />
             <span>{stock.warehouseName}</span>
           </div>
@@ -204,18 +204,18 @@ export function ProductCardStock({
 
       {/* Warehouse info */}
       {showWarehouse && stock.warehouseName && stock.status !== 'out_of_stock' && (
-        <div className="flex items-center gap-1.5 text-sm text-gray-600">
+        <div className="flex items-center gap-1.5 text-body-sm text-content-secondary">
           <LocationIcon />
           <span>{stock.warehouseName}</span>
           {stock.warehouseCode && (
-            <span className="text-gray-400">({stock.warehouseCode})</span>
+            <span className="text-content-muted">({stock.warehouseCode})</span>
           )}
         </div>
       )}
 
       {/* Restock info */}
       {stock.restockDate && stock.status === 'out_of_stock' && (
-        <div className="text-sm text-gray-500">
+        <div className="text-body-sm text-content-muted">
           Reapprovisionnement prevu le{' '}
           <span className="font-medium">
             {new Date(stock.restockDate).toLocaleDateString('fr-FR', {
@@ -228,7 +228,7 @@ export function ProductCardStock({
 
       {/* Low stock warning */}
       {stock.status === 'low_stock' && (
-        <div className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+        <div className="badge-low-stock px-2 py-1">
           Commandez rapidement, stock limite
         </div>
       )}
@@ -283,7 +283,7 @@ export function ProductCardStockBadge({
 
   return (
     <div className={cn('flex flex-col gap-1', className)}>
-      <div className={cn('flex items-center gap-1.5 text-sm', config.textClass)}>
+      <div className={cn('flex items-center gap-1.5 text-body-sm', config.textClass)}>
         <StockDot status={status} />
         <span className="font-medium">{config.label}</span>
         {quantity !== undefined && status !== 'out_of_stock' && status !== 'backorder' && (
@@ -291,7 +291,7 @@ export function ProductCardStockBadge({
         )}
       </div>
       {warehouseName && status !== 'out_of_stock' && (
-        <div className="flex items-center gap-1 text-xs text-gray-500">
+        <div className="flex items-center gap-1 text-caption text-content-muted">
           <LocationIcon className="w-3 h-3" />
           <span>{warehouseName}</span>
         </div>

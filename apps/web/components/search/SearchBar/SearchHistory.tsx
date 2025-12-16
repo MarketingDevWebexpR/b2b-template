@@ -122,16 +122,16 @@ const HistoryItem = memo(function HistoryItem({
         'focus:outline-none',
         'group',
         isActive
-          ? 'bg-b2b-primary-50'
-          : 'hover:bg-b2b-bg-secondary'
+          ? 'bg-orange-50'
+          : 'hover:bg-neutral-50'
       )}
     >
       {/* Clock Icon */}
       <ClockIcon
         className={cn(
           'w-4 h-4 flex-shrink-0',
-          'text-b2b-text-muted',
-          'group-hover:text-b2b-text-secondary'
+          'text-neutral-500',
+          'group-hover:text-neutral-600'
         )}
       />
 
@@ -139,8 +139,8 @@ const HistoryItem = memo(function HistoryItem({
       <span
         className={cn(
           'flex-1',
-          'text-b2b-body',
-          'text-b2b-text-primary',
+          'text-sm',
+          'text-neutral-900',
           'truncate'
         )}
       >
@@ -149,7 +149,7 @@ const HistoryItem = memo(function HistoryItem({
 
       {/* Result Count */}
       {item.resultCount > 0 && (
-        <span className="text-b2b-caption text-b2b-text-muted">
+        <span className="text-xs text-neutral-500">
           {item.resultCount} resultat{item.resultCount > 1 ? 's' : ''}
         </span>
       )}
@@ -158,7 +158,7 @@ const HistoryItem = memo(function HistoryItem({
       <ArrowUpLeftIcon
         className={cn(
           'w-4 h-4 flex-shrink-0',
-          'text-b2b-text-muted',
+          'text-neutral-500',
           'opacity-0 group-hover:opacity-100',
           'transition-opacity duration-150',
           'rotate-90'
@@ -189,15 +189,15 @@ export function SearchHistory({
         className={cn(
           'flex items-center justify-between',
           'px-4 py-2',
-          'bg-b2b-bg-secondary',
-          'border-b border-b2b-border-light'
+          'bg-neutral-50',
+          'border-b border-neutral-200'
         )}
       >
         <span
           className={cn(
             'flex items-center gap-2',
-            'text-b2b-label',
-            'text-b2b-text-muted',
+            'text-xs',
+            'text-neutral-500',
             'uppercase tracking-wide'
           )}
         >
@@ -211,14 +211,14 @@ export function SearchHistory({
           className={cn(
             'flex items-center gap-1.5',
             'px-2 py-1',
-            'text-b2b-caption',
-            'text-b2b-text-muted',
+            'text-xs',
+            'text-neutral-500',
             'rounded',
             'transition-colors duration-150',
-            'hover:text-b2b-danger',
-            'hover:bg-b2b-danger-50',
+            'hover:text-red-600',
+            'hover:bg-red-50',
             'focus:outline-none',
-            'focus-visible:ring-2 focus-visible:ring-b2b-danger/30'
+            'focus-visible:ring-2 focus-visible:ring-red-600/30'
           )}
           aria-label="Effacer l'historique"
         >

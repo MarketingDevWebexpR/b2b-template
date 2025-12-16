@@ -1,10 +1,11 @@
 import { type Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { LoginForm } from '@/components/auth/LoginForm';
 
 export const metadata: Metadata = {
-  title: 'Connexion | Maison Bijoux',
-  description: 'Connectez-vous a votre compte Maison Bijoux pour acceder a vos commandes et favoris.',
+  title: 'Connexion | WebexpR Pro',
+  description: 'Connectez-vous a votre compte WebexpR Pro pour acceder a vos commandes et favoris.',
 };
 
 /**
@@ -17,27 +18,29 @@ export default function LoginPage() {
       {/* Header */}
       <div className="text-center mb-10">
         {/* Decorative line */}
-        <div className="w-12 h-[2px] bg-gold-500 mx-auto mb-6" />
+        <div className="w-12 h-[2px] bg-accent mx-auto mb-6" />
 
-        <h1 className="text-heading-3 md:text-heading-2 font-serif text-luxury-pearl mb-3">
+        <h1 className="text-heading-3 md:text-heading-2 font-sans text-neutral-100 mb-3">
           Bon retour
         </h1>
 
-        <p className="text-luxury-silver">
+        <p className="text-neutral-400">
           Connectez-vous pour acceder a votre espace personnel
         </p>
       </div>
 
       {/* Login Form */}
-      <LoginForm />
+      <Suspense fallback={<div className="animate-pulse h-64 bg-neutral-800 rounded-lg" />}>
+        <LoginForm />
+      </Suspense>
 
       {/* Register link - visible on desktop */}
       <div className="hidden md:block mt-8 text-center">
-        <p className="text-luxury-silver">
+        <p className="text-neutral-400">
           Vous n'avez pas encore de compte ?{' '}
           <Link
             href="/register"
-            className="text-gold-500 hover:text-gold-400 transition-colors font-medium"
+            className="text-accent hover:text-accent transition-colors font-medium"
           >
             Créer un compte
           </Link>

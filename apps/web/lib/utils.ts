@@ -10,4 +10,5 @@ export {
   generateId,
   formatDate,
   delay,
+  deepMerge,
 } from '@bijoux/utils';

@@ -1,4 +1,5 @@
+ WARN  Issue while reading "/Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/.npmrc". Failed to replace env in config: ${GITHUB_TOKEN}
 
-> @bijoux/types@1.0.0 type-check /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux/packages/types
+> @maison/types@0.0.0 type-check /Users/jean_webexpr/Documents/projets_webexpr/monorepo_bijoux_B2B/packages/types
 > tsc --noEmit
 

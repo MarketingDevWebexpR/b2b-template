@@ -57,7 +57,7 @@ export function FilterMobile({
     <div className="flex flex-col gap-3">
       {/* Result count */}
       {showResultCount && (
-        <p className="text-b2b-body-sm text-b2b-text-secondary text-center">
+        <p className="text-sm text-neutral-600 text-center">
           {totalResults.toLocaleString('fr-FR')} produit{totalResults !== 1 ? 's' : ''} trouve{totalResults !== 1 ? 's' : ''}
         </p>
       )}
@@ -92,8 +92,8 @@ export function FilterMobile({
       <div
         className={cn(
           'fixed bottom-0 left-0 right-0 z-40',
-          'p-4 bg-b2b-bg-primary',
-          'border-t border-b2b-border-light',
+          'p-4 bg-white',
+          'border-t border-neutral-200',
           'shadow-lg',
           'lg:hidden', // Only show on mobile/tablet
           triggerClassName
@@ -105,11 +105,11 @@ export function FilterMobile({
           className={cn(
             'flex items-center justify-center gap-2 w-full',
             'px-4 py-3',
-            'bg-b2b-bg-secondary',
-            'border border-b2b-border-medium rounded-lg',
-            'text-b2b-body font-medium text-b2b-text-primary',
-            'hover:bg-b2b-bg-tertiary',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary',
+            'bg-neutral-50',
+            'border border-neutral-300 rounded-lg',
+            'text-sm font-medium text-neutral-900',
+            'hover:bg-neutral-100',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             'transition-colors duration-200'
           )}
           aria-label={`Ouvrir les filtres${activeFilterCount > 0 ? `, ${activeFilterCount} filtre${activeFilterCount > 1 ? 's' : ''} actif${activeFilterCount > 1 ? 's' : ''}` : ''}`}
@@ -139,7 +139,7 @@ export function FilterMobile({
                 'inline-flex items-center justify-center',
                 'min-w-[22px] h-[22px] px-1.5',
                 'text-xs font-semibold',
-                'bg-b2b-primary text-white',
+                'bg-accent text-white',
                 'rounded-full'
               )}
             >
@@ -208,11 +208,11 @@ export function FilterMobileTrigger({
       className={cn(
         'inline-flex items-center gap-2',
         'px-4 py-2.5',
-        'bg-b2b-bg-secondary',
-        'border border-b2b-border-medium rounded-lg',
-        'text-b2b-body-sm font-medium text-b2b-text-primary',
-        'hover:bg-b2b-bg-tertiary',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary',
+        'bg-neutral-50',
+        'border border-neutral-300 rounded-lg',
+        'text-sm font-medium text-neutral-900',
+        'hover:bg-neutral-100',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
         'transition-colors duration-200',
         className
       )}
@@ -243,7 +243,7 @@ export function FilterMobileTrigger({
             'inline-flex items-center justify-center',
             'min-w-[20px] h-5 px-1.5',
             'text-xs font-semibold',
-            'bg-b2b-primary text-white',
+            'bg-accent text-white',
             'rounded-full'
           )}
         >

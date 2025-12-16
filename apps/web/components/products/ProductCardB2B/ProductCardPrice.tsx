@@ -86,22 +86,22 @@ export function ProductCardPrice({
     return price.unitPriceHT;
   }, [price.unitPriceHT, applicableDiscount]);
 
-  // Size variants
+  // Size variants using design system
   const sizeStyles = {
     sm: {
-      main: 'text-sm font-semibold',
-      secondary: 'text-xs',
-      discount: 'text-xs',
+      main: 'text-body-sm font-semibold',
+      secondary: 'text-caption',
+      discount: 'text-caption',
     },
     md: {
-      main: 'text-base font-semibold',
-      secondary: 'text-sm',
-      discount: 'text-sm',
+      main: 'text-price font-bold',
+      secondary: 'text-body-sm',
+      discount: 'text-body-sm',
     },
     lg: {
-      main: 'text-lg font-bold',
-      secondary: 'text-base',
-      discount: 'text-sm',
+      main: 'text-price-lg font-bold',
+      secondary: 'text-body',
+      discount: 'text-body-sm',
     },
   };
 
@@ -115,7 +115,10 @@ export function ProductCardPrice({
       {/* Main price row */}
       <div className="flex items-baseline gap-2 flex-wrap">
         {/* Current price HT */}
-        <span className={cn(styles.main, 'text-gray-900')}>
+        <span className={cn(
+          styles.main,
+          price.isPromotional ? 'text-promo' : 'text-content-primary'
+        )}>
           {formatPrice
             ? formatPrice(effectiveUnitPrice)
             : `${formatPriceDisplay(effectiveUnitPrice, price.currency)} HT`}
@@ -123,35 +126,28 @@ export function ProductCardPrice({
 
         {/* Unit label */}
         {price.unitLabel && (
-          <span className={cn(styles.secondary, 'text-gray-500')}>
+          <span className={cn(styles.secondary, 'text-content-muted')}>
             /{price.unitLabel}
           </span>
         )}
 
         {/* Original price if discounted */}
         {price.originalPriceHT && price.originalPriceHT > price.unitPriceHT && (
-          <span className={cn(styles.secondary, 'text-gray-400 line-through')}>
+          <span className="price-old">
             {formatPriceDisplay(price.originalPriceHT, price.currency)}
           </span>
         )}
 
         {/* Discount badge */}
         {price.discountPercent && price.discountPercent > 0 && (
-          <span
-            className={cn(
-              'inline-flex items-center px-1.5 py-0.5 rounded',
-              'bg-red-100 text-red-700',
-              styles.discount,
-              'font-medium'
-            )}
-          >
+          <span className="badge-promo">
             -{Math.round(price.discountPercent)}%
           </span>
         )}
       </div>
 
       {/* TTC price (smaller) */}
-      <div className={cn(styles.secondary, 'text-gray-500')}>
+      <div className="price-ht">
         {formatPriceDisplay(price.unitPriceTTC, price.currency)} TTC
       </div>
 
@@ -161,7 +157,7 @@ export function ProductCardPrice({
           className={cn(
             'flex items-center gap-1.5 pt-1',
             styles.discount,
-            'text-emerald-700'
+            'text-success-700'
           )}
         >
           <span className="font-medium">
@@ -176,7 +172,7 @@ export function ProductCardPrice({
                 )}
             {' HT'}
           </span>
-          <span className="text-emerald-600">
+          <span className="text-success-600">
             ({firstVolumeDiscount.fixedUnitPrice !== undefined
               ? formatPriceDisplay(
                   firstVolumeDiscount.fixedUnitPrice,
@@ -208,7 +204,7 @@ function PromotionalBadge({ endsAt }: { endsAt: string }) {
   if (diffDays <= 0) return null;
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded mt-1">
+    <div className="flex items-center gap-1.5 text-caption text-warning-700 bg-warning-50 px-2 py-1 rounded mt-1">
       <svg
         className="w-3.5 h-3.5"
         fill="none"
@@ -242,11 +238,14 @@ export function ProductCardPriceCompact({
 }) {
   return (
     <div className={cn('flex flex-col', className)}>
-      <span className="text-sm font-semibold text-gray-900">
+      <span className={cn(
+        'text-body-sm font-semibold',
+        price.isPromotional ? 'text-promo' : 'text-content-primary'
+      )}>
         {formatPriceDisplay(price.unitPriceHT, price.currency)} HT
       </span>
       {price.volumeDiscounts && price.volumeDiscounts.length > 0 && (
-        <span className="text-xs text-emerald-600">
+        <span className="text-caption text-success-600">
           Lot {price.volumeDiscounts[0].minQuantity}:{' '}
           {price.volumeDiscounts[0].fixedUnitPrice !== undefined
             ? formatPriceDisplay(

@@ -5,53 +5,53 @@ import { motion, type HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 /**
- * Card variant styles - Hermes-inspired luxury design
+ * Card variant styles - B2B professional design
  */
 const cardVariants = {
   // Default elevated card with subtle shadow
   elevated: [
     'bg-white',
-    'border border-border-light',
-    'shadow-card',
-    'hover:shadow-card-hover hover:border-hermes-500/20',
+    'border border-neutral-200',
+    'shadow-sm',
+    'hover:shadow-md hover:border-accent/20',
   ].join(' '),
 
   // Flat card with border only
   outlined: [
     'bg-white',
-    'border border-border',
-    'hover:border-hermes-500/30',
+    'border border-neutral-200',
+    'hover:border-accent/30',
   ].join(' '),
 
   // Subtle background card
   filled: [
-    'bg-background-muted',
+    'bg-neutral-100',
     'border border-transparent',
-    'hover:bg-background-beige',
+    'hover:bg-neutral-50',
   ].join(' '),
 
   // Ghost/transparent card
   ghost: [
     'bg-transparent',
     'border border-transparent',
-    'hover:bg-background-muted',
+    'hover:bg-neutral-100',
   ].join(' '),
 
   // Interactive card with more prominent hover
   interactive: [
     'bg-white',
-    'border border-border-light',
-    'shadow-card',
-    'hover:shadow-elegant-lg hover:border-hermes-500/30 hover:-translate-y-0.5',
+    'border border-neutral-200',
+    'shadow-sm',
+    'hover:shadow-lg hover:border-accent/30 hover:-translate-y-0.5',
     'cursor-pointer',
   ].join(' '),
 
   // Highlighted/featured card with accent
   featured: [
     'bg-white',
-    'border-2 border-hermes-500/20',
-    'shadow-elegant',
-    'hover:border-hermes-500/40',
+    'border-2 border-accent/20',
+    'shadow-sm',
+    'hover:border-accent/40',
   ].join(' '),
 };
 
@@ -80,11 +80,11 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 /**
  * Card component for containing content sections.
  *
- * Design principles (Hermes-inspired):
+ * B2B professional design:
  * - Clean white backgrounds for content focus
- * - Subtle shadows for depth without heaviness
- * - Refined borders and hover states
- * - Generous padding for breathing room
+ * - Subtle shadows for depth
+ * - Clean borders and hover states
+ * - Generous padding
  *
  * @example
  * <Card variant="elevated" size="lg">
@@ -109,8 +109,8 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     ref
   ) => {
     const cardClasses = cn(
-      'rounded-soft',
-      'transition-all duration-400 ease-luxe',
+      'rounded-lg',
+      'transition-all duration-150',
       cardVariants[variant],
       cardSizes[size],
       className
@@ -164,7 +164,7 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
 CardHeader.displayName = 'CardHeader';
 
 /**
- * Card Title component - uses serif typography for luxury feel
+ * Card Title component
  */
 export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
   /** Title text */
@@ -178,7 +178,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
     <Component
       ref={ref}
       className={cn(
-        'font-serif text-heading-5 text-text-primary',
+        'font-sans font-semibold text-heading-5 text-neutral-900',
         'leading-tight tracking-tight',
         className
       )}
@@ -203,7 +203,7 @@ const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   ({ className, children, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn('font-sans text-body-sm text-text-muted', className)}
+      className={cn('font-sans text-body-sm text-neutral-500', className)}
       {...props}
     >
       {children}
@@ -292,7 +292,7 @@ export function CartItemCard({
     <motion.div
       className={cn(
         'flex gap-4 py-4',
-        'border-b border-border-light last:border-b-0',
+        'border-b border-neutral-200 last:border-b-0',
         className
       )}
       initial={{ opacity: 1, height: 'auto' }}
@@ -304,7 +304,7 @@ export function CartItemCard({
     >
       {/* Product Image */}
       {image && (
-        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-soft bg-background-muted">
+        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-neutral-100">
           <img
             src={image}
             alt={name}
@@ -316,16 +316,16 @@ export function CartItemCard({
       {/* Product Details */}
       <div className="flex flex-1 flex-col justify-between">
         <div>
-          <h4 className="font-serif text-base text-text-primary leading-tight">
+          <h4 className="font-sans font-medium text-base text-neutral-900 leading-tight">
             {name}
           </h4>
           {variant && (
-            <p className="mt-0.5 font-sans text-xs text-text-muted">
+            <p className="mt-0.5 font-sans text-xs text-neutral-500">
               {variant}
             </p>
           )}
           {quantity > 1 && (
-            <p className="mt-1 font-sans text-xs text-text-light">
+            <p className="mt-1 font-sans text-xs text-neutral-400">
               Quantite: {quantity}
             </p>
           )}
@@ -333,11 +333,11 @@ export function CartItemCard({
 
         {/* Price */}
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="font-sans text-sm font-medium text-text-primary">
+          <span className="font-sans text-sm font-medium text-neutral-900">
             {price}
           </span>
           {originalPrice && (
-            <span className="font-sans text-xs text-text-light line-through">
+            <span className="font-sans text-xs text-neutral-400 line-through">
               {originalPrice}
             </span>
           )}
@@ -399,58 +399,58 @@ export function OrderSummaryCard({
         <CardTitle className="text-center">
           {title}
         </CardTitle>
-        <div className="mx-auto mt-2 h-px w-12 bg-hermes-500" />
+        <div className="mx-auto mt-2 h-px w-12 bg-accent" />
       </CardHeader>
 
       {/* Summary Lines */}
       <CardContent className="space-y-3 pt-4">
         {/* Subtotal */}
         <div className="flex justify-between">
-          <span className="font-sans text-sm text-text-muted">Sous-total</span>
-          <span className="font-sans text-sm text-text-primary">{subtotal}</span>
+          <span className="font-sans text-sm text-neutral-500">Sous-total</span>
+          <span className="font-sans text-sm text-neutral-900">{subtotal}</span>
         </div>
 
         {/* Shipping */}
         {shipping !== undefined && (
           <div className="flex justify-between">
-            <span className="font-sans text-sm text-text-muted">Livraison</span>
-            <span className="font-sans text-sm text-text-primary">{shipping}</span>
+            <span className="font-sans text-sm text-neutral-500">Livraison</span>
+            <span className="font-sans text-sm text-neutral-900">{shipping}</span>
           </div>
         )}
 
         {/* Tax */}
         {tax && (
           <div className="flex justify-between">
-            <span className="font-sans text-sm text-text-muted">TVA</span>
-            <span className="font-sans text-sm text-text-primary">{tax}</span>
+            <span className="font-sans text-sm text-neutral-500">TVA</span>
+            <span className="font-sans text-sm text-neutral-900">{tax}</span>
           </div>
         )}
 
         {/* Discount */}
         {discount && (
           <div className="flex justify-between">
-            <span className="font-sans text-sm text-hermes-500">
+            <span className="font-sans text-sm text-accent">
               Remise{discountCode && ` (${discountCode})`}
             </span>
-            <span className="font-sans text-sm text-hermes-500">-{discount}</span>
+            <span className="font-sans text-sm text-accent">-{discount}</span>
           </div>
         )}
 
         {/* Additional Items */}
         {additionalItems?.map((item, index) => (
           <div key={index} className="flex justify-between">
-            <span className="font-sans text-sm text-text-muted">{item.label}</span>
-            <span className="font-sans text-sm text-text-primary">{item.value}</span>
+            <span className="font-sans text-sm text-neutral-500">{item.label}</span>
+            <span className="font-sans text-sm text-neutral-900">{item.value}</span>
           </div>
         ))}
 
         {/* Divider */}
-        <div className="my-4 h-px bg-border" />
+        <div className="my-4 h-px bg-neutral-200" />
 
         {/* Total */}
         <div className="flex justify-between">
-          <span className="font-serif text-lg text-text-primary">Total</span>
-          <span className="font-serif text-lg text-text-primary">{total}</span>
+          <span className="font-sans font-semibold text-lg text-neutral-900">Total</span>
+          <span className="font-sans font-semibold text-lg text-neutral-900">{total}</span>
         </div>
       </CardContent>
 

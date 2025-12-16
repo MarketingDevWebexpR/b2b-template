@@ -103,8 +103,8 @@ export function FilterAttributes({
                   'flex items-center justify-between py-1.5 px-2 -mx-2 rounded',
                   'transition-colors duration-150',
                   isSelected
-                    ? 'bg-b2b-primary/5'
-                    : 'hover:bg-b2b-bg-tertiary'
+                    ? 'bg-accent/5'
+                    : 'hover:bg-neutral-100'
                 )}
               >
                 <Checkbox
@@ -117,8 +117,8 @@ export function FilterAttributes({
                 {showCounts && (
                   <span
                     className={cn(
-                      'text-b2b-caption tabular-nums ml-2',
-                      isSelected ? 'text-b2b-primary' : 'text-b2b-text-muted'
+                      'text-xs tabular-nums ml-2',
+                      isSelected ? 'text-accent' : 'text-neutral-500'
                     )}
                   >
                     ({value.count.toLocaleString('fr-FR')})
@@ -136,8 +136,8 @@ export function FilterAttributes({
             onClick={handleShowMore}
             className={cn(
               'flex items-center gap-1.5 w-full',
-              'text-b2b-body-sm text-b2b-primary',
-              'hover:text-b2b-primary-600',
+              'text-sm text-accent',
+              'hover:text-accent/80',
               'focus:outline-none focus-visible:underline',
               'transition-colors duration-200'
             )}

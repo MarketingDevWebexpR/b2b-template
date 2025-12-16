@@ -60,7 +60,7 @@ export function PageHeader({
             <div key={index} className="flex items-center gap-2">
               {index > 0 && (
                 <svg
-                  className="w-4 h-4 text-text-muted"
+                  className="w-4 h-4 text-content-muted"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -76,12 +76,12 @@ export function PageHeader({
               {item.href ? (
                 <Link
                   href={item.href}
-                  className="font-sans text-caption text-text-muted hover:text-hermes-500 transition-colors"
+                  className="text-caption text-content-muted hover:text-primary transition-colors"
                 >
                   {item.label}
                 </Link>
               ) : (
-                <span className="font-sans text-caption text-text-secondary">
+                <span className="text-caption text-content-secondary">
                   {item.label}
                 </span>
               )}
@@ -93,11 +93,11 @@ export function PageHeader({
       {/* Header content */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-heading-3 text-text-primary">
+          <h1 className="text-hero-sm font-bold text-content-primary">
             {title}
           </h1>
           {description && (
-            <p className="mt-1 font-sans text-body text-text-muted">
+            <p className="mt-1 text-body text-content-muted">
               {description}
             </p>
           )}

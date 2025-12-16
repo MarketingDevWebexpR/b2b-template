@@ -61,10 +61,10 @@ export default function FavorisPage() {
   // Loading state
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-background-cream">
+      <main className="min-h-screen bg-white">
         <Container>
           <div className="flex min-h-[50vh] items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-hermes-500 border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           </div>
         </Container>
       </main>
@@ -72,9 +72,9 @@ export default function FavorisPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background-cream">
+    <main className="min-h-screen bg-white">
       {/* Page Header */}
-      <section className="border-b border-border-light bg-white py-12 lg:py-16">
+      <section className="border-b border-stroke-light bg-white py-12 lg:py-16">
         <Container>
           {/* Breadcrumbs */}
           <Breadcrumbs
@@ -86,14 +86,14 @@ export default function FavorisPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <Heart
-                className="h-6 w-6 text-hermes-500"
+                className="h-6 w-6 text-primary"
                 strokeWidth={1.5}
               />
-              <h1 className="font-serif text-2xl tracking-tight text-text-primary lg:text-3xl">
+              <h1 className="font-sans text-2xl tracking-tight text-content-primary lg:text-3xl">
                 Mes Favoris
               </h1>
               {wishlist.totalItems > 0 && (
-                <span className="rounded-full bg-hermes-50 px-3 py-1 font-sans text-xs font-medium text-hermes-600">
+                <span className="rounded-full bg-primary-50 px-3 py-1 font-sans text-xs font-medium text-primary-600">
                   {wishlist.totalItems} {wishlist.totalItems > 1 ? 'articles' : 'article'}
                 </span>
               )}
@@ -105,10 +105,10 @@ export default function FavorisPage() {
                 onClick={handleClearWishlist}
                 className={cn(
                   'inline-flex items-center gap-2',
-                  'font-sans text-xs font-medium uppercase tracking-luxe',
-                  'text-text-muted transition-colors duration-250',
-                  'hover:text-hermes-500',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+                  'font-sans text-xs font-medium uppercase ',
+                  'text-content-muted transition-colors duration-250',
+                  'hover:text-primary',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                 )}
                 aria-label="Vider la liste des favoris"
               >
@@ -131,41 +131,41 @@ export default function FavorisPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-background-muted">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-surface-secondary">
                 <Heart
-                  className="h-10 w-10 text-text-light"
+                  className="h-10 w-10 text-content-muted"
                   strokeWidth={1}
                 />
               </div>
-              <h2 className="mb-2 font-serif text-xl text-text-primary">
+              <h2 className="mb-2 font-sans text-xl text-content-primary">
                 Votre liste de favoris est vide
               </h2>
-              <p className="mb-8 max-w-md font-sans text-sm text-text-muted">
-                Explorez nos collections et ajoutez vos pieces preferees en cliquant sur le coeur
+              <p className="mb-8 max-w-md font-sans text-sm text-neutral-500">
+                Explorez notre catalogue et ajoutez vos pieces preferees en cliquant sur le coeur
                 pour les retrouver facilement ici.
               </p>
               <Link
                 href="/categories"
                 className={cn(
                   'inline-flex items-center gap-3',
-                  'bg-luxe-charcoal px-8 py-4',
-                  'font-sans text-xs font-medium uppercase tracking-luxe text-text-inverse',
-                  'transition-all duration-350 ease-luxe',
-                  'hover:bg-luxe-noir',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-luxe-charcoal focus-visible:ring-offset-2'
+                  'bg-neutral-900 px-8 py-3 rounded-sm',
+                  'font-sans text-sm font-medium uppercase tracking-wider text-white',
+                  'transition-all duration-200',
+                  'hover:bg-accent',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
                 )}
               >
                 <ShoppingBag className="h-4 w-4" strokeWidth={1.5} />
-                <span>Decouvrir nos collections</span>
+                <span>Decouvrir notre catalogue</span>
               </Link>
             </motion.div>
           ) : (
             /* Products Grid */
             <>
               {/* Results Header */}
-              <div className="mb-8 flex items-center justify-between border-b border-border-light pb-4">
-                <p className="font-sans text-sm text-text-muted">
-                  <span className="font-medium text-text-primary">
+              <div className="mb-8 flex items-center justify-between border-b border-stroke-light pb-4">
+                <p className="font-sans text-sm text-content-muted">
+                  <span className="font-medium text-content-primary">
                     {wishlist.totalItems}
                   </span>{' '}
                   {wishlist.totalItems > 1 ? 'pieces sauvegardees' : 'piece sauvegardee'}
@@ -202,24 +202,24 @@ export default function FavorisPage() {
 
       {/* Continue Shopping CTA (when wishlist has items) */}
       {wishlist.totalItems > 0 && (
-        <section className="border-t border-border-light bg-white py-12">
+        <section className="border-t border-stroke-light bg-white py-12">
           <Container>
             <div className="flex flex-col items-center text-center">
-              <p className="mb-4 font-sans text-sm text-text-muted">
+              <p className="mb-4 font-sans text-sm text-content-muted">
                 Envie de decouvrir d&apos;autres pieces ?
               </p>
               <Link
                 href="/categories"
                 className={cn(
                   'inline-flex items-center gap-2',
-                  'font-sans text-xs font-medium uppercase tracking-luxe',
-                  'text-hermes-500 transition-colors duration-250',
-                  'hover:text-hermes-600',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2'
+                  'font-sans text-xs font-medium uppercase ',
+                  'text-primary transition-colors duration-250',
+                  'hover:text-primary-600',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                 )}
               >
                 <span>Continuer mes achats</span>
-                <span className="h-px w-8 bg-hermes-500 transition-all duration-350 hover:w-12" />
+                <span className="h-px w-8 bg-primary transition-all duration-300 hover:w-12" />
               </Link>
             </div>
           </Container>

@@ -145,18 +145,18 @@ export const MegaMenu = memo(function MegaMenu({
             onKeyDown={handleKeyDown}
             className={cn(
               'flex items-center gap-2 px-4 py-2.5',
-              'bg-b2b-primary-500 text-white rounded-lg',
-              'hover:bg-b2b-primary-600',
+              'bg-neutral-900 text-white rounded-lg',
+              'hover:bg-neutral-800',
               'transition-colors duration-200',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/50',
-              isOpen && 'bg-b2b-primary-600'
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500/50',
+              isOpen && 'bg-neutral-800'
             )}
             aria-expanded={isOpen}
             aria-haspopup="true"
             aria-controls="mega-menu-dropdown"
           >
             <Menu className="w-5 h-5" strokeWidth={1.5} aria-hidden="true" />
-            <span className="font-medium text-b2b-body">Categories</span>
+            <span className="font-medium text-sm">Categories</span>
             <ChevronDown
               className={cn(
                 'w-4 h-4 transition-transform duration-200',
@@ -175,12 +175,12 @@ export const MegaMenu = memo(function MegaMenu({
             href={link.href}
             className={cn(
               'px-4 py-2.5',
-              'text-b2b-body font-medium',
+              'text-sm font-medium',
               link.highlight
-                ? 'text-b2b-accent-500 hover:text-b2b-accent-600'
-                : 'text-b2b-text-secondary hover:text-b2b-text-primary',
+                ? 'text-accent hover:text-orange-600'
+                : 'text-neutral-600 hover:text-neutral-900',
               'transition-colors duration-200',
-              'focus:outline-none focus-visible:text-b2b-primary-500'
+              'focus:outline-none focus-visible:text-accent'
             )}
           >
             {link.label}
@@ -198,7 +198,7 @@ export const MegaMenu = memo(function MegaMenu({
           className={cn(
             'absolute left-0 top-full mt-2 z-50',
             'w-[calc(100vw-4rem)] max-w-6xl',
-            'bg-white border border-b2b-border rounded-xl shadow-xl',
+            'bg-white border border-neutral-200 rounded-xl shadow-xl',
             'animate-fade-in-down'
           )}
           role="menu"
@@ -210,9 +210,9 @@ export const MegaMenu = memo(function MegaMenu({
             className={cn(
               'absolute top-4 right-4 md:hidden',
               'p-2 rounded-lg',
-              'text-b2b-text-muted hover:text-b2b-text-primary hover:bg-b2b-bg-secondary',
+              'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50',
               'transition-colors duration-200',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary-500/20'
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/20'
             )}
             aria-label="Fermer le menu"
           >
@@ -232,7 +232,7 @@ export const MegaMenu = memo(function MegaMenu({
             </div>
 
             {/* Featured products */}
-            <div className="hidden lg:block w-80 border-l border-b2b-border">
+            <div className="hidden lg:block w-80 border-l border-neutral-200">
               <MegaMenuFeatured
                 products={mockFeaturedProducts}
                 title="A la une"
@@ -243,13 +243,13 @@ export const MegaMenu = memo(function MegaMenu({
           </div>
 
           {/* Bottom bar with all categories link */}
-          <div className="flex items-center justify-between px-6 py-3 border-t border-b2b-border bg-b2b-bg-secondary rounded-b-xl">
+          <div className="flex items-center justify-between px-6 py-3 border-t border-neutral-200 bg-neutral-50 rounded-b-xl">
             <Link
               href="/categories"
               className={cn(
                 'inline-flex items-center gap-2',
-                'text-b2b-body font-medium text-b2b-primary-500',
-                'hover:text-b2b-primary-600 transition-colors duration-150',
+                'text-sm font-medium text-accent',
+                'hover:text-orange-600 transition-colors duration-150',
                 'focus:outline-none focus-visible:underline'
               )}
               onClick={handleLinkClick}
@@ -263,9 +263,9 @@ export const MegaMenu = memo(function MegaMenu({
                   key={category.id}
                   href={`/categories/${category.slug}`}
                   className={cn(
-                    'text-b2b-body-sm text-b2b-text-secondary',
-                    'hover:text-b2b-primary-500 transition-colors duration-150',
-                    'focus:outline-none focus-visible:text-b2b-primary-500'
+                    'text-sm text-neutral-600',
+                    'hover:text-accent transition-colors duration-150',
+                    'focus:outline-none focus-visible:text-accent'
                   )}
                   onClick={handleLinkClick}
                 >

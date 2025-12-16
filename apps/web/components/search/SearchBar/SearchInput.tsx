@@ -135,7 +135,7 @@ const sizeConfig = {
   },
   md: {
     container: 'h-12',
-    input: 'text-b2b-body pl-11 pr-24',
+    input: 'text-sm pl-11 pr-24',
     icon: 'w-5 h-5 left-3.5',
     button: 'w-8 h-8',
     buttonIcon: 'w-4 h-4',
@@ -184,14 +184,14 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <div
           className={cn(
             'absolute top-1/2 -translate-y-1/2',
-            'text-b2b-text-muted',
+            'text-neutral-500',
             'pointer-events-none',
             'transition-colors duration-200',
             config.icon
           )}
         >
           {isLoading ? (
-            <LoaderIcon className={cn(config.buttonIcon, 'text-b2b-primary')} />
+            <LoaderIcon className={cn(config.buttonIcon, 'text-accent')} />
           ) : (
             <SearchIcon className={config.buttonIcon} />
           )}
@@ -215,21 +215,21 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             'w-full h-full',
             'font-sans',
             'bg-white',
-            'text-b2b-text-primary',
-            'placeholder:text-b2b-text-muted',
-            'border border-b2b-border',
+            'text-neutral-900',
+            'placeholder:text-neutral-500',
+            'border border-neutral-200',
             'rounded-lg',
             // Transitions
-            'transition-all duration-200 ease-smooth',
+            'transition-all duration-200',
             // Focus styles
             'focus:outline-none',
-            'focus:border-b2b-primary',
-            'focus:ring-2 focus:ring-b2b-primary/20',
+            'focus:border-accent',
+            'focus:ring-2 focus:ring-accent/20',
             // Hover styles
-            'hover:border-b2b-border-medium',
+            'hover:border-neutral-300',
             // Disabled styles
-            'disabled:bg-b2b-bg-tertiary',
-            'disabled:text-b2b-text-muted',
+            'disabled:bg-neutral-100',
+            'disabled:text-neutral-500',
             'disabled:cursor-not-allowed',
             // Hide native search cancel button
             '[&::-webkit-search-cancel-button]:hidden',
@@ -254,13 +254,13 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               onClick={onClear}
               className={cn(
                 'flex items-center justify-center',
-                'text-b2b-text-muted',
+                'text-neutral-500',
                 'rounded-md',
                 'transition-all duration-200',
-                'hover:text-b2b-text-secondary',
-                'hover:bg-b2b-bg-tertiary',
+                'hover:text-neutral-600',
+                'hover:bg-neutral-100',
                 'focus:outline-none',
-                'focus-visible:ring-2 focus-visible:ring-b2b-primary/30',
+                'focus-visible:ring-2 focus-visible:ring-accent/30',
                 config.button
               )}
               aria-label="Effacer la recherche"
@@ -276,13 +276,13 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               onClick={onVoiceSearch}
               className={cn(
                 'flex items-center justify-center',
-                'text-b2b-text-muted',
+                'text-neutral-500',
                 'rounded-md',
                 'transition-all duration-200',
-                'hover:text-b2b-primary',
-                'hover:bg-b2b-primary-50',
+                'hover:text-accent',
+                'hover:bg-orange-50',
                 'focus:outline-none',
-                'focus-visible:ring-2 focus-visible:ring-b2b-primary/30',
+                'focus-visible:ring-2 focus-visible:ring-accent/30',
                 config.button
               )}
               aria-label="Recherche vocale"
@@ -298,9 +298,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
                 'hidden sm:inline-flex items-center gap-1',
                 'px-2 py-1',
                 'text-xs font-mono',
-                'text-b2b-text-muted',
-                'bg-b2b-bg-tertiary',
-                'border border-b2b-border-light',
+                'text-neutral-500',
+                'bg-neutral-100',
+                'border border-neutral-200',
                 'rounded'
               )}
             >

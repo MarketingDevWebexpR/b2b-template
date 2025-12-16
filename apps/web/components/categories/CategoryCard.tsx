@@ -22,31 +22,33 @@ export function CategoryCard({ category, className, priority = false }: Category
       className={cn('group relative', className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
       <Link
         href={`/categories/${category.slug}`}
-        className="block relative aspect-[4/5] overflow-hidden"
-        aria-label={`Voir la collection ${category.name}`}
+        className={cn(
+          'block relative bg-white rounded-xl overflow-hidden',
+          'border border-neutral-200',
+          'transition-all duration-300 ease-out',
+          'hover:shadow-md hover:border-neutral-300',
+          isHovered && 'scale-[1.02]'
+        )}
+        aria-label={`View ${category.name} collection`}
       >
-        {/* Background Image with Zoom Effect */}
-        <div
-          className={cn(
-            'absolute inset-0 transition-transform duration-700 ease-luxury',
-            isHovered && 'scale-110'
-          )}
-        >
+        {/* Image Container */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
           <Image
             src={category.image}
             alt={category.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className={cn(
-              'object-cover transition-opacity duration-500',
-              imageLoaded ? 'opacity-100' : 'opacity-0'
+              'object-cover transition-all duration-500',
+              imageLoaded ? 'opacity-100' : 'opacity-0',
+              isHovered && 'scale-105'
             )}
             priority={priority}
             onLoad={() => setImageLoaded(true)}
@@ -54,73 +56,54 @@ export function CategoryCard({ category, className, priority = false }: Category
 
           {/* Loading Skeleton */}
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-luxury-charcoal animate-shimmer bg-gradient-to-r from-luxury-charcoal via-luxury-gray to-luxury-charcoal bg-[length:200%_100%]" />
+            <div className="absolute inset-0 bg-neutral-200 animate-pulse" />
           )}
-        </div>
 
-        {/* Gradient Overlay */}
-        <div
-          className={cn(
-            'absolute inset-0 bg-gradient-to-t from-luxury-black via-luxury-black/40 to-transparent',
-            'transition-opacity duration-500',
-            isHovered ? 'opacity-90' : 'opacity-70'
-          )}
-        />
-
-        {/* Animated Border */}
-        <div
-          className={cn(
-            'absolute inset-0 z-10 pointer-events-none transition-all duration-500 ease-luxury',
-            'border-2 border-transparent',
-            isHovered && 'border-gold-500/60 m-3'
-          )}
-        />
-
-        {/* Content */}
-        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 z-20">
-          {/* Gold Decorative Line */}
-          <motion.div
-            className="w-12 h-[2px] bg-gold-500 mb-4"
-            initial={{ width: 0 }}
-            animate={{ width: isHovered ? 64 : 48 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          {/* Subtle Overlay for Text Readability */}
+          <div
+            className={cn(
+              'absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent',
+              'transition-opacity duration-300',
+              isHovered ? 'opacity-60' : 'opacity-40'
+            )}
           />
 
+          {/* Product Count Badge */}
+          <div className="absolute top-3 right-3">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 text-neutral-700 backdrop-blur-sm">
+              {category.productCount} products
+            </span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 md:p-5">
           {/* Category Name */}
-          <h3
-            className={cn(
-              'font-serif text-heading-3 md:text-heading-2 text-white mb-2',
-              'transition-transform duration-500 ease-luxury',
-              isHovered && '-translate-y-1'
-            )}
-          >
+          <h3 className="font-sans text-lg font-semibold text-neutral-900 mb-1">
             {category.name}
           </h3>
 
-          {/* Product Count */}
-          <p
+          {/* Description if available */}
+          {category.description && (
+            <p className="text-sm text-neutral-600 line-clamp-2 mb-3">
+              {category.description}
+            </p>
+          )}
+
+          {/* CTA Link */}
+          <span
             className={cn(
-              'text-luxury-silver text-sm uppercase tracking-wider',
-              'transition-all duration-500 ease-luxury',
-              isHovered && 'text-gold-400'
+              'inline-flex items-center gap-1.5 text-sm font-medium',
+              'text-neutral-600 transition-colors duration-200',
+              'group-hover:text-accent-600'
             )}
           >
-            {category.productCount} pieces
-          </p>
-
-          {/* Hover CTA */}
-          <motion.span
-            className="mt-4 text-gold-500 text-sm uppercase tracking-wider flex items-center gap-2"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{
-              opacity: isHovered ? 1 : 0,
-              y: isHovered ? 0 : 10,
-            }}
-            transition={{ duration: 0.3 }}
-          >
-            Decouvrir la collection
+            View collection
             <svg
-              className="w-4 h-4"
+              className={cn(
+                'w-4 h-4 transition-transform duration-200',
+                isHovered && 'translate-x-0.5'
+              )}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -129,10 +112,10 @@ export function CategoryCard({ category, className, priority = false }: Category
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
+                d="M9 5l7 7-7 7"
               />
             </svg>
-          </motion.span>
+          </span>
         </div>
       </Link>
     </motion.article>

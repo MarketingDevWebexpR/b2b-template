@@ -40,5 +40,15 @@ declare function formatDate(date: string | Date, locale?: string): string;
  * Delay utility for async operations
  */
 declare function delay(ms: number): Promise<void>;
+/**
+ * Deep merge two objects recursively.
+ * Arrays are replaced, not merged.
+ * Only plain objects are deep merged.
+ *
+ * @param target - Base object
+ * @param source - Object to merge into target
+ * @returns Merged object (new reference)
+ */
+declare function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T;
 
-export { calculateDiscount, cn, debounce, delay, formatDate, formatPrice, generateId, isClient, slugify, truncate };
+export { calculateDiscount, cn, debounce, deepMerge, delay, formatDate, formatPrice, generateId, isClient, slugify, truncate };

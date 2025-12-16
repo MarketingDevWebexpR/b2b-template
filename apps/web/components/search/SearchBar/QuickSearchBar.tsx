@@ -216,13 +216,13 @@ export function QuickSearchBar({
   const getStatusIcon = () => {
     switch (status) {
       case 'searching':
-        return <LoaderIcon className="w-4 h-4 text-b2b-primary" />;
+        return <LoaderIcon className="w-4 h-4 text-accent" />;
       case 'found':
-        return <CheckIcon className="w-4 h-4 text-b2b-success" />;
+        return <CheckIcon className="w-4 h-4 text-green-600" />;
       case 'not-found':
-        return <AlertCircleIcon className="w-4 h-4 text-b2b-warning" />;
+        return <AlertCircleIcon className="w-4 h-4 text-amber-600" />;
       default:
-        return <BarcodeIcon className="w-4 h-4 text-b2b-text-muted" />;
+        return <BarcodeIcon className="w-4 h-4 text-neutral-500" />;
     }
   };
 
@@ -230,11 +230,11 @@ export function QuickSearchBar({
   const getBorderColor = () => {
     switch (status) {
       case 'found':
-        return 'border-b2b-success focus-within:border-b2b-success';
+        return 'border-green-500 focus-within:border-green-500';
       case 'not-found':
-        return 'border-b2b-warning focus-within:border-b2b-warning';
+        return 'border-amber-500 focus-within:border-amber-500';
       default:
-        return 'border-b2b-border focus-within:border-b2b-primary';
+        return 'border-neutral-200 focus-within:border-accent';
     }
   };
 
@@ -253,7 +253,7 @@ export function QuickSearchBar({
           'border',
           'rounded-md',
           'transition-all duration-200',
-          'focus-within:ring-2 focus-within:ring-b2b-primary/20',
+          'focus-within:ring-2 focus-within:ring-accent/20',
           getBorderColor()
         )}
       >
@@ -279,9 +279,9 @@ export function QuickSearchBar({
             'flex-1 min-w-0',
             'h-full',
             'px-0 pr-2',
-            'text-b2b-body-sm font-mono',
-            'text-b2b-text-primary',
-            'placeholder:text-b2b-text-muted',
+            'text-sm font-mono',
+            'text-neutral-900',
+            'placeholder:text-neutral-500',
             'bg-transparent',
             'border-none outline-none',
             'disabled:opacity-50',
@@ -298,14 +298,14 @@ export function QuickSearchBar({
             'flex items-center justify-center',
             'w-8 h-8 mr-0.5',
             'rounded',
-            'text-b2b-text-muted',
+            'text-neutral-500',
             'transition-all duration-200',
-            'hover:text-b2b-primary',
-            'hover:bg-b2b-primary-50',
+            'hover:text-accent',
+            'hover:bg-orange-50',
             'focus:outline-none',
-            'focus-visible:ring-2 focus-visible:ring-b2b-primary/30',
+            'focus-visible:ring-2 focus-visible:ring-accent/30',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            'disabled:hover:bg-transparent disabled:hover:text-b2b-text-muted'
+            'disabled:hover:bg-transparent disabled:hover:text-neutral-500'
           )}
           aria-label="Rechercher"
         >
@@ -319,10 +319,10 @@ export function QuickSearchBar({
           className={cn(
             'absolute top-full left-0 right-0',
             'mt-1 px-3 py-1.5',
-            'text-b2b-caption',
-            'text-b2b-warning-700',
-            'bg-b2b-warning-50',
-            'border border-b2b-warning-200',
+            'text-xs',
+            'text-amber-700',
+            'bg-amber-50',
+            'border border-amber-200',
             'rounded',
             'animate-fade-in'
           )}

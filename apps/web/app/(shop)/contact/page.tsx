@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
-import { HeaderSpacer } from '@/components/layout/Header';
+import { B2BHeaderEcomSpacer } from '@/components/layout/B2BHeaderEcom';
 import { cn } from '@/lib/utils';
 import {
   MapPin,
@@ -98,7 +98,7 @@ const faqItems: FAQItem[] = [
   {
     question: 'Comment entretenir mes bijoux ?',
     answer:
-      'Nous recommandons de nettoyer vos bijoux avec un chiffon doux après chaque utilisation. Évitez le contact avec les parfums et produits chimiques. Un entretien professionnel annuel en boutique est offert pour toute création Maison Bijoux.',
+      'Nous recommandons de nettoyer vos bijoux avec un chiffon doux après chaque utilisation. Évitez le contact avec les parfums et produits chimiques. Un entretien professionnel annuel en boutique est offert pour toute création WebexpR Pro.',
   },
   {
     question: 'Quelle est votre politique de retour ?',
@@ -116,7 +116,7 @@ const contactInfo = {
     city: '75001 Paris, France',
   },
   phone: '+33 1 42 60 76 00',
-  email: 'contact@maisonbijoux.fr',
+  email: 'contact@webexprpro.fr',
   hours: [
     { days: 'Lundi - Vendredi', time: '10h00 - 19h00' },
     { days: 'Samedi', time: '10h00 - 18h00' },
@@ -149,19 +149,19 @@ function FAQAccordionItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="border-b border-border last:border-b-0">
+    <div className="border-b border-stroke last:border-b-0">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between py-6 text-left transition-colors duration-300 hover:text-hermes-500"
+        className="flex w-full items-center justify-between py-6 text-left transition-colors duration-300 hover:text-primary"
         aria-expanded={isOpen}
       >
-        <span className="pr-8 font-serif text-heading-5 text-text-primary">
+        <span className="pr-8 font-sans text-heading-5 text-content-primary">
           {item.question}
         </span>
         <ChevronDown
           className={cn(
-            'h-5 w-5 flex-shrink-0 text-hermes-500 transition-transform duration-300',
+            'h-5 w-5 flex-shrink-0 text-primary transition-transform duration-300',
             isOpen && 'rotate-180'
           )}
           strokeWidth={1.5}
@@ -176,7 +176,7 @@ function FAQAccordionItem({
         transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="overflow-hidden"
       >
-        <p className="pb-6 font-sans text-body leading-elegant text-text-muted">
+        <p className="pb-6 font-sans text-body leading-elegant text-content-muted">
           {item.answer}
         </p>
       </motion.div>
@@ -268,13 +268,13 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background-cream">
+    <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-warm">
-        <HeaderSpacer />
+        <B2BHeaderEcomSpacer />
         {/* Decorative background elements */}
         <div className="absolute inset-0 bg-vignette" />
-        <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-hermes-500/20 to-transparent" />
+        <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
         <Container size="lg" className="py-16 lg:py-20">
           <motion.div
@@ -285,7 +285,7 @@ export default function ContactPage() {
           >
             {/* Label */}
             <motion.span
-              className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
+              className="mb-4 inline-block font-sans text-overline uppercase  text-primary"
               variants={itemVariants}
             >
               Service Client
@@ -293,7 +293,7 @@ export default function ContactPage() {
 
             {/* Title */}
             <motion.h1
-              className="font-serif text-display-1 text-text-primary md:text-display-hero"
+              className="font-sans text-display-1 text-content-primary md:text-display-hero"
               variants={itemVariants}
             >
               Contactez-nous
@@ -301,13 +301,13 @@ export default function ContactPage() {
 
             {/* Decorative Line */}
             <motion.div
-              className="mx-auto mt-8 h-px w-24 bg-hermes-500"
+              className="mx-auto mt-8 h-px w-24 bg-primary"
               variants={itemVariants}
             />
 
             {/* Subtitle */}
             <motion.p
-              className="mx-auto mt-8 max-w-prose-narrow font-sans text-body-lg leading-elegant text-text-muted"
+              className="mx-auto mt-8 max-w-prose-narrow font-sans text-body-lg leading-elegant text-content-muted"
               variants={itemVariants}
             >
               Notre équipe est à votre disposition pour répondre à toutes vos
@@ -329,33 +329,33 @@ export default function ContactPage() {
               viewport={{ once: true, margin: '-50px' }}
             >
               <motion.div variants={itemVariants}>
-                <h2 className="font-serif text-heading-2 text-text-primary">
+                <h2 className="font-sans text-heading-2 text-content-primary">
                   Envoyez-nous un message
                 </h2>
-                <div className="mt-4 h-px w-16 bg-hermes-500" />
+                <div className="mt-4 h-px w-16 bg-primary" />
               </motion.div>
 
               {isSubmitted ? (
                 <motion.div
-                  className="mt-10 rounded-elegant border border-hermes-500/20 bg-hermes-50 p-10 text-center"
+                  className="mt-10 rounded-lg border border-primary/20 bg-primary-50 p-10 text-center"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-hermes-500">
+                  <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
                     <Check className="h-8 w-8 text-white" strokeWidth={2} />
                   </div>
-                  <h3 className="font-serif text-heading-4 text-text-primary">
+                  <h3 className="font-sans text-heading-4 text-content-primary">
                     Message envoyé
                   </h3>
-                  <p className="mt-3 font-sans text-body text-text-muted">
+                  <p className="mt-3 font-sans text-body text-content-muted">
                     Merci pour votre message. Notre équipe vous répondra dans
                     les plus brefs délais.
                   </p>
                   <button
                     type="button"
                     onClick={() => setIsSubmitted(false)}
-                    className="mt-6 font-sans text-caption uppercase tracking-luxe text-hermes-500 transition-colors hover:text-hermes-600"
+                    className="mt-6 font-sans text-caption uppercase  text-primary transition-colors hover:text-primary-600"
                   >
                     Envoyer un autre message
                   </button>
@@ -370,7 +370,7 @@ export default function ContactPage() {
                   <div>
                     <label
                       htmlFor="name"
-                      className="mb-2 block font-sans text-caption uppercase tracking-luxe text-text-primary"
+                      className="mb-2 block font-sans text-caption uppercase  text-content-primary"
                     >
                       Nom complet
                     </label>
@@ -381,13 +381,13 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       className={cn(
-                        'w-full border bg-white px-5 py-4 font-sans text-body text-text-primary',
-                        'placeholder:text-text-light',
-                        'transition-all duration-300 ease-luxe',
-                        'focus:border-hermes-500 focus:outline-none focus:ring-1 focus:ring-hermes-500/30',
+                        'w-full border bg-white px-5 py-4 font-sans text-body text-content-primary',
+                        'placeholder:text-content-muted',
+                        'transition-all duration-300 duration-200',
+                        'focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30',
                         errors.name
                           ? 'border-red-400'
-                          : 'border-border hover:border-border-medium'
+                          : 'border-stroke hover:border-stroke-medium'
                       )}
                       placeholder="Votre nom"
                       aria-invalid={!!errors.name}
@@ -408,7 +408,7 @@ export default function ContactPage() {
                   <div>
                     <label
                       htmlFor="email"
-                      className="mb-2 block font-sans text-caption uppercase tracking-luxe text-text-primary"
+                      className="mb-2 block font-sans text-caption uppercase  text-content-primary"
                     >
                       Adresse email
                     </label>
@@ -419,13 +419,13 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       className={cn(
-                        'w-full border bg-white px-5 py-4 font-sans text-body text-text-primary',
-                        'placeholder:text-text-light',
-                        'transition-all duration-300 ease-luxe',
-                        'focus:border-hermes-500 focus:outline-none focus:ring-1 focus:ring-hermes-500/30',
+                        'w-full border bg-white px-5 py-4 font-sans text-body text-content-primary',
+                        'placeholder:text-content-muted',
+                        'transition-all duration-300 duration-200',
+                        'focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30',
                         errors.email
                           ? 'border-red-400'
-                          : 'border-border hover:border-border-medium'
+                          : 'border-stroke hover:border-stroke-medium'
                       )}
                       placeholder="votre@email.com"
                       aria-invalid={!!errors.email}
@@ -446,7 +446,7 @@ export default function ContactPage() {
                   <div>
                     <label
                       htmlFor="subject"
-                      className="mb-2 block font-sans text-caption uppercase tracking-luxe text-text-primary"
+                      className="mb-2 block font-sans text-caption uppercase  text-content-primary"
                     >
                       Sujet
                     </label>
@@ -459,13 +459,13 @@ export default function ContactPage() {
                           handleInputChange('subject', e.target.value)
                         }
                         className={cn(
-                          'w-full appearance-none border bg-white px-5 py-4 font-sans text-body text-text-primary',
-                          'transition-all duration-300 ease-luxe',
-                          'focus:border-hermes-500 focus:outline-none focus:ring-1 focus:ring-hermes-500/30',
-                          !formData.subject && 'text-text-light',
+                          'w-full appearance-none border bg-white px-5 py-4 font-sans text-body text-content-primary',
+                          'transition-all duration-300 duration-200',
+                          'focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30',
+                          !formData.subject && 'text-content-muted',
                           errors.subject
                             ? 'border-red-400'
-                            : 'border-border hover:border-border-medium'
+                            : 'border-stroke hover:border-stroke-medium'
                         )}
                         aria-invalid={!!errors.subject}
                         aria-describedby={
@@ -482,7 +482,7 @@ export default function ContactPage() {
                         ))}
                       </select>
                       <ChevronDown
-                        className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-muted"
+                        className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-content-muted"
                         strokeWidth={1.5}
                       />
                     </div>
@@ -501,7 +501,7 @@ export default function ContactPage() {
                   <div>
                     <label
                       htmlFor="message"
-                      className="mb-2 block font-sans text-caption uppercase tracking-luxe text-text-primary"
+                      className="mb-2 block font-sans text-caption uppercase  text-content-primary"
                     >
                       Message
                     </label>
@@ -514,13 +514,13 @@ export default function ContactPage() {
                         handleInputChange('message', e.target.value)
                       }
                       className={cn(
-                        'w-full resize-none border bg-white px-5 py-4 font-sans text-body text-text-primary',
-                        'placeholder:text-text-light',
-                        'transition-all duration-300 ease-luxe',
-                        'focus:border-hermes-500 focus:outline-none focus:ring-1 focus:ring-hermes-500/30',
+                        'w-full resize-none border bg-white px-5 py-4 font-sans text-body text-content-primary',
+                        'placeholder:text-content-muted',
+                        'transition-all duration-300 duration-200',
+                        'focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30',
                         errors.message
                           ? 'border-red-400'
-                          : 'border-border hover:border-border-medium'
+                          : 'border-stroke hover:border-stroke-medium'
                       )}
                       placeholder="Comment pouvons-nous vous aider ?"
                       aria-invalid={!!errors.message}
@@ -545,11 +545,11 @@ export default function ContactPage() {
                     disabled={isSubmitting}
                     className={cn(
                       'group inline-flex w-full items-center justify-center gap-3',
-                      'bg-hermes-500 px-8 py-4',
-                      'font-sans text-overline font-medium uppercase tracking-luxe text-white',
+                      'bg-primary px-8 py-4',
+                      'font-sans text-overline font-medium uppercase  text-white',
                       'transition-all duration-400',
-                      'hover:bg-hermes-600 hover:shadow-button-hover',
-                      'focus:outline-none focus:ring-2 focus:ring-hermes-500 focus:ring-offset-2',
+                      'hover:bg-primary-600 hover:shadow-button-hover',
+                      'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
                       'disabled:cursor-not-allowed disabled:opacity-70'
                     )}
                   >
@@ -602,31 +602,31 @@ export default function ContactPage() {
             >
               {/* Contact Details Card */}
               <motion.div
-                className="rounded-elegant border border-border bg-white p-8 shadow-elegant lg:p-10"
+                className="rounded-lg border border-stroke bg-white p-8 shadow-elegant lg:p-10"
                 variants={itemVariants}
               >
-                <h2 className="font-serif text-heading-2 text-text-primary">
+                <h2 className="font-sans text-heading-2 text-content-primary">
                   Informations
                 </h2>
-                <div className="mt-4 h-px w-16 bg-hermes-500" />
+                <div className="mt-4 h-px w-16 bg-primary" />
 
                 <div className="mt-8 space-y-8">
                   {/* Address */}
                   <div className="flex gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-hermes-50">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary-50">
                       <MapPin
-                        className="h-5 w-5 text-hermes-500"
+                        className="h-5 w-5 text-primary"
                         strokeWidth={1.5}
                       />
                     </div>
                     <div>
-                      <h3 className="font-sans text-caption uppercase tracking-luxe text-text-muted">
+                      <h3 className="font-sans text-caption uppercase  text-content-muted">
                         Adresse
                       </h3>
-                      <p className="mt-1 font-sans text-body text-text-primary">
+                      <p className="mt-1 font-sans text-body text-content-primary">
                         {contactInfo.address.street}
                       </p>
-                      <p className="font-sans text-body text-text-primary">
+                      <p className="font-sans text-body text-content-primary">
                         {contactInfo.address.city}
                       </p>
                     </div>
@@ -634,19 +634,19 @@ export default function ContactPage() {
 
                   {/* Phone */}
                   <div className="flex gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-hermes-50">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary-50">
                       <Phone
-                        className="h-5 w-5 text-hermes-500"
+                        className="h-5 w-5 text-primary"
                         strokeWidth={1.5}
                       />
                     </div>
                     <div>
-                      <h3 className="font-sans text-caption uppercase tracking-luxe text-text-muted">
+                      <h3 className="font-sans text-caption uppercase  text-content-muted">
                         Téléphone
                       </h3>
                       <a
                         href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}
-                        className="mt-1 block font-sans text-body text-text-primary transition-colors hover:text-hermes-500"
+                        className="mt-1 block font-sans text-body text-content-primary transition-colors hover:text-primary"
                       >
                         {contactInfo.phone}
                       </a>
@@ -655,19 +655,19 @@ export default function ContactPage() {
 
                   {/* Email */}
                   <div className="flex gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-hermes-50">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary-50">
                       <Mail
-                        className="h-5 w-5 text-hermes-500"
+                        className="h-5 w-5 text-primary"
                         strokeWidth={1.5}
                       />
                     </div>
                     <div>
-                      <h3 className="font-sans text-caption uppercase tracking-luxe text-text-muted">
+                      <h3 className="font-sans text-caption uppercase  text-content-muted">
                         Email
                       </h3>
                       <a
                         href={`mailto:${contactInfo.email}`}
-                        className="mt-1 block font-sans text-body text-text-primary transition-colors hover:text-hermes-500"
+                        className="mt-1 block font-sans text-body text-content-primary transition-colors hover:text-primary"
                       >
                         {contactInfo.email}
                       </a>
@@ -678,35 +678,35 @@ export default function ContactPage() {
 
               {/* Opening Hours Card */}
               <motion.div
-                className="rounded-elegant border border-border bg-white p-8 shadow-elegant lg:p-10"
+                className="rounded-lg border border-stroke bg-white p-8 shadow-elegant lg:p-10"
                 variants={itemVariants}
               >
                 <div className="flex items-center gap-3">
                   <Clock
-                    className="h-5 w-5 text-hermes-500"
+                    className="h-5 w-5 text-primary"
                     strokeWidth={1.5}
                   />
-                  <h2 className="font-serif text-heading-4 text-text-primary">
+                  <h2 className="font-sans text-heading-4 text-content-primary">
                     Horaires d&apos;ouverture
                   </h2>
                 </div>
-                <div className="mt-4 h-px w-16 bg-hermes-500" />
+                <div className="mt-4 h-px w-16 bg-primary" />
 
                 <div className="mt-6 space-y-4">
                   {contactInfo.hours.map((schedule, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between border-b border-border-light pb-4 last:border-b-0 last:pb-0"
+                      className="flex items-center justify-between border-b border-stroke-light pb-4 last:border-b-0 last:pb-0"
                     >
-                      <span className="font-sans text-body text-text-primary">
+                      <span className="font-sans text-body text-content-primary">
                         {schedule.days}
                       </span>
                       <span
                         className={cn(
                           'font-sans text-body',
                           schedule.time === 'Fermé'
-                            ? 'text-text-light'
-                            : 'text-text-muted'
+                            ? 'text-content-muted'
+                            : 'text-content-muted'
                         )}
                       >
                         {schedule.time}
@@ -718,21 +718,21 @@ export default function ContactPage() {
 
               {/* Map Placeholder */}
               <motion.div
-                className="relative aspect-[4/3] overflow-hidden rounded-elegant border border-border bg-background-beige"
+                className="relative aspect-[4/3] overflow-hidden rounded-lg border border-stroke bg-background-beige"
                 variants={itemVariants}
               >
                 {/* Decorative Map Illustration */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-hermes-50">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50">
                     <MapPin
-                      className="h-8 w-8 text-hermes-500"
+                      className="h-8 w-8 text-primary"
                       strokeWidth={1.5}
                     />
                   </div>
-                  <h3 className="font-serif text-heading-5 text-text-primary">
+                  <h3 className="font-sans text-heading-5 text-content-primary">
                     Place Vendome, Paris
                   </h3>
-                  <p className="mt-2 max-w-xs font-sans text-body-sm text-text-muted">
+                  <p className="mt-2 max-w-xs font-sans text-body-sm text-content-muted">
                     Au coeur du prestigieux quartier de la haute joaillerie
                     parisienne
                   </p>
@@ -740,7 +740,7 @@ export default function ContactPage() {
                     href="https://maps.google.com/?q=24+Place+Vendome+Paris"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-6 inline-flex items-center gap-2 font-sans text-caption uppercase tracking-luxe text-hermes-500 transition-colors hover:text-hermes-600"
+                    className="mt-6 inline-flex items-center gap-2 font-sans text-caption uppercase  text-primary transition-colors hover:text-primary-600"
                   >
                     <span>Voir sur Google Maps</span>
                     <svg
@@ -792,7 +792,7 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="border-t border-border bg-white py-20 lg:py-28">
+      <section className="border-t border-stroke bg-white py-20 lg:py-28">
         <Container size="md">
           <motion.div
             className="text-center"
@@ -802,21 +802,21 @@ export default function ContactPage() {
             viewport={{ once: true, margin: '-50px' }}
           >
             <motion.span
-              className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
+              className="mb-4 inline-block font-sans text-overline uppercase  text-primary"
               variants={fadeInUp}
             >
               Aide
             </motion.span>
 
             <motion.h2
-              className="font-serif text-heading-1 text-text-primary"
+              className="font-sans text-heading-1 text-content-primary"
               variants={fadeInUp}
             >
               Questions fréquentes
             </motion.h2>
 
             <motion.div
-              className="mx-auto mt-6 h-px w-24 bg-hermes-500"
+              className="mx-auto mt-6 h-px w-24 bg-primary"
               variants={fadeInUp}
             />
           </motion.div>
@@ -849,12 +849,12 @@ export default function ContactPage() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <p className="font-sans text-body text-text-muted">
+            <p className="font-sans text-body text-content-muted">
               Vous n&apos;avez pas trouvé la réponse à votre question ?
             </p>
             <a
               href={`mailto:${contactInfo.email}`}
-              className="mt-4 inline-flex items-center gap-2 font-sans text-caption uppercase tracking-luxe text-hermes-500 transition-colors hover:text-hermes-600"
+              className="mt-4 inline-flex items-center gap-2 font-sans text-caption uppercase  text-primary transition-colors hover:text-primary-600"
             >
               <Mail className="h-4 w-4" strokeWidth={1.5} />
               <span>Contactez notre équipe</span>

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
-import { HeaderSpacer } from '@/components/layout/Header';
+import { B2BHeaderEcomSpacer } from '@/components/layout/B2BHeaderEcom';
 
 interface CategoryHeroProps {
   /** Category name */
@@ -20,58 +20,44 @@ const heroVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2,
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
     },
   },
 };
 
 const textVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.8,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
-
-const lineVariants = {
-  hidden: { scaleX: 0, opacity: 0 },
-  visible: {
-    scaleX: 1,
-    opacity: 1,
-    transition: {
-      duration: 0.8,
-      delay: 0.4,
+      duration: 0.5,
       ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
 };
 
 /**
- * CategoryHero - Elegant hero section for category pages
+ * CategoryHero - Clean B2B hero section for category pages
  *
  * Features:
  * - Minimalist text-based design (no images)
  * - Animated text elements
- * - Light cream/beige gradient background
+ * - Neutral gray background
  * - Product count badge
  * - Responsive design
- * - Same style as CategoriesShowcase on homepage
+ * - Professional B2B styling
  */
 export function CategoryHero({ name, description, productCount }: CategoryHeroProps) {
   return (
-    <section className="relative overflow-hidden bg-gradient-warm">
-      <HeaderSpacer />
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 bg-vignette" />
-      <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-hermes-500/20 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border-light to-transparent" />
+    <section className="relative overflow-hidden bg-neutral-50">
+      <B2BHeaderEcomSpacer showPromoBanner={true} />
 
-      <Container className="py-16 lg:py-20">
+      {/* Subtle bottom border */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
+
+      <Container className="py-10 lg:py-14">
         <motion.div
           variants={heroVariants}
           initial="hidden"
@@ -81,29 +67,29 @@ export function CategoryHero({ name, description, productCount }: CategoryHeroPr
           {/* Subtitle/Overline */}
           <motion.span
             variants={textVariants}
-            className="mb-4 inline-block font-sans text-overline uppercase tracking-luxe text-hermes-500"
+            className="mb-2 inline-block font-sans text-caption uppercase tracking-wider text-accent font-medium"
           >
-            Collection
+            Categorie
           </motion.span>
 
           {/* Category Title */}
           <motion.h1
             variants={textVariants}
-            className="font-serif text-heading-1 text-text-primary md:text-display-2 lg:text-display-1"
+            className="font-sans text-section-title text-neutral-900 md:text-hero-title font-semibold"
           >
             {name}
           </motion.h1>
 
           {/* Decorative Line */}
           <motion.div
-            variants={lineVariants}
-            className="mx-auto my-6 h-px w-24 origin-center bg-hermes-500"
+            variants={textVariants}
+            className="mx-auto my-4 h-[2px] w-12 bg-accent"
           />
 
           {/* Description */}
           <motion.p
             variants={textVariants}
-            className="mx-auto mb-6 max-w-2xl font-sans text-body-lg leading-elegant text-text-muted"
+            className="mx-auto mb-4 max-w-2xl font-sans text-body leading-relaxed text-neutral-600"
           >
             {description}
           </motion.p>
@@ -111,13 +97,13 @@ export function CategoryHero({ name, description, productCount }: CategoryHeroPr
           {/* Product Count Badge */}
           <motion.div
             variants={textVariants}
-            className="inline-flex items-center gap-3"
+            className="inline-flex items-center gap-2"
           >
-            <span className="h-px w-8 bg-border-medium" aria-hidden="true" />
-            <span className="font-sans text-xs font-medium uppercase tracking-luxe text-text-secondary">
-              {productCount} {productCount > 1 ? 'pieces' : 'piece'} d'exception
+            <span className="h-px w-6 bg-neutral-300" aria-hidden="true" />
+            <span className="font-sans text-caption font-medium uppercase tracking-wider text-neutral-500">
+              {productCount} {productCount > 1 ? 'produits' : 'produit'} disponible{productCount > 1 ? 's' : ''}
             </span>
-            <span className="h-px w-8 bg-border-medium" aria-hidden="true" />
+            <span className="h-px w-6 bg-neutral-300" aria-hidden="true" />
           </motion.div>
         </motion.div>
       </Container>

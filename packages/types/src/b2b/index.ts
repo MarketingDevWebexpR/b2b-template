@@ -299,3 +299,30 @@ export type {
   StockAlertFilters,
   StockMovementFilters,
 } from './stock';
+
+// Wishlist/Product List types
+export type {
+  // Visibility and permissions
+  WishlistVisibility,
+  WishlistPermission,
+  WishlistTemplate,
+  // Items
+  WishlistItemB2B,
+  // Collaborators
+  WishlistCollaborator,
+  // Wishlist entity
+  WishlistB2B,
+  WishlistSummary,
+  // DTOs
+  CreateWishlistInput,
+  UpdateWishlistInput,
+  AddWishlistItemInput,
+  UpdateWishlistItemInput,
+  ShareWishlistInput,
+  UpdateCollaboratorInput,
+  // Filters
+  WishlistFilters,
+  // Activity
+  WishlistActionType,
+  WishlistActivity,
+} from './wishlist';

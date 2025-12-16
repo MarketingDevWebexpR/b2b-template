@@ -4,42 +4,42 @@ import { type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Badge variant styles - Hermes-inspired luxury design
+ * Badge variant styles - B2B professional design
  *
  * Design principles:
- * - Clean, minimal aesthetic matching the light theme
- * - Hermes orange as accent color
- * - Subtle, refined appearance
+ * - Clean, minimal aesthetic
+ * - Accent orange for primary variant
+ * - Neutral gray palette
  */
 const badgeVariants = {
-  // Primary Hermes orange badge
-  hermes: [
-    'bg-hermes-500 text-white',
-    'border border-hermes-500',
+  // Primary accent badge
+  primary: [
+    'bg-accent text-white',
+    'border border-accent',
   ].join(' '),
 
-  // Subtle Hermes outline
-  'hermes-outline': [
-    'bg-transparent text-hermes-500',
-    'border border-hermes-500',
+  // Subtle accent outline
+  'primary-outline': [
+    'bg-transparent text-accent',
+    'border border-accent',
   ].join(' '),
 
-  // Soft Hermes background
-  'hermes-soft': [
-    'bg-hermes-50 text-hermes-600',
-    'border border-hermes-100',
+  // Soft accent background
+  'primary-soft': [
+    'bg-accent/5 text-accent',
+    'border border-accent/10',
   ].join(' '),
 
-  // Dark/charcoal for neutral tags
+  // Dark for neutral tags
   dark: [
-    'bg-luxe-charcoal text-white',
-    'border border-luxe-charcoal',
+    'bg-neutral-900 text-white',
+    'border border-neutral-900',
   ].join(' '),
 
   // Light/subtle for secondary information
   light: [
-    'bg-background-muted text-text-muted',
-    'border border-border-light',
+    'bg-neutral-100 text-neutral-500',
+    'border border-neutral-200',
   ].join(' '),
 
   // Success state (order confirmed, payment successful)
@@ -68,8 +68,8 @@ const badgeVariants = {
 
   // Pending/processing state
   pending: [
-    'bg-background-beige text-text-muted',
-    'border border-border',
+    'bg-neutral-50 text-neutral-500',
+    'border border-neutral-200',
   ].join(' '),
 };
 
@@ -101,9 +101,9 @@ export interface BadgeProps {
 /**
  * Badge component for status indicators, labels, and tags.
  *
- * Designed with Hermes-inspired luxury aesthetic:
- * - Refined typography with letter spacing
- * - Subtle borders for elegance
+ * B2B professional design:
+ * - Clean typography
+ * - Subtle borders
  * - Multiple variants for different contexts
  *
  * @example
@@ -112,12 +112,12 @@ export interface BadgeProps {
  * <Badge variant="pending" dot>En cours de traitement</Badge>
  *
  * // Product tags
- * <Badge variant="hermes" size="sm">Nouveau</Badge>
- * <Badge variant="hermes-soft">Edition limitee</Badge>
+ * <Badge variant="primary" size="sm">Nouveau</Badge>
+ * <Badge variant="primary-soft">Edition limitee</Badge>
  */
 function Badge({
   children,
-  variant = 'hermes',
+  variant = 'primary',
   size = 'md',
   dot = false,
   dotColor,
@@ -128,8 +128,8 @@ function Badge({
       className={cn(
         // Base styles
         'inline-flex items-center justify-center gap-1.5',
-        'font-sans font-medium uppercase tracking-elegant',
-        'rounded-soft',
+        'font-sans font-medium uppercase tracking-wide',
+        'rounded-lg',
         'transition-colors duration-200',
         // Variant styles
         badgeVariants[variant],

@@ -455,6 +455,10 @@ export function SearchProvider({
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Track if initial load is complete to avoid triggering search on mount
+  const isInitialMount = useRef(true);
+  const previousFilters = useRef<string>('');
+
   // Load persisted state from localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -489,6 +493,9 @@ export function SearchProvider({
         setState((prev) => ({ ...prev, pageSize: size }));
       }
     }
+
+    // Mark initial mount as complete
+    isInitialMount.current = false;
   }, []);
 
   // Persist history to localStorage
@@ -546,6 +553,36 @@ export function SearchProvider({
     },
     [state.query, state.filters, state.pageSize, mockMode]
   );
+
+  // Auto-trigger search when filters, sort, or page changes
+  useEffect(() => {
+    // Skip on initial mount
+    if (isInitialMount.current) return;
+
+    // Only trigger if there's an active query
+    if (!state.query.trim()) return;
+
+    // Create a serialized version of current filter state
+    const currentFilters = JSON.stringify({
+      filters: state.filters,
+      sortBy: state.sortBy,
+      currentPage: state.currentPage,
+      pageSize: state.pageSize,
+    });
+
+    // Skip if filters haven't actually changed
+    if (currentFilters === previousFilters.current) return;
+
+    // Store current filters for next comparison
+    previousFilters.current = currentFilters;
+
+    // Trigger search with debounce to avoid rapid successive calls
+    const timeoutId = setTimeout(() => {
+      search();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [state.filters, state.sortBy, state.currentPage, state.pageSize, state.query, search]);
 
   // Clear search
   const clearSearch = useCallback(() => {

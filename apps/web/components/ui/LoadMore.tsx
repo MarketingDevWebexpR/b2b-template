@@ -27,20 +27,20 @@ interface LoadMoreProps {
 const buttonVariants = {
   default: cn(
     'px-8 py-4',
-    'bg-luxe-charcoal text-white',
-    'hover:bg-luxe-noir'
+    'bg-neutral-900 text-white',
+    'hover:bg-neutral-800'
   ),
   minimal: cn(
     'px-6 py-3',
-    'bg-transparent text-text-primary',
-    'border-b border-hermes-500',
-    'hover:text-hermes-500'
+    'bg-transparent text-neutral-900',
+    'border-b border-accent',
+    'hover:text-accent'
   ),
   outline: cn(
     'px-8 py-4',
-    'bg-transparent text-text-primary',
-    'border border-border-medium',
-    'hover:border-hermes-500 hover:text-hermes-500'
+    'bg-transparent text-neutral-900',
+    'border border-neutral-300',
+    'hover:border-accent hover:text-accent'
   ),
 };
 
@@ -102,7 +102,7 @@ export function LoadMore({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <p className="font-sans text-xs uppercase tracking-luxe text-text-muted">
+        <p className="font-sans text-xs uppercase tracking-wide text-neutral-500">
           Vous avez vu tous les {totalCount} produits
         </p>
       </motion.div>
@@ -118,17 +118,17 @@ export function LoadMore({
     >
       {/* Progress Info */}
       <div className="flex flex-col items-center gap-3">
-        <p className="font-sans text-sm text-text-muted">
-          <span className="font-medium text-text-primary">{currentCount}</span>
+        <p className="font-sans text-sm text-neutral-500">
+          <span className="font-medium text-neutral-900">{currentCount}</span>
           {' sur '}
-          <span className="font-medium text-text-primary">{totalCount}</span>
+          <span className="font-medium text-neutral-900">{totalCount}</span>
           {' produits'}
         </p>
 
         {/* Progress Bar */}
-        <div className="relative h-px w-48 overflow-hidden bg-border-light">
+        <div className="relative h-px w-48 overflow-hidden bg-neutral-200">
           <motion.div
-            className="absolute inset-y-0 left-0 bg-hermes-500 origin-left"
+            className="absolute inset-y-0 left-0 bg-accent origin-left"
             style={{ width: `${progress}%` }}
             variants={progressVariants}
             initial="initial"
@@ -144,9 +144,9 @@ export function LoadMore({
         disabled={isLoading}
         className={cn(
           'group relative inline-flex items-center justify-center gap-2',
-          'font-sans text-xs font-medium uppercase tracking-luxe',
-          'transition-all duration-350 ease-luxe',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-hermes-500 focus-visible:ring-offset-2',
+          'font-sans text-xs font-medium uppercase tracking-wide',
+          'transition-all duration-150',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-60',
           buttonVariants[variant]
         )}
@@ -174,7 +174,7 @@ export function LoadMore({
             >
               <span>{buttonText}</span>
               <ChevronDown
-                className="h-4 w-4 transition-transform duration-350 group-hover:translate-y-0.5"
+                className="h-4 w-4 transition-transform duration-150 group-hover:translate-y-0.5"
                 strokeWidth={1.5}
               />
             </motion.span>
@@ -185,8 +185,8 @@ export function LoadMore({
         {variant === 'minimal' && (
           <span
             className={cn(
-              'absolute -bottom-px left-0 h-px w-0 bg-hermes-500',
-              'transition-all duration-350 ease-luxe-out',
+              'absolute -bottom-px left-0 h-px w-0 bg-accent',
+              'transition-all duration-150',
               'group-hover:w-full'
             )}
             aria-hidden="true"
@@ -195,7 +195,7 @@ export function LoadMore({
       </button>
 
       {/* Remaining count hint */}
-      <p className="font-sans text-xs text-text-light">
+      <p className="font-sans text-xs text-neutral-400">
         {remainingCount} produit{remainingCount > 1 ? 's' : ''} restant{remainingCount > 1 ? 's' : ''}
       </p>
     </motion.div>

@@ -35,15 +35,15 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
     if (!category) {
       return {
-        title: 'Collection non trouvee | Maison Joaillerie',
+        title: 'Categorie non trouvee | WebexpR Pro B2B',
       };
     }
 
     return {
-      title: `${category.name} | Maison Joaillerie`,
+      title: `${category.name} | WebexpR Pro B2B`,
       description: category.description,
       openGraph: {
-        title: `${category.name} | Maison Joaillerie`,
+        title: `${category.name} | WebexpR Pro B2B`,
         description: category.description,
         images: [
           {
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   } catch (error) {
     console.error('Error generating metadata:', error);
     return {
-      title: 'Collection non trouvee | Maison Joaillerie',
+      title: 'Categorie non trouvee | WebexpR Pro B2B',
     };
   }
 }
@@ -104,7 +104,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   }
 
   return (
-    <main className="min-h-screen bg-background-cream">
+    <main className="min-h-screen bg-white">
       {/* Category Hero */}
       <CategoryHero
         name={category.name}
@@ -114,34 +114,34 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       />
 
       {/* Main Content */}
-      <section className="py-12 lg:py-20">
+      <section className="py-10 lg:py-16">
         <Container>
           {/* Breadcrumbs */}
           <Breadcrumbs
             items={[
-              { label: 'Collections', href: '/categories' },
+              { label: 'Categories', href: '/categories' },
               { label: category.name },
             ]}
-            className="mb-8"
+            className="mb-6"
           />
 
           {/* Filters + Grid Layout */}
-          <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-12 xl:gap-16">
+          <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-10 xl:gap-12">
             {/* Filters Sidebar */}
-            <div className="mb-8 lg:mb-0">
+            <div className="mb-6 lg:mb-0">
               <CategoryFiltersLight totalProducts={products.length} categorySlug={slug} />
             </div>
 
             {/* Products Area */}
             <div>
               {/* Results Header (Desktop) */}
-              <div className="mb-8 hidden items-center justify-between border-b border-border-light pb-4 lg:flex">
-                <p className="font-sans text-sm text-text-muted">
-                  <span className="font-medium text-text-primary">{products.length}</span>
+              <div className="mb-6 hidden items-center justify-between border-b border-stroke-light pb-3 lg:flex">
+                <p className="font-sans text-body-sm text-neutral-500">
+                  <span className="font-medium text-neutral-900">{products.length}</span>
                   {' '}
-                  {products.length > 1 ? 'pieces' : 'piece'}
+                  {products.length > 1 ? 'produits' : 'produit'}
                   {products.length !== totalProductCount && (
-                    <span className="text-text-light"> sur {totalProductCount}</span>
+                    <span className="text-neutral-400"> sur {totalProductCount}</span>
                   )}
                 </p>
 
@@ -160,10 +160,10 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 <div className="py-8 text-center">
                   <Link
                     href={`/categories/${slug}`}
-                    className="inline-flex items-center gap-2 font-sans text-xs font-medium uppercase tracking-luxe text-hermes-500 transition-colors hover:text-hermes-600"
+                    className="inline-flex items-center gap-2 font-sans text-body-sm font-medium text-accent transition-colors hover:text-accent/80"
                   >
                     <span>Reinitialiser les filtres</span>
-                    <span className="h-px w-8 bg-hermes-500 transition-all duration-350 hover:w-12" />
+                    <span className="h-px w-8 bg-accent transition-all duration-200 hover:w-12" />
                   </Link>
                 </div>
               )}

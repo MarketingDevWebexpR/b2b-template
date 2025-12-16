@@ -64,7 +64,7 @@ function CategoryTreeNode({
             onClick={() => onExpand(node.id)}
             className={cn(
               'flex-shrink-0 p-0.5',
-              'text-b2b-text-muted hover:text-b2b-text-primary',
+              'text-neutral-400 hover:text-neutral-900',
               'transition-transform duration-200',
               isExpanded && 'rotate-90'
             )}
@@ -85,7 +85,7 @@ function CategoryTreeNode({
           label={
             <span className="flex items-center gap-2">
               <span className="text-sm">{node.name}</span>
-              <span className="text-xs text-b2b-text-muted">
+              <span className="text-xs text-neutral-500">
                 ({node.count.toLocaleString('fr-FR')})
               </span>
             </span>
@@ -95,7 +95,7 @@ function CategoryTreeNode({
 
       {/* Children */}
       {hasChildren && isExpanded && (
-        <div className="border-l border-b2b-border-light ml-2">
+        <div className="border-l border-neutral-200 ml-2">
           {node.children!.map((child) => (
             <CategoryTreeNode
               key={child.id}
@@ -178,7 +178,7 @@ function CheckboxFacet({
       {/* Search input */}
       {searchable && facet.values.length > 5 && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-b2b-text-muted" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
           <Input
             type="text"
             placeholder="Rechercher..."
@@ -201,7 +201,7 @@ function CheckboxFacet({
             label={
               <span className="flex items-center justify-between w-full">
                 <span className="text-sm">{value.label}</span>
-                <span className="text-xs text-b2b-text-muted ml-2">
+                <span className="text-xs text-neutral-500 ml-2">
                   ({value.count.toLocaleString('fr-FR')})
                 </span>
               </span>
@@ -217,7 +217,7 @@ function CheckboxFacet({
           onClick={() => setShowAll(!showAll)}
           className={cn(
             'text-sm font-medium',
-            'text-b2b-primary hover:text-b2b-primary-600',
+            'text-accent hover:text-orange-600',
             'transition-colors duration-200'
           )}
         >
@@ -229,7 +229,7 @@ function CheckboxFacet({
 
       {/* No results message */}
       {searchQuery && filteredValues.length === 0 && (
-        <p className="text-sm text-b2b-text-muted italic">
+        <p className="text-sm text-neutral-500 italic">
           Aucun resultat pour "{searchQuery}"
         </p>
       )}
@@ -319,19 +319,19 @@ function PriceRangeFacet({
         className={cn(
           'w-full py-2',
           'text-sm font-medium',
-          'bg-b2b-primary text-white',
+          'bg-accent text-white',
           'rounded-lg',
           'transition-colors duration-200',
-          'hover:bg-b2b-primary-600',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-primary focus-visible:ring-offset-2'
+          'hover:bg-orange-600',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
         )}
       >
         Appliquer
       </button>
 
       {/* Quick presets */}
-      <div className="pt-2 border-t border-b2b-border-light">
-        <p className="text-xs font-medium text-b2b-text-muted uppercase tracking-wide mb-2">
+      <div className="pt-2 border-t border-neutral-200">
+        <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide mb-2">
           Preselections
         </p>
         <div className="space-y-1">
@@ -345,10 +345,10 @@ function PriceRangeFacet({
                 'text-sm',
                 'rounded',
                 'transition-colors duration-200',
-                'hover:bg-b2b-bg-tertiary',
+                'hover:bg-neutral-100',
                 value?.min === preset.min && value?.max === preset.max
-                  ? 'text-b2b-primary font-medium bg-b2b-primary/5'
-                  : 'text-b2b-text-secondary'
+                  ? 'text-accent font-medium bg-orange-50'
+                  : 'text-neutral-600'
               )}
             >
               {preset.label}
@@ -520,18 +520,18 @@ export function SearchFacets({
       >
         {/* Clear all button */}
         {hasActiveFilters && (
-          <div className="mb-4 pb-4 border-b border-b2b-border-light">
+          <div className="mb-4 pb-4 border-b border-neutral-200">
             <button
               type="button"
               onClick={clearFilters}
               className={cn(
                 'w-full py-2',
                 'text-sm font-medium',
-                'text-b2b-danger hover:text-b2b-danger-600',
-                'bg-b2b-danger/5 hover:bg-b2b-danger/10',
+                'text-red-600 hover:text-red-700',
+                'bg-red-50 hover:bg-red-100',
                 'rounded-lg',
                 'transition-colors duration-200',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-b2b-danger focus-visible:ring-offset-2'
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2'
               )}
             >
               Effacer tous les filtres
@@ -548,9 +548,9 @@ export function SearchFacets({
             <AccordionItem
               key={section.id}
               value={section.id}
-              className="border-b border-b2b-border-light last:border-b-0"
+              className="border-b border-neutral-200 last:border-b-0"
             >
-              <AccordionTrigger className="text-sm font-semibold uppercase tracking-wide text-b2b-text-primary">
+              <AccordionTrigger className="text-sm font-semibold uppercase tracking-wide text-neutral-900">
                 {section.title}
               </AccordionTrigger>
               <AccordionContent className="pb-4">
@@ -576,10 +576,10 @@ export function SearchFacets({
           className={cn(
             'w-full py-2',
             'text-sm font-medium',
-            'text-b2b-danger',
-            'border border-b2b-danger/30',
+            'text-red-600',
+            'border border-red-200',
             'rounded-lg',
-            'hover:bg-b2b-danger/5',
+            'hover:bg-red-50',
             'transition-colors duration-200'
           )}
         >
@@ -589,7 +589,7 @@ export function SearchFacets({
 
       {facetSections.map((section) => (
         <div key={section.id} className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-b2b-text-primary">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-neutral-900">
             {section.title}
           </h3>
           {section.content}
