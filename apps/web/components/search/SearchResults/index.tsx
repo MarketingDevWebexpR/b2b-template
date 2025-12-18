@@ -313,5 +313,8 @@ export { SearchPagination, SearchPaginationCompact, SearchLoadMore } from './Sea
 export { SearchSortSelect, SearchSortSelectInline } from './SearchSortSelect';
 export { ViewModeToggle } from './ViewModeToggle';
 export { ActiveFilters } from './ActiveFilters';
+export { SearchResultsLive } from './SearchResultsLive';
+export { BrandFilter } from './BrandFilter';
+export type { BrandFilterItem, BrandFilterProps } from './BrandFilter';
 
 export default SearchResults;

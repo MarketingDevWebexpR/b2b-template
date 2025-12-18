@@ -227,7 +227,7 @@ export const WishlistProductRow = memo(function WishlistProductRow({
 
       {/* Product Image */}
       <Link
-        href={`/produits/${item.productId}`}
+        href={`/produit/${item.productId}`}
         className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
       >
         <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-neutral-100">
@@ -253,7 +253,7 @@ export const WishlistProductRow = memo(function WishlistProductRow({
         {/* Name and Reference */}
         <div className="flex items-start justify-between gap-2 mb-1">
           <Link
-            href={`/produits/${item.productId}`}
+            href={`/produit/${item.productId}`}
             className={cn(
               'font-sans text-body-sm font-medium text-neutral-900',
               'hover:text-accent transition-colors',
@@ -263,7 +263,7 @@ export const WishlistProductRow = memo(function WishlistProductRow({
             {item.productName}
           </Link>
           <Link
-            href={`/produits/${item.productId}`}
+            href={`/produit/${item.productId}`}
             className={cn(
               'shrink-0 p-1 rounded text-neutral-500',
               'hover:text-accent hover:bg-neutral-100 transition-colors',

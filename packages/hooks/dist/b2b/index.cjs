@@ -56,8 +56,8 @@ function useCompany(api, options = {}) {
           }
         }
         if (includeEmployees) {
-          const employeeList = await api.b2b.employees.list(targetId);
-          setEmployees(employeeList);
+          const employeeList = await api.b2b.employees.list({ companyId: targetId });
+          setEmployees([...employeeList.items]);
         }
         setState({
           company,
@@ -151,11 +151,95 @@ function useCompany(api, options = {}) {
 }
 
 // src/b2b/useQuotes.ts
-var import_react4 = require("react");
+var import_react5 = require("react");
 
 // src/api/useApiQuery.ts
+var import_react3 = require("react");
+
+// src/api/QueryCacheContext.tsx
 var import_react2 = require("react");
-var queryCache = /* @__PURE__ */ new Map();
+var import_jsx_runtime = require("react/jsx-runtime");
+var QueryCacheContext = (0, import_react2.createContext)(null);
+var clientFallbackCache = null;
+function getClientFallbackCache() {
+  if (!clientFallbackCache) {
+    clientFallbackCache = /* @__PURE__ */ new Map();
+  }
+  return clientFallbackCache;
+}
+function createCacheOperations(cacheRef) {
+  const getFromCache = function(key, staleTime) {
+    const cached = cacheRef.current.get(key);
+    if (cached && Date.now() - cached.timestamp < staleTime) {
+      return cached.data;
+    }
+    return null;
+  };
+  const hasValidCache = function(key, cacheTime) {
+    const cached = cacheRef.current.get(key);
+    return cached !== void 0 && Date.now() - cached.timestamp < cacheTime;
+  };
+  const getCachedData = function(key) {
+    const cached = cacheRef.current.get(key);
+    return cached ? cached.data : null;
+  };
+  const setInCache = function(key, data) {
+    cacheRef.current.set(key, { data, timestamp: Date.now() });
+  };
+  const invalidate = function(key) {
+    cacheRef.current.delete(key);
+  };
+  const invalidateByPrefix = function(prefix) {
+    const keysToDelete = [];
+    cacheRef.current.forEach((_, key) => {
+      if (key.startsWith(prefix)) {
+        keysToDelete.push(key);
+      }
+    });
+    keysToDelete.forEach((key) => cacheRef.current.delete(key));
+  };
+  const invalidateAll = function() {
+    cacheRef.current.clear();
+  };
+  return {
+    getFromCache,
+    hasValidCache,
+    getCachedData,
+    setInCache,
+    invalidate,
+    invalidateByPrefix,
+    invalidateAll
+  };
+}
+function useQueryCache() {
+  const context = (0, import_react2.useContext)(QueryCacheContext);
+  const fallbackRef = (0, import_react2.useRef)(null);
+  const fallbackValue = (0, import_react2.useMemo)(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!fallbackRef.current) {
+      fallbackRef.current = getClientFallbackCache();
+    }
+    return createCacheOperations(
+      fallbackRef
+    );
+  }, []);
+  if (context) {
+    return context;
+  }
+  if (typeof window === "undefined") {
+    throw new Error(
+      "QueryCacheProvider is required for SSR. Wrap your application with <QueryCacheProvider> to enable request-scoped caching."
+    );
+  }
+  if (fallbackValue) {
+    return fallbackValue;
+  }
+  throw new Error("Failed to initialize query cache");
+}
+
+// src/api/useApiQuery.ts
 function useApiQuery(queryKey, queryFn, options = {}) {
   const {
     enabled = true,
@@ -168,18 +252,24 @@ function useApiQuery(queryKey, queryFn, options = {}) {
     onError,
     refetchOnWindowFocus = false
   } = options;
+  const cache = useQueryCache();
   const cacheKey = JSON.stringify(queryKey);
-  const retryCountRef = (0, import_react2.useRef)(0);
-  const [state, setState] = (0, import_react2.useState)(() => {
-    const cached = queryCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < cacheTime) {
-      return {
-        data: cached.data,
-        isLoading: false,
-        error: null,
-        isSuccess: true,
-        isFetching: false
-      };
+  const retryCountRef = (0, import_react3.useRef)(0);
+  const retryTimeoutRef = (0, import_react3.useRef)(null);
+  const abortControllerRef = (0, import_react3.useRef)(null);
+  const isMountedRef = (0, import_react3.useRef)(true);
+  const [state, setState] = (0, import_react3.useState)(() => {
+    if (cache.hasValidCache(cacheKey, cacheTime)) {
+      const cachedData = cache.getCachedData(cacheKey);
+      if (cachedData !== null) {
+        return {
+          data: cachedData,
+          isLoading: false,
+          error: null,
+          isSuccess: true,
+          isFetching: false
+        };
+      }
     }
     return {
       data: initialData ?? null,
@@ -189,14 +279,14 @@ function useApiQuery(queryKey, queryFn, options = {}) {
       isFetching: enabled
     };
   });
-  const fetchData = (0, import_react2.useCallback)(
+  const fetchData = (0, import_react3.useCallback)(
     async (isRefetch = false) => {
       if (!isRefetch) {
-        const cached = queryCache.get(cacheKey);
-        if (cached && Date.now() - cached.timestamp < staleTime) {
+        const cachedData = cache.getFromCache(cacheKey, staleTime);
+        if (cachedData !== null) {
           setState((prev) => ({
             ...prev,
-            data: cached.data,
+            data: cachedData,
             isLoading: false,
             isSuccess: true,
             isFetching: false
@@ -204,6 +294,13 @@ function useApiQuery(queryKey, queryFn, options = {}) {
           return;
         }
       }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
       setState((prev) => ({
         ...prev,
         isLoading: !prev.data,
@@ -211,8 +308,9 @@ function useApiQuery(queryKey, queryFn, options = {}) {
         error: null
       }));
       try {
-        const data = await queryFn();
-        queryCache.set(cacheKey, { data, timestamp: Date.now() });
+        const data = await queryFn({ signal });
+        if (!isMountedRef.current || signal.aborted) return;
+        cache.setInCache(cacheKey, data);
         setState({
           data,
           isLoading: false,
@@ -223,10 +321,17 @@ function useApiQuery(queryKey, queryFn, options = {}) {
         retryCountRef.current = 0;
         onSuccess?.(data);
       } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
+        if (!isMountedRef.current) return;
         const error = err instanceof Error ? err : new Error(String(err));
         if (retryCountRef.current < retryCount) {
           retryCountRef.current++;
-          setTimeout(() => fetchData(isRefetch), retryDelay * retryCountRef.current);
+          retryTimeoutRef.current = setTimeout(
+            () => fetchData(isRefetch),
+            retryDelay * retryCountRef.current
+          );
           return;
         }
         setState((prev) => ({
@@ -239,14 +344,14 @@ function useApiQuery(queryKey, queryFn, options = {}) {
         onError?.(error);
       }
     },
-    [cacheKey, queryFn, staleTime, retryCount, retryDelay, onSuccess, onError]
+    [cacheKey, queryFn, staleTime, retryCount, retryDelay, onSuccess, onError, cache]
   );
-  const refetch = (0, import_react2.useCallback)(async () => {
+  const refetch = (0, import_react3.useCallback)(async () => {
     retryCountRef.current = 0;
     await fetchData(true);
   }, [fetchData]);
-  const reset = (0, import_react2.useCallback)(() => {
-    queryCache.delete(cacheKey);
+  const reset = (0, import_react3.useCallback)(() => {
+    cache.invalidate(cacheKey);
     setState({
       data: initialData ?? null,
       isLoading: false,
@@ -254,36 +359,50 @@ function useApiQuery(queryKey, queryFn, options = {}) {
       isSuccess: false,
       isFetching: false
     });
-  }, [cacheKey, initialData]);
-  (0, import_react2.useEffect)(() => {
+  }, [cacheKey, initialData, cache]);
+  (0, import_react3.useEffect)(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+  (0, import_react3.useEffect)(() => {
     if (enabled) {
       fetchData();
     }
   }, [enabled, cacheKey]);
-  (0, import_react2.useEffect)(() => {
-    if (!refetchOnWindowFocus || !enabled) return;
+  (0, import_react3.useEffect)(() => {
+    if (!refetchOnWindowFocus || !enabled || typeof window === "undefined") {
+      return;
+    }
     const handleFocus = () => {
-      const cached = queryCache.get(cacheKey);
-      if (!cached || Date.now() - cached.timestamp >= staleTime) {
+      const cachedData = cache.getFromCache(cacheKey, staleTime);
+      if (cachedData === null) {
         fetchData(true);
       }
     };
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [refetchOnWindowFocus, enabled, cacheKey, staleTime, fetchData]);
+  }, [refetchOnWindowFocus, enabled, cacheKey, staleTime, fetchData, cache]);
   return {
     ...state,
     refetch,
     reset
   };
 }
-function invalidateQueries(queryKey) {
-  const cacheKey = JSON.stringify(queryKey);
-  queryCache.delete(cacheKey);
+function invalidateQueries(_queryKey) {
+  console.warn(
+    "invalidateQueries() is deprecated. Use useInvalidateQueries().invalidate(queryKey) instead."
+  );
 }
 
 // src/api/useApiMutation.ts
-var import_react3 = require("react");
+var import_react4 = require("react");
 function useApiMutation(mutationFn, options = {}) {
   const {
     onSuccess,
@@ -292,14 +411,14 @@ function useApiMutation(mutationFn, options = {}) {
     invalidateKeys = [],
     retryCount = 0
   } = options;
-  const [state, setState] = (0, import_react3.useState)({
+  const [state, setState] = (0, import_react4.useState)({
     data: null,
     isLoading: false,
     error: null,
     isSuccess: false,
     isError: false
   });
-  const reset = (0, import_react3.useCallback)(() => {
+  const reset = (0, import_react4.useCallback)(() => {
     setState({
       data: null,
       isLoading: false,
@@ -308,7 +427,7 @@ function useApiMutation(mutationFn, options = {}) {
       isError: false
     });
   }, []);
-  const mutateAsync = (0, import_react3.useCallback)(
+  const mutateAsync = (0, import_react4.useCallback)(
     async (variables) => {
       setState({
         data: null,
@@ -357,7 +476,7 @@ function useApiMutation(mutationFn, options = {}) {
     },
     [mutationFn, retryCount, invalidateKeys, onSuccess, onError, onSettled]
   );
-  const mutate = (0, import_react3.useCallback)(
+  const mutate = (0, import_react4.useCallback)(
     (variables) => {
       mutateAsync(variables).catch(() => {
       });
@@ -374,7 +493,7 @@ function useApiMutation(mutationFn, options = {}) {
 
 // src/b2b/useQuotes.ts
 function useQuotes(api, initialFilters = {}) {
-  const [filters, setFilters] = (0, import_react4.useState)(initialFilters);
+  const [filters, setFilters] = (0, import_react5.useState)(initialFilters);
   const {
     data: quotes,
     isLoading,
@@ -387,7 +506,9 @@ function useQuotes(api, initialFilters = {}) {
         return [];
       }
       const result = await api.b2b.quotes.list(filters);
-      return result.items ?? result;
+      const resultAny = result;
+      const items = resultAny.items ?? resultAny;
+      return Array.isArray(items) ? [...items] : [];
     },
     {
       enabled: !!api?.b2b?.quotes,
@@ -444,7 +565,11 @@ function useQuotes(api, initialFilters = {}) {
       if (!api?.b2b?.quotes) {
         throw new Error("B2B quotes not available");
       }
-      return api.b2b.quotes.respond(quoteId, input);
+      const quotesApi = api.b2b.quotes;
+      if (!quotesApi.respond) {
+        throw new Error("Quote respond method not available");
+      }
+      return quotesApi.respond(quoteId, input);
     },
     {
       invalidateKeys: [["quotes"]]
@@ -472,7 +597,7 @@ function useQuotes(api, initialFilters = {}) {
       invalidateKeys: [["quotes"]]
     }
   );
-  const getQuote = (0, import_react4.useCallback)(
+  const getQuote = (0, import_react5.useCallback)(
     async (quoteId) => {
       if (!api?.b2b?.quotes) {
         throw new Error("B2B quotes not available");
@@ -481,7 +606,7 @@ function useQuotes(api, initialFilters = {}) {
     },
     [api]
   );
-  const fetchQuotes = (0, import_react4.useCallback)(
+  const fetchQuotes = (0, import_react5.useCallback)(
     (newFilters) => {
       if (newFilters) {
         setFilters(newFilters);
@@ -511,9 +636,9 @@ function useQuotes(api, initialFilters = {}) {
 }
 
 // src/b2b/useApprovals.ts
-var import_react5 = require("react");
+var import_react6 = require("react");
 function useApprovals(api, initialFilters = {}) {
-  const [filters, setFilters] = (0, import_react5.useState)(initialFilters);
+  const [filters, setFilters] = (0, import_react6.useState)(initialFilters);
   const {
     data: approvals,
     isLoading,
@@ -526,7 +651,9 @@ function useApprovals(api, initialFilters = {}) {
         return [];
       }
       const result = await api.b2b.approvals.list(filters);
-      return result.items ?? result;
+      const resultAny = result;
+      const items = resultAny.items ?? resultAny;
+      return Array.isArray(items) ? [...items] : [];
     },
     {
       enabled: !!api?.b2b?.approvals,
@@ -542,7 +669,11 @@ function useApprovals(api, initialFilters = {}) {
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.decide(approvalId, {
+      const approvalsApi = api.b2b.approvals;
+      if (!approvalsApi.decide) {
+        throw new Error("Approval decide method not available");
+      }
+      return approvalsApi.decide(approvalId, {
         approved: true,
         comment
       });
@@ -556,7 +687,11 @@ function useApprovals(api, initialFilters = {}) {
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.decide(approvalId, {
+      const approvalsApi = api.b2b.approvals;
+      if (!approvalsApi.decide) {
+        throw new Error("Approval decide method not available");
+      }
+      return approvalsApi.decide(approvalId, {
         approved: false,
         comment
       });
@@ -570,7 +705,11 @@ function useApprovals(api, initialFilters = {}) {
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.forward(approvalId, toEmployeeId, comment);
+      const approvalsApi = api.b2b.approvals;
+      if (!approvalsApi.forward) {
+        throw new Error("Approval forward method not available");
+      }
+      return approvalsApi.forward(approvalId, toEmployeeId, comment);
     },
     {
       invalidateKeys: [["approvals"]]
@@ -581,13 +720,17 @@ function useApprovals(api, initialFilters = {}) {
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.request(input);
+      const approvalsApi = api.b2b.approvals;
+      if (!approvalsApi.request) {
+        throw new Error("Approval request method not available");
+      }
+      return approvalsApi.request(input);
     },
     {
       invalidateKeys: [["approvals"]]
     }
   );
-  const getApproval = (0, import_react5.useCallback)(
+  const getApproval = (0, import_react6.useCallback)(
     async (approvalId) => {
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
@@ -616,7 +759,7 @@ function useApprovals(api, initialFilters = {}) {
 }
 
 // src/b2b/useSpendingLimits.ts
-var import_react6 = require("react");
+var import_react7 = require("react");
 function useSpendingLimits(api, employeeId) {
   const {
     data: limits,
@@ -634,7 +777,9 @@ function useSpendingLimits(api, employeeId) {
       if (!targetEmployeeId) {
         return [];
       }
-      const result = await api.b2b.spending.getLimits(targetEmployeeId);
+      const spendingApi = api.b2b.spending;
+      const result = await (spendingApi.getLimits ?? spendingApi.getLimit)?.(targetEmployeeId);
+      if (!result) return [];
       return Array.isArray(result) ? result : result?.items ?? [result].filter(Boolean);
     },
     {
@@ -643,13 +788,13 @@ function useSpendingLimits(api, employeeId) {
       // 1 minute
     }
   );
-  const findLimitByPeriod = (0, import_react6.useCallback)(
+  const findLimitByPeriod = (0, import_react7.useCallback)(
     (period) => {
       return (limits ?? []).find((l) => l.period === period && l.isActive) ?? null;
     },
     [limits]
   );
-  const createSummaryFromLimit = (0, import_react6.useCallback)(
+  const createSummaryFromLimit = (0, import_react7.useCallback)(
     (limit) => {
       if (!limit) {
         return null;
@@ -667,7 +812,7 @@ function useSpendingLimits(api, employeeId) {
     },
     []
   );
-  const summaries = (0, import_react6.useMemo)(() => {
+  const summaries = (0, import_react7.useMemo)(() => {
     return {
       perOrder: createSummaryFromLimit(findLimitByPeriod("per_order")),
       daily: createSummaryFromLimit(findLimitByPeriod("daily")),
@@ -675,7 +820,7 @@ function useSpendingLimits(api, employeeId) {
       monthly: createSummaryFromLimit(findLimitByPeriod("monthly"))
     };
   }, [findLimitByPeriod, createSummaryFromLimit]);
-  const canSpend = (0, import_react6.useCallback)(
+  const canSpend = (0, import_react7.useCallback)(
     (amount) => {
       if (!limits || limits.length === 0) {
         return { allowed: true };
@@ -712,7 +857,7 @@ function useSpendingLimits(api, employeeId) {
     },
     [limits, findLimitByPeriod]
   );
-  const getHistory = (0, import_react6.useCallback)(
+  const getHistory = (0, import_react7.useCallback)(
     async (period) => {
       if (!api?.b2b?.spending) {
         return [];
@@ -722,7 +867,11 @@ function useSpendingLimits(api, employeeId) {
       if (!targetEmployeeId) {
         return [];
       }
-      return api.b2b.spending.getHistory(targetEmployeeId, period);
+      const spendingApi = api.b2b.spending;
+      if (!spendingApi.getHistory) {
+        return [];
+      }
+      return spendingApi.getHistory(targetEmployeeId, period);
     },
     [api, employeeId]
   );

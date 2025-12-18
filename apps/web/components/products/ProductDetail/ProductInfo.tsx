@@ -149,7 +149,7 @@ export function ProductInfo({
     if (product.category) {
       items.push({
         label: product.category.name,
-        href: `/categories/${product.category.slug}`,
+        href: `/categorie/${product.category.slug}`,
       });
     }
 

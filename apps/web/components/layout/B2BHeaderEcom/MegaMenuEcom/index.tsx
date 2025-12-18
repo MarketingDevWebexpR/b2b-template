@@ -110,7 +110,7 @@ export const MegaMenuEcom = memo(function MegaMenuEcom({
               {/* View all link */}
               <div className="mt-4 pt-4 border-t border-stroke-light">
                 <Link
-                  href={`/categories`}
+                  href={`/c`}
                   className={cn(
                     'flex items-center gap-2 px-3 py-2',
                     'text-body font-semibold text-primary',

@@ -118,8 +118,8 @@ export function useCompany(
         }
 
         if (includeEmployees) {
-          const employeeList = await api.b2b.employees.list(targetId);
-          setEmployees(employeeList);
+          const employeeList = await api.b2b.employees.list({ companyId: targetId });
+          setEmployees([...employeeList.items] as Employee[]);
         }
 
         setState({

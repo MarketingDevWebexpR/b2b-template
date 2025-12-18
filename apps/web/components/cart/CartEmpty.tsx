@@ -137,7 +137,7 @@ function SuggestionCard({ product, index }: SuggestionCardProps) {
       transition={{ duration: 0.4, delay: index * 0.1 }}
     >
       <Link
-        href={`/produits/${product.slug}`}
+        href={`/produit/${product.slug}`}
         className="group block bg-white rounded-lg border border-neutral-200 overflow-hidden hover:border-accent hover:shadow-md transition-all duration-200"
       >
         {/* Product Image */}

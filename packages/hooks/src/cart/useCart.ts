@@ -32,6 +32,10 @@ export interface ExtendedCart extends Cart {
   subtotal?: number;
   /** Total (with taxes/discounts) */
   total?: number;
+  /** Total items count */
+  totalItems: number;
+  /** Total price */
+  totalPrice: number;
   /** Extended items with IDs */
   items: CartItemWithId[];
 }
@@ -146,16 +150,17 @@ export function useCart(
       // If we have a cart ID, retrieve it
       if (cartId) {
         try {
-          return await api.cart.get(cartId);
+          const existingCart = await api.cart.get(cartId);
+          return existingCart as unknown as ExtendedCart;
         } catch {
           // Cart not found, create new one
         }
       }
 
       // Create a new cart
-      const newCart = await api.cart.create({ regionId });
+      const newCart = await api.cart.create(regionId ?? "");
       setCartId(newCart.id);
-      return newCart;
+      return newCart as unknown as ExtendedCart;
     },
     {
       enabled: !!api?.cart,
@@ -201,12 +206,13 @@ export function useCart(
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.addItem(cartId, {
+      const result = await api.cart.addItem(cartId, {
         productId: input.productId,
         variantId: input.variantId,
         quantity: input.quantity,
         metadata: input.metadata,
       });
+      return result as unknown as ExtendedCart;
     },
     {
       invalidateKeys: [["cart", cartId]],
@@ -222,7 +228,8 @@ export function useCart(
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.updateItem(cartId, itemId, { quantity });
+      const result = await api.cart.updateItem(cartId, itemId, { quantity });
+      return result as unknown as ExtendedCart;
     },
     {
       invalidateKeys: [["cart", cartId]],
@@ -235,7 +242,8 @@ export function useCart(
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.removeItem(cartId, itemId);
+      const result = await api.cart.removeItem(cartId, itemId);
+      return result as unknown as ExtendedCart;
     },
     {
       invalidateKeys: [["cart", cartId]],
@@ -266,7 +274,8 @@ export function useCart(
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.applyDiscount(cartId, code);
+      const result = await api.cart.applyDiscount(cartId, code);
+      return result as unknown as ExtendedCart;
     },
     {
       invalidateKeys: [["cart", cartId]],
@@ -279,7 +288,8 @@ export function useCart(
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.removeDiscount(cartId, code);
+      const result = await api.cart.removeDiscount(cartId, code);
+      return result as unknown as ExtendedCart;
     },
     {
       invalidateKeys: [["cart", cartId]],

@@ -424,7 +424,7 @@ export function ProductCardCompact({
       >
         {/* Image */}
         <Link
-          href={`/produits/${product.slug || product.id}`}
+          href={`/produit/${product.slug || product.id}`}
           className="relative flex-shrink-0"
         >
           <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-neutral-50">
@@ -452,7 +452,7 @@ export function ProductCardCompact({
 
         {/* Product Info */}
         <div className="flex-1 min-w-0">
-          <Link href={`/produits/${product.slug || product.id}`}>
+          <Link href={`/produit/${product.slug || product.id}`}>
             {/* Category & Stock */}
             <div className="flex items-center justify-between gap-2 mb-1">
               <span className="text-[9px] font-semibold uppercase tracking-wider text-neutral-400 truncate">

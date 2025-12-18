@@ -1,9 +1,8 @@
 'use client';
 
-import { memo, useState, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import Link from 'next/link';
 import {
-  Search,
   User,
   Heart,
   ShoppingCart,
@@ -15,11 +14,13 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWarehouse } from '@/contexts/WarehouseContext';
+import { useMobileMenuDrawer } from '@/contexts/MobileMenuContext';
+import { SearchBar } from '@/components/search/SearchBar';
 
 export interface HeaderTopProps {
-  /** Callback when mobile menu toggle is clicked */
+  /** Callback when mobile menu toggle is clicked (optional, uses context if not provided) */
   onMobileMenuToggle?: () => void;
-  /** Whether mobile menu is open */
+  /** Whether mobile menu is open (optional, uses context if not provided) */
   isMobileMenuOpen?: boolean;
   /** Callback when search is submitted */
   onSearch?: (query: string) => void;
@@ -28,22 +29,29 @@ export interface HeaderTopProps {
 }
 
 export const HeaderTop = memo(function HeaderTop({
-  onMobileMenuToggle,
-  isMobileMenuOpen = false,
+  onMobileMenuToggle: propToggle,
+  isMobileMenuOpen: propIsOpen,
   onSearch,
   className,
 }: HeaderTopProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const { selectedWarehouse, warehouses } = useWarehouse();
+  const { selectedWarehouse } = useWarehouse();
 
-  const handleSearchSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (searchQuery.trim() && onSearch) {
-        onSearch(searchQuery.trim());
-      }
+  // Use context for mobile menu state, with props as fallback
+  let contextState: { isOpen: boolean; toggleMenu: () => void } | null = null;
+  try {
+    contextState = useMobileMenuDrawer();
+  } catch {
+    // Context not available, use props
+  }
+
+  const isMobileMenuOpen = propIsOpen ?? contextState?.isOpen ?? false;
+  const onMobileMenuToggle = propToggle ?? contextState?.toggleMenu;
+
+  const handleSearch = useCallback(
+    (query: string) => {
+      onSearch?.(query);
     },
-    [searchQuery, onSearch]
+    [onSearch]
   );
 
   // Mock cart count - would come from cart context
@@ -120,41 +128,15 @@ export const HeaderTop = memo(function HeaderTop({
             </button>
           </div>
 
-          {/* Search bar */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="hidden md:flex flex-1 max-w-xl mx-4 lg:mx-8"
-          >
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-muted" />
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Rechercher un produit, une marque, une reference..."
-                className={cn(
-                  'w-full h-11 pl-10 pr-4 rounded-lg',
-                  'bg-surface-secondary border border-transparent',
-                  'text-body text-content-primary placeholder:text-content-muted',
-                  'focus:outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary/20',
-                  'transition-all duration-200'
-                )}
-              />
-              <button
-                type="submit"
-                className={cn(
-                  'absolute right-1.5 top-1/2 -translate-y-1/2',
-                  'px-4 h-8 rounded-md',
-                  'bg-accent text-white text-sm font-medium',
-                  'hover:bg-accent-600',
-                  'transition-colors duration-200',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50'
-                )}
-              >
-                Rechercher
-              </button>
-            </div>
-          </form>
+          {/* Search bar with autocomplete */}
+          <div className="hidden md:block flex-1 max-w-xl mx-4 lg:mx-8">
+            <SearchBar
+              placeholder="Rechercher un produit, une marque, une reference..."
+              onSearch={handleSearch}
+              size="md"
+              showSuggestions={true}
+            />
+          </div>
 
           {/* Action icons */}
           <div className="flex items-center gap-1 ml-auto">
@@ -235,28 +217,15 @@ export const HeaderTop = memo(function HeaderTop({
           </div>
         </div>
 
-        {/* Mobile search */}
-        <form
-          onSubmit={handleSearchSubmit}
-          className="md:hidden pb-3"
-        >
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-content-muted" />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Rechercher..."
-              className={cn(
-                'w-full h-10 pl-10 pr-4 rounded-lg',
-                'bg-surface-secondary border border-transparent',
-                'text-body text-content-primary placeholder:text-content-muted',
-                'focus:outline-none focus:bg-white focus:border-primary',
-                'transition-all duration-200'
-              )}
-            />
-          </div>
-        </form>
+        {/* Mobile search with autocomplete */}
+        <div className="md:hidden pb-3">
+          <SearchBar
+            placeholder="Rechercher..."
+            onSearch={handleSearch}
+            size="sm"
+            showSuggestions={true}
+          />
+        </div>
       </div>
     </div>
   );

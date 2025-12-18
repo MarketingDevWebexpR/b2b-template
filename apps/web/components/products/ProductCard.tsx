@@ -512,7 +512,7 @@ export function ProductCard({
       transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <Link
-        href={`/produits/${product.slug || product.id}`}
+        href={`/produit/${product.slug || product.id}`}
         className="block"
         aria-label={`Voir ${product.name}`}
       >
@@ -550,7 +550,7 @@ export function ProductCard({
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 className={cn(
-                  'object-contain p-4',
+                  'object-cover',
                   'transition-opacity duration-300',
                   imageLoaded ? 'opacity-100' : 'opacity-0'
                 )}

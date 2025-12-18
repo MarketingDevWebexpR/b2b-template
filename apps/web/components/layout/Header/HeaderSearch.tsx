@@ -235,7 +235,7 @@ export const HeaderSearch = memo(function HeaderSearch({
                     <li key={product.id}>
                       <button
                         type="button"
-                        onClick={() => router.push(`/produits/${product.slug}`)}
+                        onClick={() => router.push(`/produit/${product.slug}`)}
                         className={cn(
                           'w-full flex items-center gap-3 px-3 py-2 rounded-lg',
                           'text-left text-sm text-neutral-700',

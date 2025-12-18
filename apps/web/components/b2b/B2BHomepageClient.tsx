@@ -476,7 +476,7 @@ export const B2BHomepageClient = memo(function B2BHomepageClient({
       price: product.price,
       originalPrice: product.compareAtPrice,
       image: product.thumbnail,
-      href: `/produits/${product.slug}`,
+      href: `/produit/${product.slug}`,
       badge: product.isBestSeller
         ? { label: 'Best-seller', variant: 'premium' as const }
         : undefined,
@@ -510,7 +510,7 @@ export const B2BHomepageClient = memo(function B2BHomepageClient({
       price: product.price,
       originalPrice: product.compareAtPrice,
       image: product.thumbnail,
-      href: `/produits/${product.slug}`,
+      href: `/produit/${product.slug}`,
       badge: { label: 'Nouveau', variant: 'new' as const },
       stock: {
         level:
@@ -542,7 +542,7 @@ export const B2BHomepageClient = memo(function B2BHomepageClient({
       price: product.price,
       originalPrice: product.compareAtPrice,
       image: product.thumbnail,
-      href: `/produits/${product.slug}`,
+      href: `/produit/${product.slug}`,
       badge: { label: 'Promo', variant: 'promo' as const },
       stock: {
         level:

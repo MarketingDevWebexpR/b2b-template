@@ -11,18 +11,25 @@ CLI Target: es2022
 CLI Cleaning output folder
 CJS Build start
 ESM Build start
-CJS dist/chunk-KPPB5KWR.cjs     7.12 KB
-CJS dist/client.cjs             283.00 B
-CJS dist/index.cjs              24.76 KB
-CJS dist/chunk-KPPB5KWR.cjs.map 17.02 KB
-CJS dist/client.cjs.map         71.00 B
-CJS dist/index.cjs.map          66.54 KB
-CJS ⚡️ Build success in 634ms
-ESM dist/index.js              22.95 KB
-ESM dist/client.js             122.00 B
-ESM dist/chunk-ZJODLBWI.js     6.84 KB
-ESM dist/index.js.map          66.47 KB
-ESM dist/client.js.map         70.00 B
-ESM dist/chunk-ZJODLBWI.js.map 17.02 KB
-ESM ⚡️ Build success in 634ms
 DTS Build start
+ESM dist/chunk-ZJODLBWI.js     6.84 KB
+ESM dist/client.js             122.00 B
+ESM dist/index.js              22.95 KB
+ESM dist/client.js.map         70.00 B
+ESM dist/index.js.map          66.47 KB
+ESM dist/chunk-ZJODLBWI.js.map 17.02 KB
+ESM ⚡️ Build success in 334ms
+CJS dist/chunk-KPPB5KWR.cjs     7.12 KB
+CJS dist/index.cjs              24.76 KB
+CJS dist/client.cjs             283.00 B
+CJS dist/chunk-KPPB5KWR.cjs.map 17.02 KB
+CJS dist/index.cjs.map          66.54 KB
+CJS dist/client.cjs.map         71.00 B
+CJS ⚡️ Build success in 335ms
+DTS ⚡️ Build success in 1961ms
+DTS dist/index.d.cts           33.51 KB
+DTS dist/client.d.cts          60.00 B
+DTS dist/client-kRKdhjzn.d.cts 3.96 KB
+DTS dist/index.d.ts            33.51 KB
+DTS dist/client.d.ts           59.00 B
+DTS dist/client-kRKdhjzn.d.ts  3.96 KB

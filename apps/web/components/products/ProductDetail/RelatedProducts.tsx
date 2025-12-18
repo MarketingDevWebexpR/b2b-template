@@ -14,10 +14,11 @@
  * @packageDocumentation
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect, memo, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { motion, useInView } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
@@ -115,19 +116,34 @@ interface ProductCardProps {
   showQuickAdd: boolean;
   onAddToCart?: (product: RelatedProduct) => Promise<void>;
   onProductClick?: (product: RelatedProduct) => void;
+  /** Load image with priority (for first visible items) */
+  priority?: boolean;
 }
 
-function ProductCard({
+/**
+ * ProductCard - Memoized for performance
+ * Only re-renders when product data or handlers change
+ */
+const ProductCard = memo(function ProductCard({
   product,
   index,
   formatPrice,
   showQuickAdd,
   onAddToCart,
   onProductClick,
+  priority = false,
 }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [added, setAdded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const router = useRouter();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(cardRef, { once: true, margin: '100px' });
+
+  // Prefetch product page on hover for faster navigation
+  const handlePrefetch = useCallback(() => {
+    router.prefetch(`/produit/${product.slug}`);
+  }, [router, product.slug]);
 
   const handleAddToCart = useCallback(
     async (e: React.MouseEvent) => {
@@ -150,24 +166,30 @@ function ProductCard({
     [product, onAddToCart, isAdding]
   );
 
-  const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
-  const discountPercent = hasDiscount
-    ? Math.round(((product.compareAtPrice! - product.price) / product.compareAtPrice!) * 100)
-    : 0;
-
-  const imageSrc = !imageError && product.images?.[0] ? product.images[0] : PLACEHOLDER_IMAGE;
+  // Memoize computed values
+  const { hasDiscount, discountPercent, imageSrc } = useMemo(() => {
+    const hasDisc = product.compareAtPrice && product.compareAtPrice > product.price;
+    const discPerc = hasDisc
+      ? Math.round(((product.compareAtPrice! - product.price) / product.compareAtPrice!) * 100)
+      : 0;
+    const imgSrc = !imageError && product.images?.[0] ? product.images[0] : PLACEHOLDER_IMAGE;
+    return { hasDiscount: hasDisc, discountPercent: discPerc, imageSrc: imgSrc };
+  }, [product.compareAtPrice, product.price, product.images, imageError]);
 
   return (
     <motion.div
+      ref={cardRef}
       variants={cardVariants}
       custom={index}
       initial="hidden"
-      animate="visible"
+      animate={isInView ? "visible" : "hidden"}
       className="flex-shrink-0 w-[200px] md:w-[240px]"
     >
       <Link
-        href={`/produits/${product.slug}`}
+        href={`/produit/${product.slug}`}
         onClick={() => onProductClick?.(product)}
+        onMouseEnter={handlePrefetch}
+        prefetch={false} // We handle prefetch manually on hover
         className={cn(
           'block group rounded-lg overflow-hidden',
           'bg-white border border-neutral-200',
@@ -184,6 +206,8 @@ function ProductCard({
             sizes="(max-width: 768px) 200px, 240px"
             className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
             onError={() => setImageError(true)}
+            priority={priority}
+            loading={priority ? undefined : 'lazy'}
           />
 
           {/* Badges */}
@@ -275,7 +299,7 @@ function ProductCard({
       </Link>
     </motion.div>
   );
-}
+});
 
 // "Bought Together" Bundle Card
 interface BundleCardProps {
@@ -312,7 +336,7 @@ function BundleCard({ bundle, formatPrice, onAddBundleToCart }: BundleCardProps)
               <Plus className="w-6 h-6 text-neutral-500 mx-2 flex-shrink-0" />
             )}
             <Link
-              href={`/produits/${product.slug}`}
+              href={`/produit/${product.slug}`}
               className="group flex flex-col items-center p-2"
             >
               <div className="relative w-20 h-20 md:w-24 md:h-24 bg-white rounded-lg overflow-hidden border border-neutral-200 group-hover:border-accent transition-colors">
@@ -505,6 +529,7 @@ export function RelatedProducts({
               showQuickAdd={showQuickAdd}
               onAddToCart={onAddToCart}
               onProductClick={onProductClick}
+              priority={index < 4} // Priority load first 4 images
             />
           ))}
         </div>
@@ -522,7 +547,7 @@ export function RelatedProducts({
       {products.length > maxProducts && (
         <div className="text-center mt-6">
           <Link
-            href={`/produits?related=${type}`}
+            href={`/recherche?related=${type}`}
             className={cn(
               'inline-flex items-center gap-2 text-sm font-medium',
               'text-accent hover:text-accent/90',

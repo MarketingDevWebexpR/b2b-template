@@ -572,7 +572,7 @@ export function ProductCardHorizontal({
             </p>
 
             {/* Product Name */}
-            <Link href={`/produits/${product.slug || product.id}`}>
+            <Link href={`/produit/${product.slug || product.id}`}>
               <h3
                 className={cn(
                   'text-lg font-semibold text-neutral-900',

@@ -293,7 +293,7 @@ export function CartItem({ item, compact = false }: CartItemProps) {
       <div className="flex gap-4">
         {/* Product Image */}
         <Link
-          href={`/produits/${item.productSlug}`}
+          href={`/produit/${item.productSlug}`}
           className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 bg-neutral-100 rounded-lg overflow-hidden group"
         >
           <Image
@@ -311,7 +311,7 @@ export function CartItem({ item, compact = false }: CartItemProps) {
             <div>
               {/* Product Name */}
               <Link
-                href={`/produits/${item.productSlug}`}
+                href={`/produit/${item.productSlug}`}
                 className="block"
               >
                 <h3 className="font-medium text-neutral-900 hover:text-accent transition-colors line-clamp-2">

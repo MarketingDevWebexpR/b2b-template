@@ -1,11 +1,15 @@
 // @ts-check
-const { defineConfig, loadEnv } = require("@medusajs/framework/utils");
+const { defineConfig, loadEnv, Modules } = require("@medusajs/framework/utils");
 
-// Load environment variables
+// Chargement des variables d'environnement
 loadEnv(process.env["NODE_ENV"] ?? "development", process.cwd());
 
 /**
  * Medusa V2 Configuration
+ *
+ * Ce fichier configure le backend Medusa pour le projet B2B e-commerce.
+ * Il inclut la configuration de la base de donnees, des modules personnalises,
+ * et du stockage de fichiers (MinIO/S3).
  */
 module.exports = defineConfig({
   projectConfig: {
@@ -35,8 +39,13 @@ module.exports = defineConfig({
     backendUrl: process.env["MEDUSA_BACKEND_URL"] ?? "http://localhost:9000",
   },
 
-  // B2B Custom Modules
+  // ==========================================================================
+  // Modules Medusa
+  // ==========================================================================
   modules: [
+    // ------------------------------------------------------------------------
+    // Modules B2B personnalises
+    // ------------------------------------------------------------------------
     {
       resolve: "./src/modules/b2b-company",
     },
@@ -49,6 +58,81 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/b2b-quote",
     },
+    // CMS Module - Gestion du contenu (bandeaux d'annonce, etc.)
+    {
+      resolve: "./src/modules/cms",
+    },
+    // Marques Module - Gestion des marques (brands)
+    {
+      resolve: "./src/modules/marques",
+    },
+
+    // ------------------------------------------------------------------------
+    // Search Module - Meilisearch integration
+    // ------------------------------------------------------------------------
+    // Ce module fournit la recherche full-text avec Meilisearch.
+    // Configure via les variables d'environnement:
+    //   - MEILISEARCH_HOST: URL du serveur (default: http://localhost:7700)
+    //   - MEILISEARCH_API_KEY: Cle API maitre
+    //   - MEILISEARCH_INDEX_PREFIX: Prefixe des index (default: bijoux_)
+    // ------------------------------------------------------------------------
+    {
+      resolve: "./src/modules/search",
+      options: {
+        provider: "meilisearch",
+        meilisearchHost: process.env["MEILISEARCH_HOST"] ?? "http://localhost:7700",
+        meilisearchApiKey: process.env["MEILISEARCH_API_KEY"] ?? "meilisearch_master_key_dev_only",
+        indexPrefix: process.env["MEILISEARCH_INDEX_PREFIX"] ?? "bijoux_",
+      },
+    },
+
+    // ------------------------------------------------------------------------
+    // Module File Storage - MinIO (S3-compatible) ou AWS S3
+    // ------------------------------------------------------------------------
+    // Ce module gere le stockage des fichiers media (images produits, etc.)
+    //
+    // En developpement: utilise MinIO (lance via docker-compose)
+    //   - Console: http://localhost:9001
+    //   - API: http://localhost:9002
+    //   - Credentials: minioadmin / minioadmin
+    //
+    // En production: utilise AWS S3 ou un service S3-compatible
+    // ------------------------------------------------------------------------
+    ...(process.env["S3_BUCKET"] ? [{
+      resolve: "@medusajs/medusa/file",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/file-s3",
+            id: "s3",
+            options: {
+              // URL publique pour acceder aux fichiers
+              file_url: process.env["S3_FILE_URL"],
+
+              // Identifiants d'acces S3/MinIO
+              access_key_id: process.env["S3_ACCESS_KEY_ID"],
+              secret_access_key: process.env["S3_SECRET_ACCESS_KEY"],
+
+              // Configuration du bucket
+              region: process.env["S3_REGION"] ?? "us-east-1",
+              bucket: process.env["S3_BUCKET"],
+
+              // Endpoint personnalise pour MinIO (ne pas definir pour AWS S3)
+              // Important: MinIO necessite un endpoint explicite
+              endpoint: process.env["S3_ENDPOINT"],
+
+              // Force le path-style pour MinIO (bucket dans le path, pas le sous-domaine)
+              // AWS S3: https://bucket-name.s3.region.amazonaws.com/key
+              // MinIO:  http://localhost:9002/bucket-name/key
+              // Par defaut true car MinIO le requiert; mettre S3_FORCE_PATH_STYLE=false pour AWS S3
+              additional_client_config: {
+                forcePathStyle: process.env["S3_FORCE_PATH_STYLE"] !== "false",
+              },
+            },
+          },
+        ],
+      },
+    }] : []),
   ],
 
   plugins: [],

@@ -183,7 +183,7 @@ export function ProductCardGrid({
 
         {/* Product image */}
         <Link
-          href={`/produits/${product.slug || product.id}`}
+          href={`/produit/${product.slug || product.id}`}
           className="block w-full h-full"
           aria-label={`Voir ${product.name}`}
         >
@@ -199,7 +199,7 @@ export function ProductCardGrid({
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               className={cn(
-                'object-contain p-4',
+                'object-cover',
                 'transition-opacity duration-300',
                 imageLoaded ? 'opacity-100' : 'opacity-0'
               )}
@@ -243,16 +243,32 @@ export function ProductCardGrid({
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-4 gap-2">
-        {/* Brand */}
-        {product.brand && (
-          <span className="text-caption font-semibold uppercase tracking-wider text-content-muted">
-            {product.brand}
-          </span>
+        {/* Brand - show brand_name or brand, link to brand page if slug available */}
+        {(product.brand || (product as { brand_name?: string }).brand_name) && (
+          (() => {
+            const brandName = (product as { brand_name?: string }).brand_name || product.brand;
+            const brandSlug = (product as { brand_slug?: string }).brand_slug;
+            if (brandSlug) {
+              return (
+                <Link
+                  href={`/marques/${brandSlug}`}
+                  className="text-caption font-semibold uppercase tracking-wider text-content-muted hover:text-primary transition-colors"
+                >
+                  {brandName}
+                </Link>
+              );
+            }
+            return (
+              <span className="text-caption font-semibold uppercase tracking-wider text-content-muted">
+                {brandName}
+              </span>
+            );
+          })()
         )}
 
         {/* Product Name */}
         <Link
-          href={`/produits/${product.slug || product.id}`}
+          href={`/produit/${product.slug || product.id}`}
           className="group/link"
         >
           <h3 className="text-body font-medium text-content-primary line-clamp-2 group-hover/link:text-primary transition-colors">

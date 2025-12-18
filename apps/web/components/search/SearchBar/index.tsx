@@ -31,6 +31,7 @@ import {
   useSearchOverlay,
   type SearchSuggestion,
 } from '@/contexts/SearchContext';
+import type { CategorySuggestion } from '@/lib/search/medusa-search-client';
 import { SearchInput } from './SearchInput';
 import { SearchSuggestions } from './SearchSuggestions';
 import { SearchHistory } from './SearchHistory';
@@ -82,9 +83,13 @@ export function SearchBar({
   const { state, setQuery, search, clearSearch } = useSearch();
   const {
     suggestions,
+    categorySuggestions: contextCategorySuggestions,
+    brandSuggestions: contextBrandSuggestions,
     isLoading: isSuggestionsLoading,
     getSuggestions,
     clearSuggestions,
+    navigateToCategory,
+    navigateToBrand,
     history,
     clearHistory,
   } = useSearchSuggestions();
@@ -122,10 +127,18 @@ export function SearchBar({
       return history.length;
     }
     if (showSuggestionsDropdown) {
-      return productSuggestions.length + categorySuggestions.length + brandSuggestions.length;
+      // Use context category suggestions if available, otherwise legacy
+      const categoryCount = contextCategorySuggestions.length > 0
+        ? contextCategorySuggestions.length
+        : categorySuggestions.length;
+      // Use context brand suggestions if available, otherwise legacy
+      const brandCount = contextBrandSuggestions.length > 0
+        ? contextBrandSuggestions.length
+        : brandSuggestions.length;
+      return productSuggestions.length + categoryCount + brandCount;
     }
     return 0;
-  }, [showHistory, showSuggestionsDropdown, history.length, productSuggestions.length, categorySuggestions.length, brandSuggestions.length]);
+  }, [showHistory, showSuggestionsDropdown, history.length, productSuggestions.length, categorySuggestions.length, contextCategorySuggestions.length, brandSuggestions.length, contextBrandSuggestions.length]);
 
   // ============================================================================
   // Effects
@@ -160,12 +173,15 @@ export function SearchBar({
 
   // Debounced search suggestions
   useEffect(() => {
+    console.log('[SearchBar] useEffect triggered, inputValue:', inputValue, 'length:', inputValue.trim().length);
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
 
     if (inputValue.trim().length >= 2) {
+      console.log('[SearchBar] Setting debounce for:', inputValue);
       debounceRef.current = setTimeout(() => {
+        console.log('[SearchBar] Debounce fired, calling getSuggestions');
         getSuggestions(inputValue);
       }, DEBOUNCE_DELAY);
     } else {
@@ -189,6 +205,7 @@ export function SearchBar({
   // ============================================================================
 
   const handleInputChange = useCallback((value: string) => {
+    console.log('[SearchBar] handleInputChange called with:', value);
     setInputValue(value);
     setActiveIndex(-1);
     if (value.trim().length > 0) {
@@ -255,6 +272,22 @@ export function SearchBar({
     clearHistory();
   }, [clearHistory]);
 
+  const handleCategoryClick = useCallback(
+    (category: CategorySuggestion) => {
+      setIsDropdownOpen(false);
+      navigateToCategory(category);
+    },
+    [navigateToCategory]
+  );
+
+  const handleBrandClick = useCallback(
+    (brand: import('@/lib/search/medusa-search-client').MarqueSuggestion) => {
+      setIsDropdownOpen(false);
+      navigateToBrand(brand);
+    },
+    [navigateToBrand]
+  );
+
   // Keyboard navigation
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -293,16 +326,30 @@ export function SearchBar({
               }
               currentIndex += productSuggestions.length;
 
-              // Check categories
-              if (activeIndex < currentIndex + categorySuggestions.length) {
-                handleSuggestionClick(categorySuggestions[activeIndex - currentIndex]);
+              // Check categories (use context category suggestions if available)
+              const activeCategorySuggestions = contextCategorySuggestions.length > 0
+                ? contextCategorySuggestions
+                : categorySuggestions;
+              if (activeIndex < currentIndex + activeCategorySuggestions.length) {
+                if (contextCategorySuggestions.length > 0) {
+                  handleCategoryClick(contextCategorySuggestions[activeIndex - currentIndex]);
+                } else {
+                  handleSuggestionClick(categorySuggestions[activeIndex - currentIndex]);
+                }
                 return;
               }
-              currentIndex += categorySuggestions.length;
+              currentIndex += activeCategorySuggestions.length;
 
-              // Check brands
-              if (activeIndex < currentIndex + brandSuggestions.length) {
-                handleSuggestionClick(brandSuggestions[activeIndex - currentIndex]);
+              // Check brands (use context brand suggestions if available)
+              const activeBrandSuggestions = contextBrandSuggestions.length > 0
+                ? contextBrandSuggestions
+                : brandSuggestions;
+              if (activeIndex < currentIndex + activeBrandSuggestions.length) {
+                if (contextBrandSuggestions.length > 0) {
+                  handleBrandClick(contextBrandSuggestions[activeIndex - currentIndex]);
+                } else {
+                  handleSuggestionClick(brandSuggestions[activeIndex - currentIndex]);
+                }
                 return;
               }
             }
@@ -332,9 +379,13 @@ export function SearchBar({
       history,
       productSuggestions,
       categorySuggestions,
+      contextCategorySuggestions,
       brandSuggestions,
+      contextBrandSuggestions,
       handleHistoryClick,
       handleSuggestionClick,
+      handleCategoryClick,
+      handleBrandClick,
       handleSubmit,
     ]
   );
@@ -410,11 +461,15 @@ export function SearchBar({
             <SearchSuggestions
               query={inputValue}
               products={productSuggestions}
+              categorySuggestions={contextCategorySuggestions}
               categories={categorySuggestions}
+              brandSuggestions={contextBrandSuggestions}
               brands={brandSuggestions}
               activeIndex={activeIndex}
               isLoading={isSuggestionsLoading}
               onSuggestionClick={handleSuggestionClick}
+              onCategoryClick={handleCategoryClick}
+              onBrandClick={handleBrandClick}
             />
           )}
         </div>
@@ -422,5 +477,13 @@ export function SearchBar({
     </div>
   );
 }
+
+// Re-exports for convenience
+export { BrandSuggestionItem } from './BrandSuggestionItem';
+export type { BrandSuggestionItemProps } from './BrandSuggestionItem';
+export { CategorySuggestionItem } from './CategorySuggestionItem';
+export type { CategorySuggestionItemProps } from './CategorySuggestionItem';
+export { SearchSuggestions } from './SearchSuggestions';
+export type { SearchSuggestionsProps } from './SearchSuggestions';
 
 export default SearchBar;

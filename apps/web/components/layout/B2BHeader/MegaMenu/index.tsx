@@ -245,7 +245,7 @@ export const MegaMenu = memo(function MegaMenu({
           {/* Bottom bar with all categories link */}
           <div className="flex items-center justify-between px-6 py-3 border-t border-neutral-200 bg-neutral-50 rounded-b-xl">
             <Link
-              href="/categories"
+              href="/categorie"
               className={cn(
                 'inline-flex items-center gap-2',
                 'text-sm font-medium text-accent',
@@ -261,7 +261,7 @@ export const MegaMenu = memo(function MegaMenu({
               {categories.slice(3, 6).map((category) => (
                 <Link
                   key={category.id}
-                  href={`/categories/${category.slug}`}
+                  href={`/categorie/${category.slug}`}
                   className={cn(
                     'text-sm text-neutral-600',
                     'hover:text-accent transition-colors duration-150',

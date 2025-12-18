@@ -11,9 +11,13 @@
 
 import { memo, useMemo } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import type { SearchSuggestion } from '@/contexts/SearchContext';
+import type { CategorySuggestion, MarqueSuggestion } from '@/lib/search/medusa-search-client';
+import { CategorySuggestionItem } from './CategorySuggestionItem';
+import { BrandSuggestionItem } from './BrandSuggestionItem';
 
 // ============================================================================
 // Icons
@@ -132,9 +136,13 @@ export interface SearchSuggestionsProps {
   query: string;
   /** Product suggestions */
   products: SearchSuggestion[];
-  /** Category suggestions */
-  categories: SearchSuggestion[];
-  /** Brand suggestions */
+  /** Category suggestions (enhanced with path) */
+  categorySuggestions?: CategorySuggestion[];
+  /** Legacy category suggestions (fallback) */
+  categories?: SearchSuggestion[];
+  /** Brand suggestions (enhanced with logo and country) */
+  brandSuggestions?: MarqueSuggestion[];
+  /** Legacy brand suggestions (fallback) */
   brands: SearchSuggestion[];
   /** Currently active/focused index */
   activeIndex: number;
@@ -142,6 +150,10 @@ export interface SearchSuggestionsProps {
   isLoading?: boolean;
   /** Click handler for suggestion */
   onSuggestionClick: (suggestion: SearchSuggestion) => void;
+  /** Click handler for category suggestion */
+  onCategoryClick?: (category: CategorySuggestion) => void;
+  /** Click handler for brand suggestion */
+  onBrandClick?: (brand: MarqueSuggestion) => void;
 }
 
 // ============================================================================
@@ -260,7 +272,7 @@ const ProductItem = memo(function ProductItem({
           alt={suggestion.text}
           fill
           sizes="48px"
-          className="object-contain p-1"
+          className="object-cover"
         />
       </div>
 
@@ -370,18 +382,52 @@ const SimpleItem = memo(function SimpleItem({
 export function SearchSuggestions({
   query,
   products,
-  categories,
+  categorySuggestions = [],
+  categories = [],
+  brandSuggestions = [],
   brands,
   activeIndex,
   isLoading = false,
   onSuggestionClick,
+  onCategoryClick,
+  onBrandClick,
 }: SearchSuggestionsProps) {
+  const router = useRouter();
+
+  // Use enhanced category suggestions if available, otherwise fall back to legacy
+  const hasCategorySuggestions = categorySuggestions.length > 0;
+  const categoryCount = hasCategorySuggestions ? categorySuggestions.length : categories.length;
+
+  // Use enhanced brand suggestions if available, otherwise fall back to legacy
+  const hasBrandSuggestions = brandSuggestions.length > 0;
+  const brandCount = hasBrandSuggestions ? brandSuggestions.length : brands.length;
+
   // Calculate index offsets for each section
   const productIndexOffset = 0;
   const categoryIndexOffset = products.length;
-  const brandIndexOffset = products.length + categories.length;
+  const brandIndexOffset = products.length + categoryCount;
 
-  const hasResults = products.length > 0 || categories.length > 0 || brands.length > 0;
+  const hasResults = products.length > 0 || categoryCount > 0 || brandCount > 0;
+
+  // Handler for category clicks
+  const handleCategoryClick = (category: CategorySuggestion) => {
+    if (onCategoryClick) {
+      onCategoryClick(category);
+    } else {
+      // Use fullPath for hierarchical URL, fallback to handle
+      const categoryPath = category.fullPath || category.handle;
+      router.push(`/categorie/${categoryPath}`);
+    }
+  };
+
+  // Handler for brand clicks
+  const handleBrandClick = (brand: MarqueSuggestion) => {
+    if (onBrandClick) {
+      onBrandClick(brand);
+    } else {
+      router.push(`/marques/${brand.slug}`);
+    }
+  };
 
   // Loading state
   if (isLoading) {
@@ -433,8 +479,30 @@ export function SearchSuggestions({
         </div>
       )}
 
-      {/* Categories Section */}
-      {categories.length > 0 && (
+      {/* Categories Section - Enhanced with path display */}
+      {hasCategorySuggestions && categorySuggestions.length > 0 && (
+        <div>
+          <SectionHeader
+            title="Categories"
+            icon={<FolderIcon className="w-4 h-4" />}
+          />
+          <div className="divide-y divide-neutral-100">
+            {categorySuggestions.map((category, index) => (
+              <CategorySuggestionItem
+                key={category.id}
+                category={category}
+                query={query}
+                isActive={activeIndex === categoryIndexOffset + index}
+                index={categoryIndexOffset + index}
+                onClick={() => handleCategoryClick(category)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Legacy Categories Section (fallback) */}
+      {!hasCategorySuggestions && categories.length > 0 && (
         <div>
           <SectionHeader
             title="Categories"
@@ -455,8 +523,30 @@ export function SearchSuggestions({
         </div>
       )}
 
-      {/* Brands Section */}
-      {brands.length > 0 && (
+      {/* Brands Section - Enhanced with logo and country */}
+      {hasBrandSuggestions && brandSuggestions.length > 0 && (
+        <div>
+          <SectionHeader
+            title="Marques"
+            icon={<BuildingIcon className="w-4 h-4" />}
+          />
+          <div className="divide-y divide-neutral-100">
+            {brandSuggestions.map((brand, index) => (
+              <BrandSuggestionItem
+                key={brand.id}
+                brand={brand}
+                query={query}
+                isActive={activeIndex === brandIndexOffset + index}
+                index={brandIndexOffset + index}
+                onClick={() => handleBrandClick(brand)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Legacy Brands Section (fallback) */}
+      {!hasBrandSuggestions && brands.length > 0 && (
         <div>
           <SectionHeader
             title="Marques"

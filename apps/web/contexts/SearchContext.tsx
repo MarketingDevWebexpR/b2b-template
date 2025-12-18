@@ -10,6 +10,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { getMedusaSearchClient, type CategorySuggestion, type MarqueSuggestion } from '@/lib/search/medusa-search-client';
 
 // ============================================================================
 // Types
@@ -145,6 +146,10 @@ export interface SearchContextValue {
   state: SearchState;
   /** Search suggestions */
   suggestions: SearchSuggestion[];
+  /** Category suggestions with path */
+  categorySuggestions: CategorySuggestion[];
+  /** Brand suggestions with logo and country */
+  brandSuggestions: MarqueSuggestion[];
   /** Is suggestions loading */
   isSuggestionsLoading: boolean;
   /** Search history */
@@ -195,6 +200,10 @@ export interface SearchContextValue {
   getSuggestions: (query: string) => Promise<void>;
   /** Clear suggestions */
   clearSuggestions: () => void;
+  /** Navigate to category */
+  navigateToCategory: (category: CategorySuggestion) => void;
+  /** Navigate to brand */
+  navigateToBrand: (brand: MarqueSuggestion) => void;
   /** Add to search history */
   addToHistory: (query: string, resultCount: number) => void;
   /** Clear search history */
@@ -442,13 +451,15 @@ export function SearchProvider({
   children,
   defaultPageSize = 24,
   maxHistoryItems = 10,
-  mockMode = true,
+  mockMode = false,
 }: SearchProviderProps) {
   const [state, setState] = useState<SearchState>(() => ({
     ...initialState,
     pageSize: defaultPageSize,
   }));
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [categorySuggestions, setCategorySuggestions] = useState<CategorySuggestion[]>([]);
+  const [brandSuggestions, setBrandSuggestions] = useState<MarqueSuggestion[]>([]);
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
   const [history, setHistory] = useState<SearchHistoryItem[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -543,8 +554,31 @@ export function SearchProvider({
           // Add to history
           addToHistory(searchQuery, mockTotal);
         } else {
-          // TODO: Real API call
-          // const response = await searchApi.search({ query: searchQuery, ...state.filters });
+          // Real API call to Medusa backend
+          const client = getMedusaSearchClient();
+          const result = await client.searchProducts(searchQuery, {
+            limit: state.pageSize,
+            offset: (state.currentPage - 1) * state.pageSize,
+            facets: true,
+            category: state.filters.categories[0],
+            brand: state.filters.brands[0],
+            inStock: state.filters.stockFilter === 'in_stock',
+            priceMin: state.filters.priceRange?.min,
+            priceMax: state.filters.priceRange?.max,
+            sort: state.sortBy === 'price_asc' ? 'price_min' : state.sortBy === 'price_desc' ? 'price_min' : undefined,
+            order: state.sortBy === 'price_asc' ? 'asc' : state.sortBy === 'price_desc' ? 'desc' : undefined,
+          });
+
+          setState((prev) => ({
+            ...prev,
+            isSearching: false,
+            totalResults: result.total,
+            totalPages: Math.ceil(result.total / prev.pageSize),
+            currentPage: 1,
+          }));
+
+          // Add to history
+          addToHistory(searchQuery, result.total);
         }
       } catch (err) {
         console.error('Search error:', err);
@@ -813,8 +847,11 @@ export function SearchProvider({
   // Suggestions
   const getSuggestions = useCallback(
     async (query: string) => {
+      console.log('[SearchContext] getSuggestions called with:', query, 'mockMode:', mockMode);
       if (!query.trim() || query.length < 2) {
         setSuggestions([]);
+        setCategorySuggestions([]);
+        setBrandSuggestions([]);
         return;
       }
 
@@ -824,21 +861,105 @@ export function SearchProvider({
       }
 
       debounceRef.current = setTimeout(async () => {
+        console.log('[SearchContext] Debounce fired, fetching suggestions for:', query);
         setIsSuggestionsLoading(true);
 
         try {
           if (mockMode) {
+            console.log('[SearchContext] Using MOCK mode');
             await new Promise((resolve) => setTimeout(resolve, 150));
             // Filter mock suggestions
             const filtered = mockSuggestions.filter((s) =>
               s.text.toLowerCase().includes(query.toLowerCase())
             );
             setSuggestions(filtered.length > 0 ? filtered : mockSuggestions.slice(0, 4));
+
+            // Mock category suggestions
+            const mockCategorySuggestionsData: CategorySuggestion[] = [
+              {
+                id: 'cat_1',
+                name: 'Bagues',
+                handle: 'bagues',
+                path: ['Bijoux', 'Bagues'],
+                pathString: 'Bijoux > Bagues',
+                fullPath: 'bijoux/bagues',
+                productCount: 156,
+                depth: 1,
+              },
+              {
+                id: 'cat_2',
+                name: 'Bagues Or',
+                handle: 'bagues-or',
+                path: ['Bijoux', 'Bagues', 'Or'],
+                pathString: 'Bijoux > Bagues > Or',
+                fullPath: 'bijoux/bagues/bagues-or',
+                productCount: 89,
+                depth: 2,
+              },
+            ].filter((c) => c.name.toLowerCase().includes(query.toLowerCase()));
+            setCategorySuggestions(mockCategorySuggestionsData);
+
+            // Mock brand suggestions
+            const mockBrandSuggestionsData: MarqueSuggestion[] = [
+              {
+                id: 'brand_1',
+                name: 'Cartier',
+                slug: 'cartier',
+                logo_url: null,
+                country: 'France',
+                product_count: 245,
+              },
+              {
+                id: 'brand_2',
+                name: 'Bulgari',
+                slug: 'bulgari',
+                logo_url: null,
+                country: 'Italie',
+                product_count: 189,
+              },
+              {
+                id: 'brand_3',
+                name: 'Chopard',
+                slug: 'chopard',
+                logo_url: null,
+                country: 'Suisse',
+                product_count: 156,
+              },
+            ].filter((b) => b.name.toLowerCase().includes(query.toLowerCase()));
+            setBrandSuggestions(mockBrandSuggestionsData);
           } else {
-            // TODO: Real API call
+            // Real API call to Medusa backend - fetch all in parallel
+            console.log('[SearchContext] Using REAL API mode');
+            const client = getMedusaSearchClient();
+            console.log('[SearchContext] Calling getSuggestions, getCategorySuggestions, and getBrandSuggestions API...');
+
+            const [productResult, categoryResult, brandResult] = await Promise.all([
+              client.getSuggestions(query, 6),
+              client.getCategorySuggestions(query, 5),
+              client.getBrandSuggestions(query, 5),
+            ]);
+
+            console.log('[SearchContext] API results:', { productResult, categoryResult, brandResult });
+
+            // Map API response to SearchSuggestion format
+            const mappedSuggestions: SearchSuggestion[] = productResult.suggestions.map((s) => ({
+              type: 'product' as SearchResultType,
+              id: s.id,
+              text: s.title,
+              url: `/produit/${s.handle}`,
+              image: s.thumbnail ?? undefined,
+              price: s.price_min ?? undefined,
+            }));
+
+            setSuggestions(mappedSuggestions);
+            setCategorySuggestions(categoryResult.categories || []);
+            setBrandSuggestions(brandResult.marques || []);
           }
         } catch (err) {
           console.error('Suggestions error:', err);
+          setSuggestions([]);
+          setCategorySuggestions([]);
+          setBrandSuggestions([]);
         } finally {
           setIsSuggestionsLoading(false);
         }
@@ -849,10 +970,37 @@ export function SearchProvider({
 
   const clearSuggestions = useCallback(() => {
     setSuggestions([]);
+    setCategorySuggestions([]);
+    setBrandSuggestions([]);
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
   }, []);
+
+  // Navigate to category and close search
+  const navigateToCategory = useCallback((category: CategorySuggestion) => {
+    // Close search overlay
+    setIsSearchOpen(false);
+    clearSuggestions();
+
+    // Navigate to category page - use fullPath for hierarchical URL
+    if (typeof window !== 'undefined') {
+      const categoryPath = category.fullPath || category.handle;
+      window.location.href = `/categorie/${categoryPath}`;
+    }
+  }, [clearSuggestions]);
+
+  // Navigate to brand and close search
+  const navigateToBrand = useCallback((brand: MarqueSuggestion) => {
+    // Close search overlay
+    setIsSearchOpen(false);
+    clearSuggestions();
+
+    // Navigate to brand page
+    if (typeof window !== 'undefined') {
+      window.location.href = `/marques/${brand.slug}`;
+    }
+  }, [clearSuggestions]);
 
   // History management
   const addToHistory = useCallback(
@@ -920,6 +1068,8 @@ export function SearchProvider({
     () => ({
       state,
       suggestions,
+      categorySuggestions,
+      brandSuggestions,
       isSuggestionsLoading,
       history,
       isSearchOpen,
@@ -945,6 +1095,8 @@ export function SearchProvider({
       toggleCategoryExpansion,
       getSuggestions,
       clearSuggestions,
+      navigateToCategory,
+      navigateToBrand,
       addToHistory,
       clearHistory,
       quickSearch,
@@ -954,6 +1106,8 @@ export function SearchProvider({
     [
       state,
       suggestions,
+      categorySuggestions,
+      brandSuggestions,
       isSuggestionsLoading,
       history,
       isSearchOpen,
@@ -979,6 +1133,8 @@ export function SearchProvider({
       toggleCategoryExpansion,
       getSuggestions,
       clearSuggestions,
+      navigateToCategory,
+      navigateToBrand,
       addToHistory,
       clearHistory,
       quickSearch,
@@ -1074,13 +1230,28 @@ export function useSearchPagination() {
  * Hook for search suggestions
  */
 export function useSearchSuggestions() {
-  const { suggestions, isSuggestionsLoading, getSuggestions, clearSuggestions, history, clearHistory } = useSearch();
+  const {
+    suggestions,
+    categorySuggestions,
+    brandSuggestions,
+    isSuggestionsLoading,
+    getSuggestions,
+    clearSuggestions,
+    navigateToCategory,
+    navigateToBrand,
+    history,
+    clearHistory,
+  } = useSearch();
 
   return {
     suggestions,
+    categorySuggestions,
+    brandSuggestions,
     isLoading: isSuggestionsLoading,
     getSuggestions,
     clearSuggestions,
+    navigateToCategory,
+    navigateToBrand,
     history,
     clearHistory,
   };

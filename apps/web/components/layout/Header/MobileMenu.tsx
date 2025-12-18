@@ -50,7 +50,7 @@ export interface MobileMenuProps {
 
 // Navigation categories
 const mainCategories = [
-  { id: 'catalogue', label: 'Catalogue', href: '/categories', hasChildren: true },
+  { id: 'catalogue', label: 'Catalogue', href: '/categorie', hasChildren: true },
   { id: 'marques', label: 'Marques', href: '/marques', hasChildren: false },
   { id: 'nouveautes', label: 'Nouveautes', href: '/nouveautes', hasChildren: false },
   { id: 'promotions', label: 'Promotions', href: '/promotions', hasChildren: false, highlight: true },
@@ -297,7 +297,7 @@ export const MobileMenu = memo(function MobileMenu({
                                   {catalog.parentCategories.slice(0, 6).map((subCategory) => (
                                     <li key={subCategory.id}>
                                       <Link
-                                        href={`/categories/${subCategory.slug}`}
+                                        href={`/categorie/${subCategory.slug}`}
                                         onClick={handleLinkClick}
                                         className={cn(
                                           'flex items-center justify-between px-3 py-2 rounded-lg',
@@ -313,7 +313,7 @@ export const MobileMenu = memo(function MobileMenu({
                                   ))}
                                   <li>
                                     <Link
-                                      href="/categories"
+                                      href="/categorie"
                                       onClick={handleLinkClick}
                                       className={cn(
                                         'flex items-center gap-1 px-3 py-2',

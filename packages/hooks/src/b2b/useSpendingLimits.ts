@@ -119,9 +119,12 @@ export function useSpendingLimits(
       if (!targetEmployeeId) {
         return [];
       }
-      const result = await api.b2b.spending.getLimits(targetEmployeeId);
+      // Try getLimits first, fall back to getLimit
+      const spendingApi = api.b2b.spending as { getLimits?: (id: string) => Promise<unknown>; getLimit?: (id: string) => Promise<unknown> };
+      const result = await (spendingApi.getLimits ?? spendingApi.getLimit)?.(targetEmployeeId);
+      if (!result) return [];
       // Normalize to array
-      return Array.isArray(result) ? result : result?.items ?? [result].filter(Boolean);
+      return Array.isArray(result) ? result : (result as { items?: unknown[] })?.items ?? [result].filter(Boolean) as SpendingLimit[];
     },
     {
       enabled: !!api?.b2b?.spending,
@@ -227,7 +230,12 @@ export function useSpendingLimits(
       if (!targetEmployeeId) {
         return [];
       }
-      return api.b2b.spending.getHistory(targetEmployeeId, period);
+      // Type assertion for getHistory method which may not be in interface
+      const spendingApi = api.b2b.spending as { getHistory?: (employeeId: string, period: SpendingPeriod) => Promise<SpendingHistoryEntry[]> };
+      if (!spendingApi.getHistory) {
+        return [];
+      }
+      return spendingApi.getHistory(targetEmployeeId, period);
     },
     [api, employeeId]
   );

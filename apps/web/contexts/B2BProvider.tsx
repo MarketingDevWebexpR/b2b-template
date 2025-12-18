@@ -637,7 +637,7 @@ export function B2BProvider({
       >
         <WarehouseProvider mockMode={mockMode}>
           <PricingProvider mockMode={mockMode}>
-            <SearchProvider mockMode={mockMode}>
+            <SearchProvider mockMode={false}>
               <OperationsProvider mockMode={mockMode}>{children}</OperationsProvider>
             </SearchProvider>
           </PricingProvider>

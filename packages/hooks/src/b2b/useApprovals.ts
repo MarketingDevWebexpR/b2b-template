@@ -137,7 +137,10 @@ export function useApprovals(
         return [];
       }
       const result = await api.b2b.approvals.list(filters);
-      return result.items ?? result;
+      // Handle both paginated and array responses
+      const resultAny = result as unknown;
+      const items = (resultAny as { items?: readonly unknown[] }).items ?? (resultAny as unknown[]);
+      return (Array.isArray(items) ? [...items] : []) as Approval[];
     },
     {
       enabled: !!api?.b2b?.approvals,
@@ -150,13 +153,24 @@ export function useApprovals(
     (a) => a.status === "pending"
   ).length;
 
+  // Type for approval API methods that may not be in interface
+  type ApprovalApiExtended = {
+    decide?: (approvalId: string, decision: { approved: boolean; comment?: string }) => Promise<Approval>;
+    forward?: (approvalId: string, toEmployeeId: string, comment?: string) => Promise<Approval>;
+    request?: (input: RequestApprovalInput) => Promise<Approval>;
+  };
+
   // Approve mutation
   const approveMutation = useApiMutation<Approval, { approvalId: string; comment?: string }>(
     async ({ approvalId, comment }) => {
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.decide(approvalId, {
+      const approvalsApi = api.b2b.approvals as ApprovalApiExtended;
+      if (!approvalsApi.decide) {
+        throw new Error("Approval decide method not available");
+      }
+      return approvalsApi.decide(approvalId, {
         approved: true,
         comment,
       });
@@ -172,7 +186,11 @@ export function useApprovals(
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.decide(approvalId, {
+      const approvalsApi = api.b2b.approvals as ApprovalApiExtended;
+      if (!approvalsApi.decide) {
+        throw new Error("Approval decide method not available");
+      }
+      return approvalsApi.decide(approvalId, {
         approved: false,
         comment,
       });
@@ -191,7 +209,11 @@ export function useApprovals(
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.forward(approvalId, toEmployeeId, comment);
+      const approvalsApi = api.b2b.approvals as ApprovalApiExtended;
+      if (!approvalsApi.forward) {
+        throw new Error("Approval forward method not available");
+      }
+      return approvalsApi.forward(approvalId, toEmployeeId, comment);
     },
     {
       invalidateKeys: [["approvals"]],
@@ -204,7 +226,11 @@ export function useApprovals(
       if (!api?.b2b?.approvals) {
         throw new Error("B2B approvals not available");
       }
-      return api.b2b.approvals.request(input);
+      const approvalsApi = api.b2b.approvals as ApprovalApiExtended;
+      if (!approvalsApi.request) {
+        throw new Error("Approval request method not available");
+      }
+      return approvalsApi.request(input);
     },
     {
       invalidateKeys: [["approvals"]],

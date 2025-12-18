@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from 'next';
 import { B2BHomepageClient } from '@/components/b2b/B2BHomepageClient';
 

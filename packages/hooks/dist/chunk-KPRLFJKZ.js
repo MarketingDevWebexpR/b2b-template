@@ -1,0 +1,393 @@
+// src/api/QueryCacheContext.tsx
+import {
+  createContext,
+  useContext,
+  useRef,
+  useMemo,
+  useCallback
+} from "react";
+import { jsx } from "react/jsx-runtime";
+var QueryCacheContext = createContext(null);
+var clientFallbackCache = null;
+function getClientFallbackCache() {
+  if (!clientFallbackCache) {
+    clientFallbackCache = /* @__PURE__ */ new Map();
+  }
+  return clientFallbackCache;
+}
+function createCacheOperations(cacheRef) {
+  const getFromCache = function(key, staleTime) {
+    const cached = cacheRef.current.get(key);
+    if (cached && Date.now() - cached.timestamp < staleTime) {
+      return cached.data;
+    }
+    return null;
+  };
+  const hasValidCache = function(key, cacheTime) {
+    const cached = cacheRef.current.get(key);
+    return cached !== void 0 && Date.now() - cached.timestamp < cacheTime;
+  };
+  const getCachedData = function(key) {
+    const cached = cacheRef.current.get(key);
+    return cached ? cached.data : null;
+  };
+  const setInCache = function(key, data) {
+    cacheRef.current.set(key, { data, timestamp: Date.now() });
+  };
+  const invalidate = function(key) {
+    cacheRef.current.delete(key);
+  };
+  const invalidateByPrefix = function(prefix) {
+    const keysToDelete = [];
+    cacheRef.current.forEach((_, key) => {
+      if (key.startsWith(prefix)) {
+        keysToDelete.push(key);
+      }
+    });
+    keysToDelete.forEach((key) => cacheRef.current.delete(key));
+  };
+  const invalidateAll = function() {
+    cacheRef.current.clear();
+  };
+  return {
+    getFromCache,
+    hasValidCache,
+    getCachedData,
+    setInCache,
+    invalidate,
+    invalidateByPrefix,
+    invalidateAll
+  };
+}
+function QueryCacheProvider({
+  children
+}) {
+  const cacheRef = useRef(/* @__PURE__ */ new Map());
+  const value = useMemo(
+    () => createCacheOperations(cacheRef),
+    []
+  );
+  return /* @__PURE__ */ jsx(QueryCacheContext.Provider, { value, children });
+}
+function useQueryCache() {
+  const context = useContext(QueryCacheContext);
+  const fallbackRef = useRef(null);
+  const fallbackValue = useMemo(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!fallbackRef.current) {
+      fallbackRef.current = getClientFallbackCache();
+    }
+    return createCacheOperations(
+      fallbackRef
+    );
+  }, []);
+  if (context) {
+    return context;
+  }
+  if (typeof window === "undefined") {
+    throw new Error(
+      "QueryCacheProvider is required for SSR. Wrap your application with <QueryCacheProvider> to enable request-scoped caching."
+    );
+  }
+  if (fallbackValue) {
+    return fallbackValue;
+  }
+  throw new Error("Failed to initialize query cache");
+}
+function useInvalidateQueries() {
+  const cache = useQueryCache();
+  const invalidate = useCallback(
+    (queryKey) => {
+      const cacheKey = JSON.stringify(queryKey);
+      cache.invalidate(cacheKey);
+    },
+    [cache]
+  );
+  const invalidateByPrefix = useCallback(
+    (prefix) => {
+      const prefixStr = typeof prefix === "string" ? prefix : JSON.stringify(prefix);
+      const normalizedPrefix = prefixStr.endsWith("]") ? prefixStr.slice(0, -1) : prefixStr;
+      cache.invalidateByPrefix(normalizedPrefix);
+    },
+    [cache]
+  );
+  const invalidateAll = useCallback(() => {
+    cache.invalidateAll();
+  }, [cache]);
+  return {
+    invalidate,
+    invalidateByPrefix,
+    invalidateAll
+  };
+}
+
+// src/api/useApiQuery.ts
+import { useState, useEffect, useCallback as useCallback2, useRef as useRef2 } from "react";
+function useApiQuery(queryKey, queryFn, options = {}) {
+  const {
+    enabled = true,
+    initialData,
+    staleTime = 0,
+    cacheTime = 5 * 60 * 1e3,
+    retryCount = 3,
+    retryDelay = 1e3,
+    onSuccess,
+    onError,
+    refetchOnWindowFocus = false
+  } = options;
+  const cache = useQueryCache();
+  const cacheKey = JSON.stringify(queryKey);
+  const retryCountRef = useRef2(0);
+  const retryTimeoutRef = useRef2(null);
+  const abortControllerRef = useRef2(null);
+  const isMountedRef = useRef2(true);
+  const [state, setState] = useState(() => {
+    if (cache.hasValidCache(cacheKey, cacheTime)) {
+      const cachedData = cache.getCachedData(cacheKey);
+      if (cachedData !== null) {
+        return {
+          data: cachedData,
+          isLoading: false,
+          error: null,
+          isSuccess: true,
+          isFetching: false
+        };
+      }
+    }
+    return {
+      data: initialData ?? null,
+      isLoading: enabled,
+      error: null,
+      isSuccess: false,
+      isFetching: enabled
+    };
+  });
+  const fetchData = useCallback2(
+    async (isRefetch = false) => {
+      if (!isRefetch) {
+        const cachedData = cache.getFromCache(cacheKey, staleTime);
+        if (cachedData !== null) {
+          setState((prev) => ({
+            ...prev,
+            data: cachedData,
+            isLoading: false,
+            isSuccess: true,
+            isFetching: false
+          }));
+          return;
+        }
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+      setState((prev) => ({
+        ...prev,
+        isLoading: !prev.data,
+        isFetching: true,
+        error: null
+      }));
+      try {
+        const data = await queryFn({ signal });
+        if (!isMountedRef.current || signal.aborted) return;
+        cache.setInCache(cacheKey, data);
+        setState({
+          data,
+          isLoading: false,
+          error: null,
+          isSuccess: true,
+          isFetching: false
+        });
+        retryCountRef.current = 0;
+        onSuccess?.(data);
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
+        if (!isMountedRef.current) return;
+        const error = err instanceof Error ? err : new Error(String(err));
+        if (retryCountRef.current < retryCount) {
+          retryCountRef.current++;
+          retryTimeoutRef.current = setTimeout(
+            () => fetchData(isRefetch),
+            retryDelay * retryCountRef.current
+          );
+          return;
+        }
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error,
+          isFetching: false
+        }));
+        retryCountRef.current = 0;
+        onError?.(error);
+      }
+    },
+    [cacheKey, queryFn, staleTime, retryCount, retryDelay, onSuccess, onError, cache]
+  );
+  const refetch = useCallback2(async () => {
+    retryCountRef.current = 0;
+    await fetchData(true);
+  }, [fetchData]);
+  const reset = useCallback2(() => {
+    cache.invalidate(cacheKey);
+    setState({
+      data: initialData ?? null,
+      isLoading: false,
+      error: null,
+      isSuccess: false,
+      isFetching: false
+    });
+  }, [cacheKey, initialData, cache]);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+  useEffect(() => {
+    if (enabled) {
+      fetchData();
+    }
+  }, [enabled, cacheKey]);
+  useEffect(() => {
+    if (!refetchOnWindowFocus || !enabled || typeof window === "undefined") {
+      return;
+    }
+    const handleFocus = () => {
+      const cachedData = cache.getFromCache(cacheKey, staleTime);
+      if (cachedData === null) {
+        fetchData(true);
+      }
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [refetchOnWindowFocus, enabled, cacheKey, staleTime, fetchData, cache]);
+  return {
+    ...state,
+    refetch,
+    reset
+  };
+}
+function clearQueryCache() {
+  console.warn(
+    "clearQueryCache() is deprecated. Use useInvalidateQueries().invalidateAll() instead."
+  );
+}
+function invalidateQueries(_queryKey) {
+  console.warn(
+    "invalidateQueries() is deprecated. Use useInvalidateQueries().invalidate(queryKey) instead."
+  );
+}
+
+// src/api/useApiMutation.ts
+import { useState as useState2, useCallback as useCallback3 } from "react";
+function useApiMutation(mutationFn, options = {}) {
+  const {
+    onSuccess,
+    onError,
+    onSettled,
+    invalidateKeys = [],
+    retryCount = 0
+  } = options;
+  const [state, setState] = useState2({
+    data: null,
+    isLoading: false,
+    error: null,
+    isSuccess: false,
+    isError: false
+  });
+  const reset = useCallback3(() => {
+    setState({
+      data: null,
+      isLoading: false,
+      error: null,
+      isSuccess: false,
+      isError: false
+    });
+  }, []);
+  const mutateAsync = useCallback3(
+    async (variables) => {
+      setState({
+        data: null,
+        isLoading: true,
+        error: null,
+        isSuccess: false,
+        isError: false
+      });
+      let lastError = null;
+      let attempts = 0;
+      while (attempts <= retryCount) {
+        try {
+          const data = await mutationFn(variables);
+          setState({
+            data,
+            isLoading: false,
+            error: null,
+            isSuccess: true,
+            isError: false
+          });
+          for (const key of invalidateKeys) {
+            invalidateQueries(key);
+          }
+          onSuccess?.(data, variables);
+          onSettled?.(data, null, variables);
+          return data;
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error(String(err));
+          attempts++;
+          if (attempts > retryCount) {
+            break;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 1e3 * attempts));
+        }
+      }
+      setState({
+        data: null,
+        isLoading: false,
+        error: lastError,
+        isSuccess: false,
+        isError: true
+      });
+      onError?.(lastError, variables);
+      onSettled?.(null, lastError, variables);
+      throw lastError;
+    },
+    [mutationFn, retryCount, invalidateKeys, onSuccess, onError, onSettled]
+  );
+  const mutate = useCallback3(
+    (variables) => {
+      mutateAsync(variables).catch(() => {
+      });
+    },
+    [mutateAsync]
+  );
+  return {
+    ...state,
+    mutate,
+    mutateAsync,
+    reset
+  };
+}
+
+export {
+  QueryCacheProvider,
+  useQueryCache,
+  useInvalidateQueries,
+  useApiQuery,
+  clearQueryCache,
+  invalidateQueries,
+  useApiMutation
+};
+//# sourceMappingURL=chunk-KPRLFJKZ.js.map

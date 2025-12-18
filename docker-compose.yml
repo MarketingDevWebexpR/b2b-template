@@ -5,6 +5,8 @@
 # Services:
 #   - postgres: PostgreSQL 16 database for Medusa
 #   - redis: Redis for caching, events, and workflows (optional in dev)
+#   - minio: MinIO S3-compatible storage for media files
+#   - meilisearch: Meilisearch full-text search engine
 #
 # Usage:
 #   pnpm docker:up       # Start services
@@ -57,6 +59,125 @@ services:
     # Uncomment to enable persistence
     # command: redis-server --appendonly yes
 
+  # ---------------------------------------------------------------------------
+  # MinIO - Stockage S3-compatible pour les fichiers media
+  # ---------------------------------------------------------------------------
+  # MinIO est une alternative open-source a AWS S3, parfaite pour le developpement
+  # local et les environnements self-hosted.
+  #
+  # Ports:
+  #   - 9002: API S3 (le port 9000 est utilise par Medusa)
+  #   - 9001: Console web d'administration
+  #
+  # Acces console: http://localhost:9001
+  # Credentials par defaut: minioadmin / minioadmin
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: medusa_minio
+    restart: unless-stopped
+    environment:
+      # Identifiants de connexion (a changer en production!)
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      # Region par defaut (important pour la compatibilite S3)
+      MINIO_REGION: us-east-1
+    ports:
+      # API S3 sur le port 9002 (9000 est pris par Medusa)
+      - "9002:9000"
+      # Console web d'administration
+      - "9001:9001"
+    volumes:
+      # Persistance des donnees
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # MinIO Init - Creation automatique du bucket au demarrage
+  # ---------------------------------------------------------------------------
+  # Ce conteneur s'execute une seule fois pour configurer MinIO:
+  #   - Cree le bucket "medusa-media" s'il n'existe pas
+  #   - Configure la politique d'acces public pour la lecture
+  # ---------------------------------------------------------------------------
+  minio-init:
+    image: minio/mc:latest
+    container_name: medusa_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        # Attendre que MinIO soit pret
+        echo "Configuration de MinIO..."
+
+        # Configurer l'alias pour se connecter a MinIO
+        mc alias set localminio http://minio:9000 minioadmin minioadmin
+
+        # Creer le bucket s'il n'existe pas
+        mc mb --ignore-existing localminio/medusa-media
+
+        # Configurer la politique d'acces public en lecture
+        # Cela permet aux images d'etre accessibles publiquement via URL
+        mc anonymous set download localminio/medusa-media
+
+        echo "MinIO configure avec succes!"
+        echo "  - Bucket: medusa-media"
+        echo "  - Politique: lecture publique"
+        echo "  - Endpoint API: http://localhost:9002"
+        echo "  - Console: http://localhost:9001"
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # Meilisearch - Moteur de recherche full-text performant
+  # ---------------------------------------------------------------------------
+  # Meilisearch est un moteur de recherche open-source, rapide et facile a
+  # configurer. Il offre une recherche tolerante aux fautes de frappe,
+  # le filtrage, le tri, et des resultats instantanes.
+  #
+  # Documentation: https://www.meilisearch.com/docs
+  # Dashboard: http://localhost:7700 (utiliser la MEILI_MASTER_KEY pour l'acces)
+  #
+  # Pour la production:
+  #   - Generer une MEILI_MASTER_KEY securisee (min 16 caracteres)
+  #   - Utiliser MEILI_ENV=production
+  #   - Configurer les limites de ressources appropriees
+  # ---------------------------------------------------------------------------
+  meilisearch:
+    image: getmeili/meilisearch:v1.6
+    container_name: medusa_meilisearch
+    restart: unless-stopped
+    environment:
+      # Cle maitre pour l'authentification API (IMPORTANT: changer en production!)
+      # Genere automatiquement les cles de recherche et d'administration
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-meilisearch_master_key_dev_only}
+      # Mode d'environnement: development ou production
+      # En production, desactive le dashboard public et active les optimisations
+      MEILI_ENV: ${MEILI_ENV:-development}
+      # Limite de memoire pour les indexes (ajuster selon les besoins)
+      # MEILI_MAX_INDEXING_MEMORY: 1024Mb
+      # Limite de threads pour l'indexation
+      # MEILI_MAX_INDEXING_THREADS: 2
+    ports:
+      # API et dashboard web
+      - "7700:7700"
+    volumes:
+      # Persistance des donnees et des indexes
+      - meili_data:/meili_data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 # ---------------------------------------------------------------------------
 # Volumes
 # ---------------------------------------------------------------------------
@@ -64,6 +185,12 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  # Volume pour la persistance des fichiers MinIO
+  minio_data:
+    driver: local
+  # Volume pour la persistance des indexes Meilisearch
+  meili_data:
     driver: local
 
 # ---------------------------------------------------------------------------

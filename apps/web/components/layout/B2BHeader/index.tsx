@@ -274,7 +274,7 @@ export const B2BHeader = memo(function B2BHeader({
               <ul className="space-y-1">
                 <li>
                   <Link
-                    href="/categories"
+                    href="/categorie"
                     onClick={closeMobileMenu}
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg',

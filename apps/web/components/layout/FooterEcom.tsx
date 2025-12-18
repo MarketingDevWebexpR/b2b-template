@@ -24,13 +24,13 @@ import { Logo } from './Logo';
 
 // Catalog links
 const catalogLinks = [
-  { label: 'Bagues', href: '/categories/bagues' },
-  { label: 'Colliers & Pendentifs', href: '/categories/colliers' },
-  { label: 'Bracelets', href: '/categories/bracelets' },
-  { label: 'Boucles d\'oreilles', href: '/categories/boucles-oreilles' },
-  { label: 'Montres', href: '/categories/montres' },
-  { label: 'Pierres & Diamants', href: '/categories/pierres' },
-  { label: 'Accessoires', href: '/categories/accessoires' },
+  { label: 'Bagues', href: '/categorie/bagues' },
+  { label: 'Colliers & Pendentifs', href: '/categorie/colliers' },
+  { label: 'Bracelets', href: '/categorie/bracelets' },
+  { label: 'Boucles d\'oreilles', href: '/categorie/boucles-oreilles' },
+  { label: 'Montres', href: '/categorie/montres' },
+  { label: 'Pierres & Diamants', href: '/categorie/pierres' },
+  { label: 'Accessoires', href: '/categorie/accessoires' },
 ];
 
 // Services links - Point to functional B2B pages

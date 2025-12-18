@@ -1,4 +1,5 @@
 import { Company, Employee, QuoteStatus, Quote, ApprovalStatus, ApprovalEntityType, ApprovalRequest, SpendingLimit, SpendingPeriod } from '@maison/types';
+import { ICommerceClient } from '@maison/api-client';
 
 /**
  * Company Hook
@@ -67,8 +68,7 @@ type B2BAction = "create_quote" | "approve_order" | "manage_employees" | "view_s
  * }
  * ```
  */
-declare function useCompany(api: any, // ICommerceClient - using any to avoid circular dep
-options?: UseCompanyOptions): UseCompanyResult;
+declare function useCompany(api: ICommerceClient, options?: UseCompanyOptions): UseCompanyResult;
 
 /**
  * Quotes Hook
@@ -179,8 +179,7 @@ interface UseQuotesResult {
  * setFilters({ status: 'responded' });
  * ```
  */
-declare function useQuotes(api: any, // ICommerceClient
-initialFilters?: QuoteFilters): UseQuotesResult;
+declare function useQuotes(api: ICommerceClient, initialFilters?: QuoteFilters): UseQuotesResult;
 
 /**
  * Approvals Hook
@@ -290,8 +289,7 @@ interface RequestApprovalInput {
  * await reject('approval_456', 'Budget exceeded');
  * ```
  */
-declare function useApprovals(api: any, // ICommerceClient
-initialFilters?: ApprovalFilters): UseApprovalsResult;
+declare function useApprovals(api: ICommerceClient, initialFilters?: ApprovalFilters): UseApprovalsResult;
 
 /**
  * Spending Limits Hook
@@ -388,7 +386,6 @@ interface SpendingHistoryEntry {
  * }
  * ```
  */
-declare function useSpendingLimits(api: any, // ICommerceClient
-employeeId?: string): UseSpendingLimitsResult;
+declare function useSpendingLimits(api: ICommerceClient, employeeId?: string): UseSpendingLimitsResult;
 
 export { type Approval, type ApprovalDecisionInput, type ApprovalFilters, type ApprovalType, type B2BAction, type CompanyState, type CreateQuoteInput, type QuoteFilters, type RequestApprovalInput, type RespondToQuoteInput, type SpendingHistoryEntry, type SpendingSummary, type UseApprovalsResult, type UseCompanyOptions, type UseCompanyResult, type UseQuotesResult, type UseSpendingLimitsResult, useApprovals, useCompany, useQuotes, useSpendingLimits };

@@ -156,7 +156,7 @@ function QuantitySelector({
 }: QuantitySelectorProps) {
   const [inputValue, setInputValue] = useState(String(value));
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync input value with prop
   useEffect(() => {

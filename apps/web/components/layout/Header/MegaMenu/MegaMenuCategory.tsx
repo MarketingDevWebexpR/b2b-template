@@ -41,7 +41,7 @@ export const MegaMenuCategory = memo(function MegaMenuCategory({
     <div className={cn('flex flex-col', className)}>
       {/* Category header */}
       <Link
-        href={`/categories/${category.handle}`}
+        href={`/categorie/${category.handle}`}
         onClick={onLinkClick}
         className={cn(
           'flex items-center gap-2 pb-3 mb-3',
@@ -60,7 +60,7 @@ export const MegaMenuCategory = memo(function MegaMenuCategory({
           {category.children.slice(0, 8).map((sub) => (
             <li key={sub.id}>
               <Link
-                href={`/categories/${category.handle}/${sub.handle}`}
+                href={`/categorie/${category.handle}/${sub.handle}`}
                 onClick={onLinkClick}
                 className={cn(
                   'flex items-center justify-between py-1.5',
@@ -85,7 +85,7 @@ export const MegaMenuCategory = memo(function MegaMenuCategory({
       {/* View all link */}
       {category.children && category.children.length > 8 && (
         <Link
-          href={`/categories/${category.handle}`}
+          href={`/categorie/${category.handle}`}
           onClick={onLinkClick}
           className={cn(
             'inline-flex items-center gap-1 mt-3 pt-3 border-t border-neutral-100',

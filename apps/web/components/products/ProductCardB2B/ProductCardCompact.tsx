@@ -225,7 +225,7 @@ export function ProductCardCompact({
       {/* Product Name */}
       <div className="flex-1 min-w-0" role="cell">
         <Link
-          href={`/produits/${product.slug || product.id}`}
+          href={`/produit/${product.slug || product.id}`}
           className="text-body-sm text-content-primary hover:text-primary transition-colors truncate block"
         >
           {product.name}

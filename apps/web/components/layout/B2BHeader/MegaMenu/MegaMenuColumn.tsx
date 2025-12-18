@@ -49,7 +49,7 @@ const SubCategorySection = memo(function SubCategorySection({
     <div className="mb-3">
       {/* Subcategory header */}
       <Link
-        href={`/categories/${categorySlug}/${subcategory.slug}`}
+        href={`/categorie/${categorySlug}/${subcategory.slug}`}
         className={cn(
           'flex items-center justify-between py-1',
           'text-sm font-medium text-neutral-900',
@@ -72,7 +72,7 @@ const SubCategorySection = memo(function SubCategorySection({
           {subcategory.items.slice(0, 5).map((item) => (
             <li key={item.id}>
               <Link
-                href={`/categories/${categorySlug}/${subcategory.slug}/${item.slug}`}
+                href={`/categorie/${categorySlug}/${subcategory.slug}/${item.slug}`}
                 className={cn(
                   'flex items-center justify-between py-1',
                   'text-sm text-neutral-600',
@@ -96,7 +96,7 @@ const SubCategorySection = memo(function SubCategorySection({
           {subcategory.items.length > 5 && (
             <li>
               <Link
-                href={`/categories/${categorySlug}/${subcategory.slug}`}
+                href={`/categorie/${categorySlug}/${subcategory.slug}`}
                 className={cn(
                   'inline-flex items-center gap-1 py-1',
                   'text-sm text-accent font-medium',
@@ -132,7 +132,7 @@ export const MegaMenuColumn = memo(function MegaMenuColumn({
     >
       {/* Category header */}
       <Link
-        href={`/categories/${category.slug}`}
+        href={`/categorie/${category.slug}`}
         className={cn(
           'flex items-center gap-2 pb-3 mb-3',
           'text-base font-semibold text-neutral-900',
@@ -159,7 +159,7 @@ export const MegaMenuColumn = memo(function MegaMenuColumn({
 
       {/* View all category link */}
       <Link
-        href={`/categories/${category.slug}`}
+        href={`/categorie/${category.slug}`}
         className={cn(
           'inline-flex items-center gap-1 mt-4 pt-3 border-t border-neutral-200',
           'text-sm font-medium text-accent',

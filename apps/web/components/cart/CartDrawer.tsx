@@ -79,7 +79,7 @@ function MiniCartItem({ item }: MiniCartItemProps) {
     >
       {/* Product Image */}
       <Link
-        href={`/produits/${item.productSlug}`}
+        href={`/produit/${item.productSlug}`}
         className="relative w-16 h-16 flex-shrink-0 bg-neutral-100 rounded overflow-hidden group"
       >
         <Image
@@ -93,7 +93,7 @@ function MiniCartItem({ item }: MiniCartItemProps) {
 
       {/* Product Details */}
       <div className="flex-1 min-w-0">
-        <Link href={`/produits/${item.productSlug}`}>
+        <Link href={`/produit/${item.productSlug}`}>
           <h4 className="text-sm font-medium text-neutral-900 line-clamp-1 hover:text-accent transition-colors">
             {item.productName}
           </h4>

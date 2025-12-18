@@ -1,24 +1,19 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { SearchResults, generateMockProducts } from '@/components/search/SearchResults';
-import { SearchProvider } from '@/contexts/SearchContext';
+import { SearchResultsLive } from '@/components/search/SearchResults';
 import { Container, Skeleton } from '@/components/ui';
 
 /**
  * Search Results Page
  *
  * Server Component that handles search query parameters and renders
- * the search results with faceted filters.
+ * the search results with faceted filters using real Meilisearch API.
  *
  * URL Parameters:
  * - q: Search query
- * - category: Category filter (comma-separated)
- * - brand: Brand filter (comma-separated)
- * - price_min: Minimum price
- * - price_max: Maximum price
- * - sort: Sort option
- * - page: Current page
- * - pageSize: Items per page
+ * - category: Category filter
+ * - brand: Brand filter
+ * - sort: Sort option (relevance, price_asc, price_desc, newest)
  */
 
 // ============================================================================
@@ -30,12 +25,7 @@ interface PageProps {
     q?: string;
     category?: string;
     brand?: string;
-    price_min?: string;
-    price_max?: string;
     sort?: string;
-    page?: string;
-    pageSize?: string;
-    stock?: string;
   }>;
 }
 
@@ -127,36 +117,13 @@ function SearchResultsLoading() {
 }
 
 // ============================================================================
-// Search Results Content (Client Component Wrapper)
-// ============================================================================
-
-interface SearchResultsContentProps {
-  query: string;
-  initialProducts?: ReturnType<typeof generateMockProducts>;
-}
-
-function SearchResultsContent({
-  query,
-  initialProducts,
-}: SearchResultsContentProps) {
-  return (
-    <SearchProvider mockMode>
-      <SearchResults initialQuery={query} initialProducts={initialProducts} />
-    </SearchProvider>
-  );
-}
-
-// ============================================================================
 // Page Component
 // ============================================================================
 
 export default async function SearchPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const query = params.q || '';
-
-  // Pre-fetch initial products for SSR
-  // In production, this would be an API call
-  const initialProducts = generateMockProducts(24);
+  const category = params.category;
 
   return (
     <>
@@ -166,9 +133,10 @@ export default async function SearchPage({ searchParams }: PageProps) {
       <section className="py-8 min-h-screen bg-white">
         <Container>
           <Suspense fallback={<SearchResultsLoading />}>
-            <SearchResultsContent
-              query={query}
-              initialProducts={initialProducts}
+            <SearchResultsLive
+              initialQuery={query}
+              initialCategory={category}
+              pageSize={24}
             />
           </Suspense>
         </Container>

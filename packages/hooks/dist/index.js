@@ -3,24 +3,28 @@ import {
   useCompany,
   useQuotes,
   useSpendingLimits
-} from "./chunk-W4T47TEI.js";
+} from "./chunk-4BFXJ7WQ.js";
 import {
   useBulkCart,
   useCart
-} from "./chunk-HBZXFFBZ.js";
-import "./chunk-MLTLTBV6.js";
+} from "./chunk-ZMG6UYVT.js";
+import "./chunk-EJSVSPJG.js";
 import {
+  QueryCacheProvider,
   clearQueryCache,
   invalidateQueries,
   useApiMutation,
-  useApiQuery
-} from "./chunk-J655YIA7.js";
+  useApiQuery,
+  useInvalidateQueries,
+  useQueryCache
+} from "./chunk-KPRLFJKZ.js";
 import {
   setStorageAdapter,
   useSessionStorage,
   useStorage
-} from "./chunk-T4JN4A26.js";
+} from "./chunk-HVO66BPO.js";
 export {
+  QueryCacheProvider,
   clearQueryCache,
   invalidateQueries,
   setStorageAdapter,
@@ -30,6 +34,8 @@ export {
   useBulkCart,
   useCart,
   useCompany,
+  useInvalidateQueries,
+  useQueryCache,
   useQuotes,
   useSessionStorage,
   useSpendingLimits,

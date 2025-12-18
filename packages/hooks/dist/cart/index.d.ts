@@ -1,4 +1,5 @@
 import { Cart, CartItem } from '@maison/types';
+import { ICommerceClient } from '@maison/api-client';
 
 /**
  * Cart Hook
@@ -27,6 +28,10 @@ interface ExtendedCart extends Cart {
     subtotal?: number;
     /** Total (with taxes/discounts) */
     total?: number;
+    /** Total items count */
+    totalItems: number;
+    /** Total price */
+    totalPrice: number;
     /** Extended items with IDs */
     items: CartItemWithId[];
 }
@@ -114,8 +119,7 @@ interface UseCartResult {
  * await updateItem('item_123', 5);
  * ```
  */
-declare function useCart(api: any, // ICommerceClient
-options?: UseCartOptions): UseCartResult;
+declare function useCart(api: ICommerceClient, options?: UseCartOptions): UseCartResult;
 
 /**
  * Bulk Cart Hook
@@ -210,7 +214,6 @@ interface UseBulkCartResult {
  * const csvResult = await importFromCSV(csvFileContent);
  * ```
  */
-declare function useBulkCart(api: any, // ICommerceClient
-options: UseBulkCartOptions): UseBulkCartResult;
+declare function useBulkCart(api: ICommerceClient, options: UseBulkCartOptions): UseBulkCartResult;
 
 export { type BulkItemInput, type CSVImportResult, type CartItemWithId, type CartUpdateInput, type ExtendedCart, type UseBulkCartOptions, type UseBulkCartResult, type UseCartOptions, type UseCartResult, useBulkCart, useCart };

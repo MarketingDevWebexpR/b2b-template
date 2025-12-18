@@ -29,21 +29,21 @@ const defaultNavItems: NavItem[] = [
   {
     id: 'catalogue',
     label: 'Catalogue',
-    href: '/categories',
+    href: '/c',
     icon: <Grid3X3 className="w-4 h-4" />,
     hasMegaMenu: true,
   },
   {
     id: 'promotions',
     label: 'Promotions',
-    href: '/categories?filter=promo',
+    href: '/c?filter=promo',
     icon: <Tag className="w-4 h-4" />,
     highlight: true,
   },
   {
     id: 'nouveautes',
     label: 'Nouveautes',
-    href: '/categories?sort=newest',
+    href: '/c?sort=newest',
     icon: <Sparkles className="w-4 h-4" />,
   },
   {

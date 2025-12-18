@@ -7,8 +7,56 @@
  * @see https://docs.medusajs.com/learn/customization/custom-features/api-route#middleware
  */
 
-import { defineMiddlewares, authenticate } from "@medusajs/framework/http";
+import {
+  defineMiddlewares,
+  authenticate,
+  unlessPath,
+} from "@medusajs/framework/http";
 import type { Request, Response, NextFunction } from "express";
+import multer from "multer";
+
+// =========================================================================
+// MULTER CONFIGURATION FOR FILE UPLOADS
+// =========================================================================
+
+/**
+ * Multer configuration for handling file uploads
+ * Uses memory storage to keep files in buffer
+ */
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB max
+  },
+});
+
+/**
+ * Middleware wrapper to handle multer single file upload
+ */
+const singleFileUpload = (fieldName: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    upload.single(fieldName)(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({
+            type: "validation_error",
+            message: "Le fichier est trop volumineux (max 10MB)",
+          });
+        }
+        return res.status(400).json({
+          type: "upload_error",
+          message: err.message,
+        });
+      } else if (err) {
+        return res.status(500).json({
+          type: "upload_error",
+          message: "Erreur lors de l'upload du fichier",
+        });
+      }
+      next();
+    });
+  };
+};
 
 // =========================================================================
 // RATE LIMITING IMPLEMENTATION
@@ -217,8 +265,89 @@ const adminB2BRateLimiter = createRateLimiter({
   message: "Too many admin API requests. Please try again later.",
 });
 
+/**
+ * Rate limiter for CMS store routes (public)
+ * 120 requests per minute per IP
+ * Higher limit because these are public cached endpoints
+ */
+const storeCmsRateLimiter = createRateLimiter({
+  maxRequests: 120,
+  windowMs: 60 * 1000, // 1 minute
+  routeKey: "store-cms-general",
+  message: "Too many requests to CMS API. Please try again later.",
+});
+
+/**
+ * Rate limiter for public CMS routes (no API key required)
+ * 120 requests per minute per IP
+ * For /cms/* routes that bypass store authentication
+ */
+const publicCmsRateLimiter = createRateLimiter({
+  maxRequests: 120,
+  windowMs: 60 * 1000, // 1 minute
+  routeKey: "public-cms",
+  message: "Too many requests to CMS API. Please try again later.",
+});
+
+/**
+ * Rate limiter for search routes (public, no API key required)
+ * 120 requests per minute per IP
+ * Higher limit for search autocomplete and search queries
+ */
+const searchRateLimiter = createRateLimiter({
+  maxRequests: 120,
+  windowMs: 60 * 1000, // 1 minute
+  routeKey: "store-search",
+  message: "Too many search requests. Please try again later.",
+});
+
+/**
+ * Rate limiter for admin CMS routes
+ * 100 requests per minute per IP
+ */
+const adminCmsRateLimiter = createRateLimiter({
+  maxRequests: 100,
+  windowMs: 60 * 1000, // 1 minute
+  routeKey: "admin-cms-general",
+  message: "Too many admin CMS API requests. Please try again later.",
+});
+
+/**
+ * Rate limiter for store marques routes (public)
+ * 120 requests per minute per IP
+ * Public endpoint for brand listing
+ */
+const storeMarquesRateLimiter = createRateLimiter({
+  maxRequests: 120,
+  windowMs: 60 * 1000, // 1 minute
+  routeKey: "store-marques",
+  message: "Too many requests to Marques API. Please try again later.",
+});
+
+/**
+ * Rate limiter for admin marques routes
+ * 100 requests per minute per IP
+ */
+const adminMarquesRateLimiter = createRateLimiter({
+  maxRequests: 100,
+  windowMs: 60 * 1000, // 1 minute
+  routeKey: "admin-marques",
+  message: "Too many admin Marques API requests. Please try again later.",
+});
+
 export default defineMiddlewares({
   routes: [
+    // =========================================================================
+    // FILE UPLOAD MIDDLEWARE (must be before authentication for multipart)
+    // =========================================================================
+
+    // Hero Slide image upload - parse multipart/form-data
+    {
+      matcher: "/admin/cms/hero-slides/:id/upload-image",
+      method: "POST",
+      middlewares: [singleFileUpload("file")],
+    },
+
     // =========================================================================
     // RATE LIMITING MIDDLEWARE (applied first, before authentication)
     // =========================================================================
@@ -255,6 +384,72 @@ export default defineMiddlewares({
     },
 
     // =========================================================================
+    // CMS RATE LIMITING MIDDLEWARE
+    // =========================================================================
+
+    // Rate limiting for CMS store routes (120 req/min - public endpoints)
+    {
+      matcher: "/store/cms/*",
+      middlewares: [storeCmsRateLimiter],
+    },
+
+    // Rate limiting for public CMS routes (120 req/min - no API key required)
+    {
+      matcher: "/cms/*",
+      middlewares: [publicCmsRateLimiter],
+    },
+
+    // Rate limiting for search routes (120 req/min - public endpoints)
+    {
+      matcher: "/store/search",
+      middlewares: [searchRateLimiter],
+    },
+    {
+      matcher: "/store/search/*",
+      middlewares: [searchRateLimiter],
+    },
+
+    // Rate limiting for public search routes (no API key required)
+    {
+      matcher: "/search",
+      middlewares: [searchRateLimiter],
+    },
+    {
+      matcher: "/search/*",
+      middlewares: [searchRateLimiter],
+    },
+
+    // Rate limiting for admin CMS routes (100 req/min)
+    {
+      matcher: "/admin/cms/*",
+      middlewares: [adminCmsRateLimiter],
+    },
+
+    // =========================================================================
+    // MARQUES RATE LIMITING MIDDLEWARE
+    // =========================================================================
+
+    // Rate limiting for store marques routes (120 req/min - public endpoints)
+    {
+      matcher: "/store/marques",
+      middlewares: [storeMarquesRateLimiter],
+    },
+    {
+      matcher: "/store/marques/*",
+      middlewares: [storeMarquesRateLimiter],
+    },
+
+    // Rate limiting for admin marques routes (100 req/min)
+    {
+      matcher: "/admin/marques",
+      middlewares: [adminMarquesRateLimiter],
+    },
+    {
+      matcher: "/admin/marques/*",
+      middlewares: [adminMarquesRateLimiter],
+    },
+
+    // =========================================================================
     // B2B STORE AUTHENTICATION MIDDLEWARE
     // =========================================================================
 
@@ -267,6 +462,13 @@ export default defineMiddlewares({
     },
 
     // =========================================================================
+    // CMS STORE ROUTES - NO AUTHENTICATION (PUBLIC)
+    // =========================================================================
+    // Note: Les routes CMS store sont publiques et ne necessitent pas
+    // d'authentification. Elles ne sont pas listees ici car elles ne
+    // requierent pas de middleware d'authentification.
+
+    // =========================================================================
     // B2B ADMIN AUTHENTICATION MIDDLEWARE
     // =========================================================================
 
@@ -277,5 +479,36 @@ export default defineMiddlewares({
         authenticate("user", ["bearer", "session"]),
       ],
     },
+
+    // =========================================================================
+    // CMS ADMIN AUTHENTICATION MIDDLEWARE
+    // =========================================================================
+
+    {
+      // Admin CMS routes - authenticate all routes under /admin/cms
+      matcher: "/admin/cms/**",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
+
+    // =========================================================================
+    // MARQUES ADMIN AUTHENTICATION MIDDLEWARE
+    // =========================================================================
+
+    {
+      // Admin Marques routes - authenticate all routes under /admin/marques
+      matcher: "/admin/marques/**",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
+
+    // =========================================================================
+    // MARQUES STORE ROUTES - NO AUTHENTICATION (PUBLIC)
+    // =========================================================================
+    // Note: Les routes store marques sont publiques et ne necessitent pas
+    // d'authentification. Elles ne sont pas listees ici car elles ne
+    // requierent pas de middleware d'authentification.
   ],
 });

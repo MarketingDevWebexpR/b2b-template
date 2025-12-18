@@ -105,33 +105,33 @@ function useStorage(key, defaultValue, options = {}) {
     error
   };
 }
-function useSessionStorage(key, defaultValue, options = {}) {
-  const memoryStorage = /* @__PURE__ */ new Map();
-  const sessionAdapter = {
-    getItem: (k) => {
-      if (typeof window !== "undefined" && window.sessionStorage) {
-        return sessionStorage.getItem(k);
-      }
-      return memoryStorage.get(k) ?? null;
-    },
-    setItem: (k, v) => {
-      if (typeof window !== "undefined" && window.sessionStorage) {
-        sessionStorage.setItem(k, v);
-      } else {
-        memoryStorage.set(k, v);
-      }
-    },
-    removeItem: (k) => {
-      if (typeof window !== "undefined" && window.sessionStorage) {
-        sessionStorage.removeItem(k);
-      } else {
-        memoryStorage.delete(k);
-      }
+var sessionMemoryStorage = /* @__PURE__ */ new Map();
+var sessionStorageAdapter = {
+  getItem: (k) => {
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      return sessionStorage.getItem(k);
     }
-  };
+    return sessionMemoryStorage.get(k) ?? null;
+  },
+  setItem: (k, v) => {
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      sessionStorage.setItem(k, v);
+    } else {
+      sessionMemoryStorage.set(k, v);
+    }
+  },
+  removeItem: (k) => {
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      sessionStorage.removeItem(k);
+    } else {
+      sessionMemoryStorage.delete(k);
+    }
+  }
+};
+function useSessionStorage(key, defaultValue, options = {}) {
   return useStorage(key, defaultValue, {
     ...options,
-    storage: sessionAdapter
+    storage: sessionStorageAdapter
   });
 }
 // Annotate the CommonJS export names for ESM import in node:

@@ -36,6 +36,9 @@ export {
   HeaderNav,
   MegaMenuEcom,
   MobileMenuEcom,
+  // SSR-compatible versions (recommended)
+  B2BHeaderEcomSSR,
+  B2BHeaderEcomSSRSpacer,
 } from './B2BHeaderEcom';
 
-export type { B2BHeaderEcomProps } from './B2BHeaderEcom';
+export type { B2BHeaderEcomProps, B2BHeaderEcomSSRProps } from './B2BHeaderEcom';

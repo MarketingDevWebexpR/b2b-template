@@ -13,6 +13,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ArrowRight, Clock, TrendingUp, Loader2 } from 'lucide-react';
 import { cn, formatPrice, debounce } from '@/lib/utils';
 import type { Product, Category } from '@/types';
+import { getMedusaSearchClient, type ProductSearchResult, type CategorySuggestion } from '@/lib/search';
+import { CategorySuggestionItem } from './SearchBar/CategorySuggestionItem';
 
 // ============================================
 // Types
@@ -24,8 +26,9 @@ interface SearchOverlayProps {
 }
 
 interface SearchResult {
-  products: Product[];
+  products: ProductSearchResult[];
   categories: Category[];
+  categorySuggestions: CategorySuggestion[];
   totalProducts: number;
 }
 
@@ -165,7 +168,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }
   }, [isOpen]);
 
-  // Debounced search function
+  // Debounced search function using Medusa Search API
   const performSearch = useCallback(
     debounce(async (searchQuery: string) => {
       if (!searchQuery.trim() || searchQuery.trim().length < 2) {
@@ -177,24 +180,23 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       setIsLoading(true);
 
       try {
-        // API call to our internal search endpoint
-        const response = await fetch(
-          `/api/search?q=${encodeURIComponent(searchQuery)}&limit=6`
-        );
+        const client = getMedusaSearchClient();
 
-        if (response.ok) {
-          const data = await response.json();
-          setResults({
-            products: data.products || [],
-            categories: [],
-            totalProducts: data.total || 0
-          });
-        } else {
-          setResults({ products: [], categories: [], totalProducts: 0 });
-        }
+        // Fetch products and categories in parallel
+        const [productResponse, categoryResponse] = await Promise.all([
+          client.searchProducts(searchQuery, { limit: 6 }),
+          client.getCategorySuggestions(searchQuery, 4),
+        ]);
+
+        setResults({
+          products: productResponse.hits || [],
+          categories: [],
+          categorySuggestions: categoryResponse.categories || [],
+          totalProducts: productResponse.total || 0
+        });
       } catch (error) {
         console.error('Search error:', error);
-        setResults({ products: [], categories: [], totalProducts: 0 });
+        setResults({ products: [], categories: [], categorySuggestions: [], totalProducts: 0 });
       } finally {
         setIsLoading(false);
       }
@@ -246,9 +248,18 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   };
 
   // Handle product click
-  const handleProductClick = (product: Product) => {
+  const handleProductClick = (product: ProductSearchResult) => {
     saveRecentSearch(query);
     onClose();
+  };
+
+  // Handle category click
+  const handleCategoryClick = (category: CategorySuggestion) => {
+    saveRecentSearch(query);
+    onClose();
+    // Use fullPath for hierarchical URL, fallback to handle
+    const categoryPath = category.fullPath || category.handle;
+    window.location.href = `/categorie/${categoryPath}`;
   };
 
   // Clear recent searches
@@ -281,7 +292,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       case 'Enter':
         if (selectedIndex >= 0 && results?.products[selectedIndex]) {
           const product = results.products[selectedIndex];
-          window.location.href = `/products/${product.id}`;
+          window.location.href = `/products/${product.handle}`;
         }
         break;
     }
@@ -289,8 +300,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
   // Determine if showing suggestions or results
   const showSuggestions = !query.trim() && !isLoading;
+  const hasAnyResults = results && (results.products.length > 0 || results.categorySuggestions.length > 0);
   const showResults = query.trim() && results && !isLoading;
-  const showNoResults = query.trim() && results && results.products.length === 0 && !isLoading;
+  const showNoResults = query.trim() && results && !hasAnyResults && !isLoading;
 
   return (
     <AnimatePresence>
@@ -539,48 +551,90 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               )}
 
               {/* Search Results */}
-              {showResults && results.products.length > 0 && (
+              {showResults && hasAnyResults && (
                 <motion.div
                   variants={staggerContainer}
                   initial="hidden"
                   animate="visible"
                 >
-                  {/* Results Header */}
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-                      {results.totalProducts} résultat{results.totalProducts > 1 ? 's' : ''}
-                    </span>
-                    <Link
-                      href={`/recherche?q=${encodeURIComponent(query)}`}
-                      className={cn(
-                        'flex items-center gap-1.5',
-                        'text-xs font-medium uppercase tracking-wider',
-                        'text-accent hover:text-accent/80',
-                        'transition-colors duration-200',
-                        'group'
-                      )}
-                      onClick={() => saveRecentSearch(query)}
-                    >
-                      Voir tout
-                      <ArrowRight
-                        className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-                        strokeWidth={1.5}
-                      />
-                    </Link>
-                  </div>
+                  {/* Categories Section */}
+                  {results.categorySuggestions.length > 0 && (
+                    <motion.div variants={itemVariants} className="mb-6">
+                      <h3 className="flex items-center gap-2 mb-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={1.5}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-4 h-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" />
+                          <path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.88-.55H13a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1Z" />
+                          <path d="M3 5a2 2 0 0 0 2 2h3" />
+                          <path d="M3 3v13a2 2 0 0 0 2 2h3" />
+                        </svg>
+                        Categories
+                      </h3>
+                      <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden divide-y divide-neutral-100">
+                        {results.categorySuggestions.map((category, index) => (
+                          <CategorySuggestionItem
+                            key={category.id}
+                            category={category}
+                            query={query}
+                            isActive={selectedIndex === index}
+                            index={index}
+                            onClick={() => handleCategoryClick(category)}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
-                  {/* Products Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-                    {results.products.slice(0, 6).map((product, index) => (
-                      <motion.div key={product.id} variants={itemVariants}>
-                        <SearchProductCard
-                          product={product}
-                          isSelected={selectedIndex === index}
-                          onClick={() => handleProductClick(product)}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
+                  {/* Products Section */}
+                  {results.products.length > 0 && (
+                    <>
+                      {/* Results Header */}
+                      <div className="flex items-center justify-between mb-6">
+                        <span className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+                          {results.totalProducts} produit{results.totalProducts > 1 ? 's' : ''}
+                        </span>
+                        <Link
+                          href={`/recherche?q=${encodeURIComponent(query)}`}
+                          className={cn(
+                            'flex items-center gap-1.5',
+                            'text-xs font-medium uppercase tracking-wider',
+                            'text-accent hover:text-accent/80',
+                            'transition-colors duration-200',
+                            'group'
+                          )}
+                          onClick={() => saveRecentSearch(query)}
+                        >
+                          Voir tout
+                          <ArrowRight
+                            className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                            strokeWidth={1.5}
+                          />
+                        </Link>
+                      </div>
+
+                      {/* Products Grid */}
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+                        {results.products.slice(0, 6).map((product, index) => (
+                          <motion.div key={product.id} variants={itemVariants}>
+                            <SearchProductCard
+                              product={product}
+                              isSelected={selectedIndex === results.categorySuggestions.length + index}
+                              onClick={() => handleProductClick(product)}
+                            />
+                          </motion.div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </motion.div>
               )}
             </div>
@@ -602,18 +656,21 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 // ============================================
 
 interface SearchProductCardProps {
-  product: Product;
+  product: ProductSearchResult;
   isSelected: boolean;
   onClick: () => void;
 }
 
 function SearchProductCard({ product, isSelected, onClick }: SearchProductCardProps) {
   const [imageError, setImageError] = useState(false);
-  const imageSrc = imageError || !product.images[0] ? PLACEHOLDER_IMAGE : product.images[0];
+  const imageSrc = imageError || !product.thumbnail ? PLACEHOLDER_IMAGE : product.thumbnail;
+
+  // Get the lowest price from the product
+  const displayPrice = product.price_min ? formatPrice(product.price_min / 100) : null;
 
   return (
     <Link
-      href={`/products/${product.id}`}
+      href={`/products/${product.handle}`}
       onClick={onClick}
       className={cn(
         'group block',
@@ -634,7 +691,7 @@ function SearchProductCard({ product, isSelected, onClick }: SearchProductCardPr
       )}>
         <Image
           src={imageSrc}
-          alt={product.name}
+          alt={product.title}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
           className={cn(
@@ -644,6 +701,10 @@ function SearchProductCard({ product, isSelected, onClick }: SearchProductCardPr
           )}
           onError={() => setImageError(true)}
         />
+        {/* Stock indicator */}
+        {product.has_stock && (
+          <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-500" title="En stock" />
+        )}
       </div>
 
       {/* Product Info */}
@@ -654,11 +715,18 @@ function SearchProductCard({ product, isSelected, onClick }: SearchProductCardPr
           'transition-colors duration-200',
           'group-hover:text-accent'
         )}>
-          {product.name}
+          {product.title}
         </h4>
-        <p className="mt-1 font-sans text-xs text-neutral-500">
-          {formatPrice(product.price)}
-        </p>
+        {displayPrice && (
+          <p className="mt-1 font-sans text-xs text-neutral-500">
+            {displayPrice}
+          </p>
+        )}
+        {product.sku && (
+          <p className="mt-0.5 font-sans text-xs text-neutral-400">
+            Ref: {product.sku}
+          </p>
+        )}
       </div>
     </Link>
   );

@@ -25,11 +25,95 @@ __export(cart_exports, {
 module.exports = __toCommonJS(cart_exports);
 
 // src/cart/useCart.ts
-var import_react3 = require("react");
+var import_react4 = require("react");
 
 // src/api/useApiQuery.ts
+var import_react2 = require("react");
+
+// src/api/QueryCacheContext.tsx
 var import_react = require("react");
-var queryCache = /* @__PURE__ */ new Map();
+var import_jsx_runtime = require("react/jsx-runtime");
+var QueryCacheContext = (0, import_react.createContext)(null);
+var clientFallbackCache = null;
+function getClientFallbackCache() {
+  if (!clientFallbackCache) {
+    clientFallbackCache = /* @__PURE__ */ new Map();
+  }
+  return clientFallbackCache;
+}
+function createCacheOperations(cacheRef) {
+  const getFromCache = function(key, staleTime) {
+    const cached = cacheRef.current.get(key);
+    if (cached && Date.now() - cached.timestamp < staleTime) {
+      return cached.data;
+    }
+    return null;
+  };
+  const hasValidCache = function(key, cacheTime) {
+    const cached = cacheRef.current.get(key);
+    return cached !== void 0 && Date.now() - cached.timestamp < cacheTime;
+  };
+  const getCachedData = function(key) {
+    const cached = cacheRef.current.get(key);
+    return cached ? cached.data : null;
+  };
+  const setInCache = function(key, data) {
+    cacheRef.current.set(key, { data, timestamp: Date.now() });
+  };
+  const invalidate = function(key) {
+    cacheRef.current.delete(key);
+  };
+  const invalidateByPrefix = function(prefix) {
+    const keysToDelete = [];
+    cacheRef.current.forEach((_, key) => {
+      if (key.startsWith(prefix)) {
+        keysToDelete.push(key);
+      }
+    });
+    keysToDelete.forEach((key) => cacheRef.current.delete(key));
+  };
+  const invalidateAll = function() {
+    cacheRef.current.clear();
+  };
+  return {
+    getFromCache,
+    hasValidCache,
+    getCachedData,
+    setInCache,
+    invalidate,
+    invalidateByPrefix,
+    invalidateAll
+  };
+}
+function useQueryCache() {
+  const context = (0, import_react.useContext)(QueryCacheContext);
+  const fallbackRef = (0, import_react.useRef)(null);
+  const fallbackValue = (0, import_react.useMemo)(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!fallbackRef.current) {
+      fallbackRef.current = getClientFallbackCache();
+    }
+    return createCacheOperations(
+      fallbackRef
+    );
+  }, []);
+  if (context) {
+    return context;
+  }
+  if (typeof window === "undefined") {
+    throw new Error(
+      "QueryCacheProvider is required for SSR. Wrap your application with <QueryCacheProvider> to enable request-scoped caching."
+    );
+  }
+  if (fallbackValue) {
+    return fallbackValue;
+  }
+  throw new Error("Failed to initialize query cache");
+}
+
+// src/api/useApiQuery.ts
 function useApiQuery(queryKey, queryFn, options = {}) {
   const {
     enabled = true,
@@ -42,18 +126,24 @@ function useApiQuery(queryKey, queryFn, options = {}) {
     onError,
     refetchOnWindowFocus = false
   } = options;
+  const cache = useQueryCache();
   const cacheKey = JSON.stringify(queryKey);
-  const retryCountRef = (0, import_react.useRef)(0);
-  const [state, setState] = (0, import_react.useState)(() => {
-    const cached = queryCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < cacheTime) {
-      return {
-        data: cached.data,
-        isLoading: false,
-        error: null,
-        isSuccess: true,
-        isFetching: false
-      };
+  const retryCountRef = (0, import_react2.useRef)(0);
+  const retryTimeoutRef = (0, import_react2.useRef)(null);
+  const abortControllerRef = (0, import_react2.useRef)(null);
+  const isMountedRef = (0, import_react2.useRef)(true);
+  const [state, setState] = (0, import_react2.useState)(() => {
+    if (cache.hasValidCache(cacheKey, cacheTime)) {
+      const cachedData = cache.getCachedData(cacheKey);
+      if (cachedData !== null) {
+        return {
+          data: cachedData,
+          isLoading: false,
+          error: null,
+          isSuccess: true,
+          isFetching: false
+        };
+      }
     }
     return {
       data: initialData ?? null,
@@ -63,14 +153,14 @@ function useApiQuery(queryKey, queryFn, options = {}) {
       isFetching: enabled
     };
   });
-  const fetchData = (0, import_react.useCallback)(
+  const fetchData = (0, import_react2.useCallback)(
     async (isRefetch = false) => {
       if (!isRefetch) {
-        const cached = queryCache.get(cacheKey);
-        if (cached && Date.now() - cached.timestamp < staleTime) {
+        const cachedData = cache.getFromCache(cacheKey, staleTime);
+        if (cachedData !== null) {
           setState((prev) => ({
             ...prev,
-            data: cached.data,
+            data: cachedData,
             isLoading: false,
             isSuccess: true,
             isFetching: false
@@ -78,6 +168,13 @@ function useApiQuery(queryKey, queryFn, options = {}) {
           return;
         }
       }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
       setState((prev) => ({
         ...prev,
         isLoading: !prev.data,
@@ -85,8 +182,9 @@ function useApiQuery(queryKey, queryFn, options = {}) {
         error: null
       }));
       try {
-        const data = await queryFn();
-        queryCache.set(cacheKey, { data, timestamp: Date.now() });
+        const data = await queryFn({ signal });
+        if (!isMountedRef.current || signal.aborted) return;
+        cache.setInCache(cacheKey, data);
         setState({
           data,
           isLoading: false,
@@ -97,10 +195,17 @@ function useApiQuery(queryKey, queryFn, options = {}) {
         retryCountRef.current = 0;
         onSuccess?.(data);
       } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
+        if (!isMountedRef.current) return;
         const error = err instanceof Error ? err : new Error(String(err));
         if (retryCountRef.current < retryCount) {
           retryCountRef.current++;
-          setTimeout(() => fetchData(isRefetch), retryDelay * retryCountRef.current);
+          retryTimeoutRef.current = setTimeout(
+            () => fetchData(isRefetch),
+            retryDelay * retryCountRef.current
+          );
           return;
         }
         setState((prev) => ({
@@ -113,14 +218,14 @@ function useApiQuery(queryKey, queryFn, options = {}) {
         onError?.(error);
       }
     },
-    [cacheKey, queryFn, staleTime, retryCount, retryDelay, onSuccess, onError]
+    [cacheKey, queryFn, staleTime, retryCount, retryDelay, onSuccess, onError, cache]
   );
-  const refetch = (0, import_react.useCallback)(async () => {
+  const refetch = (0, import_react2.useCallback)(async () => {
     retryCountRef.current = 0;
     await fetchData(true);
   }, [fetchData]);
-  const reset = (0, import_react.useCallback)(() => {
-    queryCache.delete(cacheKey);
+  const reset = (0, import_react2.useCallback)(() => {
+    cache.invalidate(cacheKey);
     setState({
       data: initialData ?? null,
       isLoading: false,
@@ -128,36 +233,50 @@ function useApiQuery(queryKey, queryFn, options = {}) {
       isSuccess: false,
       isFetching: false
     });
-  }, [cacheKey, initialData]);
-  (0, import_react.useEffect)(() => {
+  }, [cacheKey, initialData, cache]);
+  (0, import_react2.useEffect)(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+  (0, import_react2.useEffect)(() => {
     if (enabled) {
       fetchData();
     }
   }, [enabled, cacheKey]);
-  (0, import_react.useEffect)(() => {
-    if (!refetchOnWindowFocus || !enabled) return;
+  (0, import_react2.useEffect)(() => {
+    if (!refetchOnWindowFocus || !enabled || typeof window === "undefined") {
+      return;
+    }
     const handleFocus = () => {
-      const cached = queryCache.get(cacheKey);
-      if (!cached || Date.now() - cached.timestamp >= staleTime) {
+      const cachedData = cache.getFromCache(cacheKey, staleTime);
+      if (cachedData === null) {
         fetchData(true);
       }
     };
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [refetchOnWindowFocus, enabled, cacheKey, staleTime, fetchData]);
+  }, [refetchOnWindowFocus, enabled, cacheKey, staleTime, fetchData, cache]);
   return {
     ...state,
     refetch,
     reset
   };
 }
-function invalidateQueries(queryKey) {
-  const cacheKey = JSON.stringify(queryKey);
-  queryCache.delete(cacheKey);
+function invalidateQueries(_queryKey) {
+  console.warn(
+    "invalidateQueries() is deprecated. Use useInvalidateQueries().invalidate(queryKey) instead."
+  );
 }
 
 // src/api/useApiMutation.ts
-var import_react2 = require("react");
+var import_react3 = require("react");
 function useApiMutation(mutationFn, options = {}) {
   const {
     onSuccess,
@@ -166,14 +285,14 @@ function useApiMutation(mutationFn, options = {}) {
     invalidateKeys = [],
     retryCount = 0
   } = options;
-  const [state, setState] = (0, import_react2.useState)({
+  const [state, setState] = (0, import_react3.useState)({
     data: null,
     isLoading: false,
     error: null,
     isSuccess: false,
     isError: false
   });
-  const reset = (0, import_react2.useCallback)(() => {
+  const reset = (0, import_react3.useCallback)(() => {
     setState({
       data: null,
       isLoading: false,
@@ -182,7 +301,7 @@ function useApiMutation(mutationFn, options = {}) {
       isError: false
     });
   }, []);
-  const mutateAsync = (0, import_react2.useCallback)(
+  const mutateAsync = (0, import_react3.useCallback)(
     async (variables) => {
       setState({
         data: null,
@@ -231,7 +350,7 @@ function useApiMutation(mutationFn, options = {}) {
     },
     [mutationFn, retryCount, invalidateKeys, onSuccess, onError, onSettled]
   );
-  const mutate = (0, import_react2.useCallback)(
+  const mutate = (0, import_react3.useCallback)(
     (variables) => {
       mutateAsync(variables).catch(() => {
       });
@@ -249,7 +368,7 @@ function useApiMutation(mutationFn, options = {}) {
 // src/cart/useCart.ts
 function useCart(api, options = {}) {
   const { cartId: initialCartId, regionId, refreshInterval } = options;
-  const [cartId, setCartId] = (0, import_react3.useState)(initialCartId);
+  const [cartId, setCartId] = (0, import_react4.useState)(initialCartId);
   const {
     data: cart,
     isLoading,
@@ -263,11 +382,12 @@ function useCart(api, options = {}) {
       }
       if (cartId) {
         try {
-          return await api.cart.get(cartId);
+          const existingCart = await api.cart.get(cartId);
+          return existingCart;
         } catch {
         }
       }
-      const newCart = await api.cart.create({ regionId });
+      const newCart = await api.cart.create(regionId ?? "");
       setCartId(newCart.id);
       return newCart;
     },
@@ -277,23 +397,23 @@ function useCart(api, options = {}) {
       // 30 seconds
     }
   );
-  (0, import_react3.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     if (!refreshInterval || !api?.cart) return;
     const interval = setInterval(() => {
       refetch();
     }, refreshInterval);
     return () => clearInterval(interval);
   }, [refreshInterval, api, refetch]);
-  const items = (0, import_react3.useMemo)(() => cart?.items ?? [], [cart]);
-  const itemCount = (0, import_react3.useMemo)(
+  const items = (0, import_react4.useMemo)(() => cart?.items ?? [], [cart]);
+  const itemCount = (0, import_react4.useMemo)(
     () => cart?.totalItems ?? items.reduce((sum, item) => sum + item.quantity, 0),
     [cart, items]
   );
-  const subtotal = (0, import_react3.useMemo)(() => {
+  const subtotal = (0, import_react4.useMemo)(() => {
     if (cart?.subtotal !== void 0) return cart.subtotal;
     return cart?.totalPrice ?? 0;
   }, [cart]);
-  const total = (0, import_react3.useMemo)(() => cart?.total ?? cart?.totalPrice ?? 0, [cart]);
+  const total = (0, import_react4.useMemo)(() => cart?.total ?? cart?.totalPrice ?? 0, [cart]);
   const isEmpty = items.length === 0;
   const getItemId = (item, index) => {
     return item.id ?? item.productId ?? item.product?.id ?? `item-${index}`;
@@ -303,12 +423,13 @@ function useCart(api, options = {}) {
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.addItem(cartId, {
+      const result = await api.cart.addItem(cartId, {
         productId: input.productId,
         variantId: input.variantId,
         quantity: input.quantity,
         metadata: input.metadata
       });
+      return result;
     },
     {
       invalidateKeys: [["cart", cartId]]
@@ -319,7 +440,8 @@ function useCart(api, options = {}) {
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.updateItem(cartId, itemId, { quantity });
+      const result = await api.cart.updateItem(cartId, itemId, { quantity });
+      return result;
     },
     {
       invalidateKeys: [["cart", cartId]]
@@ -330,7 +452,8 @@ function useCart(api, options = {}) {
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.removeItem(cartId, itemId);
+      const result = await api.cart.removeItem(cartId, itemId);
+      return result;
     },
     {
       invalidateKeys: [["cart", cartId]]
@@ -356,7 +479,8 @@ function useCart(api, options = {}) {
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.applyDiscount(cartId, code);
+      const result = await api.cart.applyDiscount(cartId, code);
+      return result;
     },
     {
       invalidateKeys: [["cart", cartId]]
@@ -367,7 +491,8 @@ function useCart(api, options = {}) {
       if (!api?.cart || !cartId) {
         throw new Error("Cart not available");
       }
-      return api.cart.removeDiscount(cartId, code);
+      const result = await api.cart.removeDiscount(cartId, code);
+      return result;
     },
     {
       invalidateKeys: [["cart", cartId]]
@@ -393,7 +518,7 @@ function useCart(api, options = {}) {
 }
 
 // src/cart/useBulkCart.ts
-var import_react4 = require("react");
+var import_react5 = require("react");
 function parseCSV(content) {
   const lines = content.trim().split("\n");
   if (lines.length < 2) return [];
@@ -424,10 +549,10 @@ function parseCSV(content) {
 }
 function useBulkCart(api, options) {
   const { cartId, batchSize = 10, validateBeforeAdd = true } = options;
-  const [isProcessing, setIsProcessing] = (0, import_react4.useState)(false);
-  const [progress, setProgress] = (0, import_react4.useState)({ current: 0, total: 0 });
-  const [error, setError] = (0, import_react4.useState)(null);
-  const addBulkItems = (0, import_react4.useCallback)(
+  const [isProcessing, setIsProcessing] = (0, import_react5.useState)(false);
+  const [progress, setProgress] = (0, import_react5.useState)({ current: 0, total: 0 });
+  const [error, setError] = (0, import_react5.useState)(null);
+  const addBulkItems = (0, import_react5.useCallback)(
     async (items) => {
       if (!api?.cart) {
         throw new Error("Cart API not available");
@@ -446,10 +571,13 @@ function useBulkCart(api, options) {
           batch.map(async (item) => {
             try {
               let productId = item.productId;
-              if (!productId && item.sku && api.products?.findBySku) {
-                const product = await api.products.findBySku(item.sku);
-                if (product) {
-                  productId = product.id;
+              if (!productId && item.sku) {
+                const productsApi = api.products;
+                if (productsApi?.findBySku) {
+                  const product = await productsApi.findBySku(item.sku);
+                  if (product) {
+                    productId = product.id;
+                  }
                 }
               }
               if (!productId) {
@@ -491,7 +619,7 @@ function useBulkCart(api, options) {
     },
     [api, cartId, batchSize, validateBeforeAdd]
   );
-  const importFromCSV = (0, import_react4.useCallback)(
+  const importFromCSV = (0, import_react5.useCallback)(
     async (csvContent) => {
       try {
         const items = parseCSV(csvContent);
@@ -506,7 +634,7 @@ function useBulkCart(api, options) {
     },
     [addBulkItems]
   );
-  const replaceCart = (0, import_react4.useCallback)(
+  const replaceCart = (0, import_react5.useCallback)(
     async (items) => {
       if (!api?.cart) {
         throw new Error("Cart API not available");
@@ -515,8 +643,9 @@ function useBulkCart(api, options) {
       setError(null);
       try {
         const currentCart = await api.cart.get(cartId);
-        for (let i = 0; i < currentCart.items.length; i++) {
-          const item = currentCart.items[i];
+        const cartItems = currentCart.items;
+        for (let i = 0; i < cartItems.length; i++) {
+          const item = cartItems[i];
           const itemId = item.id ?? item.productId ?? item.product?.id ?? `item-${i}`;
           await api.cart.removeItem(cartId, itemId);
         }
@@ -532,7 +661,7 @@ function useBulkCart(api, options) {
     },
     [api, cartId, addBulkItems]
   );
-  const duplicateFromOrder = (0, import_react4.useCallback)(
+  const duplicateFromOrder = (0, import_react5.useCallback)(
     async (orderId) => {
       if (!api?.cart || !api?.orders) {
         throw new Error("Cart or Orders API not available");
@@ -541,7 +670,8 @@ function useBulkCart(api, options) {
       setError(null);
       try {
         const order = await api.orders.get(orderId);
-        const items = order.items.map((item) => ({
+        const orderItems = order.items;
+        const items = orderItems.map((item) => ({
           productId: item.productId ?? item.product?.id ?? "",
           variantId: item.variantId,
           quantity: item.quantity

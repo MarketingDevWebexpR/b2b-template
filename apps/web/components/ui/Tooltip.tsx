@@ -112,12 +112,18 @@ const Tooltip = ({
   ...props
 }: TooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [actualPlacement, setActualPlacement] = useState<TooltipProps['placement']>(placement);
   const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const showTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const hideTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  // Track mounted state to avoid hydration mismatch with createPortal
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const showTooltip = () => {
     if (disabled) return;
@@ -211,7 +217,7 @@ const Tooltip = ({
       >
         {children}
       </div>
-      {typeof window !== 'undefined' && tooltipElement &&
+      {isMounted && tooltipElement &&
         createPortal(tooltipElement, document.body)}
     </>
   );

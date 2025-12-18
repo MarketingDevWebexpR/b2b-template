@@ -114,7 +114,7 @@ const ProductCard = memo(function ProductCard({
 
   return (
     <Link
-      href={`/produits/${product.slug}`}
+      href={`/produit/${product.slug}`}
       onClick={onLinkClick}
       className={cn(
         'flex items-center gap-3 p-2 -mx-2 rounded-lg',

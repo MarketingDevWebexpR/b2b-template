@@ -252,7 +252,7 @@ const ProductHeaderCell = memo(function ProductHeaderCell({
 
         {/* Product image */}
         <Link
-          href={`/produits/${product.slug}`}
+          href={`/produit/${product.slug}`}
           className={cn(
             'relative w-24 h-24 sm:w-32 sm:h-32',
             'rounded-lg overflow-hidden',
@@ -274,7 +274,7 @@ const ProductHeaderCell = memo(function ProductHeaderCell({
 
         {/* Product name */}
         <Link
-          href={`/produits/${product.slug}`}
+          href={`/produit/${product.slug}`}
           className={cn(
             'text-sm font-medium text-neutral-900',
             'hover:text-accent',

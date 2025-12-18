@@ -1,73 +1,41 @@
-'use client';
-
-import { B2BProvider } from '@/contexts/B2BContext';
-import { CompanyProvider } from '@/contexts/CompanyContext';
-import { EmployeeProvider } from '@/contexts/EmployeeContext';
-import { WarehouseProvider } from '@/contexts/WarehouseContext';
-import { PricingProvider } from '@/contexts/PricingContext';
-import {
-  B2BHeaderEcom,
-  B2BHeaderEcomSpacer,
-  FooterEcom,
-} from '@/components/layout';
-import { SageSyncBadge } from '@/components/ui/SageSyncBadge';
+import { getAnnouncements, CACHE_DURATION } from '@/lib/cms';
+import ShopLayoutClient from './ShopLayoutClient';
 
 interface ShopLayoutProps {
   children: React.ReactNode;
 }
 
 /**
- * Shop Layout
+ * Shop Layout (Server Component)
  *
- * Public shop layout using B2B components with mock mode enabled.
+ * Server-side layout that fetches CMS data before rendering.
+ * This ensures all content is included in the initial HTML response,
+ * preventing content flash (CLS issues).
+ *
+ * Architecture:
+ * 1. This Server Component fetches CMS data (announcements)
+ * 2. Data is passed to ShopLayoutClient (Client Component)
+ * 3. ShopLayoutClient handles React Context and renders the UI
+ *
  * Features:
- * - 3-level header (promo banner, main header, navigation)
- * - MegaMenu navigation
- * - Full-width content area
- * - E-commerce footer
- * - Sage ERP sync status indicator
+ * - SSR for announcement banner (no flash)
+ * - ISR with 60-second revalidation for fresh content
+ * - Graceful degradation if CMS is unavailable
  *
- * Providers (mockMode enabled for public shop):
+ * Providers (in ShopLayoutClient):
  * - B2BProvider: Core B2B context (company, employee data)
  * - CompanyProvider: Company-specific data
  * - EmployeeProvider: Employee permissions and data
  * - WarehouseProvider: Warehouse/point of sale selection
  * - PricingProvider: B2B pricing rules
  */
-export default function ShopLayout({ children }: ShopLayoutProps) {
+export default async function ShopLayout({ children }: ShopLayoutProps) {
+  // Fetch CMS announcements server-side with ISR caching
+  const announcements = await getAnnouncements(CACHE_DURATION.SHORT);
+
   return (
-    <B2BProvider mockMode={true}>
-      <CompanyProvider>
-        <EmployeeProvider>
-          <WarehouseProvider>
-            <PricingProvider>
-              <div className="min-h-screen flex flex-col bg-white">
-                {/* E-commerce Header with promo banner */}
-                <B2BHeaderEcom showPromoBanner={true} />
-
-                {/* Header spacer to prevent content from going under fixed header */}
-                <B2BHeaderEcomSpacer showPromoBanner={true} />
-
-                {/* Main content area */}
-                <main
-                  id="main-content"
-                  role="main"
-                  aria-label="Contenu principal"
-                  className="flex-1"
-                >
-                  {children}
-                </main>
-
-                {/* E-commerce Footer */}
-                <FooterEcom />
-
-                {/* Sage ERP sync status indicator */}
-                <SageSyncBadge />
-              </div>
-            </PricingProvider>
-          </WarehouseProvider>
-        </EmployeeProvider>
-      </CompanyProvider>
-    </B2BProvider>
+    <ShopLayoutClient announcements={announcements}>
+      {children}
+    </ShopLayoutClient>
   );
 }

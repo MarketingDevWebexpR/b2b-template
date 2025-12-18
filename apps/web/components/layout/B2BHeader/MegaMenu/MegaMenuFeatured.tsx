@@ -73,7 +73,7 @@ const ProductCard = memo(function ProductCard({
 
   return (
     <Link
-      href={`/produits/${product.sku.toLowerCase()}`}
+      href={`/produit/${product.sku.toLowerCase()}`}
       className={cn(
         'group flex flex-col bg-white rounded-lg border border-neutral-200',
         'hover:border-neutral-300 hover:shadow-md',

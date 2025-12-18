@@ -186,7 +186,7 @@ export function ProductCardList({
             fill
             sizes="(max-width: 768px) 112px, 144px"
             className={cn(
-              'object-contain p-3',
+              'object-cover',
               'transition-opacity duration-300',
               imageLoaded ? 'opacity-100' : 'opacity-0'
             )}
@@ -208,15 +208,31 @@ export function ProductCardList({
       <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-3 md:gap-4 p-3 md:p-4 min-w-0">
         {/* Product Info */}
         <div className="flex flex-col justify-center min-w-0">
-          {/* Brand */}
-          {product.brand && (
-            <span className="text-caption font-semibold uppercase tracking-wider text-content-muted mb-0.5">
-              {product.brand}
-            </span>
+          {/* Brand - show brand_name or brand, link to brand page if slug available */}
+          {(product.brand || (product as { brand_name?: string }).brand_name) && (
+            (() => {
+              const brandName = (product as { brand_name?: string }).brand_name || product.brand;
+              const brandSlug = (product as { brand_slug?: string }).brand_slug;
+              if (brandSlug) {
+                return (
+                  <Link
+                    href={`/marques/${brandSlug}`}
+                    className="text-caption font-semibold uppercase tracking-wider text-content-muted hover:text-primary transition-colors mb-0.5"
+                  >
+                    {brandName}
+                  </Link>
+                );
+              }
+              return (
+                <span className="text-caption font-semibold uppercase tracking-wider text-content-muted mb-0.5">
+                  {brandName}
+                </span>
+              );
+            })()
           )}
 
           {/* Name */}
-          <Link href={`/produits/${product.slug || product.id}`} className="group/link">
+          <Link href={`/produit/${product.slug || product.id}`} className="group/link">
             <h3 className="text-body-sm font-medium text-content-primary line-clamp-1 group-hover/link:text-primary transition-colors">
               {product.name}
             </h3>

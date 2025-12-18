@@ -9,22 +9,25 @@
  * Features:
  * - 3-column category layout with subcategories
  * - Featured products/promotions panel
- * - Brand showcase for "Marques" section
+ * - Brand showcase for "Marques" section (dynamic data from API)
  * - Smooth framer-motion animations
  * - Keyboard accessible
  */
 
 import { memo, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ChevronRight, ArrowRight, Gem, Sparkles, Star } from 'lucide-react';
+import { ChevronRight, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMockData } from '@/hooks/useMockData';
-import { MegaMenuCategory } from './MegaMenuCategory';
+import { useBrands, prefetchBrands } from '@/hooks/use-brands';
 import { MegaMenuFeatured } from './MegaMenuFeatured';
 import { MegaMenuBrands } from './MegaMenuBrands';
 import { MegaMenuServices } from './MegaMenuServices';
+
+// ============================================================================
+// Types
+// ============================================================================
 
 export interface MegaMenuProps {
   /** Active menu section ID */
@@ -39,6 +42,10 @@ export interface MegaMenuProps {
   className?: string;
 }
 
+// ============================================================================
+// Main Component
+// ============================================================================
+
 export const MegaMenu = memo(function MegaMenu({
   activeSection,
   onClose,
@@ -48,6 +55,18 @@ export const MegaMenu = memo(function MegaMenu({
 }: MegaMenuProps) {
   const { catalog } = useMockData();
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+
+  // Fetch brands data (with caching) - only when "marques" section is active
+  const { brands, isLoading: brandsLoading } = useBrands({
+    enabled: activeSection === 'marques',
+  });
+
+  // Prefetch brands when viewing catalogue (so marques loads faster when hovered)
+  useEffect(() => {
+    if (activeSection === 'catalogue') {
+      prefetchBrands();
+    }
+  }, [activeSection]);
 
   // Reset hovered category when section changes
   useEffect(() => {
@@ -75,7 +94,13 @@ export const MegaMenu = memo(function MegaMenu({
           />
         );
       case 'marques':
-        return <MegaMenuBrands onLinkClick={handleLinkClick} />;
+        return (
+          <MegaMenuBrands
+            brands={brands}
+            isLoading={brandsLoading}
+            onLinkClick={handleLinkClick}
+          />
+        );
       case 'services':
         return <MegaMenuServices onLinkClick={handleLinkClick} />;
       default:
@@ -108,7 +133,10 @@ export const MegaMenu = memo(function MegaMenu({
 
 MegaMenu.displayName = 'MegaMenu';
 
-// Catalogue section content
+// ============================================================================
+// Catalogue Section Content
+// ============================================================================
+
 interface CatalogueContentProps {
   categories: Array<{
     id: string;
@@ -153,7 +181,7 @@ const CatalogueContent = memo(function CatalogueContent({
           {categories.map((category) => (
             <li key={category.id}>
               <Link
-                href={`/categories/${category.slug}`}
+                href={`/categorie/${category.slug}`}
                 onMouseEnter={() => onCategoryHover(category.id)}
                 onFocus={() => onCategoryHover(category.id)}
                 onClick={onLinkClick}
@@ -185,7 +213,7 @@ const CatalogueContent = memo(function CatalogueContent({
         {/* View all link */}
         <div className="mt-4 pt-4 border-t border-neutral-100">
           <Link
-            href="/categories"
+            href="/categorie"
             onClick={onLinkClick}
             className={cn(
               'flex items-center gap-2 px-3 py-2',
@@ -214,7 +242,7 @@ const CatalogueContent = memo(function CatalogueContent({
                 {currentCategory.name}
               </h3>
               <Link
-                href={`/categories/${currentCategory.slug}`}
+                href={`/categorie/${currentCategory.slug}`}
                 onClick={onLinkClick}
                 className="text-sm text-amber-700 hover:text-amber-800 font-medium flex items-center gap-1"
               >
@@ -228,7 +256,7 @@ const CatalogueContent = memo(function CatalogueContent({
               {currentCategory.children?.slice(0, 10).map((sub) => (
                 <Link
                   key={sub.id}
-                  href={`/categories/${currentCategory.slug}/${sub.slug}`}
+                  href={`/categorie/${currentCategory.slug}/${sub.slug}`}
                   onClick={onLinkClick}
                   className={cn(
                     'flex items-center justify-between py-2 px-2 -mx-2 rounded-lg',

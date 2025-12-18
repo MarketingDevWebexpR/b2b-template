@@ -145,7 +145,7 @@ export const MobileMenuEcom = memo(function MobileMenuEcom({
           </li>
           <li>
             <Link
-              href="/categories?filter=promo"
+              href="/c?filter=promo"
               onClick={handleClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-3 rounded-lg',
@@ -159,7 +159,7 @@ export const MobileMenuEcom = memo(function MobileMenuEcom({
           </li>
           <li>
             <Link
-              href="/categories?sort=newest"
+              href="/c?sort=newest"
               onClick={handleClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-3 rounded-lg',

@@ -169,10 +169,14 @@ export function useBulkCart(
             try {
               // Resolve SKU to product ID if needed
               let productId = item.productId;
-              if (!productId && item.sku && api.products?.findBySku) {
-                const product = await api.products.findBySku(item.sku);
-                if (product) {
-                  productId = product.id;
+              if (!productId && item.sku) {
+                // Try to find product by SKU if the API supports it
+                const productsApi = api.products as { findBySku?: (sku: string) => Promise<{ id: string } | null> };
+                if (productsApi?.findBySku) {
+                  const product = await productsApi.findBySku(item.sku);
+                  if (product) {
+                    productId = product.id;
+                  }
                 }
               }
 
@@ -252,8 +256,9 @@ export function useBulkCart(
       try {
         // Get current cart and clear it
         const currentCart = await api.cart.get(cartId);
-        for (let i = 0; i < currentCart.items.length; i++) {
-          const item = currentCart.items[i] as CartItemWithId;
+        const cartItems = currentCart.items as Array<{ id?: string; productId?: string; product?: { id: string } }>;
+        for (let i = 0; i < cartItems.length; i++) {
+          const item = cartItems[i];
           const itemId = item.id ?? item.productId ?? item.product?.id ?? `item-${i}`;
           await api.cart.removeItem(cartId, itemId);
         }
@@ -264,7 +269,7 @@ export function useBulkCart(
         // Return updated cart
         const updatedCart = await api.cart.get(cartId);
         setIsProcessing(false);
-        return updatedCart;
+        return updatedCart as unknown as ExtendedCart;
       } catch (err) {
         setIsProcessing(false);
         setError(err instanceof Error ? err : new Error(String(err)));
@@ -287,8 +292,10 @@ export function useBulkCart(
         // Get order items
         const order = await api.orders.get(orderId);
 
-        // Convert to bulk items
-        const items: BulkItemInput[] = order.items.map((item: CartItemWithId) => ({
+        // Convert to bulk items - use generic type for order items
+        type OrderItemLike = { productId?: string; product?: { id: string }; variantId?: string; quantity: number };
+        const orderItems = order.items as OrderItemLike[];
+        const items: BulkItemInput[] = orderItems.map((item) => ({
           productId: item.productId ?? item.product?.id ?? "",
           variantId: item.variantId,
           quantity: item.quantity,
@@ -300,7 +307,7 @@ export function useBulkCart(
         // Return updated cart
         const updatedCart = await api.cart.get(cartId);
         setIsProcessing(false);
-        return updatedCart;
+        return updatedCart as unknown as ExtendedCart;
       } catch (err) {
         setIsProcessing(false);
         setError(err instanceof Error ? err : new Error(String(err)));

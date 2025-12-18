@@ -50,3 +50,25 @@ export type {
   RelatedSectionType,
   BoughtTogetherBundle,
 } from './RelatedProducts';
+
+// B2B Product Characteristics (specs, certifications, sustainability)
+export { ProductCharacteristics } from './ProductCharacteristics';
+export type { ProductCharacteristicsProps } from './ProductCharacteristics';
+
+// B2B Variant Selector (options-based selection)
+export { ProductVariantSelector } from './ProductVariantSelector';
+export type { ProductVariantSelectorProps } from './ProductVariantSelector';
+
+// Premium Variant Selector (luxury design with color swatches, size chips, material cards)
+export { ProductVariantSelectorPremium } from './ProductVariantSelectorPremium';
+export type {
+  ProductVariantSelectorPremiumProps,
+  OptionType,
+  StockStatus,
+  OptionValue,
+  ProductOption,
+  ProductVariant as PremiumProductVariant,
+} from './ProductVariantSelectorPremium';
+
+// Demo component for variant selector states
+export { ProductVariantSelectorDemo } from './ProductVariantSelectorDemo';

@@ -134,7 +134,10 @@ export function useQuotes(
         return [];
       }
       const result = await api.b2b.quotes.list(filters);
-      return result.items ?? result;
+      // Handle both paginated and array responses
+      const resultAny = result as unknown;
+      const items = (resultAny as { items?: readonly unknown[] }).items ?? (resultAny as unknown[]);
+      return (Array.isArray(items) ? [...items] : []) as Quote[];
     },
     {
       enabled: !!api?.b2b?.quotes,
@@ -200,7 +203,12 @@ export function useQuotes(
       if (!api?.b2b?.quotes) {
         throw new Error("B2B quotes not available");
       }
-      return api.b2b.quotes.respond(quoteId, input);
+      // Use type assertion for respond method which may not be in interface
+      const quotesApi = api.b2b.quotes as { respond?: (quoteId: string, input: RespondToQuoteInput) => Promise<Quote> };
+      if (!quotesApi.respond) {
+        throw new Error("Quote respond method not available");
+      }
+      return quotesApi.respond(quoteId, input);
     },
     {
       invalidateKeys: [["quotes"]],

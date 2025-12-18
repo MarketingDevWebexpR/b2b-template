@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import {
-  HeroCarousel,
+  HeroCarouselSSR,
   QuickLinksBar,
   CategoryShowcaseEcom,
+  CategoriesSection,
   ProductCarouselSection,
   ServicesHighlights,
   PromoBanner,
@@ -11,6 +12,8 @@ import {
   type CategoryCard,
 } from '@/components/home';
 import { getCategories, getProducts } from '@/lib/api';
+import { getHeroSlides, CACHE_DURATION } from '@/lib/cms';
+import { getLevel1Categories } from '@/lib/categories/get-level1-categories';
 
 export const metadata: Metadata = {
   title: 'WebexpR Pro | Grossiste en Bijoux B2B - Fournisseur Professionnel',
@@ -55,7 +58,9 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
+// Use ISR instead of force-dynamic for better performance
+// CMS data is fetched with revalidation, products/categories use their own caching
+export const revalidate = 60; // Revalidate every 60 seconds
 
 /**
  * Transform API products to CarouselProduct format
@@ -69,7 +74,7 @@ function transformToCarouselProducts(products: Awaited<ReturnType<typeof getProd
     price: product.price,
     originalPrice: product.compareAtPrice || undefined,
     image: product.images[0] || '/images/placeholder-product.svg',
-    href: `/produits/${product.slug || product.id}`,
+    href: `/produit/${product.slug || product.id}`,
     badge: product.isNew
       ? { label: 'Nouveau', variant: 'new' as const }
       : product.compareAtPrice && product.compareAtPrice > product.price
@@ -96,7 +101,7 @@ function transformToCategoryCards(categories: Awaited<ReturnType<typeof getCateg
     id: category.id,
     name: category.name,
     description: category.description || undefined,
-    href: `/categories/${category.slug || category.id}`,
+    href: `/categorie/${category.slug || category.id}`,
     productCount: category.productCount || Math.floor(Math.random() * 500) + 100,
     featured: index < 2, // First 2 categories are featured
   }));
@@ -105,8 +110,11 @@ function transformToCategoryCards(categories: Awaited<ReturnType<typeof getCateg
 /**
  * Home Page - E-commerce B2B Style (Leroy Merlin inspired)
  *
+ * Server Component with full SSR for all above-the-fold content.
+ * All CMS and API data is fetched server-side to prevent content flash.
+ *
  * Structure:
- * - Hero Carousel with promotional slides
+ * - Hero Carousel with promotional slides (SSR)
  * - Quick links bar for fast category access
  * - Services highlights (shipping, payment, support)
  * - Category showcase with featured categories
@@ -115,17 +123,23 @@ function transformToCategoryCards(categories: Awaited<ReturnType<typeof getCateg
  * - Newsletter subscription
  */
 export default async function HomePage() {
-  // Fetch data in parallel
+  // Fetch all data in parallel for SSR
   let categories: Awaited<ReturnType<typeof getCategories>> = [];
   let products: Awaited<ReturnType<typeof getProducts>> = [];
+  let heroSlides: Awaited<ReturnType<typeof getHeroSlides>> = [];
+  let level1Categories: Awaited<ReturnType<typeof getLevel1Categories>> = [];
 
   try {
-    const [categoriesResult, productsResult] = await Promise.all([
+    const [categoriesResult, productsResult, heroSlidesResult, level1CategoriesResult] = await Promise.all([
       getCategories(),
       getProducts(),
+      getHeroSlides(CACHE_DURATION.SHORT),
+      getLevel1Categories(),
     ]);
     categories = categoriesResult;
     products = productsResult;
+    heroSlides = heroSlidesResult;
+    level1Categories = level1CategoriesResult;
   } catch (error) {
     console.error('Failed to fetch data for HomePage:', error);
   }
@@ -146,18 +160,26 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero Carousel - Promotional slides */}
-      <HeroCarousel />
+      {/* Hero Carousel - Promotional slides (SSR with data from server) */}
+      <HeroCarouselSSR cmsSlides={heroSlides} />
 
-      {/* Quick Links - Fast category access */}
-      <QuickLinksBar />
+      {/* Quick Links - Fast category access (Level 1 categories from API) */}
+      <QuickLinksBar categories={level1Categories} />
 
       {/* Services - Shipping, payment, support highlights */}
       <ServicesHighlights />
 
-      {/* Categories Showcase - Featured categories grid */}
+      {/* Categories Showcase - "Nos Categories" with image cards */}
+      <CategoriesSection
+        title="Nos Categories"
+        subtitle="Parcourez notre catalogue par univers produit"
+        maxCategories={5}
+        showViewAll={true}
+      />
+
+      {/* Secondary Categories - Featured categories grid */}
       <CategoryShowcaseEcom
-        title="Nos categories"
+        title="Explorer par type de bijou"
         subtitle="Parcourez notre catalogue de plus de 10 000 references"
         categories={categoryCards}
       />

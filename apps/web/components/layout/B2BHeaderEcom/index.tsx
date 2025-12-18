@@ -29,13 +29,16 @@ import { memo, useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { PromoBanner } from './PromoBanner';
 import { HeaderTop } from './HeaderTop';
-import { HeaderNav } from './HeaderNav';
-import { MegaMenuEcom } from './MegaMenuEcom';
-import { MobileMenuEcom } from './MobileMenuEcom';
+import { AnnouncementBanner } from '@/components/cms';
+// New 5-level navigation components
+import { MegaMenu } from '@/components/navigation/MegaMenu';
+import { MobileNavigation } from '@/components/navigation/MobileMenu';
 
 export interface B2BHeaderEcomProps {
   /** Show promo banner */
   showPromoBanner?: boolean;
+  /** Use CMS announcement banner instead of hardcoded promo */
+  useCmsAnnouncement?: boolean;
   /** Promo banner message */
   promoMessage?: string;
   /** Promo banner link */
@@ -48,16 +51,14 @@ export interface B2BHeaderEcomProps {
 
 export const B2BHeaderEcom = memo(function B2BHeaderEcom({
   showPromoBanner = true,
+  useCmsAnnouncement = false,
   promoMessage = '-15% sur toute la collection avec le code PRO15',
   promoHref = '/promotions',
   promoEndDate,
   className,
 }: B2BHeaderEcomProps) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
   const [isPromoBannerVisible, setIsPromoBannerVisible] = useState(showPromoBanner);
-  const megaMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Track scroll position
   useEffect(() => {
@@ -79,64 +80,6 @@ export const B2BHeaderEcom = memo(function B2BHeaderEcom({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on escape
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (isMobileMenuOpen) {
-          setIsMobileMenuOpen(false);
-        }
-        if (activeMegaMenu) {
-          setActiveMegaMenu(null);
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isMobileMenuOpen, activeMegaMenu]);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileMenuOpen]);
-
-  const toggleMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen((prev) => !prev);
-  }, []);
-
-  const closeMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(false);
-  }, []);
-
-  const handleMegaMenuOpen = useCallback((itemId: string | null) => {
-    if (megaMenuTimeoutRef.current) {
-      clearTimeout(megaMenuTimeoutRef.current);
-      megaMenuTimeoutRef.current = null;
-    }
-    setActiveMegaMenu(itemId);
-  }, []);
-
-  const handleMegaMenuClose = useCallback(() => {
-    megaMenuTimeoutRef.current = setTimeout(() => {
-      setActiveMegaMenu(null);
-    }, 150);
-  }, []);
-
-  const handleMegaMenuMouseEnter = useCallback(() => {
-    if (megaMenuTimeoutRef.current) {
-      clearTimeout(megaMenuTimeoutRef.current);
-      megaMenuTimeoutRef.current = null;
-    }
-  }, []);
-
   const handleSearch = useCallback((query: string) => {
     // Navigate to search results
     window.location.href = `/recherche?q=${encodeURIComponent(query)}`;
@@ -154,58 +97,32 @@ export const B2BHeaderEcom = memo(function B2BHeaderEcom({
         )}
         role="banner"
       >
-        {/* Promo Banner */}
-        {isPromoBannerVisible && (
-          <PromoBanner
-            message={promoMessage}
-            href={promoHref}
-            endDate={promoEndDate}
-            variant="dark"
-            dismissible
-          />
+        {/* CMS Announcement Banner or Promo Banner */}
+        {useCmsAnnouncement ? (
+          <AnnouncementBanner />
+        ) : (
+          isPromoBannerVisible && (
+            <PromoBanner
+              message={promoMessage}
+              href={promoHref}
+              endDate={promoEndDate}
+              variant="dark"
+              dismissible
+            />
+          )
         )}
 
-        {/* Main Header */}
-        <HeaderTop
-          onMobileMenuToggle={toggleMobileMenu}
-          isMobileMenuOpen={isMobileMenuOpen}
-          onSearch={handleSearch}
-        />
+        {/* Main Header (with mobile menu toggle using context) */}
+        <HeaderTop onSearch={handleSearch} />
 
-        {/* Navigation */}
-        <div className="relative">
-          <HeaderNav
-            onMegaMenuOpen={handleMegaMenuOpen}
-            activeMegaMenu={activeMegaMenu}
-          />
-
-          {/* MegaMenu */}
-          {activeMegaMenu && (
-            <MegaMenuEcom
-              activeSection={activeMegaMenu}
-              onClose={() => setActiveMegaMenu(null)}
-              onMouseEnter={handleMegaMenuMouseEnter}
-              onMouseLeave={handleMegaMenuClose}
-            />
-          )}
+        {/* Desktop Navigation - New 5-level MegaMenu */}
+        <div className="hidden lg:block">
+          <MegaMenu />
         </div>
       </header>
 
-      {/* Mobile Menu */}
-      <MobileMenuEcom
-        isOpen={isMobileMenuOpen}
-        onClose={closeMobileMenu}
-      />
-
-      {/* MegaMenu backdrop */}
-      {activeMegaMenu && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 hidden lg:block"
-          style={{ top: 'var(--header-height)' }}
-          onClick={() => setActiveMegaMenu(null)}
-          aria-hidden="true"
-        />
-      )}
+      {/* Mobile Navigation Drawer - Uses context for state */}
+      <MobileNavigation rootTitle="Catalogue" />
     </>
   );
 });
@@ -218,14 +135,20 @@ B2BHeaderEcom.displayName = 'B2BHeaderEcom';
  */
 export const B2BHeaderEcomSpacer = memo(function B2BHeaderEcomSpacer({
   showPromoBanner = true,
+  useCmsAnnouncement = false,
 }: {
   showPromoBanner?: boolean;
+  useCmsAnnouncement?: boolean;
 }) {
+  // CMS announcements may not always be visible (e.g., dismissed or no active announcement)
+  // so we use a slightly smaller base height and let CSS handle the rest
+  const showBanner = showPromoBanner || useCmsAnnouncement;
+
   return (
     <div
       className={cn(
         'w-full',
-        showPromoBanner ? 'h-[168px] lg:h-[180px]' : 'h-[128px] lg:h-[140px]'
+        showBanner ? 'h-[148px] lg:h-[164px]' : 'h-[108px] lg:h-[124px]'
       )}
       aria-hidden="true"
     />
@@ -240,5 +163,12 @@ export { HeaderTop } from './HeaderTop';
 export { HeaderNav } from './HeaderNav';
 export { MegaMenuEcom } from './MegaMenuEcom';
 export { MobileMenuEcom } from './MobileMenuEcom';
+
+// SSR-compatible header (recommended - prevents content flash)
+export {
+  B2BHeaderEcomSSR,
+  B2BHeaderEcomSSRSpacer,
+  type B2BHeaderEcomSSRProps,
+} from './B2BHeaderEcomSSR';
 
 export default B2BHeaderEcom;

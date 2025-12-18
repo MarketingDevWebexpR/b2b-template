@@ -64,6 +64,13 @@ export {
   ProductCardCompactList,
 } from './ProductCardCompact';
 
+// Optimized variants (recommended for B2B listings)
+export { ProductCardGridOptimized } from './ProductCardGridOptimized';
+export type { ProductCardGridOptimizedProps } from './ProductCardGridOptimized';
+export { ProductCardListOptimized, ProductCardListHeader } from './ProductCardListOptimized';
+export type { ProductCardListOptimizedProps } from './ProductCardListOptimized';
+export { ProductListingDemo, generateMockProducts } from './ProductListingDemo';
+
 // ============================================================================
 // Named Exports - Sub-Components
 // ============================================================================
@@ -83,6 +90,10 @@ export {
   ProductCardActions,
   ProductCardFloatingActions,
 } from './ProductCardActions';
+
+// B2B Metadata Badges (certifications, sustainability, manufacturing)
+export { ProductCardB2BBadges } from './ProductCardB2BBadges';
+export type { ProductCardB2BBadgesProps } from './ProductCardB2BBadges';
 
 // ============================================================================
 // Type Exports
