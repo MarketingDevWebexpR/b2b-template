@@ -15,14 +15,16 @@
 // ============================================================================
 
 /**
- * Flat category representation from Meilisearch index
+ * Flat category representation from search index (App Search or Meilisearch)
  * This is the enhanced category with full hierarchy support
  */
 export interface MeilisearchCategory {
   /** Unique category identifier */
   id: string;
-  /** Display name */
+  /** Display name (French) */
   name: string;
+  /** English translation of the name */
+  name_en?: string;
   /** URL-friendly slug */
   handle: string;
   /** Category description */
@@ -35,8 +37,10 @@ export interface MeilisearchCategory {
   parent_category_id: string | null;
   /** Array of all ancestor category IDs (ordered from root to parent) */
   parent_category_ids: string[];
-  /** Breadcrumb path string (e.g., "Electricite > Protection > Disjoncteurs") */
+  /** Full path string with hierarchy (e.g., "Électricité > Protection > Disjoncteurs") */
   path: string;
+  /** Full path string (alias for path, from App Search) */
+  full_path?: string;
   /** Array of ancestor category names (ordered from root to parent) */
   ancestor_names: string[];
   /** Array of ancestor category handles (ordered from root to parent) */
@@ -49,6 +53,8 @@ export interface MeilisearchCategory {
   rank: number;
   /** Number of products in this category */
   product_count: number;
+  /** Full metadata JSON string */
+  metadata?: string;
   /** Creation timestamp */
   created_at?: string;
   /** Last update timestamp */
@@ -91,6 +97,7 @@ export interface CategoryResponse {
 export interface MeilisearchCategoryHit {
   id: string;
   name: string;
+  name_en?: string;
   handle: string;
   description: string | null;
   icon: string | null;
@@ -98,12 +105,14 @@ export interface MeilisearchCategoryHit {
   parent_category_id: string | null;
   parent_category_ids: string[];
   path: string;
+  full_path?: string;
   ancestor_names: string[];
   ancestor_handles: string[];
   depth: number;
   is_active: boolean;
   rank: number;
   product_count: number;
+  metadata?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -178,6 +187,7 @@ export interface CategoryFilterOptions {
 export interface CategoryNavItem {
   id: string;
   name: string;
+  name_en?: string;
   handle: string;
   icon: string | null;
   image_url: string | null;

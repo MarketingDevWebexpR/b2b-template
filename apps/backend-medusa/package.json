@@ -19,7 +19,11 @@
     "db:generate": "medusa db:generate",
     "db:migrate": "medusa db:migrate",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf .medusa node_modules dist"
+    "clean": "rm -rf .medusa node_modules dist",
+    "search:test": "npx ts-node scripts/test-appsearch.ts",
+    "search:sync": "npx ts-node scripts/initial-sync-appsearch.ts",
+    "search:rollback": "npx ts-node scripts/search-rollback.ts",
+    "search:compare": "npx ts-node scripts/compare-search-engines.ts"
   },
   "dependencies": {
     "@medusajs/admin-sdk": "^2.12.2",
@@ -36,6 +40,8 @@
     "@swc/core": "^1.4.0",
     "@types/multer": "^2.0.0",
     "@types/node": "^20.11.0",
+    "@types/pg": "^8.10.0",
+    "dotenv": "^16.3.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.0"
   },
