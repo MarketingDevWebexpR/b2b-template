@@ -22,7 +22,7 @@ import Image from 'next/image';
 import { ChevronRight, Package, FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategoryPath } from '@/lib/categories/hierarchy';
-import type { MeilisearchCategory } from '@/types/category';
+import type { IndexedCategory } from '@/types/category';
 
 // ============================================================================
 // Types
@@ -30,7 +30,7 @@ import type { MeilisearchCategory } from '@/types/category';
 
 export interface SubcategoriesGridProps {
   /** Array of subcategories to display */
-  subcategories: MeilisearchCategory[];
+  subcategories: IndexedCategory[];
   /** Parent category handle for building paths */
   parentHandle?: string;
   /** Grid columns (responsive) */
@@ -48,7 +48,7 @@ export interface SubcategoriesGridProps {
 }
 
 interface SubcategoryCardProps {
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   size: 'sm' | 'md' | 'lg';
   showCount: boolean;
   showViewAll: boolean;

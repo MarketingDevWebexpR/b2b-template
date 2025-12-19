@@ -12,7 +12,7 @@ import type { Brand, BrandCardData, BrandColor } from '@/types/brand';
 // Re-export BrandCardData for consumers
 export type { BrandCardData } from '@/types/brand';
 import type {
-  MeilisearchCategory,
+  IndexedCategory,
   CategoryTreeNode,
   CategoryNavItem,
   CategoryBreadcrumb,
@@ -186,7 +186,7 @@ export function buildCategoryPath(
  * Build full path for a category including its ancestors
  */
 export function buildCategoryFullPath(
-  category: MeilisearchCategory,
+  category: IndexedCategory,
   basePath: string = '/categorie'
 ): string {
   const handles = [...category.ancestor_handles, category.handle];
@@ -197,8 +197,8 @@ export function buildCategoryFullPath(
  * Transform category to breadcrumb items
  */
 export function transformCategoryToBreadcrumbs(
-  category: MeilisearchCategory,
-  byId: Record<string, MeilisearchCategory>,
+  category: IndexedCategory,
+  byId: Record<string, IndexedCategory>,
   basePath: string = '/categorie'
 ): CategoryBreadcrumb[] {
   const breadcrumbs: CategoryBreadcrumb[] = [];
@@ -258,8 +258,8 @@ export function transformTreeToNavItems(
 /**
  * Flatten category tree to array
  */
-export function flattenCategoryTree(tree: CategoryTreeNode[]): MeilisearchCategory[] {
-  const result: MeilisearchCategory[] = [];
+export function flattenCategoryTree(tree: CategoryTreeNode[]): IndexedCategory[] {
+  const result: IndexedCategory[] = [];
 
   function collect(nodes: CategoryTreeNode[]) {
     for (const node of nodes) {

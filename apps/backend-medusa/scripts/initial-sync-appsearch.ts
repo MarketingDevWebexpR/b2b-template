@@ -437,7 +437,8 @@ async function syncCategories(pool: Pool): Promise<{ indexed: number; failed: nu
       ancestor_names: c.ancestor_names || [],
       ancestor_handles: c.ancestor_handles || [],
       parent_category_ids: c.parent_category_ids || [],
-      full_path: c.full_path || c.name,
+      path: c.full_path || c.name,
+      full_path: c.full_path || c.name, // Keep for backwards compatibility
       // Product count
       product_count: c.product_count || 0,
       // Metadata fields extracted

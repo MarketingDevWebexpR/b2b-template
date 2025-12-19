@@ -7,10 +7,8 @@
  * This endpoint does NOT require authentication for basic health checks.
  *
  * Features:
- * - Meilisearch health check with latency
  * - App Search health check with latency
  * - Index statistics per engine
- * - Active provider identification
  * - Last sync timestamps
  * - Warning aggregation
  *
@@ -30,11 +28,6 @@ import { INDEX_NAMES } from "../../../../modules/search/utils/index-config";
  * Health status enum for overall system status
  */
 type HealthStatus = "healthy" | "degraded" | "unhealthy";
-
-/**
- * Active provider type
- */
-type ActiveProvider = "meilisearch" | "appsearch" | "dual";
 
 /**
  * Individual engine health details
@@ -58,13 +51,8 @@ interface SearchHealthResponse {
   status: HealthStatus;
   /** ISO timestamp of the health check */
   timestamp: string;
-  /** Health details per engine */
-  engines: {
-    meilisearch: EngineHealthDetails;
-    appsearch: EngineHealthDetails;
-  };
-  /** Currently active search provider */
-  active_provider: ActiveProvider;
+  /** Health details for AppSearch */
+  engine: EngineHealthDetails;
   /** Array of warning messages */
   warnings: string[];
 }
@@ -111,92 +99,6 @@ async function withTimeout<T>(
     if (timeoutHandle !== undefined) {
       clearTimeout(timeoutHandle);
     }
-  }
-}
-
-/**
- * Check Meilisearch health directly via HTTP
- *
- * Uses the Meilisearch /health endpoint which returns:
- * { "status": "available" } when healthy
- *
- * @returns Engine health details with latency
- */
-async function checkMeilisearchHealth(): Promise<EngineHealthDetails> {
-  const host = process.env.MEILISEARCH_HOST || "http://localhost:7700";
-  const startTime = Date.now();
-
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), HEALTH_CHECK_TIMEOUT_MS);
-
-    const response = await fetch(`${host}/health`, {
-      method: "GET",
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-    const latency = Date.now() - startTime;
-
-    if (!response.ok) {
-      return {
-        available: false,
-        latency_ms: latency,
-        indices_count: null,
-        last_error: `HTTP ${response.status}: ${response.statusText}`,
-      };
-    }
-
-    const data = (await response.json()) as { status?: string };
-
-    if (data.status !== "available") {
-      return {
-        available: false,
-        latency_ms: latency,
-        indices_count: null,
-        last_error: `Meilisearch status: ${data.status ?? "unknown"}`,
-      };
-    }
-
-    // Get index count if healthy
-    let indicesCount: number | null = null;
-    try {
-      const statsResponse = await fetch(`${host}/stats`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.MEILISEARCH_API_KEY ?? ""}`,
-        },
-      });
-
-      if (statsResponse.ok) {
-        const stats = (await statsResponse.json()) as { indexes?: Record<string, unknown> };
-        indicesCount = stats.indexes ? Object.keys(stats.indexes).length : 0;
-      }
-    } catch {
-      // Stats fetch failed, but health is still OK
-    }
-
-    return {
-      available: true,
-      latency_ms: latency,
-      indices_count: indicesCount,
-      last_error: null,
-    };
-  } catch (error) {
-    const latency = Date.now() - startTime;
-    const errorMessage =
-      error instanceof Error
-        ? error.name === "AbortError"
-          ? `Timeout after ${HEALTH_CHECK_TIMEOUT_MS}ms`
-          : error.message
-        : "Unknown connection error";
-
-    return {
-      available: false,
-      latency_ms: latency,
-      indices_count: null,
-      last_error: errorMessage,
-    };
   }
 }
 
@@ -302,49 +204,24 @@ function getLastSyncTimestamp(searchService: SearchModuleService): Date | null {
 /**
  * Determine overall health status based on engine availability
  *
- * @param meilisearchHealth - Meilisearch health details
  * @param appsearchHealth - App Search health details
- * @param activeProvider - Currently active provider
  * @returns Overall health status
  */
 function determineOverallStatus(
-  meilisearchHealth: EngineHealthDetails,
-  appsearchHealth: EngineHealthDetails,
-  activeProvider: ActiveProvider
+  appsearchHealth: EngineHealthDetails
 ): HealthStatus {
-  // Dual mode: both engines must be available for healthy
-  if (activeProvider === "dual") {
-    if (meilisearchHealth.available && appsearchHealth.available) {
-      return "healthy";
-    }
-    if (meilisearchHealth.available || appsearchHealth.available) {
-      return "degraded";
-    }
-    return "unhealthy";
-  }
-
-  // Single engine mode: check the active engine
-  if (activeProvider === "appsearch") {
-    return appsearchHealth.available ? "healthy" : "unhealthy";
-  }
-
-  // Default to meilisearch
-  return meilisearchHealth.available ? "healthy" : "unhealthy";
+  return appsearchHealth.available ? "healthy" : "unhealthy";
 }
 
 /**
  * Collect warnings based on health check results
  *
- * @param meilisearchHealth - Meilisearch health details
  * @param appsearchHealth - App Search health details
- * @param activeProvider - Currently active provider
  * @param lastSync - Last sync timestamp
  * @returns Array of warning messages
  */
 function collectWarnings(
-  meilisearchHealth: EngineHealthDetails,
   appsearchHealth: EngineHealthDetails,
-  activeProvider: ActiveProvider,
   lastSync: Date | null
 ): string[] {
   const warnings: string[] = [];
@@ -352,27 +229,10 @@ function collectWarnings(
   // Check for high latency (> 1000ms)
   const HIGH_LATENCY_THRESHOLD_MS = 1000;
 
-  if (meilisearchHealth.available && meilisearchHealth.latency_ms !== null) {
-    if (meilisearchHealth.latency_ms > HIGH_LATENCY_THRESHOLD_MS) {
-      warnings.push(
-        `Meilisearch latency is high: ${meilisearchHealth.latency_ms}ms (threshold: ${HIGH_LATENCY_THRESHOLD_MS}ms)`
-      );
-    }
-  }
-
   if (appsearchHealth.available && appsearchHealth.latency_ms !== null) {
     if (appsearchHealth.latency_ms > HIGH_LATENCY_THRESHOLD_MS) {
       warnings.push(
         `App Search latency is high: ${appsearchHealth.latency_ms}ms (threshold: ${HIGH_LATENCY_THRESHOLD_MS}ms)`
-      );
-    }
-  }
-
-  // Check for missing indices
-  if (meilisearchHealth.available && meilisearchHealth.indices_count !== null) {
-    if (meilisearchHealth.indices_count < EXPECTED_INDICES.length) {
-      warnings.push(
-        `Meilisearch has fewer indices than expected: ${meilisearchHealth.indices_count}/${EXPECTED_INDICES.length}`
       );
     }
   }
@@ -389,22 +249,9 @@ function collectWarnings(
     warnings.push("No sync history found - indices may not be populated");
   }
 
-  // Check for dual mode with one engine down
-  if (activeProvider === "dual") {
-    if (!meilisearchHealth.available) {
-      warnings.push("Dual mode active but Meilisearch is unavailable");
-    }
-    if (!appsearchHealth.available) {
-      warnings.push("Dual mode active but App Search is unavailable");
-    }
-  }
-
   // Check for active engine being unavailable
-  if (activeProvider === "meilisearch" && !meilisearchHealth.available) {
-    warnings.push("Active provider (Meilisearch) is unavailable - search will fail");
-  }
-  if (activeProvider === "appsearch" && !appsearchHealth.available) {
-    warnings.push("Active provider (App Search) is unavailable - search will fail");
+  if (!appsearchHealth.available) {
+    warnings.push("App Search is unavailable - search will fail");
   }
 
   return warnings;
@@ -423,23 +270,14 @@ function collectWarnings(
  * Response format:
  * ```json
  * {
- *   "status": "healthy" | "degraded" | "unhealthy",
+ *   "status": "healthy" | "unhealthy",
  *   "timestamp": "2024-01-15T10:30:00.000Z",
- *   "engines": {
- *     "meilisearch": {
- *       "available": true,
- *       "latency_ms": 45,
- *       "indices_count": 4,
- *       "last_error": null
- *     },
- *     "appsearch": {
- *       "available": false,
- *       "latency_ms": null,
- *       "engines_count": null,
- *       "last_error": "App Search not configured"
- *     }
+ *   "engine": {
+ *     "available": true,
+ *     "latency_ms": 45,
+ *     "indices_count": 4,
+ *     "last_error": null
  *   },
- *   "active_provider": "meilisearch",
  *   "warnings": []
  * }
  * ```
@@ -454,57 +292,37 @@ export async function GET(
     // Get search service for active provider info
     const searchService: SearchModuleService = req.scope.resolve(SEARCH_MODULE);
 
-    // Run health checks in parallel with timeout protection
-    const [meilisearchHealth, appsearchHealth] = await Promise.all([
-      withTimeout(
-        checkMeilisearchHealth(),
-        HEALTH_CHECK_TIMEOUT_MS + 500,
-        "Meilisearch health check timed out"
-      ).catch((error): EngineHealthDetails => ({
-        available: false,
-        latency_ms: Date.now() - startTime,
-        indices_count: null,
-        last_error: error instanceof Error ? error.message : "Health check failed",
-      })),
-      withTimeout(
-        checkAppSearchHealth(),
-        HEALTH_CHECK_TIMEOUT_MS + 500,
-        "App Search health check timed out"
-      ).catch((error): EngineHealthDetails => ({
-        available: false,
-        latency_ms: Date.now() - startTime,
-        indices_count: null,
-        last_error: error instanceof Error ? error.message : "Health check failed",
-      })),
-    ]);
-
-    // Get current provider configuration
-    const engineStatus = searchService.getEngineStatus();
-    const activeProvider = engineStatus.mode as ActiveProvider;
+    // Run health check with timeout protection
+    const appsearchHealth = await withTimeout(
+      checkAppSearchHealth(),
+      HEALTH_CHECK_TIMEOUT_MS + 500,
+      "App Search health check timed out"
+    ).catch((error): EngineHealthDetails => ({
+      available: false,
+      latency_ms: Date.now() - startTime,
+      indices_count: null,
+      last_error: error instanceof Error ? error.message : "Health check failed",
+    }));
 
     // Get last sync timestamp
     const lastSync = getLastSyncTimestamp(searchService);
 
     // Determine overall status
-    const status = determineOverallStatus(meilisearchHealth, appsearchHealth, activeProvider);
+    const status = determineOverallStatus(appsearchHealth);
 
     // Collect warnings
-    const warnings = collectWarnings(meilisearchHealth, appsearchHealth, activeProvider, lastSync);
+    const warnings = collectWarnings(appsearchHealth, lastSync);
 
     // Build response
     const response: SearchHealthResponse = {
       status,
       timestamp: new Date().toISOString(),
-      engines: {
-        meilisearch: meilisearchHealth,
-        appsearch: appsearchHealth,
-      },
-      active_provider: activeProvider,
+      engine: appsearchHealth,
       warnings,
     };
 
     // Set appropriate HTTP status based on health
-    const httpStatus = status === "healthy" ? 200 : status === "degraded" ? 200 : 503;
+    const httpStatus = status === "healthy" ? 200 : 503;
 
     // Add cache control headers for load balancers
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -520,21 +338,12 @@ export async function GET(
     const errorResponse: SearchHealthResponse = {
       status: "unhealthy",
       timestamp: new Date().toISOString(),
-      engines: {
-        meilisearch: {
-          available: false,
-          latency_ms: null,
-          indices_count: null,
-          last_error: errorMessage,
-        },
-        appsearch: {
-          available: false,
-          latency_ms: null,
-          indices_count: null,
-          last_error: errorMessage,
-        },
+      engine: {
+        available: false,
+        latency_ms: null,
+        indices_count: null,
+        last_error: errorMessage,
       },
-      active_provider: "meilisearch",
       warnings: [`Health check failed: ${errorMessage}`],
     };
 

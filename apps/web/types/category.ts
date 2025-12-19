@@ -1,10 +1,10 @@
 /**
- * Category Types for Meilisearch Integration
+ * Category Types for Search Index Integration
  *
- * Types for categories indexed in Meilisearch with full hierarchy support.
+ * Types for categories indexed in the search index with full hierarchy support.
  * Categories have up to 5 levels of depth (0-4).
  *
- * Note: These types are prefixed with "Meilisearch" to avoid conflicts
+ * Note: These types are prefixed to avoid conflicts
  * with the base Category type from @bijoux/types which is used for Sage integration.
  *
  * @packageDocumentation
@@ -15,10 +15,12 @@
 // ============================================================================
 
 /**
- * Flat category representation from search index (App Search or Meilisearch)
- * This is the enhanced category with full hierarchy support
+ * Flat category representation from search index
+ *
+ * This is the enhanced category with full hierarchy support.
+ * V3 schema includes InstantSearch-style hierarchical fields.
  */
-export interface MeilisearchCategory {
+export interface IndexedCategory {
   /** Unique category identifier */
   id: string;
   /** Display name (French) */
@@ -37,7 +39,10 @@ export interface MeilisearchCategory {
   parent_category_id: string | null;
   /** Array of all ancestor category IDs (ordered from root to parent) */
   parent_category_ids: string[];
-  /** Full path string with hierarchy (e.g., "Électricité > Protection > Disjoncteurs") */
+  /**
+   * Full path string with hierarchy
+   * V3: Display path like "Électricité > Protection > Disjoncteurs"
+   */
   path: string;
   /** Full path string (alias for path, from App Search) */
   full_path?: string;
@@ -45,6 +50,20 @@ export interface MeilisearchCategory {
   ancestor_names: string[];
   /** Array of ancestor category handles (ordered from root to parent) */
   ancestor_handles: string[];
+  /**
+   * V3: InstantSearch-style hierarchical category levels
+   * These are ">" separated strings for faceted navigation
+   */
+  category_lvl0?: string;
+  category_lvl1?: string;
+  category_lvl2?: string;
+  category_lvl3?: string;
+  category_lvl4?: string;
+  /**
+   * V3: All category handles for hierarchical filtering
+   * Includes this category's handle and all ancestor handles
+   */
+  all_category_handles?: string[];
   /** Depth level in hierarchy (0 = root, up to 4 for 5 levels) */
   depth: number;
   /** Whether the category is active */
@@ -64,7 +83,7 @@ export interface MeilisearchCategory {
 /**
  * Category tree node with children
  */
-export interface CategoryTreeNode extends MeilisearchCategory {
+export interface CategoryTreeNode extends IndexedCategory {
   /** Child categories */
   children: CategoryTreeNode[];
 }
@@ -76,11 +95,11 @@ export interface CategoryResponse {
   /** Hierarchical tree structure */
   tree: CategoryTreeNode[];
   /** Flat array of all categories */
-  flat: MeilisearchCategory[];
+  flat: IndexedCategory[];
   /** Categories indexed by ID for quick lookup */
-  byId: Record<string, MeilisearchCategory>;
+  byId: Record<string, IndexedCategory>;
   /** Categories indexed by handle for URL routing */
-  byHandle: Record<string, MeilisearchCategory>;
+  byHandle: Record<string, IndexedCategory>;
   /** Total category count */
   total: number;
   /** Maximum depth in the tree */
@@ -88,13 +107,15 @@ export interface CategoryResponse {
 }
 
 // ============================================================================
-// Meilisearch Response Types
+// Search Index Response Types
 // ============================================================================
 
 /**
- * Raw Meilisearch search response for categories
+ * Raw search index search response for categories
+ *
+ * V3 schema includes hierarchical fields for InstantSearch-style faceting.
  */
-export interface MeilisearchCategoryHit {
+export interface SearchCategoryHit {
   id: string;
   name: string;
   name_en?: string;
@@ -104,10 +125,19 @@ export interface MeilisearchCategoryHit {
   image_url: string | null;
   parent_category_id: string | null;
   parent_category_ids: string[];
+  /** V3: URL path (e.g., "/plomberie/robinetterie") */
   path: string;
   full_path?: string;
   ancestor_names: string[];
   ancestor_handles: string[];
+  /** V3: InstantSearch-style hierarchical category levels */
+  category_lvl0?: string;
+  category_lvl1?: string;
+  category_lvl2?: string;
+  category_lvl3?: string;
+  category_lvl4?: string;
+  /** V3: All category handles for hierarchical filtering */
+  all_category_handles?: string[];
   depth: number;
   is_active: boolean;
   rank: number;
@@ -118,10 +148,10 @@ export interface MeilisearchCategoryHit {
 }
 
 /**
- * Meilisearch search response structure
+ * Search index search response structure
  */
-export interface MeilisearchCategoryResponse {
-  hits: MeilisearchCategoryHit[];
+export interface SearchCategoryResponse {
+  hits: SearchCategoryHit[];
   query: string;
   processingTimeMs: number;
   limit: number;
@@ -212,7 +242,7 @@ export interface CategoryBreadcrumb {
 // ============================================================================
 
 /**
- * Alias for MeilisearchCategory
+ * Alias for IndexedCategory
  * Use this when working with the categories API
  */
-export type CatalogCategory = MeilisearchCategory;
+export type CatalogCategory = IndexedCategory;

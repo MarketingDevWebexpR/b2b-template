@@ -42,7 +42,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategoryPath } from '@/lib/categories/hierarchy';
-import type { MeilisearchCategory } from '@/types/category';
+import type { IndexedCategory } from '@/types/category';
 
 // ============================================================================
 // Types
@@ -50,7 +50,7 @@ import type { MeilisearchCategory } from '@/types/category';
 
 export interface SubcategoriesTagsProps {
   /** Array of subcategories to display */
-  subcategories: MeilisearchCategory[];
+  subcategories: IndexedCategory[];
   /** Tag size variant */
   size?: 'sm' | 'md' | 'lg';
   /** Show product counts */
@@ -125,7 +125,7 @@ const sizeConfig = {
 // ============================================================================
 
 interface SubcategoryTagProps {
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   size: 'sm' | 'md' | 'lg';
   showCount: boolean;
   showIcon: boolean;

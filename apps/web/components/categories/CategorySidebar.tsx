@@ -32,7 +32,7 @@ import {
 import { cn } from '@/lib/utils';
 import { getCategoryPath, getDepthLevelName } from '@/lib/categories/hierarchy';
 import { CategoryTree } from './CategoryTree';
-import type { MeilisearchCategory, CategoryTreeNode } from '@/types/category';
+import type { IndexedCategory, CategoryTreeNode } from '@/types/category';
 
 // ============================================================================
 // Types
@@ -40,13 +40,13 @@ import type { MeilisearchCategory, CategoryTreeNode } from '@/types/category';
 
 export interface CategorySidebarProps {
   /** Current category */
-  currentCategory: MeilisearchCategory;
+  currentCategory: IndexedCategory;
   /** Parent category (null if root) */
-  parentCategory: MeilisearchCategory | null;
+  parentCategory: IndexedCategory | null;
   /** Sibling categories (same level) */
-  siblings: MeilisearchCategory[];
+  siblings: IndexedCategory[];
   /** Child categories */
-  children: MeilisearchCategory[];
+  children: IndexedCategory[];
   /** Full category tree for navigation */
   categoryTree?: CategoryTreeNode[];
   /** Show product counts */
@@ -128,7 +128,7 @@ const SidebarSection = memo(function SidebarSection({
 // ============================================================================
 
 interface CategoryLinkProps {
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   isActive?: boolean;
   showCount?: boolean;
   indent?: number;

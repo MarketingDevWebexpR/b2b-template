@@ -69,6 +69,11 @@ export const PRODUCTS_SEARCH_FIELDS: Record<string, { weight: number }> = {
   brand: { weight: 6 },
   category_names: { weight: 6 },
 
+  // Hierarchical category search
+  category_lvl0: { weight: 5 },
+  category_lvl1: { weight: 4 },
+  category_lvl2: { weight: 3 },
+
   // Standard priority - Descriptions and details
   description: { weight: 5 },
   collection: { weight: 5 },
@@ -107,6 +112,13 @@ export const PRODUCTS_RESULT_FIELDS: Record<string, { raw?: object; snippet?: { 
   all_category_handles: { raw: {} },
   categories: { raw: {} },
 
+  // Hierarchical category levels for InstantSearch navigation
+  category_lvl0: { raw: {} },
+  category_lvl1: { raw: {} },
+  category_lvl2: { raw: {} },
+  category_lvl3: { raw: {} },
+  category_lvl4: { raw: {} },
+
   // Pricing and availability
   price_min: { raw: {} },
   price_max: { raw: {} },
@@ -132,9 +144,19 @@ export const PRODUCTS_RESULT_FIELDS: Record<string, { raw?: object; snippet?: { 
 
 /**
  * Product facets configuration
+ *
+ * Includes hierarchical category levels (category_lvl0-4) for InstantSearch-style navigation
  */
 export const PRODUCTS_FACETS: Record<string, { type: 'value' | 'range'; size?: number }> = {
-  // Category facets
+  // Hierarchical category facets (Algolia/InstantSearch style)
+  // Each level contains full path: "Électricité > Câbles > Domestique"
+  category_lvl0: { type: 'value', size: 20 },  // Top-level categories
+  category_lvl1: { type: 'value', size: 50 },  // Sub-categories
+  category_lvl2: { type: 'value', size: 100 }, // Sub-sub-categories
+  category_lvl3: { type: 'value', size: 100 }, // Deeper levels
+  category_lvl4: { type: 'value', size: 50 },  // Deepest level
+
+  // Legacy category facets (kept for compatibility)
   category_names: { type: 'value', size: 50 },
   category_ids: { type: 'value', size: 50 },
 
@@ -156,15 +178,16 @@ export const PRODUCTS_FACETS: Record<string, { type: 'value' | 'range'; size?: n
 
 /**
  * Product boosts for relevance tuning
+ * Note: has_stock and is_available use string values "true"/"false" for consistent faceting
  */
 export const PRODUCTS_BOOSTS: Record<string, Array<{ type: string; value?: unknown; operation?: string; factor?: number }>> = {
-  // Boost products in stock
+  // Boost products in stock (string "true" for App Search compatibility)
   has_stock: [
-    { type: 'value', value: true, operation: 'multiply', factor: 1.5 },
+    { type: 'value', value: 'true', operation: 'multiply', factor: 1.5 },
   ],
-  // Boost available products
+  // Boost available products (string "true" for App Search compatibility)
   is_available: [
-    { type: 'value', value: true, operation: 'multiply', factor: 1.3 },
+    { type: 'value', value: 'true', operation: 'multiply', factor: 1.3 },
   ],
 };
 
@@ -393,22 +416,22 @@ interface AppSearchCombinedFilter {
 }
 
 /**
- * Convert Meilisearch filter syntax to App Search filter format
+ * Convert filter syntax to App Search filter format
  *
- * Meilisearch: 'category_id = "cat_123" AND has_stock = true'
- * App Search: { all: [{ category_id: "cat_123" }, { has_stock: true }] }
+ * Input: 'category_id = "cat_123" AND has_stock = true'
+ * Output: { all: [{ category_id: "cat_123" }, { has_stock: true }] }
  *
- * @param meilisearchFilter - Meilisearch-style filter string or array
+ * @param filter - Filter string or array
  * @returns App Search filter object or undefined if no valid filters
  */
-export function convertMeilisearchFilterToAppSearch(
-  meilisearchFilter: string | string[] | undefined
+export function convertFilterToAppSearch(
+  filter: string | string[] | undefined
 ): AppSearchFilter | AppSearchCombinedFilter | undefined {
-  if (!meilisearchFilter) return undefined;
+  if (!filter) return undefined;
 
-  const filterStr = Array.isArray(meilisearchFilter)
-    ? meilisearchFilter.join(' AND ')
-    : meilisearchFilter;
+  const filterStr = Array.isArray(filter)
+    ? filter.join(' AND ')
+    : filter;
 
   if (!filterStr.trim()) return undefined;
 
@@ -422,11 +445,9 @@ export function convertMeilisearchFilterToAppSearch(
     const field = match[1];
     const rawValue = match[2] ?? match[3];
 
-    // Handle boolean values - convert to actual booleans for App Search
-    if (rawValue === 'true') {
-      filters.push({ [field]: true });
-    } else if (rawValue === 'false') {
-      filters.push({ [field]: false });
+    // Handle boolean values - App Search requires string values for boolean fields
+    if (rawValue === 'true' || rawValue === 'false') {
+      filters.push({ [field]: rawValue });
     } else if (!isNaN(Number(rawValue)) && rawValue !== '') {
       // Handle numeric values
       filters.push({ [field]: Number(rawValue) });
@@ -508,26 +529,26 @@ export function convertMeilisearchFilterToAppSearch(
 }
 
 /**
- * Convert Meilisearch sort syntax to App Search format
+ * Convert sort syntax to App Search format
  *
- * Meilisearch: ['price_min:asc', 'created_at:desc']
- * App Search: { price_min: 'asc', created_at: 'desc' }
+ * Input: ['price_min:asc', 'created_at:desc']
+ * Output: { price_min: 'asc', created_at: 'desc' }
  */
-export function convertMeilisearchSortToAppSearch(
-  meilisearchSort: string[] | undefined
+export function convertSortToAppSearch(
+  sort: string[] | undefined
 ): Record<string, 'asc' | 'desc'> | undefined {
-  if (!meilisearchSort || meilisearchSort.length === 0) return undefined;
+  if (!sort || sort.length === 0) return undefined;
 
-  const sort: Record<string, 'asc' | 'desc'> = {};
+  const sortObj: Record<string, 'asc' | 'desc'> = {};
 
-  for (const sortItem of meilisearchSort) {
+  for (const sortItem of sort) {
     const [field, direction] = sortItem.split(':');
     if (field && (direction === 'asc' || direction === 'desc')) {
-      sort[field] = direction;
+      sortObj[field] = direction;
     }
   }
 
-  return Object.keys(sort).length > 0 ? sort : undefined;
+  return Object.keys(sortObj).length > 0 ? sortObj : undefined;
 }
 
 export default {
@@ -547,6 +568,6 @@ export default {
   JEWELRY_SYNONYMS,
   DEFAULT_CURATIONS,
   getAppSearchEngineConfig,
-  convertMeilisearchFilterToAppSearch,
-  convertMeilisearchSortToAppSearch,
+  convertFilterToAppSearch,
+  convertSortToAppSearch,
 };

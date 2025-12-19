@@ -58,7 +58,7 @@ const activeJobs: Map<string, {
  * Request Body:
  * @body sync_type - Type of sync: "full" | "incremental" | "entity" (default: "full")
  * @body entity_types - Array of entity types to sync: ["products", "categories", "marques", "collections", "all"]
- * @body target_engine - Target engine: "meilisearch" | "appsearch" | "both"
+ * @body target_engine - Target engine: "appsearch" (only AppSearch is supported)
  * @body clear_before - Clear index before reindexing (default: true for full sync)
  * @body async - Run async and return job ID (default: true)
  * @body batch_size - Batch size for indexing (100-5000, default: 1000)

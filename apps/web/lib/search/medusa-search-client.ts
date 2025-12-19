@@ -2,7 +2,7 @@
  * Medusa Search API Client
  *
  * Client for the Medusa backend search API.
- * Proxies search requests through the backend instead of direct Meilisearch access.
+ * Proxies search requests through the backend instead of direct search engine access.
  * This provides better security (no API key exposure) and allows server-side processing.
  *
  * @packageDocumentation
@@ -103,6 +103,35 @@ export interface SearchOptions {
   order?: 'asc' | 'desc';
 }
 
+/**
+ * Hierarchical category facet from App Search v3
+ * Format: "Parent > Child > Grandchild"
+ */
+export interface HierarchicalCategoryFacet {
+  /** Full path string (e.g., "Plomberie > Robinetterie > Mitigeurs") */
+  value: string;
+  /** Product count */
+  count: number;
+}
+
+/**
+ * Hierarchical facets response from v3 API
+ * Extends the base facet distribution format with typed category levels
+ */
+export type HierarchicalFacetsResponse = Record<string, Record<string, number>> & {
+  category_lvl0?: Record<string, number>;
+  category_lvl1?: Record<string, number>;
+  category_lvl2?: Record<string, number>;
+  category_lvl3?: Record<string, number>;
+  category_lvl4?: Record<string, number>;
+  brand_name?: Record<string, number>;
+  brand_slug?: Record<string, number>;
+  has_stock?: Record<string, number>;
+  is_available?: Record<string, number>;
+  material?: Record<string, number>;
+  tags?: Record<string, number>;
+};
+
 export interface ProductSearchResponse {
   query: string;
   type: 'products';
@@ -111,7 +140,8 @@ export interface ProductSearchResponse {
   limit: number;
   offset: number;
   processingTimeMs: number;
-  facetDistribution?: Record<string, Record<string, number>>;
+  /** v3 facet distribution with hierarchical categories */
+  facetDistribution?: HierarchicalFacetsResponse;
   error?: string;
 }
 
@@ -141,15 +171,30 @@ export interface MultiSearchResponse {
   };
 }
 
+/**
+ * Product suggestion with v3 brand and category fields
+ */
+export interface ProductSuggestion {
+  id: string;
+  title: string;
+  handle: string;
+  thumbnail: string | null;
+  price_min: number | null;
+  // v3 additions
+  brand_id?: string | null;
+  brand_name?: string | null;
+  brand_slug?: string | null;
+  category_path?: string | null;
+  category_handle?: string | null;
+}
+
 export interface SuggestionsResponse {
   query: string;
-  suggestions: Array<{
-    id: string;
-    title: string;
-    handle: string;
-    thumbnail: string | null;
-    price_min: number | null;
-  }>;
+  suggestions: ProductSuggestion[];
+  /** Category suggestions (from suggestions endpoint) */
+  categories?: CategorySuggestion[];
+  /** Brand suggestions (from suggestions endpoint) */
+  marques?: MarqueSuggestion[];
 }
 
 export interface CategorySuggestion {

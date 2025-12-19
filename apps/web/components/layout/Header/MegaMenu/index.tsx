@@ -14,16 +14,18 @@
  * - Keyboard accessible
  */
 
-import { memo, useState, useCallback, useEffect } from 'react';
+import { memo, useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronRight, ArrowRight, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMockData } from '@/hooks/useMockData';
+import { useCategories, prefetchCategories } from '@/hooks/use-categories';
 import { useBrands, prefetchBrands } from '@/hooks/use-brands';
 import { MegaMenuFeatured } from './MegaMenuFeatured';
 import { MegaMenuBrands } from './MegaMenuBrands';
 import { MegaMenuServices } from './MegaMenuServices';
+import type { CategoryTreeNode } from '@/types/category';
 
 // ============================================================================
 // Types
@@ -53,20 +55,44 @@ export const MegaMenu = memo(function MegaMenu({
   onMouseLeave,
   className,
 }: MegaMenuProps) {
-  const { catalog } = useMockData();
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+
+  // Fetch real categories from API (with caching)
+  const { tree: categoryTree, isLoading: categoriesLoading } = useCategories({
+    enabled: activeSection === 'catalogue',
+  });
+
+  // Map CategoryTreeNode to CatalogueContent format
+  const categories = useMemo(() => {
+    return categoryTree.slice(0, 5).map((cat: CategoryTreeNode) => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.handle,
+      description: cat.description,
+      children: cat.children.map((child: CategoryTreeNode) => ({
+        id: child.id,
+        name: child.name,
+        slug: child.handle,
+      })),
+    }));
+  }, [categoryTree]);
 
   // Fetch brands data (with caching) - only when "marques" section is active
   const { brands, isLoading: brandsLoading } = useBrands({
     enabled: activeSection === 'marques',
   });
 
-  // Prefetch brands when viewing catalogue (so marques loads faster when hovered)
+  // Prefetch brands and categories when viewing catalogue
   useEffect(() => {
     if (activeSection === 'catalogue') {
       prefetchBrands();
     }
   }, [activeSection]);
+
+  // Prefetch categories on component mount for faster response
+  useEffect(() => {
+    prefetchCategories();
+  }, []);
 
   // Reset hovered category when section changes
   useEffect(() => {
@@ -87,10 +113,11 @@ export const MegaMenu = memo(function MegaMenu({
       case 'catalogue':
         return (
           <CatalogueContent
-            categories={catalog.parentCategories.slice(0, 5)}
+            categories={categories}
             hoveredCategory={hoveredCategory}
             onCategoryHover={handleCategoryHover}
             onLinkClick={handleLinkClick}
+            isLoading={categoriesLoading}
           />
         );
       case 'marques':
@@ -142,7 +169,7 @@ interface CatalogueContentProps {
     id: string;
     name: string;
     slug: string;
-    description?: string;
+    description?: string | null;
     children?: Array<{
       id: string;
       name: string;
@@ -152,6 +179,7 @@ interface CatalogueContentProps {
   hoveredCategory: string | null;
   onCategoryHover: (id: string) => void;
   onLinkClick: () => void;
+  isLoading?: boolean;
 }
 
 const CatalogueContent = memo(function CatalogueContent({
@@ -159,16 +187,36 @@ const CatalogueContent = memo(function CatalogueContent({
   hoveredCategory,
   onCategoryHover,
   onLinkClick,
+  isLoading = false,
 }: CatalogueContentProps) {
   const { catalog } = useMockData();
 
-  // Get featured products
+  // Get featured products (still using mock data for now)
   const featuredProducts = catalog.bestSellers.slice(0, 3);
 
   // Get current category details
   const currentCategory = hoveredCategory
     ? categories.find((c) => c.id === hoveredCategory)
     : categories[0];
+
+  // Loading state
+  if (isLoading && categories.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+        <span className="ml-3 text-sm text-neutral-500">Chargement des catégories...</span>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (!isLoading && categories.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <span className="text-sm text-neutral-500">Aucune catégorie disponible</span>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-12 gap-6">

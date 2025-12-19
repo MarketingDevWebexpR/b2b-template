@@ -32,7 +32,6 @@ import type {
  *
  * Query Parameters:
  * @query status - Filter by sync status (pending|in_progress|completed|failed|cancelled)
- * @query engine - Filter by target engine (meilisearch|appsearch)
  * @query entity_type - Filter by entity type (all|products|categories|marques|collections)
  * @query from_date - Filter from date (ISO 8601)
  * @query to_date - Filter to date (ISO 8601)
@@ -75,9 +74,7 @@ export async function GET(
       filteredReports = filteredReports.filter((r) => r.status === status);
     }
 
-    if (engine) {
-      filteredReports = filteredReports.filter((r) => r.engine === engine);
-    }
+    // Engine filter removed - only AppSearch is supported
 
     if (entity_type) {
       filteredReports = filteredReports.filter(
@@ -123,7 +120,7 @@ export async function GET(
       sync_type: (r.syncType || "full") as SyncType,
       entity_type: (r.entityType || "all") as EntityType,
       status: r.status as SyncStatus,
-      engine: (r.engine || "meilisearch") as SearchEngineType,
+      engine: (r.engine || "appsearch") as SearchEngineType,
       triggered_by: r.triggeredBy || "system",
       started_at: r.startedAt?.toISOString() || null,
       completed_at: r.completedAt?.toISOString() || null,

@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  useState,
   type InputHTMLAttributes,
   type ReactNode,
   useId,
@@ -70,8 +71,19 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
   ) => {
     const generatedId = useId();
     const id = providedId || generatedId;
+    const [isChecked, setIsChecked] = useState(props.checked ?? props.defaultChecked ?? false);
 
     const sizeConfig = switchSizes[size];
+
+    // Calculate thumb translate based on size and checked state
+    const thumbTranslate = isChecked
+      ? size === 'sm' ? '16px' : size === 'md' ? '20px' : '24px'
+      : '2px';
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setIsChecked(e.target.checked);
+      props.onChange?.(e);
+    };
 
     const switchElement = (
       <span
@@ -92,6 +104,8 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           role="switch"
           id={id}
           disabled={disabled}
+          checked={isChecked}
+          onChange={handleChange}
           className={cn(
             'absolute inset-0 w-full h-full opacity-0 cursor-pointer peer',
             'disabled:cursor-not-allowed',
@@ -121,24 +135,14 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             'bg-white',
             'shadow-sm',
             'ring-0',
-            'transform translate-x-0.5',
             'transition-transform duration-200 ease-in-out',
-            `peer-checked:${sizeConfig.translate}`,
             // Focus ring
             'peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2'
           )}
           style={{
-            // Using inline style for dynamic translate since cn doesn't handle it well
-            transform: 'translateX(2px)',
+            transform: `translateX(${thumbTranslate})`,
           }}
         />
-
-        {/* Thumb when checked - using CSS sibling selector */}
-        <style jsx>{`
-          input:checked ~ span:last-child {
-            transform: translateX(${size === 'sm' ? '16px' : size === 'md' ? '20px' : '24px'});
-          }
-        `}</style>
       </span>
     );
 

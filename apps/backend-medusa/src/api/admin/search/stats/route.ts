@@ -38,29 +38,17 @@ export async function GET(
   const logger = req.scope.resolve("logger");
 
   try {
-    // Get engine status
-    const engineStatus = searchService.getEngineStatus();
-    const activeEngine = engineStatus.activeProvider as "meilisearch" | "appsearch";
-
-    // Get Meilisearch stats
-    const meilisearchStats = await getEngineStats(searchService, "meilisearch");
-
-    // Get App Search stats if configured
-    const appsearchConfigured = Boolean(process.env.APPSEARCH_ENDPOINT);
-    let appsearchStats: EngineStats | undefined;
-    if (appsearchConfigured) {
-      appsearchStats = await getAppSearchStats();
-    }
+    // Get App Search stats
+    const appsearchStats = await getAppSearchStats();
 
     // Get sync statistics
     const syncStats = await getSyncStatistics(searchService);
 
     const response: SearchStatsResponse = {
       engines: {
-        meilisearch: meilisearchStats,
-        ...(appsearchStats && { appsearch: appsearchStats }),
+        appsearch: appsearchStats,
       },
-      active_engine: activeEngine,
+      active_engine: "appsearch",
       sync_stats: syncStats,
       timestamp: new Date().toISOString(),
     };
@@ -77,67 +65,6 @@ export async function GET(
       timestamp: new Date().toISOString(),
     });
   }
-}
-
-/**
- * Get statistics for Meilisearch
- */
-async function getEngineStats(
-  searchService: SearchModuleService,
-  engine: "meilisearch" | "appsearch"
-): Promise<EngineStats> {
-  const indexes: Record<string, IndexStats> = {};
-  let totalDocuments = 0;
-  let available = true;
-
-  try {
-    // Get stats for each index
-    for (const [key, indexName] of Object.entries(INDEX_NAMES)) {
-      try {
-        const stats = await searchService.getIndexStats(indexName);
-
-        const indexStats: IndexStats = {
-          name: indexName,
-          document_count: stats.numberOfDocuments,
-          is_indexing: stats.isIndexing,
-        };
-
-        indexes[key.toLowerCase()] = indexStats;
-        totalDocuments += stats.numberOfDocuments;
-      } catch {
-        indexes[key.toLowerCase()] = {
-          name: indexName,
-          document_count: 0,
-          is_indexing: false,
-        };
-      }
-    }
-  } catch {
-    available = false;
-  }
-
-  // Get last sync info
-  let lastSync: EngineStats["last_sync"];
-  try {
-    const reports = await searchService.getSyncReports(1);
-    if (reports.length > 0 && reports[0].status === "completed") {
-      lastSync = {
-        id: reports[0].id,
-        completed_at: reports[0].completedAt?.toISOString() || new Date().toISOString(),
-        documents_processed: reports[0].documentsIndexed,
-      };
-    }
-  } catch {
-    // Ignore errors fetching sync reports
-  }
-
-  return {
-    engine,
-    available,
-    total_documents: totalDocuments,
-    indexes: indexes as EngineStats["indexes"],
-    last_sync: lastSync,
-  };
 }
 
 /**

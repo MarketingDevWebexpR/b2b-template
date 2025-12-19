@@ -1,23 +1,58 @@
 /**
- * Brand Search API Route (Proxy)
+ * Brand/Marque Search API Route (App Search v3)
  *
- * Proxies brand search requests to the Medusa backend.
- * Returns brands matching the search query with their details.
+ * Direct integration with Elastic App Search v3 engine for brand search.
+ * Filters by doc_type="marques" (plural) and returns brands with their details.
  *
  * GET /api/search/marques?q=query&limit=5
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  APP_SEARCH_CONFIG,
+  getAppSearchUrl,
+} from '@/lib/search/app-search-v3';
 
-const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || 'http://localhost:9000';
+// Types for App Search v3 marque results
+// Marques schema: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
+interface AppSearchMarqueHit {
+  id: { raw: string };
+  name?: { raw: string };
+  slug?: { raw: string };
+  description?: { raw: string };
+  doc_type?: { raw: string };
+  // Marque-specific fields
+  logo_url?: { raw: string };
+  country?: { raw: string };
+  website_url?: { raw: string };
+  is_active?: { raw: string };
+  rank?: { raw: number };
+  _meta?: {
+    score: number;
+  };
+}
 
+interface AppSearchResponse {
+  meta: {
+    request_id: string;
+    page: {
+      current: number;
+      total_pages: number;
+      total_results: number;
+      size: number;
+    };
+  };
+  results: AppSearchMarqueHit[];
+}
+
+// Note: product_count is NOT in marques schema, removed from interface
 export interface MarqueSuggestion {
   id: string;
   name: string;
   slug: string;
   logo_url: string | null;
   country: string | null;
-  product_count: number;
+  rank: number;
 }
 
 export interface MarqueSuggestionsResponse {
@@ -25,10 +60,28 @@ export interface MarqueSuggestionsResponse {
   marques: MarqueSuggestion[];
 }
 
+/**
+ * Transform App Search marque hit to MarqueSuggestion format
+ * Uses only fields from App Search v3 marques: name, slug, logo_url, country, is_active, rank
+ */
+function transformMarqueHit(hit: AppSearchMarqueHit): MarqueSuggestion {
+  const name = hit.name?.raw || '';
+  const slug = hit.slug?.raw || name.toLowerCase().replace(/\s+/g, '-');
+
+  return {
+    id: hit.id?.raw || '',
+    name,
+    slug,
+    logo_url: hit.logo_url?.raw || null,
+    country: hit.country?.raw || null,
+    rank: hit.rank?.raw ?? 0,
+  };
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('q') || '';
-  const limit = searchParams.get('limit') || '5';
+  const limit = parseInt(searchParams.get('limit') || '5', 10);
 
   // Validate query
   if (!query || query.length < 2) {
@@ -39,57 +92,78 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Search brands via Medusa backend
-    const url = `${MEDUSA_BACKEND_URL}/search?q=${encodeURIComponent(query)}&type=marques&limit=${limit}`;
+    // Build App Search query for marques
+    const searchQuery = {
+      query,
+      page: {
+        size: limit,
+        current: 1,
+      },
+      // Filter by doc_type = marques (V3: plural form)
+      filters: {
+        all: [{ doc_type: 'marques' }],
+      },
+      // Result fields - only include fields from App Search v3 marques schema
+      // Marques: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
+      result_fields: {
+        id: { raw: {} },
+        name: { raw: {} },
+        slug: { raw: {} },
+        description: { raw: {} },
+        doc_type: { raw: {} },
+        // Marque specific fields
+        logo_url: { raw: {} },
+        country: { raw: {} },
+        website_url: { raw: {} },
+        is_active: { raw: {} },
+        rank: { raw: {} },
+      },
+      // Search fields - only use fields that exist in schema
+      search_fields: {
+        name: { weight: 10 },
+        description: { weight: 3 },
+        country: { weight: 2 },
+      },
+    };
 
-    const response = await fetch(url, {
-      method: 'GET',
+    // Call App Search API using shared configuration
+    const appSearchUrl = getAppSearchUrl();
+
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
       },
-      // Allow caching for 60 seconds
+      body: JSON.stringify(searchQuery),
       next: { revalidate: 60 },
     });
 
     if (!response.ok) {
-      console.error(`[Brand Search Proxy] Error from Medusa: ${response.status}`);
+      const errorText = await response.text();
+      console.error(
+        `[Marque Search API] App Search error: ${response.status}`,
+        errorText
+      );
       return NextResponse.json({
         query,
         marques: [],
       });
     }
 
-    const data = await response.json();
+    const data: AppSearchResponse = await response.json();
 
-    // Transform Medusa brand results to our MarqueSuggestion format
-    const marques: MarqueSuggestion[] = (data.hits || []).map((brand: {
-      id: string;
-      name: string;
-      handle?: string;
-      slug?: string;
-      logo_url?: string | null;
-      logo?: string | null;
-      country?: string | null;
-      origin?: string | null;
-      product_count?: number;
-      metadata?: Record<string, unknown>;
-    }) => {
-      return {
-        id: brand.id,
-        name: brand.name,
-        slug: brand.handle || brand.slug || brand.name.toLowerCase().replace(/\s+/g, '-'),
-        logo_url: brand.logo_url || brand.logo || null,
-        country: brand.country || brand.origin || null,
-        product_count: brand.product_count || 0,
-      };
-    });
+    // Transform results to MarqueSuggestion format (V3: plural form)
+    const marques = data.results
+      .filter((hit) => hit.doc_type?.raw === 'marques')
+      .map(transformMarqueHit);
 
     return NextResponse.json({
       query,
       marques,
     });
   } catch (error) {
-    console.error('[Brand Search Proxy] Error:', error);
+    console.error('[Marque Search API] Error:', error);
     return NextResponse.json({
       query,
       marques: [],

@@ -6,6 +6,13 @@
  * React Query hooks for fetching and managing category data with full
  * hierarchy support. Provides tree structure, breadcrumbs, and filtering.
  *
+ * Compatible with App Search v3 category schema:
+ * - depth: 0-4 indicating hierarchy level (supports 5-level navigation L1-L5)
+ * - parent_category_id: reference to parent category
+ * - path: full path like "Plomberie > Robinetterie > Mitigeurs"
+ * - ancestor_handles/ancestor_names: for URL and breadcrumb construction
+ * - product_count: total products including descendants
+ *
  * @packageDocumentation
  */
 
@@ -16,7 +23,7 @@ import {
 } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import type {
-  MeilisearchCategory,
+  IndexedCategory,
   CategoryTreeNode,
   CategoryBreadcrumb,
   CategoryNavItem,
@@ -46,7 +53,7 @@ import {
  */
 export interface CategoryTreeResponse {
   tree: CategoryTreeNode[];
-  flat: MeilisearchCategory[];
+  flat: IndexedCategory[];
   total: number;
 }
 
@@ -54,10 +61,10 @@ export interface CategoryTreeResponse {
  * Category path response from API
  */
 export interface CategoryPathResponse {
-  category: MeilisearchCategory;
-  children: MeilisearchCategory[];
+  category: IndexedCategory;
+  children: IndexedCategory[];
   products: CategoryProduct[];
-  ancestors: MeilisearchCategory[];
+  ancestors: IndexedCategory[];
 }
 
 /**
@@ -353,7 +360,7 @@ export function useCategoryBreadcrumbs(
  */
 export function useCategoryByHandle(
   handle: string | null | undefined
-): MeilisearchCategory | null {
+): IndexedCategory | null {
   const { data } = useCategoryTree();
 
   return useMemo(() => {
@@ -372,7 +379,7 @@ export function useCategoryByHandle(
  * const rootCategories = useRootCategories();
  * ```
  */
-export function useRootCategories(): MeilisearchCategory[] {
+export function useRootCategories(): IndexedCategory[] {
   const { data } = useCategoryTree();
 
   return useMemo(() => {
@@ -396,7 +403,7 @@ export function useRootCategories(): MeilisearchCategory[] {
  */
 export function useCategoryChildren(
   parentId: string | null | undefined
-): MeilisearchCategory[] {
+): IndexedCategory[] {
   const { data } = useCategoryTree();
 
   return useMemo(() => {

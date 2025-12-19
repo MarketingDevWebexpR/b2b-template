@@ -11,7 +11,7 @@
  */
 
 import type {
-  MeilisearchCategory,
+  IndexedCategory,
   CategoryTreeNode,
   CategoryBreadcrumb,
   CategoryResponse,
@@ -26,9 +26,9 @@ import type {
  */
 export interface CategoryResolution {
   /** The resolved category */
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   /** Full array of ancestor categories (root to parent) */
-  ancestors: MeilisearchCategory[];
+  ancestors: IndexedCategory[];
   /** Breadcrumb trail including current category */
   breadcrumbs: CategoryBreadcrumb[];
   /** Full URL path for the category */
@@ -66,7 +66,7 @@ export interface HierarchicalBreadcrumb extends CategoryBreadcrumb {
  * // Returns: "/categorie/bijoux/colliers/or"
  * ```
  */
-export function getCategoryPath(category: MeilisearchCategory): string {
+export function getCategoryPath(category: IndexedCategory): string {
   const pathParts = [...(category.ancestor_handles || []), category.handle];
   return `/categorie/${pathParts.join('/')}`;
 }
@@ -104,10 +104,10 @@ export function parsePathToSlug(path: string): string[] {
  * @returns Array of ancestor categories from root to parent
  */
 export function getAncestors(
-  category: MeilisearchCategory,
-  byId: Record<string, MeilisearchCategory>
-): MeilisearchCategory[] {
-  const ancestors: MeilisearchCategory[] = [];
+  category: IndexedCategory,
+  byId: Record<string, IndexedCategory>
+): IndexedCategory[] {
+  const ancestors: IndexedCategory[] = [];
 
   for (const ancestorId of category.parent_category_ids || []) {
     const ancestor = byId[ancestorId];
@@ -127,10 +127,10 @@ export function getAncestors(
  * @returns Array of all descendant categories
  */
 export function getDescendants(
-  category: MeilisearchCategory,
-  allCategories: MeilisearchCategory[]
-): MeilisearchCategory[] {
-  const descendants: MeilisearchCategory[] = [];
+  category: IndexedCategory,
+  allCategories: IndexedCategory[]
+): IndexedCategory[] {
+  const descendants: IndexedCategory[] = [];
 
   // Find direct children
   const children = allCategories.filter(
@@ -155,9 +155,9 @@ export function getDescendants(
  * @returns Array of direct child categories sorted by rank
  */
 export function getDirectChildren(
-  category: MeilisearchCategory,
-  allCategories: MeilisearchCategory[]
-): MeilisearchCategory[] {
+  category: IndexedCategory,
+  allCategories: IndexedCategory[]
+): IndexedCategory[] {
   return allCategories
     .filter(
       (c) =>
@@ -175,9 +175,9 @@ export function getDirectChildren(
  * @returns Array of sibling categories sorted by rank
  */
 export function getSiblings(
-  category: MeilisearchCategory,
-  allCategories: MeilisearchCategory[]
-): MeilisearchCategory[] {
+  category: IndexedCategory,
+  allCategories: IndexedCategory[]
+): IndexedCategory[] {
   return allCategories
     .filter(
       (c) =>
@@ -196,9 +196,9 @@ export function getSiblings(
  * @returns Parent category or null if root
  */
 export function getParent(
-  category: MeilisearchCategory,
-  byId: Record<string, MeilisearchCategory>
-): MeilisearchCategory | null {
+  category: IndexedCategory,
+  byId: Record<string, IndexedCategory>
+): IndexedCategory | null {
   if (!category.parent_category_id) {
     return null;
   }
@@ -282,8 +282,8 @@ export function buildBreadcrumbsFromSlug(
  * @returns Array of hierarchical breadcrumbs
  */
 export function buildCategoryBreadcrumbs(
-  category: MeilisearchCategory,
-  byId: Record<string, MeilisearchCategory>,
+  category: IndexedCategory,
+  byId: Record<string, IndexedCategory>,
   includeHome: boolean = true
 ): HierarchicalBreadcrumb[] {
   const breadcrumbs: HierarchicalBreadcrumb[] = [];
@@ -404,8 +404,8 @@ export function resolveCategoryFromSlug(
  */
 export function findCategoryByHandle(
   handle: string,
-  byHandle: Record<string, MeilisearchCategory>
-): MeilisearchCategory | null {
+  byHandle: Record<string, IndexedCategory>
+): IndexedCategory | null {
   return byHandle[handle] || null;
 }
 
@@ -455,7 +455,7 @@ export function getPathInTree(
  */
 export function isAncestorOf(
   ancestorId: string,
-  descendantCategory: MeilisearchCategory
+  descendantCategory: IndexedCategory
 ): boolean {
   return (descendantCategory.parent_category_ids || []).includes(ancestorId);
 }
@@ -463,7 +463,7 @@ export function isAncestorOf(
 /**
  * Get total product count including all descendants
  *
- * NOTE: The `product_count` field from Meilisearch ALREADY includes
+ * NOTE: The `product_count` field from the search index ALREADY includes
  * inherited counts from descendants (calculated during backend sync).
  * This function is provided for compatibility but should typically
  * just return the existing product_count.
@@ -477,8 +477,8 @@ export function isAncestorOf(
  * @returns Total product count
  */
 export function getTotalProductCount(
-  category: MeilisearchCategory,
-  allCategories: MeilisearchCategory[],
+  category: IndexedCategory,
+  allCategories: IndexedCategory[],
   recalculate: boolean = false
 ): number {
   // By default, use the pre-calculated count from backend

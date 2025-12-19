@@ -1,15 +1,56 @@
 /**
- * Category Search API Route (Proxy)
+ * Category Search API Route (App Search v3)
  *
- * Proxies category search requests to the Medusa backend.
- * Returns categories matching the search query with their full path.
+ * Direct integration with Elastic App Search v3 engine for category search.
+ * Filters by doc_type="categories" (plural) and returns categories with paths.
+ *
+ * Note: category_lvl0-4 fields exist only on PRODUCTS, not on categories.
+ * Categories use: path, ancestor_names, ancestor_handles, depth fields.
  *
  * GET /api/search/categories?q=query&limit=5
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  APP_SEARCH_CONFIG,
+  getAppSearchUrl,
+} from '@/lib/search/app-search-v3';
 
-const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || 'http://localhost:9000';
+// Types for App Search v3 category results
+// Categories schema: name, handle, description, parent_category_id, path, ancestor_handles, ancestor_names, depth, rank, product_count, is_active, doc_type, id
+interface AppSearchCategoryHit {
+  id: { raw: string };
+  name?: { raw: string };
+  handle?: { raw: string };
+  description?: { raw: string };
+  doc_type?: { raw: string };
+  // Category hierarchy fields
+  path?: { raw: string };
+  ancestor_names?: { raw: string[] };
+  ancestor_handles?: { raw: string[] };
+  // Category-specific fields
+  depth?: { raw: number };
+  rank?: { raw: number };
+  product_count?: { raw: number };
+  parent_category_id?: { raw: string };
+  is_active?: { raw: string };
+  _meta?: {
+    score: number;
+  };
+}
+
+interface AppSearchResponse {
+  meta: {
+    request_id: string;
+    page: {
+      current: number;
+      total_pages: number;
+      total_results: number;
+      size: number;
+    };
+  };
+  results: AppSearchCategoryHit[];
+}
 
 export interface CategorySuggestion {
   id: string;
@@ -28,10 +69,49 @@ export interface CategorySuggestionsResponse {
   categories: CategorySuggestion[];
 }
 
+/**
+ * Transform App Search category hit to CategorySuggestion format
+ * Uses only fields from App Search v3 categories: name, handle, path, ancestor_names, ancestor_handles, depth, product_count
+ */
+function transformCategoryHit(hit: AppSearchCategoryHit): CategorySuggestion {
+  const name = hit.name?.raw || '';
+  const handle = hit.handle?.raw || '';
+
+  // Build path array from path field or ancestor_names
+  let pathArray: string[] = [name];
+  let pathString = name;
+
+  if (hit.path?.raw) {
+    pathString = hit.path.raw;
+    pathArray = pathString.split(' > ');
+  } else if (hit.ancestor_names?.raw?.length) {
+    // Build path from ancestor_names + current name
+    pathArray = [...hit.ancestor_names.raw, name];
+    pathString = pathArray.join(' > ');
+  }
+
+  // Build full URL path from ancestor_handles
+  let fullPath = handle;
+  if (hit.ancestor_handles?.raw?.length) {
+    fullPath = [...hit.ancestor_handles.raw, handle].join('/');
+  }
+
+  return {
+    id: hit.id?.raw || '',
+    name,
+    handle,
+    path: pathArray,
+    pathString,
+    fullPath,
+    productCount: hit.product_count?.raw ?? 0,
+    depth: hit.depth?.raw ?? Math.max(0, pathArray.length - 1),
+  };
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('q') || '';
-  const limit = searchParams.get('limit') || '5';
+  const limit = parseInt(searchParams.get('limit') || '5', 10);
 
   // Validate query
   if (!query || query.length < 2) {
@@ -42,79 +122,82 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Search categories via Medusa backend
-    const url = `${MEDUSA_BACKEND_URL}/search?q=${encodeURIComponent(query)}&type=categories&limit=${limit}`;
+    // Build App Search query for categories
+    const searchQuery = {
+      query,
+      page: {
+        size: limit,
+        current: 1,
+      },
+      // Filter by doc_type = categories (V3: plural form)
+      filters: {
+        all: [{ doc_type: 'categories' }],
+      },
+      // Result fields - only include fields from App Search v3 categories schema
+      // Categories: name, handle, description, parent_category_id, path, ancestor_handles, ancestor_names, depth, rank, product_count, is_active, doc_type, id
+      result_fields: {
+        id: { raw: {} },
+        name: { raw: {} },
+        handle: { raw: {} },
+        description: { raw: {} },
+        doc_type: { raw: {} },
+        // Category hierarchy fields
+        path: { raw: {} },
+        ancestor_names: { raw: {} },
+        ancestor_handles: { raw: {} },
+        // Category specific
+        depth: { raw: {} },
+        rank: { raw: {} },
+        product_count: { raw: {} },
+        parent_category_id: { raw: {} },
+        is_active: { raw: {} },
+      },
+      // Search fields - only use fields that exist in schema
+      search_fields: {
+        name: { weight: 10 },
+        path: { weight: 5 },
+        description: { weight: 2 },
+      },
+    };
 
-    const response = await fetch(url, {
-      method: 'GET',
+    // Call App Search API using shared configuration
+    const appSearchUrl = getAppSearchUrl();
+
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
       },
-      // Allow caching for 60 seconds
+      body: JSON.stringify(searchQuery),
       next: { revalidate: 60 },
     });
 
     if (!response.ok) {
-      console.error(`[Category Search Proxy] Error from Medusa: ${response.status}`);
+      const errorText = await response.text();
+      console.error(
+        `[Category Search API] App Search error: ${response.status}`,
+        errorText
+      );
       return NextResponse.json({
         query,
         categories: [],
       });
     }
 
-    const data = await response.json();
+    const data: AppSearchResponse = await response.json();
 
-    // Transform Medusa category results to our CategorySuggestion format
-    const categories: CategorySuggestion[] = (data.hits || []).map((cat: {
-      id: string;
-      name: string;
-      handle: string;
-      parent_category_id: string | null;
-      depth: number;
-      product_count?: number;
-      metadata?: Record<string, unknown>;
-      path?: string; // Full path string from Meilisearch (e.g., "Bijoux > Bagues > Or")
-      ancestor_names?: string[];
-      ancestor_handles?: string[]; // Handles of ancestor categories
-    }) => {
-      // Build path from the path string or ancestor_names
-      let pathArray: string[] = [cat.name];
-      let pathString = cat.name;
-
-      if (cat.path && cat.path.includes(' > ')) {
-        // path is the full hierarchy string "Bijoux > Bagues > Or"
-        pathArray = cat.path.split(' > ');
-        pathString = cat.path;
-      } else if (cat.ancestor_names && cat.ancestor_names.length > 0) {
-        // ancestor_names contains parent names from root to immediate parent
-        pathArray = [...cat.ancestor_names, cat.name];
-        pathString = pathArray.join(' > ');
-      }
-
-      // Build full URL path from ancestor_handles if available
-      let fullPath = cat.handle;
-      if (cat.ancestor_handles && cat.ancestor_handles.length > 0) {
-        fullPath = [...cat.ancestor_handles, cat.handle].join('/');
-      }
-
-      return {
-        id: cat.id,
-        name: cat.name,
-        handle: cat.handle,
-        path: pathArray,
-        pathString: pathString,
-        fullPath: fullPath,
-        productCount: cat.product_count || 0,
-        depth: pathArray.length - 1,
-      };
-    });
+    // Transform results to CategorySuggestion format (V3: plural form)
+    const categories = data.results
+      .filter((hit) => hit.doc_type?.raw === 'categories')
+      .map(transformCategoryHit);
 
     return NextResponse.json({
       query,
       categories,
     });
   } catch (error) {
-    console.error('[Category Search Proxy] Error:', error);
+    console.error('[Category Search API] Error:', error);
     return NextResponse.json({
       query,
       categories: [],

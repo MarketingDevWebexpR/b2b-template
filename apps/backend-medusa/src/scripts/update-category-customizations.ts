@@ -826,6 +826,6 @@ export default async function updateCategoryCustomizations({ container }: ExecAr
   logger.info("Category customization update completed!");
   logger.info("");
   logger.info("Next steps:");
-  logger.info("   1. Sync Meilisearch: npx medusa exec ./src/scripts/sync-search-indexes.ts");
+  logger.info("   1. Sync App Search: npx medusa exec ./src/scripts/sync-search-indexes.ts");
   logger.info("   2. Check admin: http://localhost:9000/app/categories");
 }

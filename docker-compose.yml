@@ -6,7 +6,6 @@
 #   - postgres: PostgreSQL 16 database for Medusa
 #   - redis: Redis for caching, events, and workflows (optional in dev)
 #   - minio: MinIO S3-compatible storage for media files
-#   - meilisearch: Meilisearch full-text search engine
 #
 # Usage:
 #   pnpm docker:up       # Start services
@@ -135,49 +134,6 @@ services:
         echo "  - Console: http://localhost:9001"
     restart: "no"
 
-  # ---------------------------------------------------------------------------
-  # Meilisearch - Moteur de recherche full-text performant
-  # ---------------------------------------------------------------------------
-  # Meilisearch est un moteur de recherche open-source, rapide et facile a
-  # configurer. Il offre une recherche tolerante aux fautes de frappe,
-  # le filtrage, le tri, et des resultats instantanes.
-  #
-  # Documentation: https://www.meilisearch.com/docs
-  # Dashboard: http://localhost:7700 (utiliser la MEILI_MASTER_KEY pour l'acces)
-  #
-  # Pour la production:
-  #   - Generer une MEILI_MASTER_KEY securisee (min 16 caracteres)
-  #   - Utiliser MEILI_ENV=production
-  #   - Configurer les limites de ressources appropriees
-  # ---------------------------------------------------------------------------
-  meilisearch:
-    image: getmeili/meilisearch:v1.6
-    container_name: medusa_meilisearch
-    restart: unless-stopped
-    environment:
-      # Cle maitre pour l'authentification API (IMPORTANT: changer en production!)
-      # Genere automatiquement les cles de recherche et d'administration
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-meilisearch_master_key_dev_only}
-      # Mode d'environnement: development ou production
-      # En production, desactive le dashboard public et active les optimisations
-      MEILI_ENV: ${MEILI_ENV:-development}
-      # Limite de memoire pour les indexes (ajuster selon les besoins)
-      # MEILI_MAX_INDEXING_MEMORY: 1024Mb
-      # Limite de threads pour l'indexation
-      # MEILI_MAX_INDEXING_THREADS: 2
-    ports:
-      # API et dashboard web
-      - "7700:7700"
-    volumes:
-      # Persistance des donnees et des indexes
-      - meili_data:/meili_data
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:7700/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
 # ---------------------------------------------------------------------------
 # Volumes
 # ---------------------------------------------------------------------------
@@ -188,9 +144,6 @@ volumes:
     driver: local
   # Volume pour la persistance des fichiers MinIO
   minio_data:
-    driver: local
-  # Volume pour la persistance des indexes Meilisearch
-  meili_data:
     driver: local
 
 # ---------------------------------------------------------------------------

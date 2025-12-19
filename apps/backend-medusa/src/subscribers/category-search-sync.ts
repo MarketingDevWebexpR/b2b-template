@@ -2,7 +2,7 @@
  * Category Search Sync Subscriber
  *
  * Automatically syncs category changes to the search index.
- * Listens to category lifecycle events and updates Meilisearch accordingly.
+ * Listens to category lifecycle events and updates App Search accordingly.
  */
 
 import type { SubscriberConfig, SubscriberArgs } from "@medusajs/framework";

@@ -5,6 +5,13 @@
  *
  * Fetches and transforms category data from the categories API.
  * Provides hierarchical category structure with 5 levels of nesting.
+ *
+ * Compatible with App Search v3 category schema:
+ * - depth: 0-4 indicating hierarchy level
+ * - parent_category_id: reference to parent
+ * - path: full path like "Plomberie > Robinetterie > Mitigeurs"
+ * - ancestor_handles/ancestor_names: for breadcrumb construction
+ * - product_count: total products including descendants
  */
 
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -36,7 +43,8 @@ const STALE_TIME = 5 * 60 * 1000; // 5 minutes
 // ============================================================================
 
 /**
- * Transform CategoryTreeNode to CategoryLevel5 (leaf node)
+ * Transform CategoryTreeNode to CategoryLevel5 (leaf node, depth=4)
+ * Maps v3 fields: depth, path, ancestor_handles, product_count
  */
 function transformToLevel5(node: CategoryTreeNode): CategoryLevel5 {
   return {
@@ -44,11 +52,15 @@ function transformToLevel5(node: CategoryTreeNode): CategoryLevel5 {
     name: node.name,
     slug: node.handle,
     productCount: node.product_count,
+    depth: node.depth,
+    path: node.path || node.full_path,
+    ancestorHandles: node.ancestor_handles,
   };
 }
 
 /**
- * Transform CategoryTreeNode to CategoryLevel4
+ * Transform CategoryTreeNode to CategoryLevel4 (depth=3)
+ * Maps v3 fields: depth, path, ancestor_handles, product_count
  */
 function transformToLevel4(node: CategoryTreeNode): CategoryLevel4 {
   return {
@@ -57,12 +69,16 @@ function transformToLevel4(node: CategoryTreeNode): CategoryLevel4 {
     slug: node.handle,
     icon: node.icon || undefined,
     productCount: node.product_count,
+    depth: node.depth,
+    path: node.path || node.full_path,
+    ancestorHandles: node.ancestor_handles,
     children: node.children?.map(transformToLevel5),
   };
 }
 
 /**
- * Transform CategoryTreeNode to CategoryLevel3
+ * Transform CategoryTreeNode to CategoryLevel3 (depth=2)
+ * Maps v3 fields: depth, path, ancestor_handles, product_count
  */
 function transformToLevel3(node: CategoryTreeNode): CategoryLevel3 {
   return {
@@ -71,12 +87,16 @@ function transformToLevel3(node: CategoryTreeNode): CategoryLevel3 {
     slug: node.handle,
     icon: node.icon || undefined,
     productCount: node.product_count,
+    depth: node.depth,
+    path: node.path || node.full_path,
+    ancestorHandles: node.ancestor_handles,
     children: node.children?.map(transformToLevel4),
   };
 }
 
 /**
- * Transform CategoryTreeNode to CategoryLevel2
+ * Transform CategoryTreeNode to CategoryLevel2 (depth=1)
+ * Maps v3 fields: depth, path, ancestor_handles, product_count
  */
 function transformToLevel2(node: CategoryTreeNode): CategoryLevel2 {
   return {
@@ -85,12 +105,16 @@ function transformToLevel2(node: CategoryTreeNode): CategoryLevel2 {
     slug: node.handle,
     icon: node.icon || undefined,
     productCount: node.product_count,
+    depth: node.depth,
+    path: node.path || node.full_path,
+    ancestorHandles: node.ancestor_handles,
     children: node.children?.map(transformToLevel3),
   };
 }
 
 /**
- * Transform CategoryTreeNode to CategoryLevel1
+ * Transform CategoryTreeNode to CategoryLevel1 (depth=0)
+ * Maps v3 fields: depth, path, ancestor_handles, product_count
  */
 function transformToLevel1(node: CategoryTreeNode): CategoryLevel1 {
   return {
@@ -100,12 +124,16 @@ function transformToLevel1(node: CategoryTreeNode): CategoryLevel1 {
     icon: node.icon || undefined,
     description: node.description || undefined,
     productCount: node.product_count,
+    depth: node.depth,
+    path: node.path || node.full_path,
+    ancestorHandles: node.ancestor_handles,
     children: node.children?.map(transformToLevel2),
   };
 }
 
 /**
  * Transform API response tree to MegaMenu format
+ * Preserves all v3 hierarchy fields for proper 5-level navigation
  */
 function transformCategories(tree: CategoryTreeNode[]): CategoryLevel1[] {
   return tree.map(transformToLevel1);

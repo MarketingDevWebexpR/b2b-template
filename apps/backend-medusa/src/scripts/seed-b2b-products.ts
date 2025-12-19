@@ -27,6 +27,7 @@ import {
 } from "@medusajs/medusa/core-flows";
 import { MARQUES_MODULE } from "../modules/marques";
 import type { MarquesModuleService, MarqueDTO } from "../modules/marques";
+import { allAdditionalTemplates } from "./additional-product-templates";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -950,7 +951,7 @@ const BRAND_MAPPINGS: Record<string, string[]> = {
  * Generate product templates for each category
  */
 function getProductTemplates(): ProductTemplate[] {
-  return [
+  const existingTemplates = [
     // =========== ÉLECTRICITÉ ===========
     // Câbles
     {
@@ -2272,6 +2273,8 @@ function getProductTemplates(): ProductTemplate[] {
       productType: "Étanchéité",
     },
   ];
+
+  return [...existingTemplates, ...allAdditionalTemplates];
 }
 
 // ============================================================================
@@ -2914,25 +2917,42 @@ async function createCategoriesRecursively(
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      if (message.includes("unique") || message.includes("duplicate")) {
-        // Category already exists, try to find it
-        const existing = await productService.listProductCategories({ handle: categoryDef.handle });
-        if (existing.length > 0) {
-          categoryMap[categoryDef.handle] = existing[0].id;
-          logger.info(`   Using existing category: ${categoryDef.name}`);
+      const lowerMessage = message.toLowerCase();
 
-          // Still process children
-          if (categoryDef.children && categoryDef.children.length > 0) {
-            await createCategoriesRecursively(
-              productService,
-              categoryDef.children,
-              existing[0].id,
-              categoryMap,
-              logger
-            );
-          }
+      // Check for various duplicate/constraint error patterns (case-insensitive)
+      const isDuplicateError =
+        lowerMessage.includes("unique") ||
+        lowerMessage.includes("duplicate") ||
+        lowerMessage.includes("already exists") ||
+        lowerMessage.includes("constraint") ||
+        lowerMessage.includes("violation");
+
+      // Always try to find existing category when creation fails
+      // This ensures categoryMap is populated even for unexpected error messages
+      const existing = await productService.listProductCategories({ handle: categoryDef.handle });
+
+      if (existing.length > 0) {
+        categoryMap[categoryDef.handle] = existing[0].id;
+
+        if (isDuplicateError) {
+          logger.info(`   Using existing category: ${categoryDef.name}`);
+        } else {
+          // Category exists but error wasn't a duplicate error - log for debugging
+          logger.warn(`   Category "${categoryDef.name}" exists (unexpected error: ${message.slice(0, 100)})`);
+        }
+
+        // Still process children with the existing category's ID
+        if (categoryDef.children && categoryDef.children.length > 0) {
+          await createCategoriesRecursively(
+            productService,
+            categoryDef.children,
+            existing[0].id,
+            categoryMap,
+            logger
+          );
         }
       } else {
+        // Category doesn't exist and creation failed - this is a real error
         logger.error(`   Failed to create category ${categoryDef.name}: ${message}`);
       }
     }
@@ -3141,6 +3161,29 @@ export default async function seedB2BProducts({ container }: ExecArgs): Promise<
   const productsToCreate: ReturnType<typeof generateProductData>[] = [];
   let productIndex = 0;
 
+  // Validate that all template categoryHandles exist in categoryMap
+  const missingCategories = new Set<string>();
+  const availableCategories = new Set<string>();
+  for (const template of templates) {
+    if (categoryMap[template.categoryHandle]) {
+      availableCategories.add(template.categoryHandle);
+    } else {
+      missingCategories.add(template.categoryHandle);
+    }
+  }
+
+  if (missingCategories.size > 0) {
+    logger.warn(`   WARNING: ${missingCategories.size} category handles not found in categoryMap:`);
+    for (const handle of Array.from(missingCategories).slice(0, 10)) {
+      logger.warn(`     - ${handle}`);
+    }
+    if (missingCategories.size > 10) {
+      logger.warn(`     ... and ${missingCategories.size - 10} more`);
+    }
+  }
+
+  logger.info(`   Templates use ${availableCategories.size} category handles, ${missingCategories.size} missing`);
+
   // Target distribution:
   // ~250 Electricite, ~250 Plomberie, ~250 Outillage, ~150 HVAC, ~100 Quincaillerie
   const categoryDistribution: Record<string, number> = {
@@ -3314,6 +3357,16 @@ export default async function seedB2BProducts({ container }: ExecArgs): Promise<
 
   logger.info(`   Total products to create: ${productsToCreate.length}`);
 
+  // Track category coverage for validation
+  const productsWithCategory = productsToCreate.filter((p) => p.categories && p.categories.length > 0).length;
+  const productsWithoutCategory = productsToCreate.length - productsWithCategory;
+  const categoryCoverage = productsToCreate.length > 0 ? (productsWithCategory / productsToCreate.length) * 100 : 0;
+
+  logger.info(`   Category coverage: ${productsWithCategory}/${productsToCreate.length} (${categoryCoverage.toFixed(1)}%)`);
+  if (productsWithoutCategory > 0) {
+    logger.warn(`   WARNING: ${productsWithoutCategory} products have no category assigned!`);
+  }
+
   // -------------------------------------------------------------------------
   // Step 7b: Create products in batches
   // -------------------------------------------------------------------------
@@ -3450,6 +3503,7 @@ export default async function seedB2BProducts({ container }: ExecArgs): Promise<
   logger.info(`Product Types: ${Object.keys(typeMap).length}`);
   logger.info(`Products created: ${successCount}`);
   logger.info(`Products with errors: ${errorCount}`);
+  logger.info(`Category coverage: ${categoryCoverage.toFixed(1)}% (${productsWithCategory}/${productsToCreate.length})`);
   logger.info(`Total variants: ~${successCount * 4}`);
   logger.info("");
   logger.info("Category breakdown:");

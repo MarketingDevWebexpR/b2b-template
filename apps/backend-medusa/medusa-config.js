@@ -68,48 +68,26 @@ module.exports = defineConfig({
     },
 
     // ------------------------------------------------------------------------
-    // Search Module - Meilisearch + App Search (dual-engine support)
+    // Search Module - App Search
     // ------------------------------------------------------------------------
-    // Ce module fournit la recherche full-text avec support pour:
-    //   - Meilisearch (dev/staging)
-    //   - Elastic App Search (production)
-    //   - Mode dual pour migration progressive
-    //
-    // Variables d'environnement Meilisearch:
-    //   - MEILISEARCH_HOST: URL du serveur (default: http://localhost:7700)
-    //   - MEILISEARCH_API_KEY: Cle API maitre
-    //   - MEILISEARCH_INDEX_PREFIX: Prefixe des index (default: bijoux_)
+    // Ce module fournit la recherche full-text avec Elastic App Search.
     //
     // Variables d'environnement App Search:
     //   - APPSEARCH_ENDPOINT: URL Elastic App Search
     //   - APPSEARCH_PRIVATE_KEY: Cle API privee
     //   - APPSEARCH_PUBLIC_KEY: Cle API publique (pour frontend)
     //   - APPSEARCH_ENGINE: Nom du moteur (default: dev-medusa-v2)
-    //
-    // Mode de recherche (SEARCH_PROVIDER):
-    //   - "meilisearch": Utilise uniquement Meilisearch
-    //   - "appsearch": Utilise uniquement App Search
-    //   - "dual": Indexe sur les deux, split trafic pour queries
     // ------------------------------------------------------------------------
     {
       resolve: "./src/modules/search",
       options: {
-        // Provider mode: "meilisearch" | "appsearch" | "dual"
-        provider: process.env["SEARCH_PROVIDER"] ?? "meilisearch",
-
-        // Meilisearch configuration
-        meilisearchHost: process.env["MEILISEARCH_HOST"] ?? "http://localhost:7700",
-        meilisearchApiKey: process.env["MEILISEARCH_API_KEY"] ?? "meilisearch_master_key_dev_only",
-        indexPrefix: process.env["MEILISEARCH_INDEX_PREFIX"] ?? "bijoux_",
+        provider: "appsearch",
 
         // App Search configuration (Elastic)
         appSearchEndpoint: process.env["APPSEARCH_ENDPOINT"],
         appSearchPrivateKey: process.env["APPSEARCH_PRIVATE_KEY"],
         appSearchPublicKey: process.env["APPSEARCH_PUBLIC_KEY"],
         appSearchEngine: process.env["APPSEARCH_ENGINE"] ?? "dev-medusa-v2",
-
-        // Traffic splitting for dual mode (0-100, percentage to App Search)
-        appSearchTrafficPercentage: parseInt(process.env["APPSEARCH_TRAFFIC_PERCENTAGE"] ?? "0", 10),
       },
     },
 

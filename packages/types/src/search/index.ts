@@ -2,7 +2,7 @@
  * Search Types - Provider-Agnostic Search Abstraction Layer
  *
  * This module defines a comprehensive, provider-agnostic search interface
- * that supports multiple search engines (Meilisearch, Algolia, Elasticsearch, Typesense).
+ * that supports multiple search engines (Algolia, Elasticsearch, Typesense).
  *
  * @packageDocumentation
  */
@@ -420,7 +420,7 @@ export interface SearchAnalyticsEvent {
  */
 export interface SearchProviderConfig {
   /** Provider type identifier */
-  readonly provider: 'meilisearch' | 'algolia' | 'elasticsearch' | 'typesense';
+  readonly provider: 'algolia' | 'elasticsearch' | 'typesense';
   /** API host URL */
   readonly host: string;
   /** API key for authentication */
@@ -429,15 +429,6 @@ export interface SearchProviderConfig {
   readonly timeout?: number;
   /** Enable debug logging */
   readonly debug?: boolean;
-}
-
-/**
- * Meilisearch-specific configuration.
- */
-export interface MeilisearchConfig extends SearchProviderConfig {
-  readonly provider: 'meilisearch';
-  /** Index prefix for multi-tenancy */
-  readonly indexPrefix?: string;
 }
 
 /**
@@ -481,7 +472,6 @@ export interface TypesenseConfig extends SearchProviderConfig {
  * Union type of all provider configurations.
  */
 export type AnySearchProviderConfig =
-  | MeilisearchConfig
   | AlgoliaConfig
   | ElasticsearchConfig
   | TypesenseConfig;

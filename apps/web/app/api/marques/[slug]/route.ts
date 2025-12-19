@@ -1,47 +1,44 @@
 /**
- * Brand by Slug API Route
+ * Brand by Slug API Route (App Search v3)
  *
- * GET /api/marques/[slug] - Get a single brand by slug
+ * GET /api/marques/[slug] - Get a single brand by slug with its products
  *
- * Features:
- * - Fetches brand details from Medusa backend
- * - Includes associated products
- * - Caching with Next.js revalidation
+ * Uses Elastic App Search v3 for both brand and products retrieval.
+ * Products are filtered by brand_slug field.
+ *
+ * Query Parameters:
+ * - productLimit: Number of products to return (default: 24, max: 100)
+ * - productOffset: Pagination offset for products (default: 0)
+ * - sort: Sort field for products (created_at, price_min, title) - default: created_at
+ * - order: Sort order (asc, desc) - default: desc
  *
  * @packageDocumentation
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  APP_SEARCH_CONFIG,
+  getAppSearchUrl,
+  type ProductHit,
+  type MarqueHit,
+  type AppSearchResponse,
+  transformProductHit,
+  transformMarqueHit,
+  type TransformedProduct,
+  type TransformedMarque,
+  PRODUCT_RESULT_FIELDS,
+  PRODUCT_SEARCH_FIELDS,
+} from '@/lib/search/app-search-v3';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-interface MedusaMarque {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
-  logo_url?: string | null;
-  website_url?: string | null;
-  country?: string | null;
-  is_favorite?: boolean;
-  rank?: number;
-  metadata?: Record<string, unknown> | null;
-}
-
-interface BrandWithProducts {
-  id: string;
-  name: string;
-  slug: string;
-  logo_url: string | null;
-  country: string | null;
-  product_count: number;
+interface BrandWithProducts extends TransformedMarque {
   is_premium: boolean;
   is_favorite: boolean;
-  description: string | null;
-  website_url?: string | null;
-  founded_year?: number | null;
+  website_url: string | null;
+  founded_year: number | null;
   products: BrandProduct[];
 }
 
@@ -57,45 +54,56 @@ interface BrandProduct {
   reference?: string;
 }
 
-interface MedusaProduct {
-  id: string;
-  title: string;
-  handle: string;
-  description?: string;
-  thumbnail?: string;
-  images?: Array<{ url: string }>;
-  variants?: Array<{
-    id: string;
-    prices?: Array<{ amount: number; currency_code: string }>;
-    inventory_quantity?: number;
-  }>;
-  categories?: Array<{ id: string; name: string; handle: string }>;
-  metadata?: Record<string, unknown>;
-}
-
 // ============================================================================
 // Configuration
 // ============================================================================
 
-const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || 'http://localhost:9000';
-const CACHE_REVALIDATE_SECONDS = 3600; // 1 hour
+const CACHE_REVALIDATE_SECONDS = 300; // 5 minutes
 
 // ============================================================================
-// Helper Functions
+// App Search Functions
 // ============================================================================
 
 /**
- * Fetches a brand by slug from Medusa
+ * Fetches a brand by slug from App Search
+ * Uses only fields from App Search v3 marques: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
  */
-async function fetchMedusaBrand(slug: string): Promise<MedusaMarque | null> {
-  const url = `${MEDUSA_BACKEND_URL}/store/marques/${slug}`;
+async function fetchBrandBySlug(slug: string): Promise<TransformedMarque | null> {
+  const appSearchUrl = getAppSearchUrl();
+
+  const query = {
+    query: '',
+    page: { size: 1, current: 1 },
+    filters: {
+      all: [
+        { doc_type: 'marques' },
+        { slug: slug },
+      ],
+    },
+    // Result fields - only include fields from App Search v3 marques schema
+    // Marques: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
+    result_fields: {
+      id: { raw: {} },
+      name: { raw: {} },
+      slug: { raw: {} },
+      description: { raw: {}, snippet: { size: 300, fallback: true } },
+      logo_url: { raw: {} },
+      country: { raw: {} },
+      website_url: { raw: {} },
+      is_active: { raw: {} },
+      rank: { raw: {} },
+      doc_type: { raw: {} },
+    },
+  };
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
       },
+      body: JSON.stringify(query),
       next: {
         revalidate: CACHE_REVALIDATE_SECONDS,
         tags: ['brand', `brand-${slug}`],
@@ -103,104 +111,97 @@ async function fetchMedusaBrand(slug: string): Promise<MedusaMarque | null> {
     });
 
     if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      console.error(`Medusa marque API error: ${response.status}`);
+      console.error(`[Marques API] App Search error: ${response.status}`);
       return null;
     }
 
-    const data = await response.json();
-    return data.marque;
+    const data: AppSearchResponse<MarqueHit> = await response.json();
+
+    if (data.results.length === 0) {
+      return null;
+    }
+
+    return transformMarqueHit(data.results[0]);
   } catch (error) {
-    console.error('Failed to fetch marque from Medusa:', error);
+    console.error('[Marques API] Error fetching brand:', error);
     return null;
   }
 }
 
 /**
- * Fetches products for a brand from Medusa
- * Note: This uses a search/filter approach since products may be linked via metadata
+ * Fetches products for a brand by brand_slug from App Search
  */
 async function fetchBrandProducts(
-  brandId: string,
-  brandName: string,
+  brandSlug: string,
   limit: number = 24,
-  offset: number = 0
-): Promise<{ products: MedusaProduct[]; count: number }> {
-  // Try to fetch products with brand metadata
-  const url = new URL(`${MEDUSA_BACKEND_URL}/store/products`);
-  url.searchParams.set('limit', String(limit));
-  url.searchParams.set('offset', String(offset));
+  offset: number = 0,
+  sort: string = 'created_at',
+  order: 'asc' | 'desc' = 'desc'
+): Promise<{ products: TransformedProduct[]; count: number }> {
+  const appSearchUrl = getAppSearchUrl();
+
+  const query = {
+    query: '',
+    page: {
+      size: limit,
+      current: Math.floor(offset / limit) + 1,
+    },
+    filters: {
+      all: [
+        { doc_type: 'products' },
+        { brand_slug: brandSlug },
+      ],
+    },
+    result_fields: PRODUCT_RESULT_FIELDS,
+    search_fields: PRODUCT_SEARCH_FIELDS,
+    sort: [{ [sort]: order }],
+  };
 
   try {
-    const response = await fetch(url.toString(), {
-      method: 'GET',
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
       },
+      body: JSON.stringify(query),
       next: {
         revalidate: CACHE_REVALIDATE_SECONDS,
-        tags: ['products', `brand-products-${brandId}`],
+        tags: ['products', `brand-products-${brandSlug}`],
       },
     });
 
     if (!response.ok) {
-      console.error(`Medusa products API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`[Marques Products API] App Search error: ${response.status}`, errorText);
       return { products: [], count: 0 };
     }
 
-    const data = await response.json();
-
-    // Filter products that belong to this brand (via metadata or title pattern)
-    const brandProducts = (data.products || []).filter((product: MedusaProduct) => {
-      // Check metadata for brand_id
-      if (product.metadata?.brand_id === brandId) {
-        return true;
-      }
-      // Check metadata for marque_id
-      if (product.metadata?.marque_id === brandId) {
-        return true;
-      }
-      // Fallback: check if brand name is in product title (less reliable)
-      if (product.title?.toLowerCase().includes(brandName.toLowerCase())) {
-        return true;
-      }
-      return false;
-    });
+    const data: AppSearchResponse<ProductHit> = await response.json();
 
     return {
-      products: brandProducts,
-      count: brandProducts.length,
+      products: data.results.map(transformProductHit),
+      count: data.meta.page.total_results,
     };
   } catch (error) {
-    console.error('Failed to fetch brand products from Medusa:', error);
+    console.error('[Marques Products API] Error fetching products:', error);
     return { products: [], count: 0 };
   }
 }
 
 /**
- * Transforms Medusa product to BrandProduct format
+ * Transforms TransformedProduct to BrandProduct format
  */
-function transformProduct(product: MedusaProduct): BrandProduct {
-  const variant = product.variants?.[0];
-  const priceData = variant?.prices?.find((p) => p.currency_code === 'eur') || variant?.prices?.[0];
-
+function transformToBrandProduct(product: TransformedProduct): BrandProduct {
   return {
     id: product.id,
     name: product.title,
     slug: product.handle,
-    price: priceData ? priceData.amount / 100 : 0,
-    images: product.images?.map((img) => img.url) || (product.thumbnail ? [product.thumbnail] : []),
-    category: product.categories?.[0]
-      ? {
-          id: product.categories[0].id,
-          name: product.categories[0].name,
-          handle: product.categories[0].handle,
-        }
-      : undefined,
-    stock: variant?.inventory_quantity ?? 0,
-    reference: product.metadata?.sku as string | undefined,
+    price: product.price_min ? product.price_min / 100 : 0,
+    images: product.images.length > 0 ? product.images : (product.thumbnail ? [product.thumbnail] : []),
+    category: product.categories[0] || undefined,
+    stock: product.has_stock ? 1 : 0,
+    reference: product.sku || undefined,
   };
 }
 
@@ -230,8 +231,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Fetch brand from Medusa
-    const marque = await fetchMedusaBrand(slug);
+    // Fetch brand from App Search
+    const marque = await fetchBrandBySlug(slug);
 
     if (!marque) {
       return NextResponse.json(
@@ -242,33 +243,33 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Parse query parameters for products
     const { searchParams } = new URL(request.url);
-    const productLimit = parseInt(searchParams.get('productLimit') || '24', 10);
-    const productOffset = parseInt(searchParams.get('productOffset') || '0', 10);
+    const productLimit = Math.min(
+      Math.max(parseInt(searchParams.get('productLimit') || '24', 10), 1),
+      100
+    );
+    const productOffset = Math.max(parseInt(searchParams.get('productOffset') || '0', 10), 0);
+    const sort = searchParams.get('sort') || 'created_at';
+    const order = (searchParams.get('order') || 'desc') as 'asc' | 'desc';
 
-    // Fetch products for this brand
-    const { products: medusaProducts, count: productCount } = await fetchBrandProducts(
-      marque.id,
-      marque.name,
+    // Fetch products for this brand using brand_slug
+    const { products: appSearchProducts, count: productCount } = await fetchBrandProducts(
+      slug,
       productLimit,
-      productOffset
+      productOffset,
+      sort,
+      order
     );
 
+    // Note: is_premium, is_favorite, founded_year don't exist in v3 marques schema
     // Transform to BrandWithProducts format
-    const foundedYear = marque.metadata?.year_founded as number | undefined;
-
     const brand: BrandWithProducts = {
-      id: marque.id,
-      name: marque.name,
-      slug: marque.slug,
-      logo_url: marque.logo_url || null,
-      country: marque.country || null,
-      product_count: productCount,
-      is_premium: (marque.rank ?? 0) >= 80,
-      is_favorite: marque.is_favorite || false,
-      description: marque.description || null,
-      website_url: marque.website_url,
-      founded_year: foundedYear || null,
-      products: medusaProducts.map(transformProduct),
+      ...marque,
+      product_count: productCount, // Use actual count from products search
+      is_premium: false, // is_premium doesn't exist in v3 schema
+      is_favorite: false, // is_favorite doesn't exist in v3 schema
+      website_url: marque.website_url, // website_url exists in v3 marques schema
+      founded_year: null, // founded_year doesn't exist in v3 schema
+      products: appSearchProducts.map(transformToBrandProduct),
     };
 
     return NextResponse.json(

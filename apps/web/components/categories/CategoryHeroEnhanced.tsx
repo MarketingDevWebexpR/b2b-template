@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 import { Container, Badge } from '@/components/ui';
 import { CategoryBreadcrumbsDynamic } from './CategoryBreadcrumbsDynamic';
 import { getDepthLevelName } from '@/lib/categories/hierarchy';
-import type { MeilisearchCategory } from '@/types/category';
+import type { IndexedCategory } from '@/types/category';
 import type { HierarchicalBreadcrumb } from '@/lib/categories/hierarchy';
 
 // ============================================================================
@@ -33,7 +33,7 @@ import type { HierarchicalBreadcrumb } from '@/lib/categories/hierarchy';
 
 export interface CategoryHeroEnhancedProps {
   /** The category to display */
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   /** Breadcrumbs for navigation */
   breadcrumbs: HierarchicalBreadcrumb[];
   /** Number of subcategories */

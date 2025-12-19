@@ -10,7 +10,6 @@
 // =============================================================================
 
 export const SearchEngineType = {
-  MEILISEARCH: "meilisearch",
   APPSEARCH: "appsearch",
 } as const;
 
@@ -94,8 +93,7 @@ export interface SearchStatusResponse {
   configuration: EngineConfiguration;
   /** Health status of each configured engine */
   engines: {
-    meilisearch: EngineHealth;
-    appsearch?: EngineHealth;
+    appsearch: EngineHealth;
   };
   /** Summary of last sync operation */
   last_sync: {
@@ -356,8 +354,7 @@ export interface SyncStatistics {
 export interface SearchStatsResponse {
   /** Statistics for each configured engine */
   engines: {
-    meilisearch: EngineStats;
-    appsearch?: EngineStats;
+    appsearch: EngineStats;
   };
   /** Active engine indicator */
   active_engine: SearchEngineType;

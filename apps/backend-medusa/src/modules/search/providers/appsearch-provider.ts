@@ -20,8 +20,8 @@ import type {
 } from './search-provider.interface';
 import {
   getAppSearchEngineConfig,
-  convertMeilisearchFilterToAppSearch,
-  convertMeilisearchSortToAppSearch,
+  convertFilterToAppSearch,
+  convertSortToAppSearch,
   JEWELRY_SYNONYMS,
   type AppSearchConfig,
 } from '../utils/appsearch-config';
@@ -133,7 +133,7 @@ interface AppSearchEngineInfo {
  * - Batch indexing with 100-document chunks (App Search limit)
  * - Concurrent batch processing for high throughput (500K+ documents)
  * - Automatic retry with exponential backoff and rate limit handling
- * - Filter and sort syntax translation from Meilisearch
+ * - Filter and sort syntax translation
  * - Relevance tuning via search field weights
  * - Synonym support for jewelry industry terms
  * - Memory-efficient streaming for large operations
@@ -574,7 +574,7 @@ export class AppSearchProvider implements SearchProvider {
    * Get index settings (derived from configuration)
    */
   async getIndexSettings(indexName: string): Promise<IndexSettings> {
-    // App Search doesn't have direct settings API like Meilisearch
+    // App Search doesn't have direct settings API
     // Return the configured settings from our config
     const config = getAppSearchEngineConfig(indexName, this.engineName);
 
@@ -870,41 +870,52 @@ export class AppSearchProvider implements SearchProvider {
   }
 
   /**
-   * Delete all documents from an index
+   * Delete all documents from an index (filtered by doc_type)
    *
-   * Memory-efficient implementation that streams deletions in batches
-   * rather than loading all document IDs into memory at once.
+   * Uses search with doc_type filter to find documents, then deletes in batches.
+   * This is necessary because App Search uses a single engine with doc_type discrimination.
    *
-   * @param indexName - Target index name
+   * @param indexName - Target index name (used as doc_type filter)
    */
   async deleteAllDocuments(indexName: string): Promise<void> {
     const engineName = this.getEngineName(indexName);
 
-    // App Search doesn't have a "delete all" endpoint
-    // We stream through pages and delete as we go (memory efficient)
-    let page = 1;
-    const pageSize = 1000;
+    // Use search with doc_type filter to find documents to delete
+    // This ensures we only delete documents for this specific index type
     let hasMore = true;
     let totalDeleted = 0;
+    const batchSize = 100; // App Search max batch size
 
     this.logger?.info(
-      `[App Search] Starting bulk delete for engine: ${engineName}`,
-      { engine: engineName }
+      `[App Search] Starting bulk delete for doc_type: ${indexName}`,
+      { engine: engineName, docType: indexName }
     );
 
     while (hasMore) {
       try {
-        // List documents to get IDs (always fetch page 1 since we're deleting)
-        // After deletion, remaining docs shift to page 1
-        const response = await this.apiRequest<{
-          results: Array<{ id: { raw: string } }>;
-          meta: { page: { total_pages: number; total_results: number } };
-        }>(
-          'GET',
-          `engines/${engineName}/documents/list?page[current]=1&page[size]=${pageSize}`
+        // Search for documents with this doc_type
+        const response = await this.apiRequest<AppSearchSearchResult>(
+          'POST',
+          `engines/${engineName}/search`,
+          {
+            query: '',
+            filters: { doc_type: indexName },
+            page: { current: 1, size: batchSize },
+            result_fields: { id: { raw: {} } },
+          }
         );
 
-        const ids = response.data.results.map(doc => doc.id.raw);
+        // Extract IDs from search results (search returns { id: { raw: "..." } } format)
+        const ids = response.data.results
+          .map(doc => {
+            // Handle both formats: { id: { raw: "..." } } from search and { id: "..." } from list
+            const idValue = doc.id;
+            if (typeof idValue === 'object' && idValue !== null && 'raw' in idValue) {
+              return idValue.raw as string;
+            }
+            return idValue as unknown as string;
+          })
+          .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
         if (ids.length === 0) {
           hasMore = false;
@@ -916,19 +927,16 @@ export class AppSearchProvider implements SearchProvider {
         totalDeleted += ids.length;
 
         // Check if there are more documents
-        // Note: We always fetch page 1 since documents shift after deletion
         const remainingDocs = response.data.meta.page.total_results - ids.length;
         hasMore = remainingDocs > 0;
 
         // Progress logging for large deletions
-        if (totalDeleted % 10000 === 0) {
+        if (totalDeleted % 1000 === 0) {
           this.logger?.info(
             `[App Search] Bulk delete progress`,
-            { deleted: totalDeleted, engine: engineName }
+            { deleted: totalDeleted, docType: indexName }
           );
         }
-
-        page++;
       } catch (error) {
         const appSearchError = error instanceof AppSearchError ? error : undefined;
 
@@ -941,15 +949,15 @@ export class AppSearchProvider implements SearchProvider {
         this.logger?.error(
           `[App Search] Error during bulk delete`,
           appSearchError,
-          { page, engine: engineName }
+          { docType: indexName, engine: engineName }
         );
-        hasMore = false;
+        throw error; // Re-throw to stop the sync and report the error
       }
     }
 
     this.logger?.info(
       `[App Search] Bulk delete complete`,
-      { totalDeleted, engine: engineName }
+      { totalDeleted, docType: indexName }
     );
   }
 
@@ -975,7 +983,7 @@ export class AppSearchProvider implements SearchProvider {
     };
 
     // Add filters - always include doc_type filter for single-engine architecture
-    const userFilters = convertMeilisearchFilterToAppSearch(options.filters);
+    const userFilters = convertFilterToAppSearch(options.filters);
     const docTypeFilter = { doc_type: indexName };
 
     // Combine doc_type filter with user filters
@@ -988,7 +996,7 @@ export class AppSearchProvider implements SearchProvider {
     }
 
     // Add sorting
-    const sort = convertMeilisearchSortToAppSearch(options.sort);
+    const sort = convertSortToAppSearch(options.sort);
     if (sort) {
       searchRequest.sort = sort;
     }
@@ -1174,7 +1182,7 @@ export class AppSearchProvider implements SearchProvider {
 
   async waitForTasks(_taskIds: number[]): Promise<void> {
     // App Search indexes synchronously, no need to wait for tasks
-    // This method exists for interface compatibility with Meilisearch
+    // This method exists for interface compatibility
     return Promise.resolve();
   }
 }

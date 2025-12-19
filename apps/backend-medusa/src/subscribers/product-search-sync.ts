@@ -2,7 +2,7 @@
  * Product Search Sync Subscriber
  *
  * Automatically syncs product changes to the search index.
- * Listens to product lifecycle events and updates Meilisearch accordingly.
+ * Listens to product lifecycle events and updates App Search accordingly.
  */
 
 import type { SubscriberConfig, SubscriberArgs } from "@medusajs/framework";
@@ -61,19 +61,26 @@ export default async function productSearchSyncHandler({
         "updated_at",
         "metadata",
         "images.url",
-        // Category with full parent hierarchy for path building
+        // Categories with full 5-level parent hierarchy (depth 0-4)
         "categories.id",
         "categories.name",
         "categories.handle",
+        // Level 1 parent
         "categories.parent_category.id",
         "categories.parent_category.name",
         "categories.parent_category.handle",
+        // Level 2 parent
         "categories.parent_category.parent_category.id",
         "categories.parent_category.parent_category.name",
         "categories.parent_category.parent_category.handle",
+        // Level 3 parent
         "categories.parent_category.parent_category.parent_category.id",
         "categories.parent_category.parent_category.parent_category.name",
         "categories.parent_category.parent_category.parent_category.handle",
+        // Level 4 parent (for depth-4 categories)
+        "categories.parent_category.parent_category.parent_category.parent_category.id",
+        "categories.parent_category.parent_category.parent_category.parent_category.name",
+        "categories.parent_category.parent_category.parent_category.parent_category.handle",
         "tags.id",
         "tags.value",
         "collection.id",

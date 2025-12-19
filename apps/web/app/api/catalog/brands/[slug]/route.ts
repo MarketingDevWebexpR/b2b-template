@@ -1,14 +1,23 @@
 /**
- * Catalog Brand Detail API Route
+ * Catalog Brand Detail API Route (App Search v3)
  *
- * Fetches a single brand by slug with its products and related brands.
+ * Fetches a single brand by slug with its products using Elastic App Search v3.
  *
  * GET /api/catalog/brands/[slug]
+ * GET /api/catalog/brands/[slug]?limit=20&offset=0&sort=created_at&order=desc
+ *
+ * Query Parameters:
+ * - limit: Number of products to return (default: 20, max: 100)
+ * - offset: Pagination offset (default: 0)
+ * - sort: Sort field (created_at, price_min, title) - default: created_at
+ * - order: Sort order (asc, desc) - default: desc
+ * - inStock: Filter by stock availability ('true')
  *
  * Response:
  * {
  *   brand: Brand,
- *   products: Product[],
+ *   products: TransformedProduct[],
+ *   total: number,
  *   relatedBrands: Brand[]
  * }
  *
@@ -16,7 +25,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import type { Brand } from '@/types/brand';
+import {
+  APP_SEARCH_CONFIG,
+  getAppSearchUrl,
+  type ProductHit,
+  type MarqueHit,
+  type AppSearchResponse,
+  transformProductHit,
+  transformMarqueHit,
+  type TransformedProduct,
+  type TransformedMarque,
+  PRODUCT_RESULT_FIELDS,
+  PRODUCT_SEARCH_FIELDS,
+  PRODUCT_FACETS,
+} from '@/lib/search/app-search-v3';
 
 // ============================================================================
 // Configuration
@@ -25,231 +47,261 @@ import type { Brand } from '@/types/brand';
 export const runtime = 'edge';
 export const revalidate = 300; // Cache for 5 minutes
 
-const MEDUSA_BACKEND_URL =
-  process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000';
-
 // ============================================================================
 // Types
 // ============================================================================
 
-interface MedusaMarque {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
-  logo_url?: string | null;
-  website_url?: string | null;
-  country?: string | null;
-  founded_year?: number | null;
-  is_favorite?: boolean;
-  is_premium?: boolean;
-  product_count?: number;
-}
-
-interface MedusaProduct {
-  id: string;
-  title: string;
-  handle: string;
-  subtitle: string | null;
-  description: string | null;
-  thumbnail: string | null;
-  images?: Array<{ id: string; url: string; rank: number }>;
-  variants: Array<{
-    id: string;
-    title: string;
-    sku: string | null;
-    prices: Array<{
-      id: string;
-      currency_code: string;
-      amount: number;
-    }>;
-    inventory_quantity: number;
-  }>;
-  categories?: Array<{ id: string; name: string; handle: string }>;
-  created_at: string;
-  updated_at: string;
-}
-
 interface BrandDetailResponse {
-  brand: Brand;
+  brand: TransformedMarque;
   products: TransformedProduct[];
-  relatedBrands: Brand[];
+  total: number;
+  limit: number;
+  offset: number;
+  relatedBrands: TransformedMarque[];
 }
 
-interface TransformedProduct {
-  id: string;
-  title: string;
-  handle: string;
-  thumbnail: string | null;
-  price: {
-    amount: number;
-    currency: string;
-    formatted: string;
-  } | null;
-  inStock: boolean;
+interface QueryParams {
+  limit: number;
+  offset: number;
+  sort: string;
+  order: 'asc' | 'desc';
+  inStock?: boolean;
 }
 
 // ============================================================================
-// Data Fetching
+// Query Parameter Parsing
+// ============================================================================
+
+function parseQueryParams(request: NextRequest): QueryParams {
+  const { searchParams } = new URL(request.url);
+
+  const limit = Math.min(
+    Math.max(parseInt(searchParams.get('limit') || '20', 10), 1),
+    100
+  );
+  const offset = Math.max(parseInt(searchParams.get('offset') || '0', 10), 0);
+
+  const sortParam = searchParams.get('sort') || 'created_at';
+  const validSorts = ['created_at', 'price_min', 'title', 'name'];
+  const sort = validSorts.includes(sortParam) ? sortParam : 'created_at';
+
+  const orderParam = searchParams.get('order') || 'desc';
+  const order = orderParam === 'asc' ? 'asc' : 'desc';
+
+  const inStockParam = searchParams.get('inStock');
+
+  return {
+    limit,
+    offset,
+    sort,
+    order,
+    inStock: inStockParam === 'true' ? true : undefined,
+  };
+}
+
+// ============================================================================
+// App Search Queries
 // ============================================================================
 
 /**
- * Fetch a single marque by slug from Medusa
+ * Fetch brand (marque) by slug from App Search
+ * Uses only fields from App Search v3 marques: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
  */
-async function fetchMarqueBySlug(slug: string): Promise<MedusaMarque | null> {
-  const url = `${MEDUSA_BACKEND_URL}/cms/marques?slug=${encodeURIComponent(slug)}`;
+async function fetchBrandBySlug(slug: string): Promise<TransformedMarque | null> {
+  const appSearchUrl = getAppSearchUrl();
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    next: { revalidate: 300 },
-  });
+  const query = {
+    query: '',
+    page: { size: 1, current: 1 },
+    filters: {
+      all: [
+        { doc_type: 'marques' },
+        { slug: slug },
+      ],
+    },
+    // Result fields - only include fields from App Search v3 marques schema
+    // Marques: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
+    result_fields: {
+      id: { raw: {} },
+      name: { raw: {} },
+      slug: { raw: {} },
+      description: { raw: {}, snippet: { size: 300, fallback: true } },
+      logo_url: { raw: {} },
+      country: { raw: {} },
+      website_url: { raw: {} },
+      is_active: { raw: {} },
+      rank: { raw: {} },
+      doc_type: { raw: {} },
+    },
+  };
 
-  if (!response.ok) {
-    if (response.status === 404) return null;
-    throw new Error(`Medusa request failed: ${response.status}`);
+  try {
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
+      },
+      body: JSON.stringify(query),
+      next: { revalidate: 300 },
+    });
+
+    if (!response.ok) {
+      console.error(`[Brand API] App Search error: ${response.status}`);
+      return null;
+    }
+
+    const data: AppSearchResponse<MarqueHit> = await response.json();
+
+    if (data.results.length === 0) {
+      return null;
+    }
+
+    return transformMarqueHit(data.results[0]);
+  } catch (error) {
+    console.error('[Brand API] Error fetching brand:', error);
+    return null;
   }
-
-  const data = await response.json();
-  const marques = data.marques ?? [];
-
-  return marques.find((m: MedusaMarque) => m.slug === slug) ?? null;
 }
 
 /**
- * Fetch products for a brand from Medusa
+ * Fetch products for a brand by brand_slug from App Search
  */
 async function fetchBrandProducts(
-  brandId: string,
-  limit: number = 20
-): Promise<MedusaProduct[]> {
-  // Note: This assumes there's a way to filter products by brand/marque
-  // Adjust the endpoint based on your Medusa setup
-  const url = `${MEDUSA_BACKEND_URL}/store/products?limit=${limit}&fields=*variants.prices,*images,*categories`;
+  brandSlug: string,
+  params: QueryParams
+): Promise<{ products: TransformedProduct[]; total: number }> {
+  const appSearchUrl = getAppSearchUrl();
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    next: { revalidate: 300 },
-  });
+  // Build filters
+  const filters: Record<string, unknown>[] = [
+    { doc_type: 'products' },
+    { brand_slug: brandSlug },
+  ];
 
-  if (!response.ok) {
-    console.error(`[Brand Products] Failed to fetch products: ${response.status}`);
-    return [];
+  // Add stock filter if requested
+  if (params.inStock) {
+    filters.push({ has_stock: 'true' });
   }
 
-  const data = await response.json();
-  return data.products ?? [];
+  const query = {
+    query: '',
+    page: {
+      size: params.limit,
+      current: Math.floor(params.offset / params.limit) + 1,
+    },
+    filters: {
+      all: filters,
+    },
+    result_fields: PRODUCT_RESULT_FIELDS,
+    search_fields: PRODUCT_SEARCH_FIELDS,
+    facets: PRODUCT_FACETS,
+    sort: [{ [params.sort]: params.order }],
+  };
+
+  try {
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
+      },
+      body: JSON.stringify(query),
+      next: { revalidate: 120 },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[Brand Products API] App Search error: ${response.status}`, errorText);
+      return { products: [], total: 0 };
+    }
+
+    const data: AppSearchResponse<ProductHit> = await response.json();
+
+    return {
+      products: data.results.map(transformProductHit),
+      total: data.meta.page.total_results,
+    };
+  } catch (error) {
+    console.error('[Brand Products API] Error fetching products:', error);
+    return { products: [], total: 0 };
+  }
 }
 
 /**
- * Fetch related brands (other brands from same country or with similar product count)
+ * Fetch related brands (other brands from same country)
+ * Uses only fields from App Search v3 marques: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
+ * Note: product_count does NOT exist on marques, so we sort by rank instead
  */
 async function fetchRelatedBrands(
-  currentBrand: Brand,
+  currentBrand: TransformedMarque,
   limit: number = 6
-): Promise<Brand[]> {
-  const url = `${MEDUSA_BACKEND_URL}/cms/marques?take=50`;
+): Promise<TransformedMarque[]> {
+  const appSearchUrl = getAppSearchUrl();
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    next: { revalidate: 300 },
-  });
+  // Query to get brands from the same country or by rank
+  const query = {
+    query: '',
+    page: { size: 50, current: 1 },
+    filters: {
+      all: [{ doc_type: 'marques' }],
+    },
+    // Result fields - only include fields from App Search v3 marques schema
+    result_fields: {
+      id: { raw: {} },
+      name: { raw: {} },
+      slug: { raw: {} },
+      description: { raw: {} },
+      logo_url: { raw: {} },
+      country: { raw: {} },
+      website_url: { raw: {} },
+      is_active: { raw: {} },
+      rank: { raw: {} },
+      doc_type: { raw: {} },
+    },
+    sort: [{ rank: 'asc' }], // Sort by rank since product_count doesn't exist on marques
+  };
 
-  if (!response.ok) {
+  try {
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
+      },
+      body: JSON.stringify(query),
+      next: { revalidate: 300 },
+    });
+
+    if (!response.ok) {
+      console.error(`[Related Brands API] App Search error: ${response.status}`);
+      return [];
+    }
+
+    const data: AppSearchResponse<MarqueHit> = await response.json();
+
+    // Transform and filter out current brand
+    const allBrands = data.results
+      .map(transformMarqueHit)
+      .filter((b) => b.id !== currentBrand.id);
+
+    // Score and sort by relevance (same country = higher score)
+    // Note: product_count doesn't exist on marques in v3, use _score from search instead
+    const scoredBrands = allBrands.map((brand) => ({
+      ...brand,
+      score:
+        (brand.country === currentBrand.country ? 10 : 0) +
+        brand._score, // Use search score as relevance indicator
+    }));
+
+    scoredBrands.sort((a, b) => b.score - a.score);
+
+    // Return top N without the score property
+    return scoredBrands.slice(0, limit).map(({ score, ...brand }) => brand);
+  } catch (error) {
+    console.error('[Related Brands API] Error fetching related brands:', error);
     return [];
   }
-
-  const data = await response.json();
-  const marques: MedusaMarque[] = data.marques ?? [];
-
-  // Filter out current brand and find related ones
-  const relatedMarques = marques
-    .filter((m) => m.id !== currentBrand.id)
-    .map((m) => ({
-      ...mapMedusaMarqueToBrand(m),
-      // Score based on similarity (same country, similar product count)
-      score:
-        (m.country === currentBrand.country ? 10 : 0) +
-        (Math.abs((m.product_count ?? 0) - currentBrand.product_count) < 20 ? 5 : 0),
-    }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
-    .map(({ score, ...brand }) => brand);
-
-  return relatedMarques;
-}
-
-// ============================================================================
-// Data Transformation
-// ============================================================================
-
-/**
- * Map Medusa marque to Brand type
- */
-function mapMedusaMarqueToBrand(marque: MedusaMarque): Brand {
-  return {
-    id: marque.id,
-    name: marque.name,
-    slug: marque.slug,
-    logo_url: marque.logo_url ?? null,
-    country: marque.country ?? null,
-    product_count: marque.product_count ?? 0,
-    description: marque.description ?? null,
-    founded_year: marque.founded_year ?? null,
-    is_premium: marque.is_premium ?? false,
-    is_favorite: marque.is_favorite ?? false,
-  };
-}
-
-/**
- * Format price amount
- */
-function formatPrice(amount: number, currency: string = 'EUR'): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(amount / 100);
-}
-
-/**
- * Transform Medusa product to simplified format
- */
-function transformProduct(product: MedusaProduct): TransformedProduct {
-  // Get lowest EUR price
-  let lowestPrice: { amount: number; currency: string } | null = null;
-
-  for (const variant of product.variants) {
-    for (const price of variant.prices) {
-      if (price.currency_code.toLowerCase() === 'eur') {
-        if (!lowestPrice || price.amount < lowestPrice.amount) {
-          lowestPrice = { amount: price.amount, currency: price.currency_code };
-        }
-      }
-    }
-  }
-
-  // Calculate total inventory
-  const totalInventory = product.variants.reduce(
-    (sum, v) => sum + v.inventory_quantity,
-    0
-  );
-
-  return {
-    id: product.id,
-    title: product.title,
-    handle: product.handle,
-    thumbnail: product.thumbnail,
-    price: lowestPrice
-      ? {
-          amount: lowestPrice.amount,
-          currency: lowestPrice.currency,
-          formatted: formatPrice(lowestPrice.amount, lowestPrice.currency),
-        }
-      : null,
-    inStock: totalInventory > 0,
-  };
 }
 
 // ============================================================================
@@ -264,6 +316,8 @@ export async function GET(
   request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse<BrandDetailResponse | { error: string }>> {
+  const startTime = Date.now();
+
   try {
     const { slug } = await context.params;
 
@@ -274,27 +328,35 @@ export async function GET(
       );
     }
 
-    // Fetch brand by slug
-    const marque = await fetchMarqueBySlug(slug);
+    const params = parseQueryParams(request);
 
-    if (!marque) {
+    // Fetch brand by slug
+    const brand = await fetchBrandBySlug(slug);
+
+    if (!brand) {
       return NextResponse.json(
         { error: 'Brand not found' },
         { status: 404 }
       );
     }
 
-    const brand = mapMedusaMarqueToBrand(marque);
-
     // Fetch products and related brands in parallel
-    const [products, relatedBrands] = await Promise.all([
-      fetchBrandProducts(brand.id),
+    const [productsResult, relatedBrands] = await Promise.all([
+      fetchBrandProducts(slug, params),
       fetchRelatedBrands(brand),
     ]);
 
+    const processingTimeMs = Date.now() - startTime;
+    console.log(
+      `[Brand API] Fetched brand "${brand.name}" with ${productsResult.total} products in ${processingTimeMs}ms`
+    );
+
     const response: BrandDetailResponse = {
       brand,
-      products: products.map(transformProduct),
+      products: productsResult.products,
+      total: productsResult.total,
+      limit: params.limit,
+      offset: params.offset,
       relatedBrands,
     };
 

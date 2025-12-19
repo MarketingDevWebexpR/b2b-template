@@ -17,7 +17,7 @@ import {
   getTotalProductCount,
   getCategoryPath,
 } from '@/lib/categories/hierarchy';
-import type { CategoryResponse, MeilisearchCategory } from '@/types/category';
+import type { CategoryResponse, IndexedCategory } from '@/types/category';
 import type { HierarchicalBreadcrumb } from '@/lib/categories/hierarchy';
 
 /**
@@ -196,9 +196,9 @@ function CategoryPageLoading() {
 // ============================================================================
 
 interface StructuredDataProps {
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   breadcrumbs: HierarchicalBreadcrumb[];
-  subcategories: MeilisearchCategory[];
+  subcategories: IndexedCategory[];
 }
 
 function StructuredData({ category, breadcrumbs, subcategories }: StructuredDataProps) {

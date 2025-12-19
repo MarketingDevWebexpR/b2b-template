@@ -4,7 +4,7 @@
  * GET /api/marques - List all active brands
  *
  * Features:
- * - Fetches brands from Meilisearch (primary) with Medusa fallback
+ * - Fetches brands from Medusa backend API
  * - Caching with Next.js revalidation
  * - Search, filter, and pagination support
  * - Groups brands alphabetically
@@ -17,21 +17,6 @@ import { NextRequest, NextResponse } from 'next/server';
 // ============================================================================
 // Types
 // ============================================================================
-
-interface MeilisearchMarque {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
-  logo_url?: string | null;
-  website_url?: string | null;
-  country?: string | null;
-  is_active?: boolean;
-  rank?: number;
-  metadata?: Record<string, unknown> | null;
-  created_at?: string;
-  updated_at?: string;
-}
 
 interface MedusaMarque {
   id: string;
@@ -64,79 +49,15 @@ interface Brand {
 // Configuration
 // ============================================================================
 
-const MEILISEARCH_URL =
-  process.env.NEXT_PUBLIC_MEILISEARCH_URL ||
-  process.env.MEILISEARCH_URL ||
-  'http://localhost:7700';
-const MEILISEARCH_API_KEY = process.env.MEILISEARCH_API_KEY || '';
-const MARQUES_INDEX = process.env.MEILISEARCH_MARQUES_INDEX || 'bijoux_marques';
-
 const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || 'http://localhost:9000';
 const CACHE_REVALIDATE_SECONDS = 3600; // 1 hour
 
 // ============================================================================
-// Meilisearch Functions
-// ============================================================================
-
-interface MeilisearchSearchResponse {
-  hits: MeilisearchMarque[];
-  estimatedTotalHits: number;
-  limit: number;
-  offset: number;
-}
-
-/**
- * Fetches brands from Meilisearch
- */
-async function fetchMeilisearchBrands(params: {
-  search?: string;
-  skip?: number;
-  take?: number;
-}): Promise<{ marques: MeilisearchMarque[]; count: number }> {
-  const searchUrl = `${MEILISEARCH_URL}/indexes/${MARQUES_INDEX}/search`;
-
-  try {
-    const response = await fetch(searchUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(MEILISEARCH_API_KEY && { Authorization: `Bearer ${MEILISEARCH_API_KEY}` }),
-      },
-      body: JSON.stringify({
-        q: params.search || '',
-        limit: params.take || 100,
-        offset: params.skip || 0,
-        filter: 'is_active = true',
-        sort: ['rank:desc', 'name:asc'],
-      }),
-      next: {
-        revalidate: CACHE_REVALIDATE_SECONDS,
-        tags: ['brands', 'marques'],
-      },
-    });
-
-    if (!response.ok) {
-      console.error(`Meilisearch marques API error: ${response.status}`);
-      throw new Error(`Meilisearch error: ${response.status}`);
-    }
-
-    const data: MeilisearchSearchResponse = await response.json();
-    return {
-      marques: data.hits,
-      count: data.estimatedTotalHits,
-    };
-  } catch (error) {
-    console.error('Failed to fetch marques from Meilisearch:', error);
-    throw error;
-  }
-}
-
-// ============================================================================
-// Medusa Fallback Functions
+// Backend API Functions
 // ============================================================================
 
 /**
- * Fetches brands from Medusa backend (fallback)
+ * Fetches brands from Medusa backend
  */
 async function fetchMedusaBrands(params: {
   search?: string;
@@ -182,27 +103,6 @@ async function fetchMedusaBrands(params: {
 // ============================================================================
 // Transform Functions
 // ============================================================================
-
-/**
- * Transforms Meilisearch marque to Brand format
- */
-function transformMeilisearchMarqueToBrand(marque: MeilisearchMarque): Brand {
-  const foundedYear = marque.metadata?.year_founded as number | undefined;
-
-  return {
-    id: marque.id,
-    name: marque.name,
-    slug: marque.slug,
-    logo_url: marque.logo_url || null,
-    country: marque.country || null,
-    product_count: 0, // Will be enriched later if needed
-    is_premium: (marque.rank ?? 0) >= 80,
-    is_favorite: (marque.rank ?? 0) >= 90,
-    description: marque.description || null,
-    website_url: marque.website_url,
-    founded_year: foundedYear || null,
-  };
-}
 
 /**
  * Transforms Medusa marque to Brand format
@@ -274,37 +174,16 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') as 'name' | 'product_count' | 'country' | null;
     const sortOrder = searchParams.get('sortOrder') as 'asc' | 'desc' | null;
 
-    let marques: (MeilisearchMarque | MedusaMarque)[] = [];
-    let count = 0;
-    let usedMeilisearch = true;
-
-    // Try Meilisearch first, fall back to Medusa
-    try {
-      const meilisearchResult = await fetchMeilisearchBrands({
-        search,
-        skip: offset,
-        take: limit,
-      });
-      marques = meilisearchResult.marques;
-      count = meilisearchResult.count;
-    } catch (meilisearchError) {
-      console.warn('[Brands API] Meilisearch failed, falling back to Medusa:', meilisearchError);
-      usedMeilisearch = false;
-      const medusaResult = await fetchMedusaBrands({
-        search,
-        skip: offset,
-        take: limit,
-      });
-      marques = medusaResult.marques;
-      count = medusaResult.count;
-    }
+    // Fetch brands from Medusa backend
+    const medusaResult = await fetchMedusaBrands({
+      search,
+      skip: offset,
+      take: limit,
+    });
 
     // Transform to Brand format
-    let brands = marques.map((m) =>
-      usedMeilisearch
-        ? transformMeilisearchMarqueToBrand(m as MeilisearchMarque)
-        : transformMarqueToBrand(m as MedusaMarque)
-    );
+    let brands = medusaResult.marques.map(transformMarqueToBrand);
+    const count = medusaResult.count;
 
     // Apply filters
     if (letter) {

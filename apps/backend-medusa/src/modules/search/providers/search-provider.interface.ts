@@ -2,7 +2,7 @@
  * Search Provider Interface
  *
  * Abstract interface for search engine implementations.
- * This allows swapping between Meilisearch, Algolia, Elasticsearch, etc.
+ * This allows swapping between different search engines (App Search, Algolia, Elasticsearch, etc).
  */
 
 export interface SearchableDocument {

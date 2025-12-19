@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategoryPath } from '@/lib/categories/hierarchy';
-import type { CategoryTreeNode, MeilisearchCategory } from '@/types/category';
+import type { CategoryTreeNode, IndexedCategory } from '@/types/category';
 
 // ============================================================================
 // Types
@@ -46,7 +46,7 @@ export interface CategoryTreeProps {
   /** Whether to auto-expand path to active category */
   autoExpandActive?: boolean;
   /** Callback when a category is selected */
-  onSelect?: (category: MeilisearchCategory) => void;
+  onSelect?: (category: IndexedCategory) => void;
   /** Additional CSS classes */
   className?: string;
   /** Compact mode for sidebars */
@@ -62,7 +62,7 @@ interface TreeNodeProps {
   showCounts: boolean;
   compact: boolean;
   onToggle: (id: string) => void;
-  onSelect?: (category: MeilisearchCategory) => void;
+  onSelect?: (category: IndexedCategory) => void;
 }
 
 // ============================================================================

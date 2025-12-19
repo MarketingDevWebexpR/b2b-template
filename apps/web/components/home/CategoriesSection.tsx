@@ -11,6 +11,11 @@
  * - Responsive grid (1 col mobile, 3 col tablet, 5 col desktop)
  * - Section header with title and subtitle
  * - Category cards with images, icons, and hover effects
+ *
+ * V3 API Integration:
+ * - Uses /api/categories endpoint with hierarchical category data
+ * - Categories have category_lvl0-4 fields for faceting
+ * - Supports all_category_handles for filtering
  */
 
 import { cn } from '@/lib/utils';
@@ -98,7 +103,43 @@ const defaultCategories: CategoryCardData[] = [
 // ============================================================================
 
 /**
- * Fetch root categories from Meilisearch via internal API
+ * V3 Category Response Type
+ */
+interface V3CategoryTreeNode {
+  id: string;
+  name: string;
+  handle: string;
+  description?: string | null;
+  icon?: string | null;
+  image_url?: string | null;
+  depth: number;
+  rank: number;
+  product_count: number;
+  is_active: boolean;
+  children: V3CategoryTreeNode[];
+  // V3 hierarchical fields
+  path?: string;
+  ancestor_names?: string[];
+  ancestor_handles?: string[];
+}
+
+interface V3CategoryResponse {
+  tree: V3CategoryTreeNode[];
+  flat: Array<{
+    id: string;
+    name: string;
+    handle: string;
+    depth: number;
+    rank: number;
+    product_count: number;
+    is_active: boolean;
+  }>;
+  total: number;
+  maxDepth: number;
+}
+
+/**
+ * Fetch root categories from v3 API
  * Returns categories at depth 0, sorted by rank
  */
 async function fetchRootCategories(): Promise<CategoryCardData[]> {
@@ -114,25 +155,17 @@ async function fetchRootCategories(): Promise<CategoryCardData[]> {
       return defaultCategories;
     }
 
-    const data = await response.json();
+    const data: V3CategoryResponse = await response.json();
     const rootCategories = data.tree || [];
 
     if (rootCategories.length === 0) {
       return defaultCategories;
     }
 
-    // Transform Meilisearch categories to CategoryCardData format
+    // Transform v3 API categories to CategoryCardData format
     return rootCategories
-      .map((cat: {
-        id: string;
-        name: string;
-        handle: string;
-        icon?: string | null;
-        image_url?: string | null;
-        children?: unknown[];
-        product_count?: number;
-        rank?: number;
-      }) => ({
+      .filter((cat) => cat.is_active)
+      .map((cat) => ({
         id: cat.id,
         name: cat.name,
         handle: cat.handle,
@@ -142,7 +175,7 @@ async function fetchRootCategories(): Promise<CategoryCardData[]> {
         productCount: cat.product_count || 0,
         rank: cat.rank || 0,
       }))
-      .sort((a: CategoryCardData, b: CategoryCardData) => (a.rank || 0) - (b.rank || 0));
+      .sort((a, b) => (a.rank || 0) - (b.rank || 0));
   } catch (error) {
     console.error('[CategoriesSection] Error fetching categories:', error);
     return defaultCategories;

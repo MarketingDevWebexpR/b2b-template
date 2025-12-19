@@ -6,12 +6,19 @@
  * React hook for fetching and managing category data with hierarchy support.
  * Provides caching, prefetching for hover states, and SSR initial data support.
  *
+ * Compatible with App Search v3 category schema:
+ * - depth: 0-4 indicating hierarchy level (supports 5-level navigation L1-L5)
+ * - parent_category_id: reference to parent category
+ * - path: full path like "Plomberie > Robinetterie > Mitigeurs"
+ * - ancestor_handles/ancestor_names: for URL and breadcrumb construction
+ * - product_count: total products including descendants
+ *
  * @packageDocumentation
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import type {
-  MeilisearchCategory,
+  IndexedCategory,
   CategoryResponse,
   CategoryTreeNode,
   CategoryFilterOptions,
@@ -48,11 +55,11 @@ export interface UseCategoriesResult {
   /** Hierarchical tree structure */
   tree: CategoryTreeNode[];
   /** Flat array of all categories */
-  flat: MeilisearchCategory[];
+  flat: IndexedCategory[];
   /** Category lookup by ID */
-  byId: Record<string, MeilisearchCategory>;
+  byId: Record<string, IndexedCategory>;
   /** Category lookup by handle */
-  byHandle: Record<string, MeilisearchCategory>;
+  byHandle: Record<string, IndexedCategory>;
   /** Is currently fetching */
   isLoading: boolean;
   /** Has initial data loaded */
@@ -66,17 +73,17 @@ export interface UseCategoriesResult {
   /** Manually refetch categories */
   refetch: () => Promise<void>;
   /** Get category by ID */
-  getCategoryById: (id: string) => MeilisearchCategory | null;
+  getCategoryById: (id: string) => IndexedCategory | null;
   /** Get category by handle */
-  getCategoryByHandle: (handle: string) => MeilisearchCategory | null;
+  getCategoryByHandle: (handle: string) => IndexedCategory | null;
   /** Get breadcrumbs for a category */
   getBreadcrumbs: (categoryId: string) => CategoryBreadcrumb[];
   /** Get root level categories */
-  getRootCategories: () => MeilisearchCategory[];
+  getRootCategories: () => IndexedCategory[];
   /** Get children of a category */
-  getChildren: (parentId: string) => MeilisearchCategory[];
+  getChildren: (parentId: string) => IndexedCategory[];
   /** Filter categories */
-  filter: (options: CategoryFilterOptions) => MeilisearchCategory[];
+  filter: (options: CategoryFilterOptions) => IndexedCategory[];
   /** Prefetch (no-op, for future TanStack Query compatibility) */
   prefetch: () => void;
 }
@@ -271,14 +278,14 @@ export function useCategories(options: UseCategoriesOptions = {}): UseCategories
 
   // Utility functions
   const getCategoryById = useCallback(
-    (id: string): MeilisearchCategory | null => {
+    (id: string): IndexedCategory | null => {
       return byId[id] ?? null;
     },
     [byId]
   );
 
   const getCategoryByHandle = useCallback(
-    (handle: string): MeilisearchCategory | null => {
+    (handle: string): IndexedCategory | null => {
       return byHandle[handle] ?? null;
     },
     [byHandle]
@@ -293,19 +300,19 @@ export function useCategories(options: UseCategoriesOptions = {}): UseCategories
     [byId]
   );
 
-  const getRootCategoriesCallback = useCallback((): MeilisearchCategory[] => {
+  const getRootCategoriesCallback = useCallback((): IndexedCategory[] => {
     return getRootCategories(flat);
   }, [flat]);
 
   const getChildren = useCallback(
-    (parentId: string): MeilisearchCategory[] => {
+    (parentId: string): IndexedCategory[] => {
       return getChildCategories(parentId, flat);
     },
     [flat]
   );
 
   const filter = useCallback(
-    (filterOptions: CategoryFilterOptions): MeilisearchCategory[] => {
+    (filterOptions: CategoryFilterOptions): IndexedCategory[] => {
       return filterCategories(flat, filterOptions);
     },
     [flat]

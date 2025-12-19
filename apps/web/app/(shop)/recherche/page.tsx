@@ -7,7 +7,7 @@ import { Container, Skeleton } from '@/components/ui';
  * Search Results Page
  *
  * Server Component that handles search query parameters and renders
- * the search results with faceted filters using real Meilisearch API.
+ * the search results with faceted filters using App Search via backend API.
  *
  * URL Parameters:
  * - q: Search query

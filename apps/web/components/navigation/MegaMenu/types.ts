@@ -3,64 +3,69 @@
  *
  * Type definitions for the 5-level MegaMenu navigation component.
  * Supports hierarchical category structure with icons and metadata.
+ *
+ * Compatible with App Search v3 category schema:
+ * - depth: 0-4 indicating hierarchy level
+ * - parent_category_id: reference to parent
+ * - path: full path like "Plomberie > Robinetterie > Mitigeurs"
+ * - ancestor_handles/ancestor_names: for breadcrumb construction
+ * - product_count: total products including descendants
  */
 
 /**
- * Level 5: Deepest category item (leaf node)
+ * Base category properties shared across all levels
  */
-export interface CategoryLevel5 {
+interface BaseCategoryLevel {
   id: string;
   name: string;
   slug: string;
+  /** Number of products in this category (including descendants) */
   productCount?: number;
+  /** Hierarchy depth level (0-4, mapped from API depth field) */
+  depth?: number;
+  /** Full path string for display (e.g., "Plomberie > Robinetterie") */
+  path?: string;
+  /** Array of ancestor handles for URL construction */
+  ancestorHandles?: string[];
 }
 
 /**
- * Level 4: Sub-sub-subcategory
+ * Level 5: Deepest category item (leaf node, depth=4)
  */
-export interface CategoryLevel4 {
-  id: string;
-  name: string;
-  slug: string;
+export interface CategoryLevel5 extends BaseCategoryLevel {
+  // No children at this level
+}
+
+/**
+ * Level 4: Sub-sub-subcategory (depth=3)
+ */
+export interface CategoryLevel4 extends BaseCategoryLevel {
   icon?: string;
-  productCount?: number;
   children?: CategoryLevel5[];
 }
 
 /**
- * Level 3: Sub-subcategory (shown in main grid)
+ * Level 3: Sub-subcategory (shown in main grid, depth=2)
  */
-export interface CategoryLevel3 {
-  id: string;
-  name: string;
-  slug: string;
+export interface CategoryLevel3 extends BaseCategoryLevel {
   icon?: string;
-  productCount?: number;
   children?: CategoryLevel4[];
 }
 
 /**
- * Level 2: Subcategory (shown in sidebar)
+ * Level 2: Subcategory (shown in sidebar, depth=1)
  */
-export interface CategoryLevel2 {
-  id: string;
-  name: string;
-  slug: string;
+export interface CategoryLevel2 extends BaseCategoryLevel {
   icon?: string;
-  productCount?: number;
   children?: CategoryLevel3[];
 }
 
 /**
- * Level 1: Root category (shown in nav bar)
+ * Level 1: Root category (shown in nav bar, depth=0)
  */
-export interface CategoryLevel1 {
-  id: string;
-  name: string;
-  slug: string;
+export interface CategoryLevel1 extends BaseCategoryLevel {
   icon?: string;
   description?: string;
-  productCount?: number;
   children?: CategoryLevel2[];
 }
 

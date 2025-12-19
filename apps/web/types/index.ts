@@ -4,14 +4,14 @@ export * from '@bijoux/types';
 // CMS types
 export * from './cms';
 
-// Category types (Meilisearch)
+// Category types (Search Index)
 // Note: Using explicit exports to avoid conflict with Category from @bijoux/types
 export {
-  type MeilisearchCategory,
+  type IndexedCategory,
   type CategoryTreeNode,
   type CategoryResponse,
-  type MeilisearchCategoryHit,
-  type MeilisearchCategoryResponse,
+  type SearchCategoryHit,
+  type SearchCategoryResponse,
   type CategoryIconName,
   type CategoryFilterOptions,
   type CategoryNavItem,

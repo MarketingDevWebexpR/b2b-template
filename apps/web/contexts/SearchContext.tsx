@@ -11,6 +11,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { getMedusaSearchClient, type CategorySuggestion, type MarqueSuggestion } from '@/lib/search/medusa-search-client';
+import { transformHierarchicalCategoryFacets, transformBrandFacets, transformStockFacets, type FacetDistribution } from '@/lib/search/facet-transformers';
 
 // ============================================================================
 // Types
@@ -87,6 +88,54 @@ export interface CategoryNode {
 }
 
 /**
+ * Hierarchical category path for v3 faceting
+ * Supports category_lvl0 through category_lvl4
+ */
+export interface HierarchicalCategoryPath {
+  /** Current category level (0-4) */
+  level: number;
+  /** Full path segments (e.g., ["Plomberie", "Robinetterie", "Mitigeurs"]) */
+  path: string[];
+  /** Full path string (e.g., "Plomberie > Robinetterie > Mitigeurs") */
+  pathString: string;
+}
+
+/**
+ * Hierarchical facet value with path information
+ */
+export interface HierarchicalFacetValue {
+  /** Display label (just the last segment) */
+  label: string;
+  /** Full path string for filtering */
+  value: string;
+  /** Product count */
+  count: number;
+  /** Whether this value is currently selected */
+  isSelected: boolean;
+  /** Full path segments */
+  path: string[];
+  /** Depth level (0-4) */
+  level: number;
+}
+
+/**
+ * Hierarchical category facets from App Search v3
+ * Uses category_lvl0 through category_lvl4 structure
+ */
+export interface HierarchicalCategoryFacets {
+  /** Root categories */
+  category_lvl0: HierarchicalFacetValue[];
+  /** Level 1 categories (Parent > Child format) */
+  category_lvl1: HierarchicalFacetValue[];
+  /** Level 2 categories */
+  category_lvl2: HierarchicalFacetValue[];
+  /** Level 3 categories */
+  category_lvl3: HierarchicalFacetValue[];
+  /** Level 4 categories */
+  category_lvl4: HierarchicalFacetValue[];
+}
+
+/**
  * Search suggestion item
  */
 export interface SearchSuggestion {
@@ -119,6 +168,8 @@ export interface ActiveFilters {
   stockFilter: StockFilter;
   attributes: Record<string, string[]>;
   warehouseId?: string;
+  /** Hierarchical category path for v3 faceting */
+  hierarchicalCategory?: HierarchicalCategoryPath;
 }
 
 /**
@@ -136,6 +187,8 @@ export interface SearchState {
   filters: ActiveFilters;
   facets: Facet[];
   categoryTree: CategoryNode[];
+  /** Hierarchical category facets from App Search v3 */
+  hierarchicalCategoryFacets: HierarchicalCategoryFacets;
 }
 
 /**
@@ -196,6 +249,12 @@ export interface SearchContextValue {
   toggleFacetExpansion: (facetId: string) => void;
   /** Toggle category expansion in tree */
   toggleCategoryExpansion: (categoryId: string) => void;
+  /** Select a hierarchical category (drill-down navigation) */
+  selectHierarchicalCategory: (value: string, level: number) => void;
+  /** Navigate up to a parent category level */
+  navigateToHierarchicalLevel: (level: number) => void;
+  /** Clear hierarchical category selection */
+  clearHierarchicalCategory: () => void;
   /** Get suggestions for query */
   getSuggestions: (query: string) => Promise<void>;
   /** Clear suggestions */
@@ -273,7 +332,46 @@ const mockFacets: Facet[] = [
       { value: '10000+', label: 'Plus de 10 000 EUR', count: 167, selected: false },
     ],
   },
+  // v3 stock facet with boolean string values
+  {
+    id: 'has_stock',
+    name: 'Disponibilite',
+    type: 'checkbox',
+    isExpanded: true,
+    values: [
+      { value: 'true', label: 'En stock', count: 1850, selected: false },
+      { value: 'false', label: 'Sur commande', count: 450, selected: false },
+    ],
+  },
 ];
+
+/**
+ * Mock hierarchical category facets (App Search v3 format)
+ */
+const mockHierarchicalCategoryFacets: HierarchicalCategoryFacets = {
+  category_lvl0: [
+    { label: 'Bagues', value: 'Bagues', count: 1234, isSelected: false, path: ['Bagues'], level: 0 },
+    { label: 'Colliers', value: 'Colliers', count: 987, isSelected: false, path: ['Colliers'], level: 0 },
+    { label: 'Boucles d\'oreilles', value: 'Boucles d\'oreilles', count: 856, isSelected: false, path: ['Boucles d\'oreilles'], level: 0 },
+    { label: 'Bracelets', value: 'Bracelets', count: 654, isSelected: false, path: ['Bracelets'], level: 0 },
+    { label: 'Montres', value: 'Montres', count: 432, isSelected: false, path: ['Montres'], level: 0 },
+  ],
+  category_lvl1: [
+    { label: 'Fiancailles', value: 'Bagues > Fiancailles', count: 456, isSelected: false, path: ['Bagues', 'Fiancailles'], level: 1 },
+    { label: 'Alliances', value: 'Bagues > Alliances', count: 389, isSelected: false, path: ['Bagues', 'Alliances'], level: 1 },
+    { label: 'Cocktail', value: 'Bagues > Cocktail', count: 234, isSelected: false, path: ['Bagues', 'Cocktail'], level: 1 },
+    { label: 'Chevalieres', value: 'Bagues > Chevalieres', count: 155, isSelected: false, path: ['Bagues', 'Chevalieres'], level: 1 },
+    { label: 'Pendentifs', value: 'Colliers > Pendentifs', count: 345, isSelected: false, path: ['Colliers', 'Pendentifs'], level: 1 },
+    { label: 'Chaines', value: 'Colliers > Chaines', count: 289, isSelected: false, path: ['Colliers', 'Chaines'], level: 1 },
+  ],
+  category_lvl2: [
+    { label: 'Solitaires', value: 'Bagues > Fiancailles > Solitaires', count: 234, isSelected: false, path: ['Bagues', 'Fiancailles', 'Solitaires'], level: 2 },
+    { label: 'Trilogy', value: 'Bagues > Fiancailles > Trilogy', count: 122, isSelected: false, path: ['Bagues', 'Fiancailles', 'Trilogy'], level: 2 },
+    { label: 'Halo', value: 'Bagues > Fiancailles > Halo', count: 100, isSelected: false, path: ['Bagues', 'Fiancailles', 'Halo'], level: 2 },
+  ],
+  category_lvl3: [],
+  category_lvl4: [],
+};
 
 const mockCategoryTree: CategoryNode[] = [
   {
@@ -392,6 +490,7 @@ const initialFilters: ActiveFilters = {
   stockFilter: 'all',
   attributes: {},
   warehouseId: undefined,
+  hierarchicalCategory: undefined,
 };
 
 const initialState: SearchState = {
@@ -406,6 +505,7 @@ const initialState: SearchState = {
   filters: initialFilters,
   facets: mockFacets,
   categoryTree: mockCategoryTree,
+  hierarchicalCategoryFacets: mockHierarchicalCategoryFacets,
 };
 
 // ============================================================================
@@ -560,14 +660,60 @@ export function SearchProvider({
             limit: state.pageSize,
             offset: (state.currentPage - 1) * state.pageSize,
             facets: true,
-            category: state.filters.categories[0],
+            category: state.filters.hierarchicalCategory?.pathString
+              ? state.filters.hierarchicalCategory.path[state.filters.hierarchicalCategory.path.length - 1]
+              : state.filters.categories[0],
             brand: state.filters.brands[0],
-            inStock: state.filters.stockFilter === 'in_stock',
+            inStock: state.filters.stockFilter === 'in_stock' ? true : undefined,
             priceMin: state.filters.priceRange?.min,
             priceMax: state.filters.priceRange?.max,
             sort: state.sortBy === 'price_asc' ? 'price_min' : state.sortBy === 'price_desc' ? 'price_min' : undefined,
             order: state.sortBy === 'price_asc' ? 'asc' : state.sortBy === 'price_desc' ? 'desc' : undefined,
           });
+
+          // Transform v3 facets from API response
+          const facetDistribution = result.facetDistribution as FacetDistribution | undefined;
+          const hierarchicalCategoryFacets = transformHierarchicalCategoryFacets(
+            facetDistribution,
+            state.filters.hierarchicalCategory?.pathString
+          );
+
+          // Transform brand facets
+          const brandFacet = transformBrandFacets(facetDistribution, state.filters.brands);
+
+          // Transform stock facets (v3 uses has_stock with "true"/"false" strings)
+          const stockCounts = transformStockFacets(facetDistribution);
+          const stockFacet: Facet = {
+            id: 'has_stock',
+            name: 'Disponibilite',
+            type: 'checkbox',
+            isExpanded: true,
+            values: [
+              { value: 'true', label: 'En stock', count: stockCounts.inStock, selected: false },
+              { value: 'false', label: 'Sur commande', count: stockCounts.outOfStock, selected: false },
+            ],
+          };
+
+          // Build updated facets array
+          const updatedFacets = state.facets.map(facet => {
+            if (facet.id === 'brand' && brandFacet) {
+              return brandFacet;
+            }
+            if (facet.id === 'has_stock') {
+              return stockFacet;
+            }
+            return facet;
+          });
+
+          // If brand facet doesn't exist yet but we have one from API, add it
+          if (brandFacet && !state.facets.some(f => f.id === 'brand')) {
+            updatedFacets.unshift(brandFacet);
+          }
+
+          // If stock facet doesn't exist yet, add it
+          if (!state.facets.some(f => f.id === 'has_stock')) {
+            updatedFacets.push(stockFacet);
+          }
 
           setState((prev) => ({
             ...prev,
@@ -575,6 +721,8 @@ export function SearchProvider({
             totalResults: result.total,
             totalPages: Math.ceil(result.total / prev.pageSize),
             currentPage: 1,
+            hierarchicalCategoryFacets,
+            facets: updatedFacets,
           }));
 
           // Add to history
@@ -844,6 +992,152 @@ export function SearchProvider({
     }));
   }, []);
 
+  // Hierarchical category selection (v3 faceting)
+  const selectHierarchicalCategory = useCallback((value: string, level: number) => {
+    // Parse the path from the value (e.g., "Plomberie > Robinetterie" -> ["Plomberie", "Robinetterie"])
+    const path = value.split(' > ').map((s) => s.trim());
+    const pathString = value;
+
+    setState((prev) => {
+      // Update the hierarchical category filter
+      const hierarchicalCategory: HierarchicalCategoryPath = {
+        level,
+        path,
+        pathString,
+      };
+
+      // Update selection state in facets
+      const updateFacetSelection = (
+        facets: HierarchicalCategoryFacets,
+        selectedPath: string[]
+      ): HierarchicalCategoryFacets => {
+        const levelKeys: (keyof HierarchicalCategoryFacets)[] = [
+          'category_lvl0',
+          'category_lvl1',
+          'category_lvl2',
+          'category_lvl3',
+          'category_lvl4',
+        ];
+
+        const updated = { ...facets };
+        levelKeys.forEach((key, idx) => {
+          updated[key] = facets[key].map((item) => ({
+            ...item,
+            isSelected: idx === level && item.value === pathString,
+          }));
+        });
+
+        return updated;
+      };
+
+      return {
+        ...prev,
+        filters: {
+          ...prev.filters,
+          hierarchicalCategory,
+        },
+        hierarchicalCategoryFacets: updateFacetSelection(
+          prev.hierarchicalCategoryFacets,
+          path
+        ),
+        currentPage: 1,
+      };
+    });
+  }, []);
+
+  // Navigate to a specific level in the hierarchy (go back up)
+  const navigateToHierarchicalLevel = useCallback((level: number) => {
+    setState((prev) => {
+      const currentPath = prev.filters.hierarchicalCategory?.path;
+      if (!currentPath || level < 0) {
+        // Clear selection if going to root
+        return {
+          ...prev,
+          filters: {
+            ...prev.filters,
+            hierarchicalCategory: undefined,
+          },
+          hierarchicalCategoryFacets: {
+            ...prev.hierarchicalCategoryFacets,
+            category_lvl0: prev.hierarchicalCategoryFacets.category_lvl0.map((v) => ({
+              ...v,
+              isSelected: false,
+            })),
+            category_lvl1: prev.hierarchicalCategoryFacets.category_lvl1.map((v) => ({
+              ...v,
+              isSelected: false,
+            })),
+            category_lvl2: prev.hierarchicalCategoryFacets.category_lvl2.map((v) => ({
+              ...v,
+              isSelected: false,
+            })),
+            category_lvl3: prev.hierarchicalCategoryFacets.category_lvl3.map((v) => ({
+              ...v,
+              isSelected: false,
+            })),
+            category_lvl4: prev.hierarchicalCategoryFacets.category_lvl4.map((v) => ({
+              ...v,
+              isSelected: false,
+            })),
+          },
+          currentPage: 1,
+        };
+      }
+
+      // Trim path to the target level
+      const newPath = currentPath.slice(0, level + 1);
+      const newPathString = newPath.join(' > ');
+
+      return {
+        ...prev,
+        filters: {
+          ...prev.filters,
+          hierarchicalCategory: {
+            level,
+            path: newPath,
+            pathString: newPathString,
+          },
+        },
+        currentPage: 1,
+      };
+    });
+  }, []);
+
+  // Clear hierarchical category selection
+  const clearHierarchicalCategory = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        hierarchicalCategory: undefined,
+      },
+      hierarchicalCategoryFacets: {
+        ...prev.hierarchicalCategoryFacets,
+        category_lvl0: prev.hierarchicalCategoryFacets.category_lvl0.map((v) => ({
+          ...v,
+          isSelected: false,
+        })),
+        category_lvl1: prev.hierarchicalCategoryFacets.category_lvl1.map((v) => ({
+          ...v,
+          isSelected: false,
+        })),
+        category_lvl2: prev.hierarchicalCategoryFacets.category_lvl2.map((v) => ({
+          ...v,
+          isSelected: false,
+        })),
+        category_lvl3: prev.hierarchicalCategoryFacets.category_lvl3.map((v) => ({
+          ...v,
+          isSelected: false,
+        })),
+        category_lvl4: prev.hierarchicalCategoryFacets.category_lvl4.map((v) => ({
+          ...v,
+          isSelected: false,
+        })),
+      },
+      currentPage: 1,
+    }));
+  }, []);
+
   // Suggestions
   const getSuggestions = useCallback(
     async (query: string) => {
@@ -1093,6 +1387,9 @@ export function SearchProvider({
       removeFilter,
       toggleFacetExpansion,
       toggleCategoryExpansion,
+      selectHierarchicalCategory,
+      navigateToHierarchicalLevel,
+      clearHierarchicalCategory,
       getSuggestions,
       clearSuggestions,
       navigateToCategory,
@@ -1131,6 +1428,9 @@ export function SearchProvider({
       removeFilter,
       toggleFacetExpansion,
       toggleCategoryExpansion,
+      selectHierarchicalCategory,
+      navigateToHierarchicalLevel,
+      clearHierarchicalCategory,
       getSuggestions,
       clearSuggestions,
       navigateToCategory,
@@ -1185,6 +1485,9 @@ export function useSearchFilters() {
     setWarehouseFilter,
     clearFilters,
     removeFilter,
+    selectHierarchicalCategory,
+    navigateToHierarchicalLevel,
+    clearHierarchicalCategory,
     activeFilterCount,
     hasActiveFilters,
   } = useSearch();
@@ -1193,6 +1496,7 @@ export function useSearchFilters() {
     filters: state.filters,
     facets: state.facets,
     categoryTree: state.categoryTree,
+    hierarchicalCategoryFacets: state.hierarchicalCategoryFacets,
     toggleCategoryFilter,
     toggleBrandFilter,
     setPriceRange,
@@ -1201,6 +1505,9 @@ export function useSearchFilters() {
     setWarehouseFilter,
     clearFilters,
     removeFilter,
+    selectHierarchicalCategory,
+    navigateToHierarchicalLevel,
+    clearHierarchicalCategory,
     activeFilterCount,
     hasActiveFilters,
   };

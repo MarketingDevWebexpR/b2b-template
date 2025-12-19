@@ -9,6 +9,11 @@
  * - Responsive product grid
  * - Pagination with URL sync
  *
+ * V3 API Integration:
+ * - Uses brand_slug for product filtering
+ * - has_stock filter uses string "true"/"false"
+ * - Category filters use all_category_handles for hierarchy
+ *
  * @packageDocumentation
  */
 

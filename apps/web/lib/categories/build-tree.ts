@@ -8,7 +8,7 @@
  */
 
 import type {
-  MeilisearchCategory,
+  IndexedCategory,
   CategoryTreeNode,
   CategoryResponse,
   CategoryFilterOptions,
@@ -39,7 +39,7 @@ import type {
  * // tree is now hierarchical with children arrays
  * ```
  */
-export function buildCategoryTree(categories: MeilisearchCategory[]): CategoryTreeNode[] {
+export function buildCategoryTree(categories: IndexedCategory[]): CategoryTreeNode[] {
   // Step 1: Create a map with all categories as tree nodes
   const nodeMap = new Map<string, CategoryTreeNode>();
 
@@ -92,10 +92,10 @@ function sortTreeByRank(nodes: CategoryTreeNode[]): void {
 /**
  * Build complete category response with tree, flat list, and lookup maps
  *
- * @param categories - Flat array of categories from Meilisearch
+ * @param categories - Flat array of categories from search index
  * @returns Complete category response structure
  */
-export function buildCategoryResponse(categories: MeilisearchCategory[]): CategoryResponse {
+export function buildCategoryResponse(categories: IndexedCategory[]): CategoryResponse {
   // Filter to active categories only
   const activeCategories = categories.filter((c) => c.is_active);
 
@@ -110,8 +110,8 @@ export function buildCategoryResponse(categories: MeilisearchCategory[]): Catego
   const tree = buildCategoryTree(activeCategories);
 
   // Build lookup maps
-  const byId: Record<string, MeilisearchCategory> = {};
-  const byHandle: Record<string, MeilisearchCategory> = {};
+  const byId: Record<string, IndexedCategory> = {};
+  const byHandle: Record<string, IndexedCategory> = {};
 
   for (const category of activeCategories) {
     byId[category.id] = category;
@@ -188,10 +188,10 @@ export function findCategoryByHandle(
  * @returns Array of ancestor categories from root to parent
  */
 export function getCategoryAncestors(
-  category: MeilisearchCategory,
-  byId: Record<string, MeilisearchCategory>
-): MeilisearchCategory[] {
-  const ancestors: MeilisearchCategory[] = [];
+  category: IndexedCategory,
+  byId: Record<string, IndexedCategory>
+): IndexedCategory[] {
+  const ancestors: IndexedCategory[] = [];
 
   for (const ancestorId of category.parent_category_ids) {
     const ancestor = byId[ancestorId];
@@ -212,8 +212,8 @@ export function getCategoryAncestors(
  * @returns Array of breadcrumb items including the current category
  */
 export function getCategoryBreadcrumbs(
-  category: MeilisearchCategory,
-  byId: Record<string, MeilisearchCategory>,
+  category: IndexedCategory,
+  byId: Record<string, IndexedCategory>,
   basePath: string = '/categories'
 ): CategoryBreadcrumb[] {
   const ancestors = getCategoryAncestors(category, byId);
@@ -242,8 +242,8 @@ export function getCategoryBreadcrumbs(
  * @param node - Category tree node
  * @returns Flat array of all descendant categories
  */
-export function getCategoryDescendants(node: CategoryTreeNode): MeilisearchCategory[] {
-  const descendants: MeilisearchCategory[] = [];
+export function getCategoryDescendants(node: CategoryTreeNode): IndexedCategory[] {
+  const descendants: IndexedCategory[] = [];
 
   function collect(n: CategoryTreeNode) {
     for (const child of n.children) {
@@ -262,8 +262,8 @@ export function getCategoryDescendants(node: CategoryTreeNode): MeilisearchCateg
  * @param tree - Category tree
  * @returns Flat array of categories
  */
-export function flattenTree(tree: CategoryTreeNode[]): MeilisearchCategory[] {
-  const result: MeilisearchCategory[] = [];
+export function flattenTree(tree: CategoryTreeNode[]): IndexedCategory[] {
+  const result: IndexedCategory[] = [];
 
   function collect(nodes: CategoryTreeNode[]) {
     for (const node of nodes) {
@@ -292,9 +292,9 @@ export function flattenTree(tree: CategoryTreeNode[]): MeilisearchCategory[] {
  * @returns Filtered categories
  */
 export function filterCategories(
-  categories: MeilisearchCategory[],
+  categories: IndexedCategory[],
   options: CategoryFilterOptions
-): MeilisearchCategory[] {
+): IndexedCategory[] {
   let filtered = [...categories];
 
   if (options.activeOnly !== false) {
@@ -326,7 +326,7 @@ export function filterCategories(
  * @param categories - All categories
  * @returns Root level categories sorted by rank
  */
-export function getRootCategories(categories: MeilisearchCategory[]): MeilisearchCategory[] {
+export function getRootCategories(categories: IndexedCategory[]): IndexedCategory[] {
   return categories
     .filter((c) => c.depth === 0 && c.is_active)
     .sort((a, b) => a.rank - b.rank);
@@ -341,8 +341,8 @@ export function getRootCategories(categories: MeilisearchCategory[]): Meilisearc
  */
 export function getChildCategories(
   parentId: string,
-  categories: MeilisearchCategory[]
-): MeilisearchCategory[] {
+  categories: IndexedCategory[]
+): IndexedCategory[] {
   return categories
     .filter((c) => c.parent_category_id === parentId && c.is_active)
     .sort((a, b) => a.rank - b.rank);
@@ -392,9 +392,9 @@ export function treeToNavItems(
  * @returns Sibling categories sorted by rank
  */
 export function getSiblingCategories(
-  category: MeilisearchCategory,
-  categories: MeilisearchCategory[]
-): MeilisearchCategory[] {
+  category: IndexedCategory,
+  categories: IndexedCategory[]
+): IndexedCategory[] {
   return categories
     .filter(
       (c) =>

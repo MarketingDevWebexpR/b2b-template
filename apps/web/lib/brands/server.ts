@@ -3,7 +3,7 @@
  *
  * Server-side functions for fetching brand data.
  * Used in Server Components and API routes.
- * Fetches directly from Meilisearch for optimal SSR performance.
+ * Fetches from Medusa backend API for consistent data access.
  *
  * @packageDocumentation
  */
@@ -40,7 +40,11 @@ export interface BrandProduct {
   reference?: string;
 }
 
-interface MeilisearchMarque {
+/**
+ * Indexed brand format from search API
+ * Based on App Search v3 marques schema: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
+ */
+interface IndexedMarque {
   id: string;
   name: string;
   slug: string;
@@ -50,13 +54,13 @@ interface MeilisearchMarque {
   country?: string | null;
   is_active?: boolean;
   rank?: number;
-  metadata?: Record<string, unknown> | null;
-  created_at?: string;
-  updated_at?: string;
 }
 
-interface MeilisearchSearchResponse {
-  hits: MeilisearchMarque[];
+/**
+ * Search API response format
+ */
+interface SearchResponse {
+  hits: IndexedMarque[];
   estimatedTotalHits: number;
   limit: number;
   offset: number;
@@ -66,13 +70,16 @@ interface MeilisearchSearchResponse {
 // Configuration
 // ============================================================================
 
-const MEILISEARCH_URL =
-  process.env.NEXT_PUBLIC_MEILISEARCH_URL ||
-  process.env.MEILISEARCH_URL ||
-  'http://localhost:7700';
-const MEILISEARCH_API_KEY = process.env.MEILISEARCH_API_KEY || '';
-const MARQUES_INDEX = process.env.MEILISEARCH_MARQUES_INDEX || 'bijoux_marques';
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
+  process.env.MEDUSA_BACKEND_URL ||
+  'http://localhost:9000';
 const CACHE_REVALIDATE_SECONDS = 3600; // 1 hour
+
+// App Search v3 Configuration
+const APPSEARCH_ENDPOINT = process.env.APPSEARCH_ENDPOINT || 'https://elasticsearch-webexpr.ent.europe-west1.gcp.cloud.es.io';
+const APPSEARCH_PUBLIC_KEY = process.env.APPSEARCH_PUBLIC_KEY || 'search-smojpz6bs5oufe3g9krdupke';
+const APPSEARCH_ENGINE = process.env.APPSEARCH_ENGINE || 'dev-medusa-v3';
 
 // ============================================================================
 // Utility Functions
@@ -96,11 +103,10 @@ function groupBrandsByLetter(brands: Brand[]): Record<string, Brand[]> {
 }
 
 /**
- * Transform Meilisearch marque to Brand format
+ * Transform indexed marque to Brand format
+ * Note: founded_year is not available in v3 schema
  */
-function transformMeilisearchMarqueToBrand(marque: MeilisearchMarque): Brand {
-  const foundedYear = marque.metadata?.year_founded as number | undefined;
-
+function transformIndexedMarqueToBrand(marque: IndexedMarque): Brand {
   return {
     id: marque.id,
     name: marque.name,
@@ -112,38 +118,97 @@ function transformMeilisearchMarqueToBrand(marque: MeilisearchMarque): Brand {
     is_favorite: (marque.rank ?? 0) >= 90,
     description: marque.description || null,
     website_url: marque.website_url,
-    founded_year: foundedYear || null,
+    founded_year: null, // Not available in v3 schema
   };
 }
 
 // ============================================================================
-// Meilisearch Direct Functions
+// App Search API Functions
 // ============================================================================
 
 /**
- * Fetches brands directly from Meilisearch
+ * App Search v3 marque result structure
+ * Marques schema: name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
  */
-async function fetchMeilisearchBrands(params: {
+interface AppSearchMarqueResult {
+  id: { raw: string };
+  name: { raw: string };
+  slug: { raw: string };
+  description?: { raw: string };
+  logo_url?: { raw: string };
+  website_url?: { raw: string };
+  country?: { raw: string };
+  is_active?: { raw: string };
+  rank?: { raw: number | string }; // Can be number or string depending on indexing
+  doc_type: { raw: string };
+}
+
+interface AppSearchResponse {
+  meta: { page: { total_results: number } };
+  results: AppSearchMarqueResult[];
+}
+
+/**
+ * Build App Search filters for marques
+ * App Search v3 uses { all: [...], any: [...], none: [...] } format for multiple conditions
+ * Single filter can use simple { field: value } format
+ */
+function buildMarqueFilters(slugFilter?: string): Record<string, unknown> {
+  // Base filter for doc_type
+  const docTypeFilter = { doc_type: 'marques' };
+
+  if (!slugFilter) {
+    // Single filter - simple format works
+    return docTypeFilter;
+  }
+
+  // Multiple filters - use 'all' array format
+  return {
+    all: [
+      { doc_type: 'marques' },
+      { slug: slugFilter },
+    ],
+  };
+}
+
+/**
+ * Fetches brands from App Search v3
+ */
+async function fetchAppSearchBrands(params: {
   search?: string;
   skip?: number;
   take?: number;
-  filter?: string;
-}): Promise<{ marques: MeilisearchMarque[]; count: number }> {
-  const searchUrl = `${MEILISEARCH_URL}/indexes/${MARQUES_INDEX}/search`;
+  slugFilter?: string;
+}): Promise<{ marques: IndexedMarque[]; count: number }> {
+  const searchUrl = `${APPSEARCH_ENDPOINT}/api/as/v1/engines/${APPSEARCH_ENGINE}/search`;
 
   try {
+    const filters = buildMarqueFilters(params.slugFilter);
+
     const response = await fetch(searchUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(MEILISEARCH_API_KEY && { Authorization: `Bearer ${MEILISEARCH_API_KEY}` }),
+        'Authorization': `Bearer ${APPSEARCH_PUBLIC_KEY}`,
       },
       body: JSON.stringify({
-        q: params.search || '',
-        limit: params.take || 100,
-        offset: params.skip || 0,
-        filter: params.filter || 'is_active = true',
-        sort: ['rank:desc', 'name:asc'],
+        query: params.search || '',
+        filters,
+        // Result fields - only include fields from App Search v3 marques schema:
+        // name, slug, description, country, logo_url, website_url, is_active, rank, doc_type, id
+        result_fields: {
+          id: { raw: {} },
+          name: { raw: {} },
+          slug: { raw: {} },
+          description: { raw: {} },
+          logo_url: { raw: {} },
+          website_url: { raw: {} },
+          country: { raw: {} },
+          is_active: { raw: {} },
+          rank: { raw: {} },
+          doc_type: { raw: {} },
+        },
+        page: { current: Math.floor((params.skip || 0) / (params.take || 100)) + 1, size: params.take || 100 },
       }),
       next: {
         revalidate: CACHE_REVALIDATE_SECONDS,
@@ -152,17 +217,32 @@ async function fetchMeilisearchBrands(params: {
     });
 
     if (!response.ok) {
-      console.error(`[Meilisearch] Brands API error: ${response.status}`);
-      throw new Error(`Meilisearch error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`[App Search] Brands search error: ${response.status}`, errorText);
+      throw new Error(`App Search error: ${response.status}`);
     }
 
-    const data: MeilisearchSearchResponse = await response.json();
+    const data: AppSearchResponse = await response.json();
+
+    // Transform App Search results to IndexedMarque format
+    const marques: IndexedMarque[] = data.results.map(r => ({
+      id: r.id?.raw || '',
+      name: r.name?.raw || '',
+      slug: r.slug?.raw || '',
+      description: r.description?.raw || null,
+      logo_url: r.logo_url?.raw || null,
+      website_url: r.website_url?.raw || null,
+      country: r.country?.raw || null,
+      is_active: r.is_active?.raw === 'true',
+      rank: typeof r.rank?.raw === 'number' ? r.rank.raw : parseInt(r.rank?.raw || '0', 10),
+    }));
+
     return {
-      marques: data.hits,
-      count: data.estimatedTotalHits,
+      marques,
+      count: data.meta.page.total_results,
     };
   } catch (error) {
-    console.error('[Meilisearch] Failed to fetch brands:', error);
+    console.error('[App Search] Failed to fetch brands:', error);
     throw error;
   }
 }
@@ -173,7 +253,7 @@ async function fetchMeilisearchBrands(params: {
 
 /**
  * Fetch brands for SSR/SSG
- * Fetches directly from Meilisearch for optimal SSR performance.
+ * Fetches from Medusa backend API for consistent data access.
  *
  * @returns Promise<BrandResponse> - Brands data with grouping
  *
@@ -185,13 +265,13 @@ async function fetchMeilisearchBrands(params: {
  */
 export async function getServerBrands(): Promise<BrandResponse> {
   try {
-    // Fetch directly from Meilisearch for SSR
-    const { marques, count } = await fetchMeilisearchBrands({
+    // Fetch from App Search v3
+    const { marques, count } = await fetchAppSearchBrands({
       take: 200, // Get all brands
     });
 
     // Transform to Brand format
-    const brands = marques.map(transformMeilisearchMarqueToBrand);
+    const brands = marques.map(transformIndexedMarqueToBrand);
 
     // Sort: favorites first, then premium, then alphabetically
     brands.sort((a, b) => {
@@ -221,7 +301,7 @@ export async function getServerBrands(): Promise<BrandResponse> {
 
 /**
  * Fetch a single brand by slug for SSR/SSG
- * Fetches directly from Meilisearch for optimal SSR performance.
+ * Fetches from Medusa backend API for consistent data access.
  *
  * @param slug - Brand slug
  * @returns Promise<BrandWithProducts | null> - Brand data or null if not found
@@ -234,45 +314,25 @@ export async function getServerBrands(): Promise<BrandResponse> {
  */
 export async function getServerBrand(slug: string): Promise<BrandWithProducts | null> {
   try {
-    // Search by slug in Meilisearch
-    const searchUrl = `${MEILISEARCH_URL}/indexes/${MARQUES_INDEX}/search`;
-
-    const response = await fetch(searchUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(MEILISEARCH_API_KEY && { Authorization: `Bearer ${MEILISEARCH_API_KEY}` }),
-      },
-      body: JSON.stringify({
-        q: '',
-        filter: `slug = "${slug}"`,
-        limit: 1,
-      }),
-      next: {
-        revalidate: CACHE_REVALIDATE_SECONDS,
-        tags: ['brands', 'marques', `brand-${slug}`],
-      },
+    // Search by slug via App Search v3
+    const { marques } = await fetchAppSearchBrands({
+      slugFilter: slug,
+      take: 1,
     });
 
-    if (!response.ok) {
-      console.error(`[getServerBrand] Meilisearch error: ${response.status}`);
+    if (marques.length === 0) {
+      console.warn(`[getServerBrand] Brand not found: ${slug}`);
       return null;
     }
 
-    const data: MeilisearchSearchResponse = await response.json();
+    const marque = marques[0];
+    const brand = transformIndexedMarqueToBrand(marque);
 
-    if (data.hits.length === 0) {
-      return null;
-    }
-
-    const marque = data.hits[0];
-    const brand = transformMeilisearchMarqueToBrand(marque);
-
-    // Return with extended properties
+    // Return with extended properties (founded_year not available in v3 schema)
     return {
       ...brand,
       website_url: marque.website_url || null,
-      founded_year: (marque.metadata?.year_founded as number) || null,
+      founded_year: null, // Not available in v3 schema
     };
   } catch (error) {
     console.error('[getServerBrand] Error:', error);
@@ -282,7 +342,7 @@ export async function getServerBrand(slug: string): Promise<BrandWithProducts | 
 
 /**
  * Fetch brands with specific filters for SSR
- * Fetches directly from Meilisearch for optimal SSR performance.
+ * Fetches from Medusa backend API for consistent data access.
  *
  * @param options - Filter options
  * @returns Promise<BrandResponse> - Filtered brands data
@@ -296,31 +356,27 @@ export async function getFilteredBrands(options: {
   offset?: number;
 }): Promise<BrandResponse> {
   try {
-    // Build Meilisearch filter
-    const filters: string[] = ['is_active = true'];
-    if (options.country) {
-      filters.push(`country = "${options.country}"`);
-    }
-    if (options.premiumOnly) {
-      filters.push('rank >= 80');
-    }
-
-    // Fetch from Meilisearch
-    const { marques, count } = await fetchMeilisearchBrands({
+    // Fetch from App Search v3
+    const { marques, count } = await fetchAppSearchBrands({
       search: options.search,
       skip: options.offset,
       take: options.limit || 100,
-      filter: filters.join(' AND '),
     });
 
     // Transform to Brand format
-    let brands = marques.map(transformMeilisearchMarqueToBrand);
+    let brands = marques.map(transformIndexedMarqueToBrand);
 
-    // Apply letter filter (post-process as Meilisearch doesn't support startsWith)
+    // Apply filters (post-process since App Search doesn't support all filters)
     if (options.letter) {
       brands = brands.filter(
         (b) => b.name.charAt(0).toUpperCase() === options.letter!.toUpperCase()
       );
+    }
+    if (options.country) {
+      brands = brands.filter((b) => b.country === options.country);
+    }
+    if (options.premiumOnly) {
+      brands = brands.filter((b) => b.is_premium || b.is_favorite);
     }
 
     // Sort: favorites first, then premium, then alphabetically

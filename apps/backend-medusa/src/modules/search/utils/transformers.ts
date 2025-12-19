@@ -96,6 +96,81 @@ function extractAllHandlesInHierarchy(category: CategoryWithParent): string[] {
 }
 
 /**
+ * Build hierarchical category levels for Algolia/InstantSearch style navigation
+ *
+ * For a category "Électricité > Câbles > Domestique", returns:
+ * {
+ *   lvl0: "Électricité",
+ *   lvl1: "Électricité > Câbles",
+ *   lvl2: "Électricité > Câbles > Domestique"
+ * }
+ *
+ * This allows hierarchical faceting where clicking "Électricité" shows sub-categories,
+ * then clicking "Câbles" shows its sub-categories, etc.
+ */
+function buildCategoryLevels(category: CategoryWithParent): {
+  lvl0: string;
+  lvl1: string | null;
+  lvl2: string | null;
+  lvl3: string | null;
+  lvl4: string | null;
+} {
+  // First, collect all names from root to leaf
+  const names: string[] = [];
+  let current: CategoryWithParent | null | undefined = category;
+
+  while (current) {
+    names.unshift(current.name);
+    current = current.parent_category;
+  }
+
+  // Build cumulative paths for each level
+  return {
+    lvl0: names[0] || '',
+    lvl1: names.length > 1 ? names.slice(0, 2).join(' > ') : null,
+    lvl2: names.length > 2 ? names.slice(0, 3).join(' > ') : null,
+    lvl3: names.length > 3 ? names.slice(0, 4).join(' > ') : null,
+    lvl4: names.length > 4 ? names.slice(0, 5).join(' > ') : null,
+  };
+}
+
+/**
+ * Aggregate category levels from multiple categories
+ * Products can belong to multiple categories, so we collect all unique values per level
+ */
+function aggregateCategoryLevels(categories: CategoryWithParent[]): {
+  category_lvl0: string[];
+  category_lvl1: string[];
+  category_lvl2: string[];
+  category_lvl3: string[];
+  category_lvl4: string[];
+} {
+  const lvl0Set = new Set<string>();
+  const lvl1Set = new Set<string>();
+  const lvl2Set = new Set<string>();
+  const lvl3Set = new Set<string>();
+  const lvl4Set = new Set<string>();
+
+  for (const category of categories) {
+    const levels = buildCategoryLevels(category);
+
+    if (levels.lvl0) lvl0Set.add(levels.lvl0);
+    if (levels.lvl1) lvl1Set.add(levels.lvl1);
+    if (levels.lvl2) lvl2Set.add(levels.lvl2);
+    if (levels.lvl3) lvl3Set.add(levels.lvl3);
+    if (levels.lvl4) lvl4Set.add(levels.lvl4);
+  }
+
+  return {
+    category_lvl0: Array.from(lvl0Set),
+    category_lvl1: Array.from(lvl1Set),
+    category_lvl2: Array.from(lvl2Set),
+    category_lvl3: Array.from(lvl3Set),
+    category_lvl4: Array.from(lvl4Set),
+  };
+}
+
+/**
  * Transform a Medusa product into a searchable document
  *
  * Includes brand/marque information from the product-marque link.
@@ -182,6 +257,10 @@ export function transformProductForIndex(product: Record<string, unknown>): Sear
       return extractAllHandlesInHierarchy(categoryWithParent);
     }))],
 
+    // Hierarchical category levels for Algolia/InstantSearch style navigation
+    // Each level contains the full path up to that depth: "Électricité > Câbles > Domestique"
+    ...aggregateCategoryLevels(categories.map((cat) => cat as unknown as CategoryWithParent)),
+
     // Tags
     tags: tags.map((tag) => tag.value as string).filter(Boolean),
 
@@ -201,8 +280,9 @@ export function transformProductForIndex(product: Record<string, unknown>): Sear
     // Computed fields for filtering
     price_min: priceMin,
     price_max: priceMax,
-    is_available: (product.status as string) === 'published',
-    has_stock: hasStock,
+    // Boolean as strings for consistent faceting in App Search
+    is_available: (product.status as string) === 'published' ? 'true' : 'false',
+    has_stock: hasStock ? 'true' : 'false',
 
     // Timestamps
     created_at: product.created_at as string,
@@ -240,12 +320,15 @@ export function transformCategoryForIndex(category: Record<string, unknown>): Se
   const ancestorHandles = extractAncestorHandles(categoryWithParent);
   const path = buildCategoryPath(categoryWithParent);
 
+  // Get parent_category_id - try direct field first, then nested object
+  const parentCategoryId = (category.parent_category_id as string) || (parentCategory?.id as string) || null;
+
   return {
     id: category.id as string,
     name: category.name as string,
     handle: category.handle as string,
     description: (category.description as string) || null,
-    parent_category_id: parentCategory?.id as string || null,
+    parent_category_id: parentCategoryId,
     // Hierarchy fields
     parent_category_ids: parentCategoryIds,
     path,
@@ -271,7 +354,7 @@ export function transformCategoryForIndex(category: Record<string, unknown>): Se
 /**
  * Transform a marque (brand) into a searchable document
  *
- * Maps the Marque module entity to a Meilisearch-compatible document.
+ * Maps the Marque module entity to an App Search compatible document.
  */
 export function transformMarqueForIndex(marque: Record<string, unknown>): SearchableDocument {
   const metadata = (marque.metadata as Record<string, unknown>) || {};

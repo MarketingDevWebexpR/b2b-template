@@ -6,8 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, X, SlidersHorizontal, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// API URL for fetching filter data
-const API_BASE_URL = process.env.NEXT_PUBLIC_SAGE_API_URL || 'https://sage-portal.webexpr.dev/api';
+// API URL for fetching filter data - V3 uses Next.js API routes
+const API_BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+interface SubcategoryFacet {
+  value: string;
+  label: string;
+  count: number;
+}
+
+interface BrandFacet {
+  value: string;
+  label: string;
+  count: number;
+}
 
 interface CategoryFiltersLightProps {
   className?: string;
@@ -15,6 +27,10 @@ interface CategoryFiltersLightProps {
   totalProducts?: number;
   /** Category slug for filtering (optional - if not provided, uses all products) */
   categorySlug?: string;
+  /** Subcategory facets from v3 API (category_lvl* fields) */
+  subcategoryFacets?: SubcategoryFacet[];
+  /** Brand facets from v3 API (brand_name/brand_slug fields) */
+  brandFacets?: BrandFacet[];
 }
 
 interface PricePreset {
@@ -160,7 +176,13 @@ const drawerVariants = {
  * - Dynamic price presets from API
  * - Dynamic materials from API
  */
-export function CategoryFiltersLight({ className, totalProducts, categorySlug }: CategoryFiltersLightProps) {
+export function CategoryFiltersLight({
+  className,
+  totalProducts,
+  categorySlug,
+  subcategoryFacets = [],
+  brandFacets = [],
+}: CategoryFiltersLightProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -172,69 +194,51 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 0 });
   const [isLoadingFilters, setIsLoadingFilters] = useState(true);
 
-  // Fetch filter data from API
+  // Fetch filter data from V3 API
   useEffect(() => {
     async function fetchFilterData() {
       setIsLoadingFilters(true);
       try {
-        // Fetch price range and materials in parallel
-        const categoryParam = categorySlug ? `?categorySlug=${encodeURIComponent(categorySlug)}` : '';
+        // Build query params for v3 catalog products API
+        const searchParams = new URLSearchParams();
+        if (categorySlug) {
+          searchParams.set('category', categorySlug);
+        }
+        searchParams.set('limit', '1'); // We only need facets, not products
 
-        const [priceResponse, materialsResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/sage/filters/price-range${categoryParam}`).catch(() => null),
-          fetch(`${API_BASE_URL}/sage/filters/materials${categoryParam}`).catch(() => null),
-        ]);
-
-        // If dedicated filter endpoints don't exist, fetch products and compute locally
-        // This is a fallback approach using existing product data
+        // Fetch from v3 catalog products API to get price range from facets
         const productsResponse = await fetch(
-          `${API_BASE_URL}/sage/articles`,
+          `${API_BASE_URL}/api/catalog/products?${searchParams.toString()}`,
           { next: { revalidate: 300 } }
         );
 
         if (productsResponse.ok) {
-          const articles = await productsResponse.json();
+          const data = await productsResponse.json();
 
-          // Filter by category if provided
-          let filteredArticles = articles.filter(
-            (a: { EstEnSommeil: boolean; Fictif: boolean }) => !a.EstEnSommeil && !a.Fictif
-          );
+          // V3: Price ranges come from facets.priceRanges
+          if (data.facets?.priceRanges && data.facets.priceRanges.length > 0) {
+            // Use the facet price ranges directly
+            const ranges = data.facets.priceRanges;
+            // Extract min/max from range values (format: "0-5000", "5000-10000", etc.)
+            const allBounds: number[] = [];
+            ranges.forEach((r: { value: string }) => {
+              const parts = r.value.split('-');
+              if (parts[0]) allBounds.push(parseInt(parts[0], 10) / 100);
+              if (parts[1] && parts[1] !== '') allBounds.push(parseInt(parts[1], 10) / 100);
+            });
 
-          if (categorySlug) {
-            // Need to fetch families to map slug to code
-            const familiesResponse = await fetch(`${API_BASE_URL}/sage/families`);
-            if (familiesResponse.ok) {
-              const families = await familiesResponse.json();
-              const categoryFamily = families.find((f: { Intitule: string }) => {
-                const slug = f.Intitule
-                  .toLowerCase()
-                  .normalize('NFD')
-                  .replace(/[\u0300-\u036f]/g, '')
-                  .replace(/[^a-z0-9]+/g, '-')
-                  .replace(/(^-|-$)/g, '');
-                return slug === categorySlug;
-              });
-
-              if (categoryFamily) {
-                filteredArticles = filteredArticles.filter(
-                  (a: { CodeFamille: string }) => a.CodeFamille === categoryFamily.CodeFamille
-                );
+            if (allBounds.length > 0) {
+              const minPrice = Math.min(...allBounds.filter(n => !isNaN(n)));
+              const maxPrice = Math.max(...allBounds.filter(n => !isNaN(n)));
+              if (maxPrice > minPrice) {
+                setPriceRange({ min: minPrice, max: maxPrice });
+                setPricePresets(generatePricePresets(minPrice, maxPrice));
               }
             }
           }
 
-          // Calculate price range
-          if (filteredArticles.length > 0) {
-            const prices = filteredArticles.map((a: { PrixVente: number }) => a.PrixVente);
-            const minPrice = Math.min(...prices);
-            const maxPrice = Math.max(...prices);
-            setPriceRange({ min: minPrice, max: maxPrice });
-            setPricePresets(generatePricePresets(minPrice, maxPrice));
-          }
-
-          // Extract unique materials (from InfosLibres if available, otherwise leave empty)
-          // Since materials aren't directly available in the current API, we keep an empty array
-          // This can be extended when material data becomes available
+          // V3: Materials could be added as a future facet
+          // For now, leave empty as the schema doesn't include materials
           setMaterials([]);
         }
       } catch (error) {
@@ -252,9 +256,19 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
   // Expanded sections state
   const [expandedSections, setExpandedSections] = useState({
     sort: true,
+    subcategories: true,
+    brands: true,
     price: true,
     materials: true,
+    stock: true,
   });
+
+  // Get current subcategory filter from URL
+  const currentSubcategory = searchParams.get('subcategory') || '';
+  // Get current brand filter from URL (v3: brand_slug field)
+  const currentBrand = searchParams.get('brand') || '';
+  // Get current stock filter from URL (v3: has_stock is string "true"/"false")
+  const currentInStock = searchParams.get('inStock') === 'true';
 
   // Local state for inputs
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
@@ -315,6 +329,34 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
     [updateFilters]
   );
 
+  // Handle subcategory change (v3 hierarchical filtering)
+  const handleSubcategoryChange = useCallback(
+    (subcategoryHandle: string) => {
+      updateFilters({
+        subcategory: subcategoryHandle === currentSubcategory ? null : subcategoryHandle,
+      });
+    },
+    [currentSubcategory, updateFilters]
+  );
+
+  // Handle brand change (v3: brand_slug field)
+  const handleBrandChange = useCallback(
+    (brandSlug: string) => {
+      updateFilters({
+        brand: brandSlug === currentBrand ? null : brandSlug,
+      });
+    },
+    [currentBrand, updateFilters]
+  );
+
+  // Handle stock filter change (v3: has_stock is string "true"/"false")
+  const handleStockChange = useCallback(
+    (checked: boolean) => {
+      updateFilters({ inStock: checked ? 'true' : null });
+    },
+    [updateFilters]
+  );
+
   // Handle price filter
   const applyPriceFilter = useCallback(() => {
     updateFilters({
@@ -352,12 +394,18 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
     currentMaterials.length > 0 ||
     searchParams.has('minPrice') ||
     searchParams.has('maxPrice') ||
+    searchParams.has('subcategory') ||
+    searchParams.has('brand') ||
+    searchParams.has('inStock') ||
     (searchParams.has('sort') && searchParams.get('sort') !== 'newest');
 
   // Count active filters
   const activeFilterCount =
     currentMaterials.length +
     (searchParams.has('minPrice') || searchParams.has('maxPrice') ? 1 : 0) +
+    (searchParams.has('subcategory') ? 1 : 0) +
+    (searchParams.has('brand') ? 1 : 0) +
+    (searchParams.has('inStock') ? 1 : 0) +
     (searchParams.has('sort') && searchParams.get('sort') !== 'newest' ? 1 : 0);
 
   // Check if price preset is selected
@@ -495,6 +543,104 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
         </AnimatePresence>
       </div>
 
+      {/* Subcategories Section - V3 hierarchical faceting */}
+      {subcategoryFacets.length > 0 && (
+        <div className="border-b border-neutral-200 pb-1">
+          <FilterSectionHeader
+            title="Sous-categories"
+            section="subcategories"
+            isExpanded={expandedSections.subcategories}
+          />
+          <AnimatePresence>
+            {expandedSections.subcategories && (
+              <motion.div
+                id="filter-subcategories"
+                variants={filterSectionVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="overflow-hidden"
+              >
+                <div className="space-y-0.5 pb-3">
+                  {subcategoryFacets.map((facet) => {
+                    const isSelected = currentSubcategory === facet.value;
+                    return (
+                      <button
+                        key={facet.value}
+                        onClick={() => handleSubcategoryChange(facet.value)}
+                        className={cn(
+                          'w-full px-2.5 py-1.5 text-left font-sans text-body-sm transition-all duration-150 rounded-sm flex items-center justify-between',
+                          isSelected
+                            ? 'border-l-2 border-accent bg-accent/5 text-accent font-medium'
+                            : 'border-l-2 border-transparent text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                        )}
+                      >
+                        <span>{facet.label}</span>
+                        <span className={cn(
+                          'text-body-xs',
+                          isSelected ? 'text-accent' : 'text-neutral-400'
+                        )}>
+                          ({facet.count})
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Brands Section - V3 brand_slug/brand_name facets */}
+      {brandFacets.length > 0 && (
+        <div className="border-b border-neutral-200 pb-1">
+          <FilterSectionHeader
+            title="Marques"
+            section="brands"
+            isExpanded={expandedSections.brands}
+          />
+          <AnimatePresence>
+            {expandedSections.brands && (
+              <motion.div
+                id="filter-brands"
+                variants={filterSectionVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="overflow-hidden"
+              >
+                <div className="space-y-0.5 pb-3 max-h-48 overflow-y-auto">
+                  {brandFacets.map((facet) => {
+                    const isSelected = currentBrand === facet.value;
+                    return (
+                      <button
+                        key={facet.value}
+                        onClick={() => handleBrandChange(facet.value)}
+                        className={cn(
+                          'w-full px-2.5 py-1.5 text-left font-sans text-body-sm transition-all duration-150 rounded-sm flex items-center justify-between',
+                          isSelected
+                            ? 'border-l-2 border-accent bg-accent/5 text-accent font-medium'
+                            : 'border-l-2 border-transparent text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                        )}
+                      >
+                        <span>{facet.label}</span>
+                        <span className={cn(
+                          'text-body-xs',
+                          isSelected ? 'text-accent' : 'text-neutral-400'
+                        )}>
+                          ({facet.count})
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
       {/* Price Range Section */}
       <div className="border-b border-neutral-200 pb-1">
         <FilterSectionHeader
@@ -601,7 +747,7 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
 
       {/* Materials Section - Only show if materials are available */}
       {materials.length > 0 && (
-        <div className="pb-1">
+        <div className="border-b border-neutral-200 pb-1">
           <FilterSectionHeader
             title="Materiaux"
             section="materials"
@@ -646,6 +792,35 @@ export function CategoryFiltersLight({ className, totalProducts, categorySlug }:
           </AnimatePresence>
         </div>
       )}
+
+      {/* Stock Filter Section - V3: has_stock is string "true"/"false" */}
+      <div className="pb-1">
+        <FilterSectionHeader
+          title="Disponibilite"
+          section="stock"
+          isExpanded={expandedSections.stock}
+        />
+        <AnimatePresence>
+          {expandedSections.stock && (
+            <motion.div
+              id="filter-stock"
+              variants={filterSectionVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="overflow-hidden"
+            >
+              <div className="pb-3">
+                <CustomCheckbox
+                  checked={currentInStock}
+                  onChange={() => handleStockChange(!currentInStock)}
+                  label="En stock uniquement"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Reset Button */}
       <AnimatePresence>

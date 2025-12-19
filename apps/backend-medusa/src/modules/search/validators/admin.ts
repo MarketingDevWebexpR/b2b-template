@@ -10,7 +10,7 @@ import { z } from "zod";
 // SHARED SCHEMAS
 // =============================================================================
 
-export const SearchEngineTypeSchema = z.enum(["meilisearch", "appsearch"]);
+export const SearchEngineTypeSchema = z.enum(["appsearch"]);
 
 export const SyncStatusSchema = z.enum([
   "pending",

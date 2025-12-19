@@ -87,20 +87,25 @@ export async function GET(
   const includeFacets = facets === "true" || facets === "1";
 
   try {
-    // Build filters array for Meilisearch
+    // Build filters array for App Search
     const filters: string[] = [];
 
     if (category) {
-      // Support both handle and ID
+      // Support both handle and ID using the correct indexed field names
       if (category.startsWith("cat_")) {
-        filters.push(`categories.id = "${category}"`);
+        // Use category_ids for ID-based filtering
+        filters.push(`category_ids = "${category}"`);
       } else {
-        filters.push(`categories.handle = "${category}"`);
+        // Use all_category_handles for hierarchical filtering by handle
+        // This allows products in child categories to appear when filtering by parent
+        filters.push(`all_category_handles = "${category}"`);
       }
     }
 
     if (brand) {
-      filters.push(`brand = "${brand}"`);
+      // V3: Use brand_slug for filtering by brand slug
+      // The 'brand' param from frontend contains the slug value
+      filters.push(`brand_slug = "${brand}"`);
     }
 
     if (material) {
@@ -116,11 +121,13 @@ export async function GET(
     }
 
     if (in_stock === "true" || in_stock === "1") {
-      filters.push("has_stock = true");
+      // App Search requires string values for boolean fields
+      filters.push('has_stock = "true"');
     }
 
-    // Always filter to available products
-    filters.push("is_available = true");
+    // NOTE: is_available filter temporarily disabled as products need re-indexing
+    // TODO: Re-run initial-sync-appsearch.ts to fix is_available status
+    // filters.push('is_available = "true"');
 
     if (price_min) {
       const minPrice = parseInt(price_min, 10);
@@ -144,9 +151,10 @@ export async function GET(
       sortOptions.push(`${sortField}:${sortOrder}`);
     }
 
-    // Define facets for product search
+    // Define facets for product search - use correct App Search field names
+    // V3: Include brand_slug for URL-friendly filtering and brand_name for display
     const productFacets = includeFacets
-      ? ["categories.name", "brand", "material", "tags", "has_stock"]
+      ? ["category_names", "brand_name", "brand_slug", "material", "tags", "has_stock"]
       : undefined;
 
     if (type === "products") {

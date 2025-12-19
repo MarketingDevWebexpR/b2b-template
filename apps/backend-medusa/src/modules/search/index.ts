@@ -1,7 +1,7 @@
 /**
  * Search Module
  *
- * Provides full-text search capabilities using Meilisearch.
+ * Provides full-text search capabilities using App Search.
  * Supports product, category, and brand search with faceting.
  */
 

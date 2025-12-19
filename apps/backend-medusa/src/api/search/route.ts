@@ -85,7 +85,7 @@ export async function GET(
   const includeFacets = facets === "true" || facets === "1";
 
   try {
-    // Build filters array for Meilisearch
+    // Build filters array for App Search
     const filters: string[] = [];
 
     if (category) {

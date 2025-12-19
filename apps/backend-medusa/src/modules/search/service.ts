@@ -2,38 +2,29 @@
  * Search Module Service
  *
  * Main service for search functionality in Medusa V2.
- * Supports dual-engine operation (Meilisearch + App Search) for progressive migration.
+ * Uses Elastic App Search for indexing and searching products, categories, and brands.
  * Provides methods for indexing and searching products, categories, etc.
  */
 
 import { MedusaService } from '@medusajs/framework/utils';
 import type { Logger } from '@medusajs/framework/types';
 import type { SearchProvider, SearchResult, SearchOptions, SearchableDocument } from './providers/search-provider.interface';
-import { MeilisearchProvider, type MeilisearchConfig } from './providers/meilisearch-provider';
 import { AppSearchProvider } from './providers/appsearch-provider';
 import { INDEX_NAMES, getIndexSettings } from './utils/index-config';
 import { transformProductForIndex, transformCategoryForIndex, transformMarqueForIndex } from './utils/transformers';
 import type { AppSearchConfig } from './utils/appsearch-config';
 
-export type SearchProviderType = 'meilisearch' | 'appsearch' | 'dual';
+export type SearchProviderType = 'appsearch';
 
 export interface SearchServiceConfig {
-  /** Active search provider: 'meilisearch', 'appsearch', or 'dual' for A/B testing */
+  /** Active search provider: only 'appsearch' is supported */
   provider: SearchProviderType;
-
-  // Meilisearch configuration
-  meilisearchHost?: string;
-  meilisearchApiKey?: string;
-  indexPrefix?: string;
 
   // App Search configuration
   appSearchEndpoint?: string;
   appSearchPrivateKey?: string;
   appSearchPublicKey?: string;
   appSearchEngine?: string;
-
-  /** Traffic percentage to send to App Search in dual mode (0-100) */
-  appSearchTrafficPercentage?: number;
 }
 
 export interface ProductDocument extends SearchableDocument {
@@ -156,28 +147,19 @@ export interface SyncReport {
 export interface SearchEngineStatus {
   provider: SearchProviderType;
   isHealthy: boolean;
-  meilisearch?: {
-    isHealthy: boolean;
-    host: string;
-    indexes: Record<string, { documents: number; isIndexing: boolean }>;
-  };
-  appSearch?: {
+  appSearch: {
     isHealthy: boolean;
     endpoint: string;
     engine: string;
     indexes: Record<string, { documents: number }>;
   };
-  trafficPercentage?: number;
 }
 
 class SearchModuleService extends MedusaService({}) {
-  protected meilisearchProvider_?: SearchProvider;
-  protected appSearchProvider_?: SearchProvider;
-  protected activeProvider_: SearchProviderType;
+  protected appSearchProvider_!: SearchProvider;
   protected logger_: Logger;
   protected config_: SearchServiceConfig;
   protected initialized_: boolean = false;
-  protected appSearchTrafficPercentage_: number = 0;
 
   /** In-memory sync reports (should be persisted to DB in production) */
   protected syncReports_: SyncReport[] = [];
@@ -193,10 +175,8 @@ class SearchModuleService extends MedusaService({}) {
 
     this.logger_ = container.logger as Logger;
     this.config_ = config;
-    this.activeProvider_ = config.provider || 'meilisearch';
-    this.appSearchTrafficPercentage_ = config.appSearchTrafficPercentage || 0;
 
-    // Initialize providers based on configuration
+    // Initialize App Search provider
     this.initializeProviders(config);
   }
 
@@ -208,78 +188,33 @@ class SearchModuleService extends MedusaService({}) {
       warn: (msg: string) => this.logger_.warn(msg),
     };
 
-    // Always initialize Meilisearch if config provided (for dual mode or meilisearch mode)
-    if (config.provider === 'meilisearch' || config.provider === 'dual' || config.meilisearchHost) {
-      const meilisearchConfig: MeilisearchConfig = {
-        host: config.meilisearchHost || process.env.MEILISEARCH_HOST || 'http://localhost:7700',
-        apiKey: config.meilisearchApiKey || process.env.MEILISEARCH_API_KEY || '',
-        indexPrefix: config.indexPrefix || process.env.MEILISEARCH_INDEX_PREFIX || 'bijoux_',
-      };
-      this.meilisearchProvider_ = new MeilisearchProvider(meilisearchConfig);
+    // Initialize App Search provider
+    const appSearchConfig: AppSearchConfig = {
+      endpoint: config.appSearchEndpoint || process.env.APPSEARCH_ENDPOINT || '',
+      privateApiKey: config.appSearchPrivateKey || process.env.APPSEARCH_PRIVATE_KEY || '',
+      publicSearchKey: config.appSearchPublicKey || process.env.APPSEARCH_PUBLIC_KEY || '',
+      engineName: config.appSearchEngine || process.env.APPSEARCH_ENGINE || 'dev-medusa-v2',
+    };
+
+    if (!appSearchConfig.endpoint || !appSearchConfig.privateApiKey) {
+      throw new Error('App Search endpoint and private API key are required');
     }
 
-    // Initialize App Search if config provided
-    if (config.provider === 'appsearch' || config.provider === 'dual' || config.appSearchEndpoint) {
-      const appSearchConfig: AppSearchConfig = {
-        endpoint: config.appSearchEndpoint || process.env.APPSEARCH_ENDPOINT || '',
-        privateApiKey: config.appSearchPrivateKey || process.env.APPSEARCH_PRIVATE_KEY || '',
-        publicSearchKey: config.appSearchPublicKey || process.env.APPSEARCH_PUBLIC_KEY || '',
-        engineName: config.appSearchEngine || process.env.APPSEARCH_ENGINE || 'dev-medusa-v2',
-      };
-
-      if (appSearchConfig.endpoint && appSearchConfig.privateApiKey) {
-        this.appSearchProvider_ = new AppSearchProvider(appSearchConfig, loggerAdapter);
-      }
-    }
-
-    // Validate provider configuration
-    if (config.provider === 'appsearch' && !this.appSearchProvider_) {
-      throw new Error('App Search configuration is required when provider is set to "appsearch"');
-    }
-
-    if (config.provider === 'meilisearch' && !this.meilisearchProvider_) {
-      throw new Error('Meilisearch configuration is required when provider is set to "meilisearch"');
-    }
-
-    if (config.provider === 'dual' && (!this.meilisearchProvider_ || !this.appSearchProvider_)) {
-      throw new Error('Both Meilisearch and App Search configuration required for dual mode');
-    }
+    this.appSearchProvider_ = new AppSearchProvider(appSearchConfig, loggerAdapter);
   }
 
   /**
    * Get the active provider for queries
-   * In dual mode, routes traffic based on percentage
    */
   private getQueryProvider(): SearchProvider {
-    if (this.activeProvider_ === 'dual') {
-      // Route traffic based on percentage
-      const useAppSearch = Math.random() * 100 < this.appSearchTrafficPercentage_;
-      const provider = useAppSearch ? this.appSearchProvider_! : this.meilisearchProvider_!;
-      this.logger_.debug(`[Search] Query routed to ${provider.name} (traffic split: ${this.appSearchTrafficPercentage_}% App Search)`);
-      return provider;
-    }
-
-    if (this.activeProvider_ === 'appsearch') {
-      return this.appSearchProvider_!;
-    }
-
-    return this.meilisearchProvider_!;
+    return this.appSearchProvider_;
   }
 
   /**
    * Get all providers for indexing operations
-   * In dual mode, index to both engines
    */
   private getIndexingProviders(): SearchProvider[] {
-    if (this.activeProvider_ === 'dual') {
-      return [this.meilisearchProvider_!, this.appSearchProvider_!].filter(Boolean);
-    }
-
-    if (this.activeProvider_ === 'appsearch') {
-      return [this.appSearchProvider_!];
-    }
-
-    return [this.meilisearchProvider_!];
+    return [this.appSearchProvider_];
   }
 
   // ============================================
@@ -290,46 +225,7 @@ class SearchModuleService extends MedusaService({}) {
    * Get current active provider type
    */
   getActiveProvider(): SearchProviderType {
-    return this.activeProvider_;
-  }
-
-  /**
-   * Switch active provider
-   */
-  async switchProvider(provider: SearchProviderType): Promise<void> {
-    if (provider === 'appsearch' && !this.appSearchProvider_) {
-      throw new Error('App Search provider not configured');
-    }
-
-    if (provider === 'meilisearch' && !this.meilisearchProvider_) {
-      throw new Error('Meilisearch provider not configured');
-    }
-
-    if (provider === 'dual' && (!this.meilisearchProvider_ || !this.appSearchProvider_)) {
-      throw new Error('Both providers must be configured for dual mode');
-    }
-
-    const previousProvider = this.activeProvider_;
-    this.activeProvider_ = provider;
-    this.logger_.info(`Search provider switched from '${previousProvider}' to '${provider}'`);
-  }
-
-  /**
-   * Set App Search traffic percentage in dual mode
-   */
-  setAppSearchTrafficPercentage(percentage: number): void {
-    if (percentage < 0 || percentage > 100) {
-      throw new Error('Traffic percentage must be between 0 and 100');
-    }
-    this.appSearchTrafficPercentage_ = percentage;
-    this.logger_.info(`App Search traffic percentage set to ${percentage}%`);
-  }
-
-  /**
-   * Get App Search traffic percentage
-   */
-  getAppSearchTrafficPercentage(): number {
-    return this.appSearchTrafficPercentage_;
+    return 'appsearch';
   }
 
   /**
@@ -338,26 +234,11 @@ class SearchModuleService extends MedusaService({}) {
    */
   getEngineStatus(): {
     mode: SearchProviderType;
-    activeProvider: 'meilisearch' | 'appsearch';
-    secondaryProvider: 'meilisearch' | 'appsearch' | null;
-    appSearchTrafficPercentage: number;
+    activeProvider: 'appsearch';
   } {
-    const mode = this.activeProvider_;
-    let activeProvider: 'meilisearch' | 'appsearch' = 'meilisearch';
-    let secondaryProvider: 'meilisearch' | 'appsearch' | null = null;
-
-    if (mode === 'dual') {
-      activeProvider = 'meilisearch';
-      secondaryProvider = 'appsearch';
-    } else if (mode === 'appsearch') {
-      activeProvider = 'appsearch';
-    }
-
     return {
-      mode,
-      activeProvider,
-      secondaryProvider,
-      appSearchTrafficPercentage: this.appSearchTrafficPercentage_,
+      mode: 'appsearch',
+      activeProvider: 'appsearch',
     };
   }
 
@@ -365,85 +246,41 @@ class SearchModuleService extends MedusaService({}) {
    * Get comprehensive search engine status with health checks (async)
    */
   async getEngineStatusDetailed(): Promise<SearchEngineStatus> {
-    const status: SearchEngineStatus = {
-      provider: this.activeProvider_,
-      isHealthy: false,
-    };
+    try {
+      const isHealthy = await this.appSearchProvider_.isHealthy();
+      const indexes: Record<string, { documents: number }> = {};
 
-    // Check Meilisearch health
-    if (this.meilisearchProvider_) {
-      try {
-        const isHealthy = await this.meilisearchProvider_.isHealthy();
-        const indexes: Record<string, { documents: number; isIndexing: boolean }> = {};
-
-        for (const indexName of Object.values(INDEX_NAMES)) {
-          try {
-            const stats = await this.meilisearchProvider_.getIndexStats(indexName);
-            indexes[indexName] = {
-              documents: stats.numberOfDocuments,
-              isIndexing: stats.isIndexing,
-            };
-          } catch {
-            indexes[indexName] = { documents: 0, isIndexing: false };
-          }
+      for (const indexName of Object.values(INDEX_NAMES)) {
+        try {
+          const stats = await this.appSearchProvider_.getIndexStats(indexName);
+          indexes[indexName] = { documents: stats.numberOfDocuments };
+        } catch {
+          indexes[indexName] = { documents: 0 };
         }
-
-        status.meilisearch = {
-          isHealthy,
-          host: this.config_.meilisearchHost || 'http://localhost:7700',
-          indexes,
-        };
-      } catch {
-        status.meilisearch = {
-          isHealthy: false,
-          host: this.config_.meilisearchHost || 'http://localhost:7700',
-          indexes: {},
-        };
       }
-    }
 
-    // Check App Search health
-    if (this.appSearchProvider_) {
-      try {
-        const isHealthy = await this.appSearchProvider_.isHealthy();
-        const indexes: Record<string, { documents: number }> = {};
-
-        for (const indexName of Object.values(INDEX_NAMES)) {
-          try {
-            const stats = await this.appSearchProvider_.getIndexStats(indexName);
-            indexes[indexName] = { documents: stats.numberOfDocuments };
-          } catch {
-            indexes[indexName] = { documents: 0 };
-          }
-        }
-
-        status.appSearch = {
+      return {
+        provider: 'appsearch',
+        isHealthy,
+        appSearch: {
           isHealthy,
           endpoint: this.config_.appSearchEndpoint || '',
           engine: this.config_.appSearchEngine || 'dev-medusa-v2',
           indexes,
-        };
-      } catch {
-        status.appSearch = {
+        },
+      };
+    } catch {
+      return {
+        provider: 'appsearch',
+        isHealthy: false,
+        appSearch: {
           isHealthy: false,
           endpoint: this.config_.appSearchEndpoint || '',
           engine: this.config_.appSearchEngine || 'dev-medusa-v2',
           indexes: {},
-        };
-      }
+        },
+      };
     }
-
-    // Overall health
-    if (this.activeProvider_ === 'dual') {
-      status.isHealthy = (status.meilisearch?.isHealthy || false) && (status.appSearch?.isHealthy || false);
-      status.trafficPercentage = this.appSearchTrafficPercentage_;
-    } else if (this.activeProvider_ === 'appsearch') {
-      status.isHealthy = status.appSearch?.isHealthy || false;
-    } else {
-      status.isHealthy = status.meilisearch?.isHealthy || false;
-    }
-
-    return status;
   }
 
   // ============================================
@@ -491,7 +328,7 @@ class SearchModuleService extends MedusaService({}) {
   ): SyncReport {
     const report: SyncReport = {
       id: `sync_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-      engine: this.activeProvider_,
+      engine: 'appsearch',
       syncType,
       entityType,
       status: 'in_progress',

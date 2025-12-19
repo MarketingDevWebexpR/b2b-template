@@ -9,9 +9,9 @@
  * Response:
  * {
  *   tree: CategoryTreeNode[],      // Hierarchical structure
- *   flat: MeilisearchCategory[],   // Flat array sorted by depth/rank
- *   byId: Record<string, MeilisearchCategory>, // ID lookup map
- *   byHandle: Record<string, MeilisearchCategory>, // Handle lookup map
+ *   flat: IndexedCategory[],   // Flat array sorted by depth/rank
+ *   byId: Record<string, IndexedCategory>, // ID lookup map
+ *   byHandle: Record<string, IndexedCategory>, // Handle lookup map
  *   total: number,                 // Total category count
  *   maxDepth: number               // Maximum tree depth
  * }
@@ -20,7 +20,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import type { MeilisearchCategory, CategoryResponse } from '@/types/category';
+import type { IndexedCategory, CategoryResponse } from '@/types/category';
 import { buildCategoryResponse } from '@/lib/categories/build-tree';
 
 // ============================================================================
@@ -30,19 +30,25 @@ import { buildCategoryResponse } from '@/lib/categories/build-tree';
 export const runtime = 'edge';
 export const revalidate = 3600; // Cache for 1 hour
 
-const APPSEARCH_ENDPOINT = process.env.APPSEARCH_ENDPOINT || '';
-const APPSEARCH_PUBLIC_KEY = process.env.APPSEARCH_PUBLIC_KEY || '';
-const APPSEARCH_ENGINE = process.env.APPSEARCH_ENGINE || 'dev-medusa-v2';
-
-// Fallback to Meilisearch if App Search not configured
-const MEILISEARCH_URL = process.env.NEXT_PUBLIC_MEILISEARCH_URL || 'http://localhost:7700';
-const MEILISEARCH_API_KEY = process.env.MEILISEARCH_API_KEY || '';
-const CATEGORIES_INDEX = process.env.MEILISEARCH_CATEGORIES_INDEX || 'bijoux_categories';
+const APPSEARCH_ENDPOINT = process.env.APPSEARCH_ENDPOINT || 'https://elasticsearch-webexpr.ent.europe-west1.gcp.cloud.es.io';
+const APPSEARCH_PUBLIC_KEY = process.env.APPSEARCH_PUBLIC_KEY || 'search-smojpz6bs5oufe3g9krdupke';
+const APPSEARCH_ENGINE = process.env.APPSEARCH_ENGINE || 'dev-medusa-v3';
 
 // ============================================================================
 // App Search Types
 // ============================================================================
 
+/**
+ * App Search v3 result structure for categories
+ *
+ * V3 schema:
+ * - `doc_type` is "categories" (plural)
+ * - `path`: URL path (e.g., "/plomberie/robinetterie/mitigeurs")
+ * - `depth`: Hierarchy depth (0-4)
+ * - `ancestor_handles`: Array of parent handles for breadcrumbs
+ *
+ * Note: `category_lvl0-4` fields exist only on PRODUCTS, not on categories
+ */
 interface AppSearchResult {
   id: { raw: string };
   doc_type: { raw: string };
@@ -52,12 +58,27 @@ interface AppSearchResult {
   description?: { raw: string };
   icon?: { raw: string };
   image_url?: { raw: string };
+  // V3: Parent category reference
   parent_category_id?: { raw: string };
   parent_category_ids?: { raw: string[] };
+  // V3: URL path (e.g., "/plomberie/robinetterie")
+  path?: { raw: string };
   full_path?: { raw: string };
+  // V3: Ancestor arrays for breadcrumb building
   ancestor_names?: { raw: string[] };
   ancestor_handles?: { raw: string[] };
+  // V3: InstantSearch-style hierarchical category levels
+  // These are ">" separated strings, e.g., "Plomberie > Robinetterie > Mitigeurs"
+  category_lvl0?: { raw: string };
+  category_lvl1?: { raw: string };
+  category_lvl2?: { raw: string };
+  category_lvl3?: { raw: string };
+  category_lvl4?: { raw: string };
+  // V3: All category handles for hierarchical filtering
+  all_category_handles?: { raw: string[] };
+  // V3: depth as string (will be parsed to number)
   depth?: { raw: string };
+  // V3: Boolean fields as strings ("true"/"false")
   is_active?: { raw: string };
   rank?: { raw: string };
   product_count?: { raw: string };
@@ -81,11 +102,11 @@ interface AppSearchResponse {
 /**
  * Fetch all categories from App Search
  */
-async function fetchCategoriesFromAppSearch(): Promise<MeilisearchCategory[]> {
+async function fetchCategoriesFromAppSearch(): Promise<IndexedCategory[]> {
   const searchUrl = `${APPSEARCH_ENDPOINT}/api/as/v1/engines/${APPSEARCH_ENGINE}/search`;
 
   // Fetch all categories with pagination (App Search max 100 per page)
-  const allCategories: MeilisearchCategory[] = [];
+  const allCategories: IndexedCategory[] = [];
   let currentPage = 1;
   let hasMorePages = true;
 
@@ -98,19 +119,20 @@ async function fetchCategoriesFromAppSearch(): Promise<MeilisearchCategory[]> {
       },
       body: JSON.stringify({
         query: '',
+        // V3: doc_type is "categories" (plural)
         filters: { doc_type: 'categories' },
         result_fields: {
           id: { raw: {} },
           doc_type: { raw: {} },
           name: { raw: {} },
-          name_en: { raw: {} },
           handle: { raw: {} },
           description: { raw: {} },
           icon: { raw: {} },
           image_url: { raw: {} },
           parent_category_id: { raw: {} },
           parent_category_ids: { raw: {} },
-          full_path: { raw: {} },
+          // V3 hierarchical fields
+          path: { raw: {} },
           ancestor_names: { raw: {} },
           ancestor_handles: { raw: {} },
           depth: { raw: {} },
@@ -119,7 +141,6 @@ async function fetchCategoriesFromAppSearch(): Promise<MeilisearchCategory[]> {
           product_count: { raw: {} },
           metadata: { raw: {} },
           created_at: { raw: {} },
-          updated_at: { raw: {} },
         },
         page: { current: currentPage, size: 100 },
       }),
@@ -148,113 +169,69 @@ async function fetchCategoriesFromAppSearch(): Promise<MeilisearchCategory[]> {
 }
 
 /**
- * Map App Search result to MeilisearchCategory type
+ * Map App Search v3 result to IndexedCategory type
+ *
+ * V3 schema includes:
+ * - `doc_type: "categories"` (plural)
+ * - `path`: URL path (e.g., "/plomberie/robinetterie")
+ * - `depth`: Hierarchy level (0-4)
+ * - `parent_category_id`: Reference to parent
+ * - `ancestor_handles`: Array of parent handles for breadcrumbs
+ *
+ * Note: `category_lvl0-4` exist only on products, not on categories
+ *
+ * @param result - Raw App Search result
+ * @returns Mapped IndexedCategory for frontend consumption
  */
-function mapAppSearchResultToCategory(result: AppSearchResult): MeilisearchCategory {
-  const fullPath = result.full_path?.raw || result.name?.raw || '';
-
+function mapAppSearchResultToCategory(result: AppSearchResult): IndexedCategory {
   return {
     id: result.id?.raw || '',
     name: result.name?.raw || '',
-    name_en: result.name_en?.raw || undefined,
     handle: result.handle?.raw || '',
     description: result.description?.raw || null,
     icon: result.icon?.raw || null,
     image_url: result.image_url?.raw || null,
+    // V3: Parent reference for tree building
     parent_category_id: result.parent_category_id?.raw || null,
     parent_category_ids: result.parent_category_ids?.raw || [],
-    path: fullPath,
-    full_path: fullPath,
+    // V3: Path is the display path (e.g., "Outillage > Électroportatif > Visseuses à Chocs")
+    path: result.path?.raw || result.name?.raw || '',
+    // V3: Ancestor arrays for navigation
     ancestor_names: result.ancestor_names?.raw || [],
     ancestor_handles: result.ancestor_handles?.raw || [],
+    // V3: Depth field (0-4) - critical for tree building
     depth: parseInt(result.depth?.raw || '0', 10),
     is_active: result.is_active?.raw === 'true',
     rank: parseInt(result.rank?.raw || '0', 10),
     product_count: parseInt(result.product_count?.raw || '0', 10),
     metadata: result.metadata?.raw || undefined,
     created_at: result.created_at?.raw || undefined,
-    updated_at: result.updated_at?.raw || undefined,
   };
 }
 
-// ============================================================================
-// Meilisearch Fallback Client
-// ============================================================================
-
-interface MeilisearchSearchResponse {
-  hits: Array<{
-    id: string;
-    name: string;
-    handle: string;
-    description: string | null;
-    icon: string | null;
-    image_url: string | null;
-    parent_category_id: string | null;
-    parent_category_ids: string[];
-    path: string;
-    ancestor_names: string[];
-    ancestor_handles: string[];
-    depth: number;
-    is_active: boolean;
-    rank: number;
-    product_count: number;
-    created_at?: string;
-    updated_at?: string;
-  }>;
-  query: string;
-  processingTimeMs: number;
-  limit: number;
-  offset: number;
-  estimatedTotalHits: number;
-}
-
 /**
- * Fallback: Fetch categories from Meilisearch if App Search is not configured
+ * Build display path from V3 category_lvl fields
+ *
+ * V3 indexes categories with InstantSearch-style hierarchical fields:
+ * - category_lvl0: "Plomberie"
+ * - category_lvl1: "Plomberie > Robinetterie"
+ * - category_lvl2: "Plomberie > Robinetterie > Mitigeurs"
+ *
+ * This function returns the deepest level as the display path.
+ *
+ * @param result - App Search result with category_lvl fields
+ * @returns Display path string or empty string
  */
-async function fetchCategoriesFromMeilisearch(): Promise<MeilisearchCategory[]> {
-  const searchUrl = `${MEILISEARCH_URL}/indexes/${CATEGORIES_INDEX}/search`;
-
-  const response = await fetch(searchUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(MEILISEARCH_API_KEY && { Authorization: `Bearer ${MEILISEARCH_API_KEY}` }),
-    },
-    body: JSON.stringify({
-      q: '',
-      limit: 1000,
-      sort: ['depth:asc', 'rank:asc'],
-      filter: 'is_active = true',
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[Categories API] Meilisearch error: ${response.status}`, errorText);
-    throw new Error(`Meilisearch request failed: ${response.status}`);
-  }
-
-  const data: MeilisearchSearchResponse = await response.json();
-  return data.hits.map((hit) => ({
-    id: hit.id,
-    name: hit.name,
-    handle: hit.handle,
-    description: hit.description ?? null,
-    icon: hit.icon ?? null,
-    image_url: hit.image_url ?? null,
-    parent_category_id: hit.parent_category_id ?? null,
-    parent_category_ids: hit.parent_category_ids ?? [],
-    path: hit.path ?? hit.name,
-    ancestor_names: hit.ancestor_names ?? [],
-    ancestor_handles: hit.ancestor_handles ?? [],
-    depth: hit.depth ?? 0,
-    is_active: hit.is_active ?? true,
-    rank: hit.rank ?? 0,
-    product_count: hit.product_count ?? 0,
-    created_at: hit.created_at,
-    updated_at: hit.updated_at,
-  }));
+function buildDisplayPathFromLevels(result: AppSearchResult): string {
+  // Return the deepest available level (most specific path)
+  if (result.category_lvl4?.raw) return result.category_lvl4.raw;
+  if (result.category_lvl3?.raw) return result.category_lvl3.raw;
+  if (result.category_lvl2?.raw) return result.category_lvl2.raw;
+  if (result.category_lvl1?.raw) return result.category_lvl1.raw;
+  if (result.category_lvl0?.raw) return result.category_lvl0.raw;
+  return '';
 }
+
 
 // ============================================================================
 // Route Handler
@@ -262,16 +239,8 @@ async function fetchCategoriesFromMeilisearch(): Promise<MeilisearchCategory[]> 
 
 export async function GET(): Promise<NextResponse<CategoryResponse | { error: string }>> {
   try {
-    let categories: MeilisearchCategory[];
-
-    // Use App Search if configured, otherwise fallback to Meilisearch
-    if (APPSEARCH_ENDPOINT && APPSEARCH_PUBLIC_KEY) {
-      console.log('[Categories API] Fetching from App Search');
-      categories = await fetchCategoriesFromAppSearch();
-    } else {
-      console.log('[Categories API] Fetching from Meilisearch (fallback)');
-      categories = await fetchCategoriesFromMeilisearch();
-    }
+    console.log('[Categories API] Fetching from App Search');
+    const categories = await fetchCategoriesFromAppSearch();
 
     // Build complete response with tree structure
     const response = buildCategoryResponse(categories);

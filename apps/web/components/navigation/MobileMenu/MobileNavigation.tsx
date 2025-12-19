@@ -5,6 +5,13 @@
  *
  * Wrapper component that connects MobileDrawer to the categories API.
  * Handles data fetching and transformation for the mobile menu.
+ *
+ * Compatible with App Search v3 category schema:
+ * - depth: 0-4 indicating hierarchy level (supports 5-level navigation)
+ * - parent_category_id: reference to parent
+ * - path: full path like "Plomberie > Robinetterie > Mitigeurs"
+ * - ancestor_handles/ancestor_names: for URL and breadcrumb construction
+ * - product_count: total products including descendants
  */
 
 import { memo, useMemo, useCallback } from 'react';
@@ -28,19 +35,27 @@ export interface MobileNavigationProps {
 // ============================================================================
 
 /**
- * Transform CategoryTreeNode to CategoryData format for mobile menu
- */
-/**
- * Build hierarchical URL path for a category
- * Uses ancestor_handles to construct full path like /c/bijoux/colliers/or
+ * Build hierarchical URL path for a category using v3 ancestor_handles
+ * Constructs full path like /categorie/bijoux/colliers/or
+ *
+ * @param node - Category tree node with v3 fields
+ * @returns Full URL path for the category
  */
 function buildCategoryPath(node: CategoryTreeNode): string {
+  // Use ancestor_handles from v3 API if available for accurate path construction
   const handles = node.ancestor_handles && node.ancestor_handles.length > 0
     ? [...node.ancestor_handles, node.handle]
     : [node.handle];
   return `/categorie/${handles.join('/')}`;
 }
 
+/**
+ * Transform CategoryTreeNode to CategoryData format for mobile menu
+ * Maps v3 fields: depth, path, ancestor_handles, product_count
+ *
+ * @param node - Category tree node from API
+ * @returns CategoryData for mobile navigation
+ */
 function transformToMobileCategoryData(node: CategoryTreeNode): CategoryData {
   return {
     id: node.id,
@@ -48,6 +63,7 @@ function transformToMobileCategoryData(node: CategoryTreeNode): CategoryData {
     href: buildCategoryPath(node),
     icon: node.icon || undefined,
     productCount: node.product_count,
+    // Recursively transform children (supports full 5-level hierarchy L1-L5)
     children: node.children?.map(transformToMobileCategoryData),
   };
 }

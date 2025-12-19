@@ -37,19 +37,8 @@ export async function GET(
   const logger = req.scope.resolve("logger");
 
   try {
-    // Check health of Meilisearch
-    const meilisearchHealth = await checkEngineHealth(searchService, "meilisearch");
-
-    // Initialize engines object
-    const engines: { meilisearch: EngineHealth; appsearch?: EngineHealth } = {
-      meilisearch: meilisearchHealth,
-    };
-
-    // Check App Search if configured
-    const appsearchConfigured = Boolean(process.env.APPSEARCH_ENDPOINT);
-    if (appsearchConfigured) {
-      engines.appsearch = await checkAppSearchHealth();
-    }
+    // Check App Search health
+    const appsearchHealth = await checkAppSearchHealth();
 
     // Get current configuration
     const configuration = getEngineConfiguration(searchService);
@@ -58,25 +47,14 @@ export async function GET(
     const lastSync = await getLastSyncReport(searchService);
 
     // Determine overall status
-    const activeEngine = configuration.active_engine;
-    const activeEngineHealth = engines[activeEngine];
-    let status: "healthy" | "degraded" | "unhealthy" = "healthy";
-
-    if (!activeEngineHealth?.healthy) {
-      status = "unhealthy";
-    } else if (
-      configuration.dual_write_enabled &&
-      configuration.secondary_engine &&
-      engines[configuration.secondary_engine] &&
-      !engines[configuration.secondary_engine]?.healthy
-    ) {
-      status = "degraded";
-    }
+    const status: "healthy" | "unhealthy" = appsearchHealth.healthy ? "healthy" : "unhealthy";
 
     const response: SearchStatusResponse = {
       status,
       configuration,
-      engines,
+      engines: {
+        appsearch: appsearchHealth,
+      },
       last_sync: lastSync,
       timestamp: new Date().toISOString(),
     };
@@ -92,36 +70,6 @@ export async function GET(
       details: { error: error instanceof Error ? error.message : "Unknown error" },
       timestamp: new Date().toISOString(),
     });
-  }
-}
-
-/**
- * Check health of Meilisearch via SearchModuleService
- */
-async function checkEngineHealth(
-  searchService: SearchModuleService,
-  engine: "meilisearch" | "appsearch"
-): Promise<EngineHealth> {
-  const startTime = Date.now();
-
-  try {
-    const healthy = await searchService.isHealthy();
-    const latency = Date.now() - startTime;
-
-    return {
-      engine,
-      healthy,
-      latency_ms: latency,
-      last_check_at: new Date().toISOString(),
-    };
-  } catch (error) {
-    return {
-      engine,
-      healthy: false,
-      latency_ms: Date.now() - startTime,
-      last_check_at: new Date().toISOString(),
-      error: error instanceof Error ? error.message : "Connection failed",
-    };
   }
 }
 
@@ -196,12 +144,12 @@ function getEngineConfiguration(searchService: SearchModuleService): EngineConfi
   const engineStatus = searchService.getEngineStatus();
 
   return {
-    active_engine: engineStatus.activeProvider as "meilisearch" | "appsearch",
-    secondary_engine: engineStatus.secondaryProvider as "meilisearch" | "appsearch" | null,
-    dual_write_enabled: engineStatus.mode === "dual",
-    appsearch_traffic_percentage: engineStatus.appSearchTrafficPercentage,
-    last_switch_at: null, // Would come from database
-    last_switch_by: null, // Would come from database
+    active_engine: "appsearch",
+    secondary_engine: null,
+    dual_write_enabled: false,
+    appsearch_traffic_percentage: 100,
+    last_switch_at: null,
+    last_switch_by: null,
   };
 }
 

@@ -21,15 +21,12 @@ import type { MetadataRoute } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sage-portal.webexpr.dev';
 const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || 'http://localhost:9000';
-const MEILISEARCH_URL = process.env.NEXT_PUBLIC_MEILISEARCH_URL || 'http://localhost:7700';
-const MEILISEARCH_API_KEY = process.env.MEILISEARCH_API_KEY || '';
-const CATEGORIES_INDEX = process.env.MEILISEARCH_CATEGORIES_INDEX || 'bijoux_categories';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-interface MeilisearchCategory {
+interface IndexedCategory {
   id: string;
   name: string;
   handle: string;
@@ -37,11 +34,6 @@ interface MeilisearchCategory {
   depth: number;
   is_active: boolean;
   updated_at?: string;
-}
-
-interface MeilisearchSearchResponse {
-  hits: MeilisearchCategory[];
-  estimatedTotalHits: number;
 }
 
 interface MedusaMarque {
@@ -72,22 +64,12 @@ interface MedusaProductsResponse {
 // ============================================================================
 
 /**
- * Fetch all active categories from Meilisearch
+ * Fetch all active categories from backend API
  */
-async function fetchCategories(): Promise<MeilisearchCategory[]> {
+async function fetchCategories(): Promise<IndexedCategory[]> {
   try {
-    const response = await fetch(`${MEILISEARCH_URL}/indexes/${CATEGORIES_INDEX}/search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(MEILISEARCH_API_KEY && { Authorization: `Bearer ${MEILISEARCH_API_KEY}` }),
-      },
-      body: JSON.stringify({
-        q: '',
-        limit: 1000,
-        sort: ['depth:asc', 'rank:asc'],
-        filter: 'is_active = true',
-      }),
+    const response = await fetch(`${MEDUSA_BACKEND_URL}/store/product-categories`, {
+      headers: { 'Content-Type': 'application/json' },
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
@@ -96,8 +78,24 @@ async function fetchCategories(): Promise<MeilisearchCategory[]> {
       return [];
     }
 
-    const data: MeilisearchSearchResponse = await response.json();
-    return data.hits;
+    const data = await response.json();
+    return (data.product_categories || []).map((cat: {
+      id: string;
+      name: string;
+      handle: string;
+      parent_category_id: string | null;
+      is_active: boolean;
+      updated_at?: string;
+      metadata?: { rank?: number; ancestor_handles?: string[]; depth?: number };
+    }) => ({
+      id: cat.id,
+      name: cat.name,
+      handle: cat.handle,
+      ancestor_handles: cat.metadata?.ancestor_handles || [],
+      depth: cat.metadata?.depth || 0,
+      is_active: cat.is_active,
+      updated_at: cat.updated_at,
+    }));
   } catch (error) {
     console.error('[Sitemap] Error fetching categories:', error);
     return [];
@@ -179,7 +177,7 @@ async function fetchProducts(): Promise<MedusaProduct[]> {
  * Build category URL with full hierarchy path
  * e.g., /categorie/bijoux or /categorie/bijoux/colliers
  */
-function buildCategoryUrl(category: MeilisearchCategory): string {
+function buildCategoryUrl(category: IndexedCategory): string {
   const pathParts = [...category.ancestor_handles, category.handle];
   return `/categorie/${pathParts.join('/')}`;
 }

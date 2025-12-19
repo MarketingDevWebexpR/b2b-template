@@ -3,8 +3,8 @@
 /**
  * SearchResultsLive Component
  *
- * Live search results using real Meilisearch API through Medusa backend.
- * Replaces mock data with real product data.
+ * Live search results using search API through Medusa backend.
+ * Displays real product data from the backend search service.
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';

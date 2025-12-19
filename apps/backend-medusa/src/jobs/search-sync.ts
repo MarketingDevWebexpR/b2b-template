@@ -1,7 +1,7 @@
 /**
  * Search Sync Scheduled Job
  *
- * Periodically synchronizes data to search engines (Meilisearch/App Search).
+ * Periodically synchronizes data to App Search.
  * Runs every 5 minutes by default (configurable via SEARCH_SYNC_INTERVAL_MINUTES).
  *
  * Features:
@@ -320,18 +320,26 @@ async function syncProducts(
           "updated_at",
           "metadata",
           "images.url",
+          // Categories with full 5-level parent hierarchy (depth 0-4)
           "categories.id",
           "categories.name",
           "categories.handle",
+          // Level 1 parent
           "categories.parent_category.id",
           "categories.parent_category.name",
           "categories.parent_category.handle",
+          // Level 2 parent
           "categories.parent_category.parent_category.id",
           "categories.parent_category.parent_category.name",
           "categories.parent_category.parent_category.handle",
+          // Level 3 parent
           "categories.parent_category.parent_category.parent_category.id",
           "categories.parent_category.parent_category.parent_category.name",
           "categories.parent_category.parent_category.parent_category.handle",
+          // Level 4 parent (for depth-4 categories)
+          "categories.parent_category.parent_category.parent_category.parent_category.id",
+          "categories.parent_category.parent_category.parent_category.parent_category.name",
+          "categories.parent_category.parent_category.parent_category.parent_category.handle",
           "tags.id",
           "tags.value",
           "collection.id",
@@ -409,6 +417,8 @@ async function syncCategories(
         filters.updated_at = { $gte: sinceDate.toISOString() };
       }
 
+      // Fetch categories with full 5-level parent hierarchy (depth 0-4)
+      // Each level needs id, name, handle for proper path building
       const { data: categories } = await query.graph({
         entity: "product_category",
         fields: [
@@ -420,15 +430,22 @@ async function syncCategories(
           "rank",
           "created_at",
           "metadata",
+          // Level 1 parent
           "parent_category.id",
           "parent_category.name",
           "parent_category.handle",
+          // Level 2 parent
           "parent_category.parent_category.id",
           "parent_category.parent_category.name",
           "parent_category.parent_category.handle",
+          // Level 3 parent
           "parent_category.parent_category.parent_category.id",
           "parent_category.parent_category.parent_category.name",
           "parent_category.parent_category.parent_category.handle",
+          // Level 4 parent (for depth-4 categories which need 4 ancestors)
+          "parent_category.parent_category.parent_category.parent_category.id",
+          "parent_category.parent_category.parent_category.parent_category.name",
+          "parent_category.parent_category.parent_category.parent_category.handle",
         ],
         filters,
         pagination: {

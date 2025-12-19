@@ -55,6 +55,7 @@ export function ProductFilters({
     categoryTree,
     clearFilters,
     removeFilter,
+    clearHierarchicalCategory,
     activeFilterCount,
     hasActiveFilters,
   } = useSearchFilters();
@@ -75,16 +76,28 @@ export function ProductFilters({
       return null;
     };
 
-    // Category filters
-    filters.categories.forEach((categoryId) => {
-      const name = findCategoryName(categoryId, categoryTree) ?? categoryId;
+    // Hierarchical category filter (v3)
+    if (filters.hierarchicalCategory) {
       chips.push({
         type: 'category',
-        id: categoryId,
-        label: `Categorie: ${name}`,
-        value: categoryId,
+        id: 'hierarchical-category',
+        label: `Categorie: ${filters.hierarchicalCategory.pathString}`,
+        value: filters.hierarchicalCategory.pathString,
       });
-    });
+    }
+
+    // Legacy category filters (only if no hierarchical category is set)
+    if (!filters.hierarchicalCategory) {
+      filters.categories.forEach((categoryId) => {
+        const name = findCategoryName(categoryId, categoryTree) ?? categoryId;
+        chips.push({
+          type: 'category',
+          id: categoryId,
+          label: `Categorie: ${name}`,
+          value: categoryId,
+        });
+      });
+    }
 
     // Brand filters
     const brandFacet = facets.find((f) => f.id === 'brand');
@@ -144,7 +157,12 @@ export function ProductFilters({
     (chip: ActiveFilterChip) => {
       switch (chip.type) {
         case 'category':
-          removeFilter('category', chip.value);
+          // Handle hierarchical category vs legacy category
+          if (chip.id === 'hierarchical-category') {
+            clearHierarchicalCategory();
+          } else {
+            removeFilter('category', chip.value);
+          }
           break;
         case 'brand':
           removeFilter('brand', chip.value);
@@ -162,7 +180,7 @@ export function ProductFilters({
           break;
       }
     },
-    [removeFilter]
+    [removeFilter, clearHierarchicalCategory]
   );
 
   // Handle clearing all filters
@@ -269,5 +287,6 @@ export { FilterBrand } from './FilterBrand';
 export { FilterPrice } from './FilterPrice';
 export { FilterStock } from './FilterStock';
 export { FilterAttributes, FilterMaterial, FilterStone, FilterColor } from './FilterAttributes';
+export { CategoryBreadcrumb, CategoryBreadcrumbChip } from './CategoryBreadcrumb';
 
 export default ProductFilters;

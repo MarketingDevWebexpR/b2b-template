@@ -453,7 +453,7 @@ export const NavBar = memo(function NavBar({
               return (
                 <CatalogueButton
                   key={item.id}
-                  ref={setItemRef(item.id) as React.Ref<HTMLButtonElement>}
+                  ref={setItemRef(item.id)}
                   isActive={isCatalogueActive}
                   onMouseEnter={() => onCategoryHover(CATALOGUE_ID)}
                   onMouseLeave={() => {}}
@@ -467,7 +467,7 @@ export const NavBar = memo(function NavBar({
               return (
                 <MarquesButton
                   key={item.id}
-                  ref={setItemRef(item.id) as React.Ref<HTMLButtonElement>}
+                  ref={setItemRef(item.id)}
                   isActive={isMarquesActive}
                   onMouseEnter={() => onCategoryHover(MARQUES_ID)}
                   onMouseLeave={() => {}}
@@ -480,7 +480,7 @@ export const NavBar = memo(function NavBar({
             return (
               <NavLink
                 key={item.id}
-                ref={setItemRef(item.id) as React.Ref<HTMLAnchorElement>}
+                ref={setItemRef(item.id)}
                 item={item}
                 onKeyDown={(e) => handleKeyDown(e, index, item.id)}
               />

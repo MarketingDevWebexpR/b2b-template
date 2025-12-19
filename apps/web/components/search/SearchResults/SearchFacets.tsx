@@ -4,7 +4,7 @@
  * SearchFacets Component
  *
  * Sidebar filters with faceted navigation for search results.
- * Supports hierarchical categories, checkboxes, range sliders, and radio buttons.
+ * Supports hierarchical categories (v3 format), checkboxes, range sliders, and radio buttons.
  */
 
 import { useState, useCallback, useMemo } from 'react';
@@ -16,6 +16,9 @@ import type {
   FacetValue,
   StockFilter,
   PriceRange,
+  HierarchicalFacetValue,
+  HierarchicalCategoryFacets,
+  HierarchicalCategoryPath,
 } from '@/contexts/SearchContext';
 import {
   Accordion,
@@ -26,10 +29,209 @@ import {
 import { Checkbox, Radio } from '@/components/ui/Checkbox';
 import { RangeSlider } from '@/components/ui/Slider';
 import { Input } from '@/components/ui/Input';
-import { ChevronRight, Search } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Search, Home } from 'lucide-react';
 
 // ============================================================================
-// Category Tree Component
+// Hierarchical Category Breadcrumb Component (v3)
+// ============================================================================
+
+interface HierarchicalCategoryBreadcrumbProps {
+  path: HierarchicalCategoryPath | undefined;
+  onNavigateToLevel: (level: number) => void;
+  onClear: () => void;
+}
+
+function HierarchicalCategoryBreadcrumb({
+  path,
+  onNavigateToLevel,
+  onClear,
+}: HierarchicalCategoryBreadcrumbProps) {
+  if (!path || path.path.length === 0) {
+    return null;
+  }
+
+  return (
+    <nav
+      className="flex items-center flex-wrap gap-1 mb-3 text-sm"
+      aria-label="Chemin de categorie"
+    >
+      {/* Home/Root button */}
+      <button
+        type="button"
+        onClick={onClear}
+        className={cn(
+          'flex items-center gap-1 px-2 py-1 rounded',
+          'text-neutral-600 hover:text-accent hover:bg-orange-50',
+          'transition-colors duration-150',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+        )}
+        aria-label="Retour a toutes les categories"
+      >
+        <Home className="w-3.5 h-3.5" />
+      </button>
+
+      {/* Breadcrumb segments */}
+      {path.path.map((segment, index) => (
+        <span key={index} className="flex items-center">
+          <ChevronRight className="w-4 h-4 text-neutral-400 mx-0.5" aria-hidden="true" />
+          {index < path.path.length - 1 ? (
+            <button
+              type="button"
+              onClick={() => onNavigateToLevel(index)}
+              className={cn(
+                'px-2 py-1 rounded',
+                'text-neutral-600 hover:text-accent hover:bg-orange-50',
+                'transition-colors duration-150',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+              )}
+            >
+              {segment}
+            </button>
+          ) : (
+            <span className="px-2 py-1 font-medium text-accent">
+              {segment}
+            </span>
+          )}
+        </span>
+      ))}
+    </nav>
+  );
+}
+
+// ============================================================================
+// Hierarchical Category Facet Component (v3)
+// ============================================================================
+
+interface HierarchicalCategoryFacetProps {
+  facets: HierarchicalCategoryFacets;
+  currentPath: HierarchicalCategoryPath | undefined;
+  onSelectCategory: (value: string, level: number) => void;
+  onNavigateToLevel: (level: number) => void;
+  onClear: () => void;
+}
+
+/**
+ * HierarchicalCategoryFacet
+ *
+ * Drill-down category navigation using App Search v3 hierarchical facets.
+ * Shows breadcrumb for current path and children at current level.
+ */
+function HierarchicalCategoryFacet({
+  facets,
+  currentPath,
+  onSelectCategory,
+  onNavigateToLevel,
+  onClear,
+}: HierarchicalCategoryFacetProps) {
+  // Determine which level to show
+  const currentLevel = currentPath?.level ?? -1;
+  const nextLevel = currentLevel + 1;
+
+  // Get the current path prefix for filtering children
+  const currentPrefix = currentPath?.pathString ?? '';
+
+  // Get facet values for the next level, filtered by current path
+  const getVisibleCategories = (): HierarchicalFacetValue[] => {
+    const levelKeys: (keyof HierarchicalCategoryFacets)[] = [
+      'category_lvl0',
+      'category_lvl1',
+      'category_lvl2',
+      'category_lvl3',
+      'category_lvl4',
+    ];
+
+    if (nextLevel > 4) {
+      // Max depth reached
+      return [];
+    }
+
+    const levelKey = levelKeys[nextLevel];
+    const levelFacets = facets[levelKey];
+
+    if (currentLevel < 0) {
+      // No selection - show root categories (lvl0)
+      return levelFacets;
+    }
+
+    // Filter to show only children of current selection
+    return levelFacets.filter((item) =>
+      item.value.startsWith(currentPrefix + ' > ')
+    );
+  };
+
+  const visibleCategories = getVisibleCategories();
+
+  // Show "back" option if we're at a deeper level
+  const showBackButton = currentLevel >= 0;
+
+  return (
+    <div className="space-y-2">
+      {/* Breadcrumb navigation */}
+      <HierarchicalCategoryBreadcrumb
+        path={currentPath}
+        onNavigateToLevel={onNavigateToLevel}
+        onClear={onClear}
+      />
+
+      {/* Back button for mobile-friendly navigation */}
+      {showBackButton && (
+        <button
+          type="button"
+          onClick={() => onNavigateToLevel(currentLevel - 1)}
+          className={cn(
+            'flex items-center gap-2 w-full px-2 py-2 rounded-md',
+            'text-sm text-neutral-600',
+            'hover:bg-neutral-100 hover:text-neutral-900',
+            'transition-colors duration-150',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+          )}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>Retour</span>
+        </button>
+      )}
+
+      {/* Category list */}
+      {visibleCategories.length > 0 ? (
+        <div className="space-y-1">
+          {visibleCategories.map((category) => (
+            <button
+              key={category.value}
+              type="button"
+              onClick={() => onSelectCategory(category.value, nextLevel)}
+              className={cn(
+                'flex items-center justify-between w-full px-2 py-2 rounded-md',
+                'text-sm text-left',
+                'hover:bg-neutral-100',
+                'transition-colors duration-150',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                category.isSelected && 'bg-orange-50 text-accent font-medium'
+              )}
+              aria-current={category.isSelected ? 'true' : undefined}
+            >
+              <span className="flex items-center gap-2">
+                <span>{category.label}</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-xs text-neutral-500">
+                  ({category.count.toLocaleString('fr-FR')})
+                </span>
+                <ChevronRight className="w-4 h-4 text-neutral-400" />
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : currentLevel >= 0 ? (
+        <p className="text-sm text-neutral-500 italic px-2 py-2">
+          Pas de sous-categories
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+// ============================================================================
+// Category Tree Component (Legacy)
 // ============================================================================
 
 interface CategoryTreeNodeProps {
@@ -405,6 +607,8 @@ export interface SearchFacetsProps {
   collapsible?: boolean;
   /** Default expanded sections */
   defaultExpanded?: string[];
+  /** Use hierarchical category facets (v3 format) instead of tree */
+  useHierarchicalCategories?: boolean;
 }
 
 /**
@@ -414,16 +618,21 @@ export function SearchFacets({
   className,
   collapsible = true,
   defaultExpanded = ['categories', 'brand', 'price'],
+  useHierarchicalCategories = true,
 }: SearchFacetsProps) {
   const {
     filters,
     facets,
     categoryTree,
+    hierarchicalCategoryFacets,
     toggleCategoryFilter,
     toggleBrandFilter,
     setPriceRange,
     setStockFilter,
     toggleAttributeFilter,
+    selectHierarchicalCategory,
+    navigateToHierarchicalLevel,
+    clearHierarchicalCategory,
     clearFilters,
     hasActiveFilters,
   } = useSearchFilters();
@@ -437,19 +646,36 @@ export function SearchFacets({
     (f) => f.id !== 'brand' && f.id !== 'price' && f.type === 'checkbox'
   );
 
+  // Build category section based on mode
+  const categorySection = useHierarchicalCategories
+    ? {
+        id: 'categories',
+        title: 'Categories',
+        content: (
+          <HierarchicalCategoryFacet
+            facets={hierarchicalCategoryFacets}
+            currentPath={filters.hierarchicalCategory}
+            onSelectCategory={selectHierarchicalCategory}
+            onNavigateToLevel={navigateToHierarchicalLevel}
+            onClear={clearHierarchicalCategory}
+          />
+        ),
+      }
+    : {
+        id: 'categories',
+        title: 'Categories',
+        content: (
+          <CategoryFacet
+            categories={categoryTree}
+            selectedCategories={filters.categories}
+            onToggle={toggleCategoryFilter}
+            onExpand={toggleCategoryExpansion}
+          />
+        ),
+      };
+
   const facetSections = [
-    {
-      id: 'categories',
-      title: 'Categories',
-      content: (
-        <CategoryFacet
-          categories={categoryTree}
-          selectedCategories={filters.categories}
-          onToggle={toggleCategoryFilter}
-          onExpand={toggleCategoryExpansion}
-        />
-      ),
-    },
+    categorySection,
     ...(brandFacet
       ? [
           {

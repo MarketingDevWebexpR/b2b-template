@@ -1,6 +1,16 @@
 import { Suspense } from 'react';
 import { BrandProductsClient } from './BrandProductsClient';
 import { Skeleton } from '@/components/ui/Skeleton';
+import {
+  APP_SEARCH_CONFIG,
+  getAppSearchUrl,
+  type ProductHit,
+  type AppSearchResponse,
+  transformProductHit,
+  PRODUCT_RESULT_FIELDS,
+  PRODUCT_SEARCH_FIELDS,
+  PRODUCT_FACETS,
+} from '@/lib/search/app-search-v3';
 
 // ============================================================================
 // Types
@@ -67,14 +77,54 @@ interface ProductsResponse {
 // ============================================================================
 
 const DEFAULT_PAGE_SIZE = 24;
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const CACHE_REVALIDATE_SECONDS = 120; // 2 minutes
 
 // ============================================================================
-// Data Fetching
+// Sort Configuration
+// ============================================================================
+
+type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc' | 'popular';
+
+const SORT_MAP: Record<SortOption, string> = {
+  name_asc: 'title',
+  name_desc: 'title',
+  price_asc: 'price_min',
+  price_desc: 'price_min',
+  newest: 'created_at',
+  popular: 'created_at',
+};
+
+const ORDER_MAP: Record<SortOption, 'asc' | 'desc'> = {
+  name_asc: 'asc',
+  name_desc: 'desc',
+  price_asc: 'asc',
+  price_desc: 'desc',
+  newest: 'desc',
+  popular: 'desc',
+};
+
+// ============================================================================
+// Price Ranges
+// ============================================================================
+
+function generatePriceRanges(): FacetOption[] {
+  return [
+    { value: '0-5000', label: 'Moins de 50 EUR', count: 0 },
+    { value: '5000-10000', label: '50 - 100 EUR', count: 0 },
+    { value: '10000-25000', label: '100 - 250 EUR', count: 0 },
+    { value: '25000-50000', label: '250 - 500 EUR', count: 0 },
+    { value: '50000-100000', label: '500 - 1000 EUR', count: 0 },
+    { value: '100000-', label: 'Plus de 1000 EUR', count: 0 },
+  ];
+}
+
+// ============================================================================
+// Data Fetching - Direct App Search v3
 // ============================================================================
 
 /**
- * Fetch products from the catalog API with brand filter
+ * Fetch products directly from App Search v3 with brand filter
+ * This is more reliable than calling an API route from a Server Component
  */
 async function fetchBrandProducts(
   brandSlug: string,
@@ -82,61 +132,194 @@ async function fetchBrandProducts(
 ): Promise<ProductsResponse> {
   const page = params.page ? parseInt(params.page, 10) : 1;
   const offset = (page - 1) * DEFAULT_PAGE_SIZE;
+  const sortKey = (params.sort || 'newest') as SortOption;
 
-  const searchParams = new URLSearchParams();
-  searchParams.set('brand', brandSlug);
-  searchParams.set('limit', String(DEFAULT_PAGE_SIZE));
-  searchParams.set('offset', String(offset));
+  // Build filters array
+  const filters: Record<string, unknown>[] = [
+    { doc_type: 'products' },
+    { brand_slug: brandSlug },
+  ];
 
-  if (params.sort) {
-    searchParams.set('sort', params.sort);
-  }
-
+  // Category filter - use all_category_handles for hierarchical filtering
   if (params.category) {
-    searchParams.set('category', params.category);
+    filters.push({ all_category_handles: params.category });
   }
 
-  if (params.minPrice) {
-    searchParams.set('minPrice', params.minPrice);
+  // Stock filter - V3 uses string "true"/"false"
+  if (params.inStock === 'true') {
+    filters.push({ has_stock: 'true' });
   }
 
-  if (params.maxPrice) {
-    searchParams.set('maxPrice', params.maxPrice);
+  // Price filters
+  if (params.minPrice || params.maxPrice) {
+    const priceFilter: { from?: number; to?: number } = {};
+    if (params.minPrice) priceFilter.from = parseInt(params.minPrice, 10);
+    if (params.maxPrice) priceFilter.to = parseInt(params.maxPrice, 10);
+    filters.push({ price_min: priceFilter });
   }
 
-  if (params.inStock) {
-    searchParams.set('inStock', params.inStock);
-  }
-
-  const url = `${API_BASE_URL}/api/catalog/products?${searchParams.toString()}`;
+  // Build query
+  const query = {
+    query: '',
+    page: {
+      size: DEFAULT_PAGE_SIZE,
+      current: page,
+    },
+    filters: { all: filters },
+    result_fields: PRODUCT_RESULT_FIELDS,
+    search_fields: PRODUCT_SEARCH_FIELDS,
+    facets: PRODUCT_FACETS,
+    sort: [{ [SORT_MAP[sortKey]]: ORDER_MAP[sortKey] }],
+  };
 
   try {
-    const response = await fetch(url, {
-      next: { revalidate: 120 }, // Cache for 2 minutes
+    const appSearchUrl = getAppSearchUrl();
+
+    console.log('[BrandProductsSection] Calling App Search v3 directly for brand:', brandSlug);
+
+    const response = await fetch(appSearchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
+      },
+      body: JSON.stringify(query),
+      next: {
+        revalidate: CACHE_REVALIDATE_SECONDS,
+        tags: ['products', `brand-products-${brandSlug}`],
+      },
     });
 
     if (!response.ok) {
-      console.error(`[BrandProductsSection] API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`[BrandProductsSection] App Search error: ${response.status}`, errorText);
       return {
         products: [],
         total: 0,
-        facets: { categories: [], brands: [], priceRanges: [] },
+        facets: { categories: [], brands: [], priceRanges: generatePriceRanges() },
         limit: DEFAULT_PAGE_SIZE,
-        offset: 0,
+        offset,
       };
     }
 
-    return response.json();
+    const data: AppSearchResponse<ProductHit> = await response.json();
+
+    console.log('[BrandProductsSection] Got', data.results?.length || 0, 'products for brand:', brandSlug);
+
+    // Transform products
+    const products = data.results.map((hit) => {
+      const transformed = transformProductHit(hit);
+      return {
+        id: transformed.id,
+        title: transformed.title,
+        handle: transformed.handle,
+        subtitle: null,
+        description: transformed.description,
+        thumbnail: transformed.thumbnail,
+        images: transformed.images,
+        price: transformed.price_min !== null
+          ? {
+              amount: transformed.price_min,
+              currency: 'EUR',
+              formatted: formatPrice(transformed.price_min),
+            }
+          : null,
+        inStock: transformed.has_stock,
+        totalInventory: transformed.has_stock ? 1 : 0,
+        categories: transformed.categories,
+        tags: transformed.tags,
+        createdAt: transformed.created_at,
+      };
+    });
+
+    // Transform facets
+    const facets = transformFacets(data.facets);
+
+    return {
+      products,
+      total: data.meta?.page?.total_results || 0,
+      facets,
+      limit: DEFAULT_PAGE_SIZE,
+      offset,
+    };
   } catch (error) {
     console.error('[BrandProductsSection] Fetch error:', error);
     return {
       products: [],
       total: 0,
-      facets: { categories: [], brands: [], priceRanges: [] },
+      facets: { categories: [], brands: [], priceRanges: generatePriceRanges() },
       limit: DEFAULT_PAGE_SIZE,
       offset: 0,
     };
   }
+}
+
+/**
+ * Format price in cents to locale string
+ */
+function formatPrice(amount: number, currency: string = 'EUR'): string {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+  }).format(amount / 100);
+}
+
+/**
+ * Transform App Search v3 facets to Facets format
+ */
+function transformFacets(
+  facetData?: Record<string, Array<{ type: string; data: Array<{ value: string; count: number }> }>>
+): Facets {
+  const categories: FacetOption[] = [];
+  const brands: FacetOption[] = [];
+
+  if (facetData) {
+    // Get category facets from hierarchical levels
+    const categoryLevels = ['category_lvl0', 'category_lvl1', 'category_lvl2'];
+    for (const level of categoryLevels) {
+      const levelFacets = facetData[level]?.[0]?.data;
+      if (levelFacets) {
+        for (const item of levelFacets) {
+          // Extract the last segment after " > " for display label
+          const parts = item.value.split(' > ');
+          const label = parts[parts.length - 1] || item.value;
+          const slug = label
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+
+          // Avoid duplicates
+          if (!categories.find(c => c.value === slug)) {
+            categories.push({ value: slug, label, count: item.count });
+          }
+        }
+      }
+    }
+
+    // Get brand facets (not used on brand page but kept for consistency)
+    const brandFacets = facetData['brand_slug']?.[0]?.data || facetData['brand_name']?.[0]?.data;
+    if (brandFacets) {
+      for (const item of brandFacets) {
+        brands.push({
+          value: item.value,
+          label: item.value.charAt(0).toUpperCase() + item.value.slice(1).replace(/-/g, ' '),
+          count: item.count,
+        });
+      }
+    }
+  }
+
+  // Sort by count descending
+  categories.sort((a, b) => b.count - a.count);
+  brands.sort((a, b) => b.count - a.count);
+
+  return {
+    categories,
+    brands,
+    priceRanges: generatePriceRanges(),
+  };
 }
 
 // ============================================================================

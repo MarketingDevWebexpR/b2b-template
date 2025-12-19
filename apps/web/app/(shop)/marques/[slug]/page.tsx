@@ -16,6 +16,12 @@ import { getServerBrand, getServerBrands } from '@/lib/brands/server';
  * - Product grid with server-side pagination and filters
  * - Related/popular brands section
  * - SEO metadata and structured data
+ *
+ * V3 API Integration:
+ * - Uses brand_slug for product filtering
+ * - Supports brand_id and brand_name from indexed products
+ * - has_stock filter uses string "true"/"false"
+ * - Category filters use all_category_handles for hierarchy
  */
 
 // ============================================================================

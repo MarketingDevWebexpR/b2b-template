@@ -30,7 +30,6 @@
     "@medusajs/framework": "latest",
     "@medusajs/medusa": "latest",
     "awilix": "^8.0.1",
-    "meilisearch": "^0.54.0",
     "multer": "^2.0.2",
     "pg": "^8.11.0",
     "zod": "^3.22.0"

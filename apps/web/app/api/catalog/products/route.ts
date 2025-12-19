@@ -1,21 +1,29 @@
 /**
  * Catalog Products API Route
  *
- * Fetches products from Medusa/Meilisearch with comprehensive filtering,
+ * Fetches products from App Search v3 with comprehensive filtering,
  * sorting, pagination, and faceted search support.
+ * Falls back to Medusa backend if App Search fails.
  *
  * GET /api/catalog/products
  *
  * Query Parameters:
- * - category: Filter by category ID or handle
- * - brand: Filter by brand slug
+ * - category: Filter by category handle (uses all_category_handles for hierarchy)
+ * - brand: Filter by brand_slug
  * - minPrice: Minimum price in cents
  * - maxPrice: Maximum price in cents
  * - search: Search query string
  * - sort: Sort order (name_asc, name_desc, price_asc, price_desc, newest, popular)
  * - limit: Number of products (default: 20, max: 100)
  * - offset: Pagination offset (default: 0)
- * - inStock: Filter by stock availability ('true' | 'false')
+ * - inStock: Filter by stock availability ('true' | 'false') - V3 uses string booleans
+ *
+ * V3 API Fields:
+ * - category_lvl0 to category_lvl4: Hierarchical category faceting
+ * - all_category_handles: Array of category handles for hierarchical filtering
+ * - brand_name, brand_slug, brand_id: Brand information
+ * - has_stock, is_available: Boolean fields as strings ("true"/"false")
+ * - category_paths: Full path like "Plomberie > Robinetterie > Mitigeurs"
  *
  * Response:
  * {
@@ -28,6 +36,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  APP_SEARCH_CONFIG,
+  getAppSearchUrl,
+  type ProductHit,
+  type AppSearchResponse,
+  transformProductHit,
+  PRODUCT_RESULT_FIELDS,
+  PRODUCT_SEARCH_FIELDS,
+  PRODUCT_FACETS,
+  type TransformedProduct as AppSearchTransformedProduct,
+} from '@/lib/search/app-search-v3';
 
 // ============================================================================
 // Configuration
@@ -41,13 +60,8 @@ const MEDUSA_BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
   'http://localhost:9000';
 
-const MEILISEARCH_URL =
-  process.env.NEXT_PUBLIC_MEILISEARCH_URL ||
-  process.env.MEILISEARCH_URL ||
-  'http://localhost:7700';
-const MEILISEARCH_API_KEY = process.env.MEILISEARCH_API_KEY || '';
-const PRODUCTS_INDEX =
-  process.env.MEILISEARCH_PRODUCTS_INDEX || 'bijoux_products';
+const MEDUSA_PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || '';
 
 // ============================================================================
 // Types
@@ -183,136 +197,493 @@ function parseQueryParams(request: NextRequest): QueryParams {
 }
 
 // ============================================================================
-// Data Fetching - Meilisearch
+// Data Fetching - App Search v3 Direct
 // ============================================================================
 
-interface MeilisearchProductHit {
-  id: string;
-  title: string;
-  handle: string;
-  subtitle?: string | null;
-  description?: string | null;
-  thumbnail?: string | null;
-  images?: string[];
-  price?: number;
-  currency_code?: string;
-  inventory_quantity?: number;
-  categories?: Array<{ id: string; name: string; handle: string }>;
-  brand?: string;
-  tags?: string[];
-  created_at?: string;
-}
-
-interface MeilisearchSearchResponse {
-  hits: MeilisearchProductHit[];
-  estimatedTotalHits: number;
-  facetDistribution?: Record<string, Record<string, number>>;
-}
-
 /**
- * Search products using Meilisearch
+ * Search products using App Search v3 directly
+ * This bypasses Medusa backend and calls Elastic App Search API directly
  */
-async function searchProductsMeilisearch(
+async function searchProductsAppSearchDirect(
   params: QueryParams
 ): Promise<{ products: TransformedProduct[]; total: number; facets: Facets }> {
-  const searchUrl = `${MEILISEARCH_URL}/indexes/${PRODUCTS_INDEX}/search`;
+  const appSearchUrl = getAppSearchUrl();
 
-  // Build filters
-  const filters: string[] = [];
+  // Build filters array
+  const filters: Record<string, unknown>[] = [{ doc_type: 'products' }];
 
-  if (params.category) {
-    // Use all_category_handles for hierarchical filtering
-    // This allows products in child categories to appear when filtering by parent
-    filters.push(`all_category_handles = "${params.category}"`);
-  }
-
+  // Brand filter - use brand_slug field
   if (params.brand) {
-    filters.push(`brand = "${params.brand}"`);
+    filters.push({ brand_slug: params.brand });
   }
 
-  if (params.minPrice !== undefined) {
-    filters.push(`price >= ${params.minPrice}`);
+  // Category filter - use all_category_handles for hierarchical filtering
+  if (params.category) {
+    filters.push({ all_category_handles: params.category });
   }
 
-  if (params.maxPrice !== undefined) {
-    filters.push(`price <= ${params.maxPrice}`);
-  }
-
+  // Stock filter - V3 uses string "true"/"false"
   if (params.inStock === true) {
-    filters.push('inventory_quantity > 0');
+    filters.push({ has_stock: 'true' });
   }
 
-  // Build sort
-  const sortMap: Record<SortOption, string[]> = {
-    name_asc: ['title:asc'],
-    name_desc: ['title:desc'],
-    price_asc: ['price:asc'],
-    price_desc: ['price:desc'],
-    newest: ['created_at:desc'],
-    popular: ['inventory_quantity:desc'],
+  // Price filters
+  if (params.minPrice !== undefined || params.maxPrice !== undefined) {
+    const priceFilter: { from?: number; to?: number } = {};
+    if (params.minPrice !== undefined) priceFilter.from = params.minPrice;
+    if (params.maxPrice !== undefined) priceFilter.to = params.maxPrice;
+    filters.push({ price_min: priceFilter });
+  }
+
+  // Build sort configuration
+  const sortMap: Record<SortOption, string> = {
+    name_asc: 'title',
+    name_desc: 'title',
+    price_asc: 'price_min',
+    price_desc: 'price_min',
+    newest: 'created_at',
+    popular: 'created_at',
+  };
+  const orderMap: Record<SortOption, 'asc' | 'desc'> = {
+    name_asc: 'asc',
+    name_desc: 'desc',
+    price_asc: 'asc',
+    price_desc: 'desc',
+    newest: 'desc',
+    popular: 'desc',
   };
 
-  const response = await fetch(searchUrl, {
+  // Build query
+  const query = {
+    query: params.search || '',
+    page: {
+      size: params.limit,
+      current: Math.floor(params.offset / params.limit) + 1,
+    },
+    filters: { all: filters },
+    result_fields: PRODUCT_RESULT_FIELDS,
+    search_fields: PRODUCT_SEARCH_FIELDS,
+    facets: PRODUCT_FACETS,
+    sort: [{ [sortMap[params.sort]]: orderMap[params.sort] }],
+  };
+
+  console.log('[Products API] Calling App Search v3 directly:', appSearchUrl);
+  console.log('[Products API] Query filters:', JSON.stringify(filters));
+
+  const response = await fetch(appSearchUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(MEILISEARCH_API_KEY && { Authorization: `Bearer ${MEILISEARCH_API_KEY}` }),
+      Authorization: `Bearer ${APP_SEARCH_CONFIG.publicKey}`,
     },
-    body: JSON.stringify({
-      q: params.search || '',
-      limit: params.limit,
-      offset: params.offset,
-      filter: filters.length > 0 ? filters.join(' AND ') : undefined,
-      sort: sortMap[params.sort],
-      facets: ['categories.name', 'brand'],
-    }),
-    next: { revalidate: 120 },
+    body: JSON.stringify(query),
+    next: {
+      revalidate: 120, // Cache for 2 minutes
+      tags: ['products', params.brand ? `brand-products-${params.brand}` : 'all-products'],
+    },
   });
 
+  console.log('[Products API] Response status:', response.status);
+
   if (!response.ok) {
-    throw new Error(`Meilisearch request failed: ${response.status}`);
+    const errorText = await response.text();
+    console.error('[Products API] Error response:', errorText);
+    throw new Error(`App Search v3 request failed: ${response.status}`);
   }
 
-  const data: MeilisearchSearchResponse = await response.json();
+  const data: AppSearchResponse<ProductHit> = await response.json();
+  console.log('[Products API] Got', data.results?.length || 0, 'results, total:', data.meta?.page?.total_results || 0);
 
-  // Transform hits
-  const products = data.hits.map((hit) => transformMeilisearchHit(hit));
+  // Transform results using shared transformer
+  const products = data.results.map((hit) => transformAppSearchHitToProduct(hit));
 
   // Transform facets
-  const facets = transformFacets(data.facetDistribution);
+  const facets = transformAppSearchFacetsV3(data.facets);
 
   return {
     products,
-    total: data.estimatedTotalHits,
+    total: data.meta?.page?.total_results || 0,
     facets,
   };
 }
 
 /**
- * Transform Meilisearch hit to product format
+ * Transform App Search v3 hit to TransformedProduct format for this API
  */
-function transformMeilisearchHit(hit: MeilisearchProductHit): TransformedProduct {
+function transformAppSearchHitToProduct(hit: ProductHit): TransformedProduct {
+  const transformed = transformProductHit(hit);
+
+  return {
+    id: transformed.id,
+    title: transformed.title,
+    handle: transformed.handle,
+    subtitle: null,
+    description: transformed.description,
+    thumbnail: transformed.thumbnail,
+    images: transformed.images,
+    price: transformed.price_min !== null
+      ? {
+          amount: transformed.price_min,
+          currency: 'EUR',
+          formatted: formatPrice(transformed.price_min),
+        }
+      : null,
+    inStock: transformed.has_stock,
+    totalInventory: transformed.has_stock ? 1 : 0,
+    categories: transformed.categories,
+    tags: transformed.tags,
+    createdAt: transformed.created_at,
+  };
+}
+
+/**
+ * Transform App Search v3 facets to Facets format
+ */
+function transformAppSearchFacetsV3(
+  facetData?: Record<string, Array<{ type: string; data: Array<{ value: string; count: number }> }>>
+): Facets {
+  const categories: FacetOption[] = [];
+  const brands: FacetOption[] = [];
+
+  if (facetData) {
+    // Get category facets from hierarchical levels
+    const categoryLevels = ['category_lvl0', 'category_lvl1', 'category_lvl2'];
+    for (const level of categoryLevels) {
+      const levelFacets = facetData[level]?.[0]?.data;
+      if (levelFacets) {
+        for (const item of levelFacets) {
+          if (!item.value || typeof item.value !== 'string') continue;
+          // Extract the last segment after " > " for display label
+          const parts = item.value.split(' > ');
+          const label = parts[parts.length - 1] || item.value;
+          const slug = String(label)
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+
+          // Avoid duplicates
+          if (!categories.find(c => c.value === slug)) {
+            categories.push({ value: slug, label, count: item.count });
+          }
+        }
+      }
+    }
+
+    // Get brand facets
+    const brandFacets = facetData['brand_slug']?.[0]?.data || facetData['brand_name']?.[0]?.data;
+    if (brandFacets) {
+      for (const item of brandFacets) {
+        brands.push({
+          value: item.value,
+          label: item.value.charAt(0).toUpperCase() + item.value.slice(1).replace(/-/g, ' '),
+          count: item.count,
+        });
+      }
+    }
+  }
+
+  // Sort by count descending
+  categories.sort((a, b) => b.count - a.count);
+  brands.sort((a, b) => b.count - a.count);
+
+  return {
+    categories,
+    brands,
+    priceRanges: generatePriceRanges(),
+  };
+}
+
+// ============================================================================
+// Data Fetching - Medusa Backend Fallback
+// ============================================================================
+
+/**
+ * App Search v3 Product Hit (for Medusa backend fallback)
+ *
+ * V3 schema includes:
+ * - `doc_type: "product"`
+ * - `category_lvl0-4`: InstantSearch-style hierarchical facets (e.g., "Plomberie > Robinetterie")
+ * - `all_category_handles`: Array of category handles for hierarchical filtering
+ * - `has_stock`, `is_available`: Boolean fields as strings ("true"/"false")
+ * - `brand_name`, `brand_slug`, `brand_id`: Brand information
+ * - `category_paths`: Full path like "Plomberie > Robinetterie > Mitigeurs"
+ */
+interface MedusaAppSearchProductHit {
+  id: string;
+  title: string;
+  handle: string;
+  description?: string | null;
+  thumbnail?: string | null;
+  images?: string[];
+  price_min?: number;
+  price_max?: number;
+  // V3: Boolean fields as strings ("true"/"false")
+  has_stock?: string | boolean;
+  is_available?: string | boolean;
+  categories?: Array<{ id: string; name: string; handle: string }>;
+  category_names?: string[];
+  // V3: InstantSearch-style hierarchical category levels
+  // These are ">" separated strings, e.g., "Plomberie > Robinetterie"
+  category_lvl0?: string;
+  category_lvl1?: string;
+  category_lvl2?: string;
+  category_lvl3?: string;
+  category_lvl4?: string;
+  // V3: Full category path for display
+  category_paths?: string[];
+  // V3: All category handles for hierarchical filtering
+  all_category_handles?: string[];
+  // V3: Brand fields
+  brand_name?: string;
+  brand_slug?: string;
+  brand_id?: string;
+  tags?: string[];
+  created_at?: string;
+}
+
+/**
+ * Search products using Medusa Backend (fallback)
+ */
+async function searchProductsMedusaBackend(
+  params: QueryParams
+): Promise<{ products: TransformedProduct[]; total: number; facets: Facets }> {
+  const searchParams = new URLSearchParams();
+
+  // Add search query
+  searchParams.set('q', params.search || '');
+  searchParams.set('type', 'products');
+  searchParams.set('limit', String(params.limit));
+  searchParams.set('offset', String(params.offset));
+  searchParams.set('facets', 'true');
+
+  // Add category filter (uses all_category_handles for hierarchical filtering)
+  if (params.category) {
+    searchParams.set('category', params.category);
+  }
+
+  // Add brand filter
+  if (params.brand) {
+    searchParams.set('brand', params.brand);
+  }
+
+  // Add price filters
+  if (params.minPrice !== undefined) {
+    searchParams.set('price_min', String(params.minPrice));
+  }
+  if (params.maxPrice !== undefined) {
+    searchParams.set('price_max', String(params.maxPrice));
+  }
+
+  // Add stock filter
+  if (params.inStock === true) {
+    searchParams.set('in_stock', 'true');
+  }
+
+  // Add sort
+  const sortMap: Record<SortOption, string> = {
+    name_asc: 'title',
+    name_desc: 'title',
+    price_asc: 'price_min',
+    price_desc: 'price_min',
+    newest: 'created_at',
+    popular: 'created_at',
+  };
+  const orderMap: Record<SortOption, string> = {
+    name_asc: 'asc',
+    name_desc: 'desc',
+    price_asc: 'asc',
+    price_desc: 'desc',
+    newest: 'desc',
+    popular: 'desc',
+  };
+
+  searchParams.set('sort', sortMap[params.sort]);
+  searchParams.set('order', orderMap[params.sort]);
+
+  const searchUrl = `${MEDUSA_BACKEND_URL}/store/search?${searchParams.toString()}`;
+
+  console.log('[Products API Fallback] Calling Medusa Backend:', searchUrl);
+
+  const response = await fetch(searchUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(MEDUSA_PUBLISHABLE_KEY && { 'x-publishable-api-key': MEDUSA_PUBLISHABLE_KEY }),
+    },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[Products API Fallback] Error response:', errorText);
+    throw new Error(`Medusa Backend request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  // Transform results from backend search format
+  const products = (data.hits || []).map((hit: MedusaAppSearchProductHit) => transformMedusaAppSearchHit(hit));
+
+  // Transform facets from backend search format (uses 'facetDistribution')
+  const facets = transformAppSearchFacets(data.facetDistribution);
+
+  return {
+    products,
+    total: data.total || 0,
+    facets,
+  };
+}
+
+/**
+ * Parse v3 boolean string ("true"/"false") or actual boolean to boolean
+ */
+function parseV3Boolean(value: string | boolean | undefined): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') return value === 'true';
+  return false;
+}
+
+/**
+ * Transform Medusa App Search hit to product format (for fallback)
+ *
+ * V3 changes:
+ * - `has_stock` and `is_available` are strings ("true"/"false") not booleans
+ * - Brand info available via `brand_name`, `brand_slug`, `brand_id`
+ */
+function transformMedusaAppSearchHit(hit: MedusaAppSearchProductHit): TransformedProduct {
+  const price = hit.price_min ?? hit.price_max;
+  // V3: Parse boolean strings
+  const hasStock = parseV3Boolean(hit.has_stock);
+
   return {
     id: hit.id,
     title: hit.title,
     handle: hit.handle,
-    subtitle: hit.subtitle ?? null,
+    subtitle: null,
     description: hit.description ?? null,
     thumbnail: hit.thumbnail ?? null,
     images: hit.images ?? [],
     price:
-      hit.price !== undefined
+      price !== undefined
         ? {
-            amount: hit.price,
-            currency: hit.currency_code || 'EUR',
-            formatted: formatPrice(hit.price, hit.currency_code || 'EUR'),
+            amount: price,
+            currency: 'EUR',
+            formatted: formatPrice(price),
           }
         : null,
-    inStock: (hit.inventory_quantity ?? 0) > 0,
-    totalInventory: hit.inventory_quantity ?? 0,
+    // V3: Use parsed boolean
+    inStock: hasStock,
+    totalInventory: hasStock ? 1 : 0,
     categories: hit.categories ?? [],
     tags: hit.tags ?? [],
     createdAt: hit.created_at || new Date().toISOString(),
+  };
+}
+
+/**
+ * Transform App Search v3 facets to standard format
+ *
+ * V3 schema includes:
+ * - `category_lvl0-4`: Hierarchical faceting (InstantSearch style)
+ *   - category_lvl0: "Plomberie" (root level)
+ *   - category_lvl1: "Plomberie > Robinetterie" (sub-category)
+ * - `brand_name`: Brand facets
+ * - `brand_slug`: Brand slug for filtering
+ *
+ * Strategy for hierarchical categories:
+ * 1. Try to get the current level + 1 for subcategories
+ * 2. If filtering by category at level N, show level N+1 facets
+ * 3. Extract the last segment after " > " for display label
+ *
+ * @param facetData - Raw facet distribution from App Search
+ * @param currentCategoryDepth - Current category filter depth (0-4), -1 if none
+ * @returns Transformed facets for frontend
+ */
+function transformAppSearchFacets(
+  facetData?: Record<string, Record<string, number>>,
+  currentCategoryDepth: number = -1
+): Facets {
+  const categories: FacetOption[] = [];
+  const brands: FacetOption[] = [];
+
+  if (facetData) {
+    // V3: Get the appropriate category level for subcategory faceting
+    // If we're at depth 0, show depth 1 subcategories; if at depth 1, show depth 2, etc.
+    const targetLevel = Math.min(currentCategoryDepth + 1, 4);
+    const categoryLevelKey = `category_lvl${targetLevel}`;
+
+    // Try the target level first, then fall back to available levels
+    const categoryFacets =
+      facetData[categoryLevelKey] ||
+      facetData['category_lvl1'] ||
+      facetData['category_lvl0'] ||
+      facetData['categories.name'] ||
+      facetData['category_names'];
+
+    if (categoryFacets) {
+      for (const [name, count] of Object.entries(categoryFacets)) {
+        if (!name || typeof name !== 'string') continue;
+        // V3: Extract the last segment after " > " for display label
+        // e.g., "Plomberie > Robinetterie > Mitigeurs" -> "Mitigeurs"
+        const parts = name.split(' > ');
+        const label = parts[parts.length - 1] || name;
+
+        // The value is the full path for hierarchical filtering
+        // or the handle if available (we use last segment lowercased as slug)
+        const slug = String(label)
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+
+        categories.push({
+          value: slug, // Use slug for URL-friendly filtering
+          label: label,
+          count: count
+        });
+      }
+    }
+
+    // V3: Try brand_slug for values, brand_name for labels
+    // This allows filtering by slug while displaying name
+    const brandSlugFacets = facetData['brand_slug'];
+    const brandNameFacets = facetData['brand_name'];
+
+    if (brandSlugFacets) {
+      for (const [slug, count] of Object.entries(brandSlugFacets)) {
+        // Use slug as value, try to find corresponding name
+        brands.push({
+          value: slug,
+          label: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
+          count
+        });
+      }
+    } else if (brandNameFacets) {
+      for (const [name, count] of Object.entries(brandNameFacets)) {
+        if (!name || typeof name !== 'string') continue;
+        // Generate slug from name for filtering
+        const slug = String(name)
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        brands.push({ value: slug, label: name, count });
+      }
+    }
+  }
+
+  // Sort by count descending
+  categories.sort((a, b) => b.count - a.count);
+  brands.sort((a, b) => b.count - a.count);
+
+  return {
+    categories,
+    brands,
+    priceRanges: generatePriceRanges(),
   };
 }
 
@@ -357,7 +728,7 @@ async function fetchProductsMedusa(
   const response = await fetch(url, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    next: { revalidate: 120 },
+    cache: 'no-store',
   });
 
   if (!response.ok) {
@@ -474,37 +845,21 @@ function formatPrice(amount: number, currency: string = 'EUR'): string {
 }
 
 /**
- * Transform Meilisearch facet distribution to our format
+ * Transform facet distribution to our format (v3 compatible)
+ *
+ * V3 supports:
+ * - `category_lvl0-4`: Hierarchical category facets
+ * - `brand_name`, `brand_slug`: Brand facets
+ *
+ * Falls back to legacy field names for backward compatibility.
+ *
+ * @deprecated Use transformAppSearchFacets instead
  */
 function transformFacets(
   distribution?: Record<string, Record<string, number>>
 ): Facets {
-  const categories: FacetOption[] = [];
-  const brands: FacetOption[] = [];
-
-  if (distribution) {
-    if (distribution['categories.name']) {
-      for (const [name, count] of Object.entries(distribution['categories.name'])) {
-        categories.push({ value: name, label: name, count });
-      }
-    }
-
-    if (distribution['brand']) {
-      for (const [name, count] of Object.entries(distribution['brand'])) {
-        brands.push({ value: name, label: name, count });
-      }
-    }
-  }
-
-  // Sort by count descending
-  categories.sort((a, b) => b.count - a.count);
-  brands.sort((a, b) => b.count - a.count);
-
-  return {
-    categories,
-    brands,
-    priceRanges: generatePriceRanges(),
-  };
+  // Delegate to the main facet transformer
+  return transformAppSearchFacets(distribution);
 }
 
 /**
@@ -568,15 +923,24 @@ export async function GET(
 
     let result: { products: TransformedProduct[]; total: number; facets: Facets };
 
-    // Try Meilisearch first, fall back to Medusa
+    // Try App Search v3 directly first, then Medusa backend fallback, then direct Medusa API
     try {
-      result = await searchProductsMeilisearch(params);
-    } catch (meilisearchError) {
+      result = await searchProductsAppSearchDirect(params);
+    } catch (appSearchDirectError) {
       console.warn(
-        '[Catalog Products API] Meilisearch failed, falling back to Medusa:',
-        meilisearchError
+        '[Catalog Products API] App Search v3 direct failed, trying Medusa backend:',
+        appSearchDirectError
       );
-      result = await fetchProductsMedusa(params);
+
+      try {
+        result = await searchProductsMedusaBackend(params);
+      } catch (medusaBackendError) {
+        console.warn(
+          '[Catalog Products API] Medusa backend failed, falling back to direct Medusa API:',
+          medusaBackendError
+        );
+        result = await fetchProductsMedusa(params);
+      }
     }
 
     const response: ProductsResponse = {

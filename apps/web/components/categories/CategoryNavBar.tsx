@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategoryPath } from '@/lib/categories/hierarchy';
-import type { MeilisearchCategory, CategoryResponse } from '@/types/category';
+import type { IndexedCategory, CategoryResponse } from '@/types/category';
 import type { HierarchicalBreadcrumb } from '@/lib/categories/hierarchy';
 
 // ============================================================================
@@ -37,13 +37,13 @@ import type { HierarchicalBreadcrumb } from '@/lib/categories/hierarchy';
 
 export interface CategoryNavBarProps {
   /** Current category */
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   /** Breadcrumb trail */
   breadcrumbs: HierarchicalBreadcrumb[];
   /** Direct subcategories of current category */
-  subcategories: MeilisearchCategory[];
+  subcategories: IndexedCategory[];
   /** Sibling categories for dropdown navigation */
-  siblings: MeilisearchCategory[];
+  siblings: IndexedCategory[];
   /** Full categories data for sibling lookup at each level */
   categoriesData?: CategoryResponse;
   /** Total product count */
@@ -54,7 +54,7 @@ export interface CategoryNavBarProps {
 
 interface BreadcrumbDropdownProps {
   item: HierarchicalBreadcrumb;
-  siblings: MeilisearchCategory[];
+  siblings: IndexedCategory[];
   isLast: boolean;
   size: 'sm' | 'md';
 }
@@ -258,7 +258,7 @@ const BreadcrumbsSection = memo(function BreadcrumbsSection({
   );
 
   // Get siblings for each breadcrumb level
-  const getSiblingsForBreadcrumb = (breadcrumb: HierarchicalBreadcrumb, index: number): MeilisearchCategory[] => {
+  const getSiblingsForBreadcrumb = (breadcrumb: HierarchicalBreadcrumb, index: number): IndexedCategory[] => {
     if (!categoriesData) return [];
 
     const category = categoriesData.byId[breadcrumb.id];
@@ -336,7 +336,7 @@ const BreadcrumbsSection = memo(function BreadcrumbsSection({
 // ============================================================================
 
 interface SubcategoryTagsInlineProps {
-  subcategories: MeilisearchCategory[];
+  subcategories: IndexedCategory[];
   showCounts?: boolean;
 }
 
@@ -397,7 +397,7 @@ const SubcategoryTagsInline = memo(function SubcategoryTagsInline({
 // ============================================================================
 
 interface CategoryStatsBadgeProps {
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   totalProductCount?: number;
   subcategoriesCount: number;
 }

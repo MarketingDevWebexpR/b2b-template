@@ -2,7 +2,7 @@
  * Brand Types for B2B E-commerce
  *
  * Types for brands/marques displayed in the MegaMenu and brand pages.
- * Brands come from Medusa backend with optional Meilisearch enrichment.
+ * Brands come from Medusa backend with search index enrichment.
  *
  * @packageDocumentation
  */

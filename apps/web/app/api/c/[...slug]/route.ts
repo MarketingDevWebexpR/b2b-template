@@ -20,7 +20,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import type { MeilisearchCategory, CategoryResponse, CategoryTreeNode } from '@/types/category';
+import type { IndexedCategory, CategoryResponse, CategoryTreeNode } from '@/types/category';
 import { buildCategoryResponse } from '@/lib/categories/build-tree';
 import {
   resolveCategoryFromSlug,
@@ -41,9 +41,7 @@ import type { HierarchicalBreadcrumb } from '@/lib/categories/hierarchy';
 export const runtime = 'edge';
 export const revalidate = 3600; // Cache for 1 hour
 
-const MEILISEARCH_URL = process.env.NEXT_PUBLIC_MEILISEARCH_URL || 'http://localhost:7700';
-const MEILISEARCH_API_KEY = process.env.MEILISEARCH_API_KEY || '';
-const CATEGORIES_INDEX = process.env.MEILISEARCH_CATEGORIES_INDEX || 'bijoux_categories';
+const MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL || 'http://localhost:9000';
 
 // ============================================================================
 // Types
@@ -51,17 +49,17 @@ const CATEGORIES_INDEX = process.env.MEILISEARCH_CATEGORIES_INDEX || 'bijoux_cat
 
 interface HierarchicalCategoryResponse {
   /** The resolved category */
-  category: MeilisearchCategory;
+  category: IndexedCategory;
   /** Breadcrumb trail */
   breadcrumbs: HierarchicalBreadcrumb[];
   /** Ancestor categories */
-  ancestors: MeilisearchCategory[];
+  ancestors: IndexedCategory[];
   /** Direct child categories */
-  children: MeilisearchCategory[];
+  children: IndexedCategory[];
   /** Sibling categories (same level) */
-  siblings: MeilisearchCategory[];
+  siblings: IndexedCategory[];
   /** Parent category (null if root) */
-  parent: MeilisearchCategory | null;
+  parent: IndexedCategory | null;
   /** Total product count including descendants */
   totalProductCount: number;
   /** Full URL path */
@@ -85,43 +83,23 @@ interface ErrorResponse {
 }
 
 // ============================================================================
-// Meilisearch Client
+// Backend API Client
 // ============================================================================
 
-interface MeilisearchSearchResponse {
-  hits: MeilisearchCategory[];
-  query: string;
-  processingTimeMs: number;
-  limit: number;
-  offset: number;
-  estimatedTotalHits: number;
-}
-
-async function fetchCategoriesFromMeilisearch(): Promise<MeilisearchCategory[]> {
-  const searchUrl = `${MEILISEARCH_URL}/indexes/${CATEGORIES_INDEX}/search`;
-
-  const response = await fetch(searchUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(MEILISEARCH_API_KEY && { Authorization: `Bearer ${MEILISEARCH_API_KEY}` }),
-    },
-    body: JSON.stringify({
-      q: '',
-      limit: 1000,
-      sort: ['depth:asc', 'rank:asc'],
-      filter: 'is_active = true',
-    }),
+async function fetchCategoriesFromBackend(): Promise<IndexedCategory[]> {
+  const response = await fetch(`${MEDUSA_BACKEND_URL}/api/categories`, {
+    headers: { 'Content-Type': 'application/json' },
+    next: { revalidate: 3600 },
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[Category API] Meilisearch error: ${response.status}`, errorText);
-    throw new Error(`Meilisearch request failed: ${response.status}`);
+    console.error(`[Category API] Backend API error: ${response.status}`, errorText);
+    throw new Error(`Backend API request failed: ${response.status}`);
   }
 
-  const data: MeilisearchSearchResponse = await response.json();
-  return data.hits;
+  const data = await response.json();
+  return data.flat || [];
 }
 
 // ============================================================================
@@ -159,7 +137,7 @@ export async function GET(
     }
 
     // Fetch all categories
-    const categories = await fetchCategoriesFromMeilisearch();
+    const categories = await fetchCategoriesFromBackend();
 
     if (categories.length === 0) {
       return NextResponse.json(
@@ -270,7 +248,7 @@ export async function HEAD(
       return new NextResponse(null, { status: 400 });
     }
 
-    const categories = await fetchCategoriesFromMeilisearch();
+    const categories = await fetchCategoriesFromBackend();
     const categoryResponse = buildCategoryResponse(categories);
     const resolution = resolveCategoryFromSlug(slug, categoryResponse);
 

@@ -1,7 +1,7 @@
 /**
  * Search Index Synchronization Script
  *
- * Rebuilds all Meilisearch indexes with complete data including:
+ * Rebuilds all App Search indexes with complete data including:
  * - Marques (brands) with all metadata
  * - Products with full category hierarchy and brand info from product-marque link
  * - Categories with full hierarchy (path, ancestor_names, ancestor_handles)
@@ -117,6 +117,8 @@ async function syncCategories(
       "rank",
       "created_at",
       "metadata",
+      // Direct parent FK field (critical for chain building)
+      "parent_category_id",
       // Full parent hierarchy with name and handle for path building
       "parent_category.id",
       "parent_category.name",
@@ -201,12 +203,13 @@ async function syncCategories(
   }
 
   // Build full ancestor chain for each category
-  // This is necessary because Medusa's graph query may not return deeply nested parent_category
+  // Uses parent_category_id directly since Medusa's graph query returns it as a direct field
   function buildFullParentChain(categoryId: string): any | null {
     const cat = categoryById.get(categoryId);
     if (!cat) return null;
 
-    const parentId = cat.parent_category?.id;
+    // Use parent_category_id directly (not parent_category?.id)
+    const parentId = cat.parent_category_id;
     if (!parentId) {
       return {
         id: cat.id,
@@ -226,9 +229,9 @@ async function syncCategories(
 
   // Add product_count and full parent chain to each category
   const categoriesWithCounts = categories.map((cat: any) => {
-    // Build the full nested parent_category chain
-    const fullParentChain = cat.parent_category?.id
-      ? buildFullParentChain(cat.parent_category.id)
+    // Build the full nested parent_category chain using parent_category_id
+    const fullParentChain = cat.parent_category_id
+      ? buildFullParentChain(cat.parent_category_id)
       : null;
 
     return {
@@ -251,13 +254,14 @@ async function syncCategories(
   await searchService.indexCategories(categoriesWithCounts);
   logger.info(`   Indexed ${categoriesWithCounts.length} categories`);
 
-  // Log hierarchy stats
+  // Log hierarchy stats using categoryById map for proper parent traversal
   const depths = categories.reduce((acc: Record<number, number>, cat: any) => {
     let depth = 0;
-    let current = cat;
-    while (current.parent_category) {
+    let currentId = cat.parent_category_id;
+    while (currentId) {
       depth++;
-      current = current.parent_category;
+      const parent = categoryById.get(currentId);
+      currentId = parent?.parent_category_id || null;
     }
     acc[depth] = (acc[depth] || 0) + 1;
     return acc;
@@ -274,6 +278,7 @@ async function syncCategories(
  *
  * Includes brand/marque information from the product-marque link.
  * Uses categoryById map to rebuild full parent chains for hierarchical filtering.
+ * Processes products in batches to avoid memory issues.
  */
 async function syncProducts(
   query: any,
@@ -283,67 +288,22 @@ async function syncProducts(
 ): Promise<void> {
   logger.info("Syncing products...");
 
-  // Fetch all published products with full category hierarchy and marque link
-  const { data: products } = await (query as any).graph({
-    entity: "product",
-    fields: [
-      "id",
-      "title",
-      "handle",
-      "description",
-      "status",
-      "thumbnail",
-      "created_at",
-      "updated_at",
-      "metadata",
-      "images.url",
-      // Marque (brand) from product-marque link
-      "marque.id",
-      "marque.name",
-      "marque.slug",
-      "marque.logo_url",
-      "marque.country",
-      // Category with full parent hierarchy for path building
-      "categories.id",
-      "categories.name",
-      "categories.handle",
-      "categories.parent_category.id",
-      "categories.parent_category.name",
-      "categories.parent_category.handle",
-      "categories.parent_category.parent_category.id",
-      "categories.parent_category.parent_category.name",
-      "categories.parent_category.parent_category.handle",
-      "categories.parent_category.parent_category.parent_category.id",
-      "categories.parent_category.parent_category.parent_category.name",
-      "categories.parent_category.parent_category.parent_category.handle",
-      "tags.id",
-      "tags.value",
-      "collection.id",
-      "collection.title",
-      "variants.id",
-      "variants.title",
-      "variants.sku",
-      "variants.barcode",
-      "variants.inventory_quantity",
-      "variants.prices.amount",
-      "variants.prices.currency_code",
-    ],
-    filters: {
-      status: "published",
-    },
-  });
-
-  if (products.length === 0) {
-    logger.info("   No published products found to sync");
-    return;
-  }
+  const BATCH_SIZE = 100; // Process 100 products at a time
+  let offset = 0;
+  let totalIndexed = 0;
+  let totalWithCategories = 0;
+  let totalWithMarque = 0;
+  let hasMore = true;
+  let sampleLogged = false;
 
   // Helper function to build full parent chain from categoryById map
+  // Uses parent_category_id (direct field) as Medusa stores FK separately from joined object
   function buildFullParentChain(categoryId: string): any | null {
     const cat = categoryById.get(categoryId);
     if (!cat) return null;
 
-    const parentId = cat.parent_category?.id;
+    // Use parent_category_id directly (same as syncCategories)
+    const parentId = cat.parent_category_id || cat.parent_category?.id;
     if (!parentId) {
       return {
         id: cat.id,
@@ -361,64 +321,138 @@ async function syncProducts(
     };
   }
 
-  // Rebuild full parent chains for all product categories
-  // This ensures all_category_handles includes ALL ancestor handles (L1, L2, L3, etc.)
-  const productsWithFullCategoryChains = products.map((product: any) => {
-    if (!product.categories || product.categories.length === 0) {
-      return product;
-    }
-
-    const categoriesWithFullChain = product.categories.map((cat: any) => {
-      // Build complete parent chain from categoryById map
-      return buildFullParentChain(cat.id) || cat;
-    });
-
-    return {
-      ...product,
-      categories: categoriesWithFullChain,
-    };
-  });
-
-  // Clear existing products index
+  // Clear existing products index before starting batch processing
   await searchService.clearIndex("products");
   logger.info(`   Cleared products index`);
 
-  // Index all products with full category chains
-  await searchService.indexProducts(productsWithFullCategoryChains);
-  logger.info(`   Indexed ${products.length} products`);
+  while (hasMore) {
+    // Fetch products in batches
+    const { data: products } = await (query as any).graph({
+      entity: "product",
+      fields: [
+        "id",
+        "title",
+        "handle",
+        "description",
+        "status",
+        "thumbnail",
+        "created_at",
+        "updated_at",
+        "metadata",
+        "images.url",
+        // Marque (brand) from product-marque link
+        "marque.id",
+        "marque.name",
+        "marque.slug",
+        "marque.logo_url",
+        "marque.country",
+        // Category with full parent hierarchy for path building
+        "categories.id",
+        "categories.name",
+        "categories.handle",
+        "categories.parent_category.id",
+        "categories.parent_category.name",
+        "categories.parent_category.handle",
+        "categories.parent_category.parent_category.id",
+        "categories.parent_category.parent_category.name",
+        "categories.parent_category.parent_category.handle",
+        "categories.parent_category.parent_category.parent_category.id",
+        "categories.parent_category.parent_category.parent_category.name",
+        "categories.parent_category.parent_category.parent_category.handle",
+        "tags.id",
+        "tags.value",
+        "collection.id",
+        "collection.title",
+        "variants.id",
+        "variants.title",
+        "variants.sku",
+        "variants.barcode",
+        "variants.inventory_quantity",
+        "variants.prices.amount",
+        "variants.prices.currency_code",
+      ],
+      filters: {
+        status: "published",
+      },
+      pagination: {
+        skip: offset,
+        take: BATCH_SIZE,
+      },
+    });
 
-  // Log category coverage stats
-  const productsWithCategories = productsWithFullCategoryChains.filter((p: any) => p.categories && p.categories.length > 0);
-  logger.info(`   Products with categories: ${productsWithCategories.length}/${products.length}`);
-
-  // Log brand/marque coverage stats
-  const productsWithMarque = productsWithFullCategoryChains.filter((p: any) => p.marque && p.marque.id);
-  logger.info(`   Products with marque (brand): ${productsWithMarque.length}/${products.length}`);
-
-  // Log sample category paths for verification (showing full hierarchy)
-  if (productsWithCategories.length > 0) {
-    const sample = productsWithCategories[0];
-    if (sample.categories && sample.categories.length > 0) {
-      const sampleCategory = sample.categories[0];
-      const path = buildCategoryPath(sampleCategory);
-      logger.info(`   Sample category path (full chain): "${path}"`);
-
-      // Also log all handles for verification
-      const handles: string[] = [];
-      let current = sampleCategory;
-      while (current) {
-        handles.push(current.handle);
-        current = current.parent_category;
-      }
-      logger.info(`   Sample all_category_handles will be: [${handles.join(", ")}]`);
+    if (products.length === 0) {
+      hasMore = false;
+      break;
     }
+
+    // Rebuild full parent chains for all product categories
+    const productsWithFullCategoryChains = products.map((product: any) => {
+      if (!product.categories || product.categories.length === 0) {
+        return product;
+      }
+
+      const categoriesWithFullChain = product.categories.map((cat: any) => {
+        return buildFullParentChain(cat.id) || cat;
+      });
+
+      return {
+        ...product,
+        categories: categoriesWithFullChain,
+      };
+    });
+
+    // Index this batch
+    await searchService.indexProducts(productsWithFullCategoryChains);
+    totalIndexed += products.length;
+
+    // Count stats
+    const batchWithCategories = productsWithFullCategoryChains.filter((p: any) => p.categories && p.categories.length > 0);
+    totalWithCategories += batchWithCategories.length;
+
+    const batchWithMarque = productsWithFullCategoryChains.filter((p: any) => p.marque && p.marque.id);
+    totalWithMarque += batchWithMarque.length;
+
+    // Log sample on first batch
+    if (!sampleLogged && batchWithCategories.length > 0) {
+      const sample = batchWithCategories[0];
+      if (sample.categories && sample.categories.length > 0) {
+        const sampleCategory = sample.categories[0];
+        const path = buildCategoryPath(sampleCategory);
+        logger.info(`   Sample category path (full chain): "${path}"`);
+
+        const handles: string[] = [];
+        let current = sampleCategory;
+        while (current) {
+          handles.push(current.handle);
+          current = current.parent_category;
+        }
+        logger.info(`   Sample all_category_handles will be: [${handles.join(", ")}]`);
+      }
+
+      if (batchWithMarque.length > 0) {
+        const sampleMarque = batchWithMarque[0];
+        logger.info(`   Sample marque: "${sampleMarque.marque.name}" (${sampleMarque.marque.slug})`);
+      }
+      sampleLogged = true;
+    }
+
+    // Progress logging
+    logger.info(`   Indexed batch ${Math.floor(offset / BATCH_SIZE) + 1}: ${products.length} products (total: ${totalIndexed})`);
+
+    // Check if there are more products
+    if (products.length < BATCH_SIZE) {
+      hasMore = false;
+    } else {
+      offset += BATCH_SIZE;
+    }
+
+    // Allow garbage collection between batches
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  // Log sample marque for verification
-  if (productsWithMarque.length > 0) {
-    const sample = productsWithMarque[0];
-    logger.info(`   Sample marque: "${sample.marque.name}" (${sample.marque.slug})`);
-  }
+  logger.info(`   Indexing complete: ${totalIndexed} products`);
+  logger.info(`   Products with categories: ${totalWithCategories}/${totalIndexed}`);
+  logger.info(`   Products with marque (brand): ${totalWithMarque}/${totalIndexed}`);
 }
 
 /**

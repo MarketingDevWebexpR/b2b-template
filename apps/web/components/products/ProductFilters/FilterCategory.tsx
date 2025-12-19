@@ -4,7 +4,13 @@ import { useCallback, useMemo, type MouseEvent, type KeyboardEvent } from 'react
 import { cn } from '@/lib/utils';
 import { useSearchFilters, useSearch } from '@/contexts/SearchContext';
 import { FilterCollapsible } from './FilterCollapsible';
-import type { CategoryNode } from '@/contexts/SearchContext';
+import type {
+  CategoryNode,
+  HierarchicalFacetValue,
+  HierarchicalCategoryFacets,
+  HierarchicalCategoryPath,
+} from '@/contexts/SearchContext';
+import { ChevronRight, ChevronLeft, Home } from 'lucide-react';
 
 export interface FilterCategoryProps {
   /** Custom title for the section */
@@ -13,6 +19,8 @@ export interface FilterCategoryProps {
   showCounts?: boolean;
   /** Additional class name */
   className?: string;
+  /** Use hierarchical facets (v3 format) instead of tree */
+  useHierarchical?: boolean;
 }
 
 /**
@@ -179,27 +187,214 @@ function CategoryTreeNode({
   );
 }
 
+// ============================================================================
+// Hierarchical Category Breadcrumb (v3)
+// ============================================================================
+
+interface HierarchicalBreadcrumbProps {
+  path: HierarchicalCategoryPath | undefined;
+  onNavigateToLevel: (level: number) => void;
+  onClear: () => void;
+}
+
+function HierarchicalBreadcrumb({
+  path,
+  onNavigateToLevel,
+  onClear,
+}: HierarchicalBreadcrumbProps) {
+  if (!path || path.path.length === 0) {
+    return null;
+  }
+
+  return (
+    <nav
+      className="flex items-center flex-wrap gap-1 mb-3 text-sm"
+      aria-label="Chemin de categorie"
+    >
+      <button
+        type="button"
+        onClick={onClear}
+        className={cn(
+          'flex items-center gap-1 px-2 py-1 rounded',
+          'text-neutral-600 hover:text-accent hover:bg-orange-50',
+          'transition-colors duration-150',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+        )}
+        aria-label="Retour a toutes les categories"
+      >
+        <Home className="w-3.5 h-3.5" />
+      </button>
+
+      {path.path.map((segment, index) => (
+        <span key={index} className="flex items-center">
+          <ChevronRight className="w-4 h-4 text-neutral-400 mx-0.5" aria-hidden="true" />
+          {index < path.path.length - 1 ? (
+            <button
+              type="button"
+              onClick={() => onNavigateToLevel(index)}
+              className={cn(
+                'px-2 py-1 rounded',
+                'text-neutral-600 hover:text-accent hover:bg-orange-50',
+                'transition-colors duration-150',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+              )}
+            >
+              {segment}
+            </button>
+          ) : (
+            <span className="px-2 py-1 font-medium text-accent">
+              {segment}
+            </span>
+          )}
+        </span>
+      ))}
+    </nav>
+  );
+}
+
+// ============================================================================
+// Hierarchical Category List (v3)
+// ============================================================================
+
+interface HierarchicalCategoryListProps {
+  facets: HierarchicalCategoryFacets;
+  currentPath: HierarchicalCategoryPath | undefined;
+  onSelectCategory: (value: string, level: number) => void;
+  onNavigateToLevel: (level: number) => void;
+  onClear: () => void;
+  showCounts: boolean;
+}
+
+function HierarchicalCategoryList({
+  facets,
+  currentPath,
+  onSelectCategory,
+  onNavigateToLevel,
+  onClear,
+  showCounts,
+}: HierarchicalCategoryListProps) {
+  const currentLevel = currentPath?.level ?? -1;
+  const nextLevel = currentLevel + 1;
+  const currentPrefix = currentPath?.pathString ?? '';
+
+  const getVisibleCategories = (): HierarchicalFacetValue[] => {
+    const levelKeys: (keyof HierarchicalCategoryFacets)[] = [
+      'category_lvl0',
+      'category_lvl1',
+      'category_lvl2',
+      'category_lvl3',
+      'category_lvl4',
+    ];
+
+    if (nextLevel > 4) {
+      return [];
+    }
+
+    const levelKey = levelKeys[nextLevel];
+    const levelFacets = facets[levelKey];
+
+    if (currentLevel < 0) {
+      return levelFacets;
+    }
+
+    return levelFacets.filter((item) =>
+      item.value.startsWith(currentPrefix + ' > ')
+    );
+  };
+
+  const visibleCategories = getVisibleCategories();
+  const showBackButton = currentLevel >= 0;
+
+  return (
+    <div className="space-y-2">
+      <HierarchicalBreadcrumb
+        path={currentPath}
+        onNavigateToLevel={onNavigateToLevel}
+        onClear={onClear}
+      />
+
+      {showBackButton && (
+        <button
+          type="button"
+          onClick={() => onNavigateToLevel(currentLevel - 1)}
+          className={cn(
+            'flex items-center gap-2 w-full px-2 py-2 rounded-md',
+            'text-sm text-neutral-600',
+            'hover:bg-neutral-100 hover:text-neutral-900',
+            'transition-colors duration-150',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+          )}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>Retour</span>
+        </button>
+      )}
+
+      {visibleCategories.length > 0 ? (
+        <div className="space-y-1">
+          {visibleCategories.map((category) => (
+            <button
+              key={category.value}
+              type="button"
+              onClick={() => onSelectCategory(category.value, nextLevel)}
+              className={cn(
+                'flex items-center justify-between w-full px-2 py-2 rounded-md',
+                'text-sm text-left',
+                'hover:bg-neutral-100',
+                'transition-colors duration-150',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                category.isSelected && 'bg-orange-50 text-accent font-medium'
+              )}
+              aria-current={category.isSelected ? 'true' : undefined}
+            >
+              <span>{category.label}</span>
+              <span className="flex items-center gap-2">
+                {showCounts && (
+                  <span className="text-xs text-neutral-500">
+                    ({category.count.toLocaleString('fr-FR')})
+                  </span>
+                )}
+                <ChevronRight className="w-4 h-4 text-neutral-400" />
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : currentLevel >= 0 ? (
+        <p className="text-sm text-neutral-500 italic px-2 py-2">
+          Pas de sous-categories
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+// ============================================================================
+// Main FilterCategory Component
+// ============================================================================
+
 /**
  * FilterCategory
  *
- * Hierarchical category filter with tree structure.
- * Supports multi-level categories with expand/collapse and selection.
+ * Hierarchical category filter with tree structure or drill-down navigation.
+ * Supports both legacy tree mode and v3 hierarchical facets.
  */
 export function FilterCategory({
   title = 'Categories',
   showCounts = true,
   className,
+  useHierarchical = true,
 }: FilterCategoryProps) {
   const {
     categoryTree,
+    hierarchicalCategoryFacets,
     filters,
     toggleCategoryFilter,
+    selectHierarchicalCategory,
+    navigateToHierarchicalLevel,
+    clearHierarchicalCategory,
   } = useSearchFilters();
 
-  // Access toggleCategoryExpansion from the main search context
   const { toggleCategoryExpansion } = useSearch();
-
-  const activeCount = filters.categories.length;
 
   const handleToggleCategory = useCallback(
     (categoryId: string) => {
@@ -215,38 +410,57 @@ export function FilterCategory({
     [toggleCategoryExpansion]
   );
 
-  // Count all selected categories including nested ones
-  const totalSelectedCount = useMemo(() => {
+  // Compute active count based on mode
+  const activeCount = useMemo(() => {
+    if (useHierarchical) {
+      return filters.hierarchicalCategory ? 1 : 0;
+    }
     return filters.categories.length;
-  }, [filters.categories]);
+  }, [useHierarchical, filters.hierarchicalCategory, filters.categories]);
 
-  if (!categoryTree || categoryTree.length === 0) {
+  // Check if we have data to show
+  const hasData = useHierarchical
+    ? hierarchicalCategoryFacets?.category_lvl0?.length > 0
+    : categoryTree?.length > 0;
+
+  if (!hasData) {
     return null;
   }
 
   return (
     <FilterCollapsible
       title={title}
-      activeCount={totalSelectedCount}
+      activeCount={activeCount}
       defaultExpanded={true}
       className={className}
     >
-      <div
-        role="tree"
-        aria-label="Categories de produits"
-        className="space-y-0.5"
-      >
-        {categoryTree.map((node) => (
-          <CategoryTreeNode
-            key={node.id}
-            node={node}
-            selectedCategories={filters.categories}
-            onToggleCategory={handleToggleCategory}
-            onToggleExpand={handleToggleExpand}
-            showCounts={showCounts}
-          />
-        ))}
-      </div>
+      {useHierarchical ? (
+        <HierarchicalCategoryList
+          facets={hierarchicalCategoryFacets}
+          currentPath={filters.hierarchicalCategory}
+          onSelectCategory={selectHierarchicalCategory}
+          onNavigateToLevel={navigateToHierarchicalLevel}
+          onClear={clearHierarchicalCategory}
+          showCounts={showCounts}
+        />
+      ) : (
+        <div
+          role="tree"
+          aria-label="Categories de produits"
+          className="space-y-0.5"
+        >
+          {categoryTree.map((node) => (
+            <CategoryTreeNode
+              key={node.id}
+              node={node}
+              selectedCategories={filters.categories}
+              onToggleCategory={handleToggleCategory}
+              onToggleExpand={handleToggleExpand}
+              showCounts={showCounts}
+            />
+          ))}
+        </div>
+      )}
     </FilterCollapsible>
   );
 }
